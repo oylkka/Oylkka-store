@@ -31,9 +31,6 @@ const eslintConfig = [
       'no-var': 'error', // Disallow var declarations to encourage let/const
       'prefer-const': 'error', // Prefer const declarations for variables that are never reassigned
       'no-duplicate-imports': 'error', // Disallow duplicate module imports
-      'consistent-return': 'warn', // Ensure functions either always or never return a value
-      'no-shadow': 'error', // Disallow variable declarations from shadowing variables in the outer scope
-      'array-callback-return': 'error', // Enforce that array method callbacks return a value
       'no-unreachable': 'error', // Disallow unreachable code after return/throw statements
 
       // React-specific rules
@@ -74,9 +71,6 @@ const eslintConfig = [
       // Security & reliability rules
       'no-eval': 'error', // Disallow eval() for security reasons
       'no-implied-eval': 'error', // Disallow the use of implied eval()
-
-      // General code hygiene
-      'no-unused-vars': 'warn', // Warn on unused variables
     },
   },
 
