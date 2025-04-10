@@ -57,18 +57,18 @@ export default function SearchBar({ isMobile = false }: SearchBarProps) {
                     <Input
                       {...field}
                       placeholder="Search products..."
-                      className={`h-10 min-w-max rounded-full border-none bg-muted pl-10 pr-10 ring-offset-0 focus-visible:ring-1 focus-visible:ring-primary focus-visible:ring-offset-0 ${
+                      className={`bg-muted focus-visible:ring-primary h-10 min-w-max rounded-full border-none pr-10 pl-10 ring-offset-0 focus-visible:ring-1 focus-visible:ring-offset-0 ${
                         isMobile ? 'h-9' : ''
                       }`}
                       autoComplete="off"
                     />
                     <Search
-                      className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground"
+                      className="text-muted-foreground absolute top-1/2 left-3 -translate-y-1/2"
                       size={18}
                     />
                     {field.value?.length > 0 && (
                       <X
-                        className="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer text-muted-foreground hover:text-foreground"
+                        className="text-muted-foreground hover:text-foreground absolute top-1/2 right-3 -translate-y-1/2 cursor-pointer"
                         size={18}
                         onClick={clearInput}
                       />

@@ -9,4 +9,5 @@ export default {
   arrowParens: 'always', // Always include parentheses around arrow function arguments
   endOfLine: 'lf', // Enforce LF line endings to avoid cross-platform issues
   quoteProps: 'as-needed', // Only quote object properties where required
+  plugins: ['prettier-plugin-tailwindcss'],
 };

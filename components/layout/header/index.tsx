@@ -16,17 +16,9 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import {
-  NavigationMenu,
-  NavigationMenuContent,
-  NavigationMenuItem,
-  NavigationMenuLink,
-  NavigationMenuList,
-  NavigationMenuTrigger,
-  navigationMenuTriggerStyle,
-} from '@/components/ui/navigation-menu';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 
+import Navigation from './navigation';
 import SearchBar from './search-bar';
 
 export default function Header() {
@@ -37,8 +29,8 @@ export default function Header() {
   const cartItemCount = 3;
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container flex h-16 items-center justify-between mx-auto">
+    <header className="bg-background/95 supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50 w-full border-b backdrop-blur">
+      <div className="container mx-auto flex h-16 items-center justify-between">
         <div className="flex items-center gap-2">
           {/* Mobile Menu Button */}
           <Sheet open={isOpen} onOpenChange={setIsOpen}>
@@ -52,7 +44,7 @@ export default function Header() {
               <nav className="flex flex-col gap-6 pt-16">
                 <Link
                   href="/"
-                  className="text-lg font-semibold transition-colors hover:text-primary"
+                  className="hover:text-primary text-lg font-semibold transition-colors"
                   onClick={() => setIsOpen(false)}
                 >
                   Home
@@ -62,21 +54,21 @@ export default function Header() {
                   <div className="ml-4 flex flex-col space-y-2">
                     <Link
                       href="/products/clothing"
-                      className="text-muted-foreground transition-colors hover:text-primary"
+                      className="text-muted-foreground hover:text-primary transition-colors"
                       onClick={() => setIsOpen(false)}
                     >
                       Clothing
                     </Link>
                     <Link
                       href="/products/accessories"
-                      className="text-muted-foreground transition-colors hover:text-primary"
+                      className="text-muted-foreground hover:text-primary transition-colors"
                       onClick={() => setIsOpen(false)}
                     >
                       Accessories
                     </Link>
                     <Link
                       href="/products/footwear"
-                      className="text-muted-foreground transition-colors hover:text-primary"
+                      className="text-muted-foreground hover:text-primary transition-colors"
                       onClick={() => setIsOpen(false)}
                     >
                       Footwear
@@ -85,7 +77,7 @@ export default function Header() {
                 </div>
                 <Link
                   href="/new-arrivals"
-                  className="text-lg font-semibold transition-colors hover:text-primary"
+                  className="hover:text-primary text-lg font-semibold transition-colors"
                   onClick={() => setIsOpen(false)}
                 >
                   New Arrivals
@@ -99,7 +91,7 @@ export default function Header() {
                 </Link>
                 <Link
                   href="/about"
-                  className="text-lg font-semibold transition-colors hover:text-primary"
+                  className="hover:text-primary text-lg font-semibold transition-colors"
                   onClick={() => setIsOpen(false)}
                 >
                   About
@@ -117,87 +109,8 @@ export default function Header() {
         </div>
 
         {/* Desktop Navigation Menu */}
-        <div className="hidden md:block ml-10">
-          <NavigationMenu>
-            <NavigationMenuList>
-              <NavigationMenuItem>
-                <NavigationMenuTrigger>Products</NavigationMenuTrigger>
-                <NavigationMenuContent>
-                  <div className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px]">
-                    <div>
-                      <NavigationMenuLink asChild>
-                        <Link
-                          href="/products/clothing"
-                          className="flex h-full w-full select-none flex-col justify-end rounded-md bg-gradient-to-b from-muted/50 to-muted p-6 no-underline outline-none focus:shadow-md"
-                        >
-                          <div className="mb-2 mt-4 text-lg font-medium">
-                            Clothing
-                          </div>
-                          <p className="text-sm leading-tight text-muted-foreground">
-                            Explore our latest clothing collection for all
-                            occasions.
-                          </p>
-                        </Link>
-                      </NavigationMenuLink>
-                    </div>
-                    <div>
-                      <NavigationMenuLink asChild>
-                        <Link
-                          href="/products/accessories"
-                          className="flex h-full w-full select-none flex-col justify-end rounded-md bg-gradient-to-b from-muted/50 to-muted p-6 no-underline outline-none focus:shadow-md"
-                        >
-                          <div className="mb-2 mt-4 text-lg font-medium">
-                            Accessories
-                          </div>
-                          <p className="text-sm leading-tight text-muted-foreground">
-                            Complete your look with our stylish accessories.
-                          </p>
-                        </Link>
-                      </NavigationMenuLink>
-                    </div>
-                    <div className="md:col-span-2">
-                      <NavigationMenuLink asChild>
-                        <Link
-                          href="/products/footwear"
-                          className="flex h-full w-full select-none flex-col justify-end rounded-md bg-gradient-to-b from-muted/50 to-muted p-6 no-underline outline-none focus:shadow-md"
-                        >
-                          <div className="mb-2 mt-4 text-lg font-medium">
-                            Footwear
-                          </div>
-                          <p className="text-sm leading-tight text-muted-foreground">
-                            Step out in style with our premium footwear
-                            collection.
-                          </p>
-                        </Link>
-                      </NavigationMenuLink>
-                    </div>
-                  </div>
-                </NavigationMenuContent>
-              </NavigationMenuItem>
-              <NavigationMenuItem>
-                <Link href="/new-arrivals" legacyBehavior passHref>
-                  <NavigationMenuLink className={navigationMenuTriggerStyle()}>
-                    New Arrivals
-                  </NavigationMenuLink>
-                </Link>
-              </NavigationMenuItem>
-              <NavigationMenuItem>
-                <Link href="/sale" legacyBehavior passHref>
-                  <NavigationMenuLink className="group inline-flex h-10 w-max items-center justify-center rounded-md bg-background px-4 py-2 text-sm font-medium text-red-500 transition-colors hover:bg-red-500/10 hover:text-red-600 focus:bg-accent focus:text-accent-foreground focus:outline-none disabled:pointer-events-none disabled:opacity-50">
-                    Sale
-                  </NavigationMenuLink>
-                </Link>
-              </NavigationMenuItem>
-              <NavigationMenuItem>
-                <Link href="/about" legacyBehavior passHref>
-                  <NavigationMenuLink className={navigationMenuTriggerStyle()}>
-                    About
-                  </NavigationMenuLink>
-                </Link>
-              </NavigationMenuItem>
-            </NavigationMenuList>
-          </NavigationMenu>
-        </div>
+
+        <Navigation />
 
         {/* Search and Actions - Adjusted for better spacing */}
         <div className="flex flex-1 items-center justify-end gap-4 md:justify-end md:gap-6">
@@ -224,7 +137,7 @@ export default function Header() {
                 {cartItemCount > 0 && (
                   <Badge
                     variant="destructive"
-                    className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full p-0 text-xs"
+                    className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full p-0 text-xs"
                   >
                     {cartItemCount}
                   </Badge>
@@ -236,7 +149,7 @@ export default function Header() {
               <DropdownMenuLabel>Your Cart</DropdownMenuLabel>
               <DropdownMenuSeparator />
               <div className="flex flex-col gap-2 p-2">
-                <p className="text-center text-sm text-muted-foreground">
+                <p className="text-muted-foreground text-center text-sm">
                   item in your cart
                 </p>
                 {/* Cart items would go here */}
@@ -283,10 +196,10 @@ export default function Header() {
                 <>
                   <DropdownMenuLabel className="font-normal">
                     <div className="flex flex-col space-y-1">
-                      <p className="text-sm font-medium leading-none">
+                      <p className="text-sm leading-none font-medium">
                         John Doe
                       </p>
-                      <p className="text-xs leading-none text-muted-foreground">
+                      <p className="text-muted-foreground text-xs leading-none">
                         john.doe@example.com
                       </p>
                     </div>
