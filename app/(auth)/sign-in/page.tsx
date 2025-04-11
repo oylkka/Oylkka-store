@@ -9,7 +9,7 @@ export default async function SignInPage() {
 
   // Redirect to dashboard if user is authenticated
   if (session?.user) {
-    redirect('/profile');
+    redirect('/dashboard');
   }
 
   // Render client component for unauthenticated users

@@ -44,7 +44,7 @@ export default function SignIn() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-gray-50 via-gray-100 to-gray-200 p-4 sm:p-6 dark:from-gray-900 dark:via-gray-800 dark:to-gray-700">
+    <div className="flex min-h-[70vh] items-center justify-center bg-gradient-to-br from-gray-50 via-gray-100 to-gray-200 p-4 sm:p-6 dark:from-gray-900 dark:via-gray-800 dark:to-gray-700">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}

@@ -211,7 +211,7 @@ export default function HeroSection() {
                       {slide.badge}
                     </Badge>
                   )}
-                  <h2 className="font-heading text-xl font-bold tracking-tight text-white sm:text-4xl md:text-3xl md:text-5xl lg:text-6xl">
+                  <h2 className="font-heading text-xl font-bold tracking-tight text-white sm:text-4xl md:text-5xl lg:text-6xl">
                     {slide.title}
                   </h2>
                   <p className="text-lg font-medium text-white md:text-2xl">
