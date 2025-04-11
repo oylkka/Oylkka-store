@@ -22,4 +22,18 @@ export const {
       clientSecret: process.env.AUTH_GITHUB_SECRET!,
     }),
   ],
+  callbacks: {
+    async jwt({ token, user }) {
+      if (user) {
+        token.id = user.id;
+        token.role = user.role;
+      }
+      return token;
+    },
+    async session({ session, token }) {
+      session.user.id = token.id;
+      session.user.role = token.role as string;
+      return session;
+    },
+  },
 });
