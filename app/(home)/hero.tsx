@@ -164,7 +164,7 @@ export default function HeroSection() {
       onTouchMove={handleTouchMove}
       onTouchEnd={handleTouchEnd}
     >
-      <div className="relative h-[60vh] min-h-[500px] w-full md:h-[70vh] lg:h-[91vh]">
+      <div className="relative h-[40vh] w-full md:h-[70vh] lg:h-[91vh]">
         {slides.map((slide, index) => (
           <div
             key={slide.id}
@@ -196,14 +196,14 @@ export default function HeroSection() {
             <div className="relative z-10 flex h-full items-center">
               <div
                 className={cn(
-                  'container mx-auto flex',
-                  index === 2 ? 'justify-end' : 'justify-start'
+                  'container mx-auto flex px-2 md:px-0',
+                  index === 2 ? 'justify-end text-end' : 'justify-start'
                 )}
               >
-                <div className="max-w-md space-y-4 md:max-w-lg lg:max-w-xl">
+                <div className="max-w-md space-y-2 md:max-w-lg md:space-y-4 lg:max-w-xl">
                   {slide.badge && (
                     <Badge
-                      className="mb-2 rounded-md px-3 py-1 text-sm font-medium"
+                      className="md:mb-2 md:rounded-md md:px-3 md:py-1 md:text-sm md:font-medium"
                       variant={
                         slide.theme === 'light' ? 'secondary' : 'default'
                       }
@@ -211,28 +211,23 @@ export default function HeroSection() {
                       {slide.badge}
                     </Badge>
                   )}
-                  <h2 className="font-heading text-3xl font-bold tracking-tight text-white sm:text-4xl md:text-5xl lg:text-6xl">
+                  <h2 className="font-heading text-xl font-bold tracking-tight text-white sm:text-4xl md:text-3xl md:text-5xl lg:text-6xl">
                     {slide.title}
                   </h2>
-                  <p className="text-xl font-medium text-white md:text-2xl">
+                  <p className="text-lg font-medium text-white md:text-2xl">
                     {slide.subtitle}
                   </p>
-                  <p className="text-base text-white/90 md:text-lg">
+                  <p className="text-sm text-white/90 md:text-lg">
                     {slide.description}
                   </p>
                   <div className="flex flex-wrap gap-3 pt-2">
-                    <Button asChild size="lg" className="rounded-md">
+                    <Button asChild>
                       <Link href={slide.primaryCta.link}>
                         {slide.primaryCta.text}
                       </Link>
                     </Button>
                     {slide.secondaryCta && (
-                      <Button
-                        asChild
-                        variant="outline"
-                        size="lg"
-                        className="rounded-md bg-white/10 backdrop-blur"
-                      >
+                      <Button asChild variant="outline">
                         <Link href={slide.secondaryCta.link}>
                           {slide.secondaryCta.text}
                         </Link>
@@ -262,8 +257,8 @@ export default function HeroSection() {
         </div>
       </div>
 
-      <div className="container mx-auto py-8 md:py-12">
-        <div className="grid grid-cols-2 gap-4 md:grid-cols-4 lg:gap-6">
+      <div className="container mx-auto px-2 py-8 md:px-0 md:py-12">
+        <div className="grid grid-cols-2 gap-3 md:grid-cols-4 lg:gap-6">
           {[
             {
               name: 'Women',
