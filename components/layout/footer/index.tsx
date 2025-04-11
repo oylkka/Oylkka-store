@@ -19,9 +19,11 @@ export default function Footer() {
       <div className="container mx-auto grid grid-cols-1 gap-12 px-6 py-16 sm:grid-cols-2 md:grid-cols-4">
         {/* Brand */}
         <div>
-          <h2 className="text-primary mb-4 text-3xl font-bold tracking-tight">
-            Mookkly
-          </h2>
+          <Link href="/" className="mb-4 flex items-center gap-2">
+            <h1 className="text-2xl font-extrabold tracking-tight md:text-3xl">
+              <span className="text-primary">Mook</span>kly
+            </h1>
+          </Link>
           <p className="mb-6 text-sm leading-relaxed text-zinc-400">
             Discover quality products at unbeatable prices. Fast shipping,
             secure checkout, and premium support.
