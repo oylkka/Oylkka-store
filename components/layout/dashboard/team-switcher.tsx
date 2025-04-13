@@ -1,6 +1,6 @@
 'use client';
 
-import { ChevronsUpDown, Database } from 'lucide-react';
+import { ChevronsUpDown, ShoppingBag } from 'lucide-react';
 import Link from 'next/link';
 
 import {
@@ -24,12 +24,12 @@ export function TeamSwitcher() {
               className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
             >
               <div className="bg-sidebar-primary text-sidebar-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg">
-                <Database className="size-4" />
+                <ShoppingBag className="size-4" />
               </div>
               <div className="grid flex-1 text-left text-sm leading-tight">
                 <Link href="/" className="flex items-center gap-2">
                   <h1 className="text-2xl font-extrabold tracking-tight md:text-3xl">
-                    <span className="text-primary">Mook</span>kly
+                    <span className="text-primary">Oyl</span>kka
                   </h1>
                 </Link>
               </div>

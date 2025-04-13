@@ -1,6 +1,6 @@
 'use client';
 
-import { Menu } from 'lucide-react';
+import { Menu, ShoppingBag } from 'lucide-react';
 import Link from 'next/link';
 import { useState } from 'react';
 
@@ -71,8 +71,9 @@ export default function HeaderClient() {
 
       {/* Logo */}
       <Link href="/" className="flex items-center gap-2">
+        <ShoppingBag className="text-primary h-6 w-6" />
         <h1 className="text-2xl font-extrabold tracking-tight md:text-3xl">
-          <span className="text-primary">Mook</span>kly
+          <span className="text-primary">Oyl</span>kka
         </h1>
       </Link>
     </div>
