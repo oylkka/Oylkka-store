@@ -4,6 +4,7 @@ import { ReactNode, useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 
 import { ProductImage } from '@/hooks/use-product-image';
+import { useCreateProduct } from '@/service';
 
 import { ProductFormContext } from './product-form-context';
 import { ProductFormSchema, ProductFormValues } from './product-form-type';
@@ -47,33 +48,28 @@ export function ProductFormProvider({ children }: ProductFormProviderProps) {
     },
   });
 
+  const { mutate } = useCreateProduct();
+
   function onSubmit(data: ProductFormValues) {
-    // Check if there's at least one image uploaded
     if (productImages.length === 0) {
-      // Show an error using React Hook Form's setError function
       methods.setError('root.images', {
         type: 'manual',
         message: 'At least one product image is required',
       });
-      return; // Prevent form submission
+      return;
     }
 
-    // Check if there's a cover image selected
     if (!productImages.some((img) => img.isCover)) {
-      // If there are images but no cover image is set, set the first one as cover
       const updatedImages = [...productImages];
       updatedImages[0].isCover = true;
       setProductImages(updatedImages);
     }
 
-    // Create form data to handle file uploads
     const formData = new FormData();
 
-    // Append all form values
     Object.entries(data).forEach(([key, value]) => {
       if (value !== undefined) {
         if (Array.isArray(value)) {
-          // Handle arrays like tags
           formData.append(key, JSON.stringify(value));
         } else {
           formData.append(key, String(value));
@@ -81,22 +77,23 @@ export function ProductFormProvider({ children }: ProductFormProviderProps) {
       }
     });
 
-    // Find cover image
     const coverImage = productImages.find((img) => img.isCover);
-    // Get additional images (excluding cover)
     const additionalImages = productImages.filter((img) => !img.isCover);
 
-    // Add cover image separately
     if (coverImage) {
       formData.append('coverImage', coverImage.file);
     }
 
-    // Add additional product images to formData
     additionalImages.forEach((image, index) => {
       formData.append(`additionalImage_${index}`, image.file);
     });
 
-    // TODO: Send formData to your API
+    mutate(formData, {
+      onSuccess: () => {
+        methods.reset();
+        setProductImages([]);
+      },
+    });
   }
 
   return (

@@ -1,5 +1,10 @@
+
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import type { Metadata } from 'next';
 import { Geist, Geist_Mono } from 'next/font/google';
+
+import { Toaster } from '@/components/ui/sonner';
+import TanstackProvider from '@/context/tanstack-provider';
 import './globals.css';
 
 const geistSans = Geist({
@@ -23,12 +28,16 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased [&::-webkit-scrollbar]:w-0`}
-      >
-        {children}
-      </body>
-    </html>
+    <TanstackProvider>
+      <html lang="en">
+        <body
+          className={`${geistSans.variable} ${geistMono.variable} antialiased [&::-webkit-scrollbar]:w-0`}
+        >
+          {children}
+          <ReactQueryDevtools initialIsOpen={false} />
+          <Toaster position="top-right" richColors />
+        </body>
+      </html>
+    </TanstackProvider>
   );
 }

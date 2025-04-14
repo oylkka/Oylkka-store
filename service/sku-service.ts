@@ -40,9 +40,8 @@ export class SkuService {
   }
 
   static isValidSku(sku: string): boolean {
-    // Adjusted regex to allow new format: CAT-SUB-PROD-ATTR-SEQ
     const skuRegex =
-      /^[A-Z0-9]{2,3}-[A-Z0-9]{2,3}-[A-Z0-9]{2,3}(-[A-Z0-9]{1,5})?(-\d{1,6})?$/;
+      /^([A-Z0-9]{2,3})-([A-Z0-9]{2,3})-([A-Z0-9]{2,3})(?:-([A-Z0-9]{1,5}))?(?:-(\d{1,6}))?$/;
     return skuRegex.test(sku);
   }
 
