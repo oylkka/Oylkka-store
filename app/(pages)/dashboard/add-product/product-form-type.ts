@@ -56,6 +56,15 @@ export const ProductFormSchema = z.object({
     .min(0, { message: 'Length must be at least 0' })
     .optional(),
   width: z.number().min(0, { message: 'Width must be at least 0' }).optional(),
+  weightUnit: z
+    .string()
+    .refine((val) => ['kg', 'g', 'lb', 'oz'].includes(val), {
+      message: 'Weight unit must be kg, g, lb, or oz',
+    }),
+
+  dimensionUnit: z.string().refine((val) => ['cm', 'in', 'm'].includes(val), {
+    message: 'Dimension unit must be cm, in, or m',
+  }),
   height: z
     .number()
     .min(0, { message: 'Height must be at least 0' })

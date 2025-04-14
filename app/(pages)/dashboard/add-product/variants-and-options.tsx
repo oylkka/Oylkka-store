@@ -398,7 +398,7 @@ export function VariantsOptionsCard() {
           <div
             className="mr-2 h-4 w-4 rounded-sm"
             style={{ backgroundColor: value }}
-           />
+          />
           <span className="mr-1">
             {colorName ? `${colorName} (${value})` : value}
           </span>

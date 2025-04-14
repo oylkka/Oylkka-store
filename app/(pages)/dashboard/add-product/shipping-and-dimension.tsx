@@ -1,4 +1,3 @@
-// components/product/ShippingDimensionsCard.tsx
 'use client';
 
 import { useFormContext } from 'react-hook-form';
@@ -33,51 +32,53 @@ export function ShippingDimensionsCard() {
         <CardTitle>Shipping & Dimensions</CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-3 gap-4">
+          <div className="col-span-2">
+            <FormField
+              control={control}
+              name="weight"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Weight</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="number"
+                      placeholder="Product weight"
+                      step="0.01"
+                      {...field}
+                      value={field.value === 0 ? '' : field.value}
+                      onChange={(e) =>
+                        field.onChange(
+                          e.target.value === '' ? 0 : parseFloat(e.target.value)
+                        )
+                      }
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
           <FormField
             control={control}
-            name="weight"
+            name="weightUnit"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Weight (kg)</FormLabel>
-                <FormControl>
-                  <Input
-                    type="number"
-                    placeholder="Product weight"
-                    step="0.01"
-                    {...field}
-                    value={field.value === 0 ? '' : field.value}
-                    onChange={(e) =>
-                      field.onChange(
-                        e.target.value === '' ? 0 : parseFloat(e.target.value)
-                      )
-                    }
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={control}
-            name="shippingClass"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Shipping Class</FormLabel>
+                <FormLabel>Unit</FormLabel>
                 <Select
                   onValueChange={field.onChange}
-                  defaultValue={field.value}
+                  defaultValue={field.value || 'kg'}
                 >
                   <FormControl>
                     <SelectTrigger>
-                      <SelectValue placeholder="Select shipping class" />
+                      <SelectValue placeholder="Unit" />
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
-                    <SelectItem value="standard">Standard</SelectItem>
-                    <SelectItem value="express">Express</SelectItem>
-                    <SelectItem value="oversized">Oversized</SelectItem>
-                    <SelectItem value="fragile">Fragile</SelectItem>
+                    <SelectItem value="kg">kg</SelectItem>
+                    <SelectItem value="g">g</SelectItem>
+                    <SelectItem value="lb">lb</SelectItem>
+                    <SelectItem value="oz">oz</SelectItem>
                   </SelectContent>
                 </Select>
                 <FormMessage />
@@ -86,79 +87,133 @@ export function ShippingDimensionsCard() {
           />
         </div>
 
-        <div className="grid grid-cols-3 gap-4">
-          <FormField
-            control={control}
-            name="length"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Length (cm)</FormLabel>
+        <FormField
+          control={control}
+          name="shippingClass"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Shipping Class</FormLabel>
+              <Select onValueChange={field.onChange} defaultValue={field.value}>
                 <FormControl>
-                  <Input
-                    type="number"
-                    placeholder="Length"
-                    step="0.1"
-                    {...field}
-                    value={field.value === 0 ? '' : field.value}
-                    onChange={(e) =>
-                      field.onChange(
-                        e.target.value === '' ? 0 : parseFloat(e.target.value)
-                      )
-                    }
-                  />
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select shipping class" />
+                  </SelectTrigger>
                 </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={control}
-            name="width"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Width (cm)</FormLabel>
-                <FormControl>
-                  <Input
-                    type="number"
-                    placeholder="Width"
-                    step="0.1"
-                    {...field}
-                    value={field.value === 0 ? '' : field.value}
-                    onChange={(e) =>
-                      field.onChange(
-                        e.target.value === '' ? 0 : parseFloat(e.target.value)
-                      )
-                    }
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={control}
-            name="height"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Height (cm)</FormLabel>
-                <FormControl>
-                  <Input
-                    type="number"
-                    placeholder="Height"
-                    step="0.1"
-                    {...field}
-                    value={field.value === 0 ? '' : field.value}
-                    onChange={(e) =>
-                      field.onChange(
-                        e.target.value === '' ? 0 : parseFloat(e.target.value)
-                      )
-                    }
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+                <SelectContent>
+                  <SelectItem value="standard">Standard</SelectItem>
+                  <SelectItem value="express">Express</SelectItem>
+                  <SelectItem value="oversized">Oversized</SelectItem>
+                  <SelectItem value="fragile">Fragile</SelectItem>
+                </SelectContent>
+              </Select>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <div className="space-y-2">
+          <div className="flex items-center">
+            <h3 className="text-sm font-medium">Dimensions</h3>
+            <FormField
+              control={control}
+              name="dimensionUnit"
+              render={({ field }) => (
+                <FormItem className="ml-auto">
+                  <Select
+                    onValueChange={field.onChange}
+                    defaultValue={field.value || 'cm'}
+                  >
+                    <FormControl>
+                      <SelectTrigger className="w-20">
+                        <SelectValue placeholder="Unit" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectItem value="cm">cm</SelectItem>
+                      <SelectItem value="in">in</SelectItem>
+                      <SelectItem value="m">m</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+
+          <div className="grid grid-cols-3 gap-4">
+            <FormField
+              control={control}
+              name="length"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Length</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="number"
+                      placeholder="Length"
+                      step="0.1"
+                      {...field}
+                      value={field.value === 0 ? '' : field.value}
+                      onChange={(e) =>
+                        field.onChange(
+                          e.target.value === '' ? 0 : parseFloat(e.target.value)
+                        )
+                      }
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={control}
+              name="width"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Width</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="number"
+                      placeholder="Width"
+                      step="0.1"
+                      {...field}
+                      value={field.value === 0 ? '' : field.value}
+                      onChange={(e) =>
+                        field.onChange(
+                          e.target.value === '' ? 0 : parseFloat(e.target.value)
+                        )
+                      }
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={control}
+              name="height"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Height</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="number"
+                      placeholder="Height"
+                      step="0.1"
+                      {...field}
+                      value={field.value === 0 ? '' : field.value}
+                      onChange={(e) =>
+                        field.onChange(
+                          e.target.value === '' ? 0 : parseFloat(e.target.value)
+                        )
+                      }
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
         </div>
 
         <FormField

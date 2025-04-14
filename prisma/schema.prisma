@@ -111,8 +111,9 @@ model Product {
   condition            ProductCondition
   conditionDescription String?
 
-  weight     Float?
-  dimensions Dimensions?
+  weight      Float?
+  weightUnit  String    @default("kg")
+  dimensions  Dimensions?
 
   shippingClass String?
   freeShipping  Boolean @default(false)
@@ -139,7 +140,7 @@ type Dimensions {
   length Float
   width  Float
   height Float
-  unit   String // Removed default as composite type fields cannot have default values
+  unit   String // This already exists in your schema
 }
 
 model ProductVariant {
@@ -163,7 +164,7 @@ model Category {
   slug        String     @unique
   description String?
   parentId    String?    @db.ObjectId
-  parent      Category?  @relation("CategoryHierarchy", fields: [parentId], references: [id], onDelete: NoAction, onUpdate: NoAction) // Changed to NoAction
+  parent      Category?  @relation("CategoryHierarchy", fields: [parentId], references: [id], onDelete: NoAction, onUpdate: NoAction)
   children    Category[] @relation("CategoryHierarchy")
 
   createdAt DateTime @default(now())

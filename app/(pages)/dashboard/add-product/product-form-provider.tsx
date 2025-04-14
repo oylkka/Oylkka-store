@@ -1,6 +1,4 @@
-// components/product/ProductFormProvider.tsx
 'use client';
-
 import { zodResolver } from '@hookform/resolvers/zod';
 import { ReactNode, useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
@@ -18,7 +16,6 @@ export function ProductFormProvider({ children }: ProductFormProviderProps) {
   const [selectedCategory, setSelectedCategory] = useState<string>('');
   const [productImages, setProductImages] = useState<ProductImage[]>([]);
 
-  // components/product/ProductFormProvider.tsx
   const methods = useForm<ProductFormValues>({
     resolver: zodResolver(ProductFormSchema),
     defaultValues: {
@@ -27,33 +24,29 @@ export function ProductFormProvider({ children }: ProductFormProviderProps) {
       category: '',
       subcategory: '',
       tags: [],
-
       price: 0,
       discountPrice: undefined,
       discountPercent: 0,
       stock: 0,
       lowStockAlert: 0,
-
       barcode: '',
       weight: 0,
+      weightUnit: 'kg',
+      dimensionUnit: 'cm',
       length: 0,
       width: 0,
       height: 0,
       shippingClass: 'standard',
       freeShipping: false,
-
       variantOptions: [],
-
       metaTitle: '',
       metaDescription: '',
       sku: '',
-
       condition: '',
       conditionDescription: '',
     },
   });
 
-  // components/product/ProductFormProvider.tsx
   function onSubmit(data: ProductFormValues) {
     // Check if there's at least one image uploaded
     if (productImages.length === 0) {
@@ -88,37 +81,20 @@ export function ProductFormProvider({ children }: ProductFormProviderProps) {
       }
     });
 
-    // Add product images to formData
-    productImages.forEach((image, index) => {
-      formData.append(`image_${index}`, image.file);
+    // Find cover image
+    const coverImage = productImages.find((img) => img.isCover);
+    // Get additional images (excluding cover)
+    const additionalImages = productImages.filter((img) => !img.isCover);
 
-      // Mark cover image
-      if (image.isCover) {
-        formData.append('cover_image_index', String(index));
-      }
+    // Add cover image separately
+    if (coverImage) {
+      formData.append('coverImage', coverImage.file);
+    }
+
+    // Add additional product images to formData
+    additionalImages.forEach((image, index) => {
+      formData.append(`additionalImage_${index}`, image.file);
     });
-
-    // Log the submitted data
-    // console.table(data);
-
-    // Log the images information
-    // console.log(
-    //   'Product Images:',
-    //   productImages.map((img) => ({
-    //     filename: img.file.name,
-    //     size: `${(img.file.size / 1024).toFixed(2)} KB`,
-    //     isCover: img.isCover,
-    //   }))
-    // );
-
-    // Log which image is the cover
-    // const coverImage = productImages.find((img) => img.isCover);
-    // if (coverImage) {
-    //   console.log('Cover Image:', {
-    //     filename: coverImage.file.name,
-    //     size: `${(coverImage.file.size / 1024).toFixed(2)} KB`,
-    //   });
-    // }
 
     // TODO: Send formData to your API
   }
