@@ -34,6 +34,7 @@ export function ProductFormProvider({ children }: ProductFormProviderProps) {
       stock: 0,
       lowStockAlert: 0,
 
+      barcode: '',
       weight: 0,
       length: 0,
       width: 0,
@@ -45,7 +46,10 @@ export function ProductFormProvider({ children }: ProductFormProviderProps) {
 
       metaTitle: '',
       metaDescription: '',
-      slug: '',
+      sku: '',
+
+      condition: '',
+      conditionDescription: '',
     },
   });
 
@@ -95,26 +99,26 @@ export function ProductFormProvider({ children }: ProductFormProviderProps) {
     });
 
     // Log the submitted data
-    console.table(data);
+    // console.table(data);
 
     // Log the images information
-    console.log(
-      'Product Images:',
-      productImages.map((img) => ({
-        filename: img.file.name,
-        size: `${(img.file.size / 1024).toFixed(2)} KB`,
-        isCover: img.isCover,
-      }))
-    );
+    // console.log(
+    //   'Product Images:',
+    //   productImages.map((img) => ({
+    //     filename: img.file.name,
+    //     size: `${(img.file.size / 1024).toFixed(2)} KB`,
+    //     isCover: img.isCover,
+    //   }))
+    // );
 
     // Log which image is the cover
-    const coverImage = productImages.find((img) => img.isCover);
-    if (coverImage) {
-      console.log('Cover Image:', {
-        filename: coverImage.file.name,
-        size: `${(coverImage.file.size / 1024).toFixed(2)} KB`,
-      });
-    }
+    // const coverImage = productImages.find((img) => img.isCover);
+    // if (coverImage) {
+    //   console.log('Cover Image:', {
+    //     filename: coverImage.file.name,
+    //     size: `${(coverImage.file.size / 1024).toFixed(2)} KB`,
+    //   });
+    // }
 
     // TODO: Send formData to your API
   }

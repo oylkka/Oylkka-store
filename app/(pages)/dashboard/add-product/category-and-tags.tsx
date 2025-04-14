@@ -1,7 +1,7 @@
-// components/product/BasicInformationCard.tsx
+// components/product/CategoryCard.tsx
 'use client';
 
-import { LayoutGrid } from 'lucide-react';
+import { Tag } from 'lucide-react';
 import { useContext } from 'react';
 import { useFormContext } from 'react-hook-form';
 
@@ -14,7 +14,6 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
 import {
   Select,
   SelectContent,
@@ -25,13 +24,13 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { TagsInput } from '@/components/ui/tags-input';
-import { Textarea } from '@/components/ui/textarea';
 import { productCategories } from '@/constant';
 
 import { ProductFormContext } from './product-form-context';
+import { ProductFormValues } from './product-form-type';
 
-export function BasicInformationCard() {
-  const { control, setValue } = useFormContext();
+export function CategoryCard() {
+  const { control, setValue } = useFormContext<ProductFormValues>();
   const { selectedCategory, setSelectedCategory } =
     useContext(ProductFormContext);
 
@@ -42,38 +41,10 @@ export function BasicInformationCard() {
   return (
     <Card>
       <CardHeader className="flex flex-row items-center gap-2">
-        <LayoutGrid className="h-5 w-5" />
-        <span className="text-lg font-semibold">Basic Information</span>
+        <Tag className="h-5 w-5" />
+        <span className="text-lg font-semibold">Category & Tags</span>
       </CardHeader>
       <CardContent className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-        <FormField
-          control={control}
-          name="productname"
-          render={({ field }) => (
-            <FormItem className="lg:col-span-2">
-              <FormLabel>Product Name *</FormLabel>
-              <FormControl>
-                <Input placeholder="Product Name" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <FormField
-          control={control}
-          name="description"
-          render={({ field }) => (
-            <FormItem className="lg:col-span-2">
-              <FormLabel>Description *</FormLabel>
-              <FormControl>
-                <Textarea placeholder="Description" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
         <FormField
           control={control}
           name="category"
@@ -119,7 +90,7 @@ export function BasicInformationCard() {
               >
                 <FormControl>
                   <SelectTrigger className="w-full">
-                    <SelectValue placeholder="Select a sub category" />
+                    <SelectValue placeholder="Sub category" />
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>

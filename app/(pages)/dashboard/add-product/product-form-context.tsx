@@ -1,4 +1,3 @@
-// components/product/ProductFormContext.tsx
 'use client';
 
 import { createContext } from 'react';

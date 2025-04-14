@@ -1,6 +1,8 @@
 // components/product/ProductFormTypes.ts
 import { z } from 'zod';
 
+import { SkuService } from '@/service';
+
 // Define the variant option schema
 const VariantOptionSchema = z.object({
   id: z.string(),
@@ -64,6 +66,16 @@ export const ProductFormSchema = z.object({
   // Variants & Options
   variantOptions: z.array(VariantOptionSchema).optional(),
 
+  // conditions
+  condition: z.string().min(1),
+  barcode: z
+    .string()
+    .optional()
+    .refine((val) => !val || /^[0-9]{8,14}$/.test(val), {
+      message: 'Barcode must be 8-14 digits',
+    }),
+  conditionDescription: z.string().optional(),
+
   // SEO & Meta
   metaTitle: z
     .string()
@@ -73,7 +85,12 @@ export const ProductFormSchema = z.object({
     .string()
     .max(160, { message: 'Meta description should be under 160 characters' })
     .optional(),
-  slug: z.string().optional(),
+  sku: z
+    .string()
+    .min(1, 'SKU is required')
+    .refine((val) => SkuService.isValidSku(val), {
+      message: 'Invalid SKU format. Should follow pattern like CAT-PRD-001',
+    }),
 });
 
 export type ProductFormValues = z.infer<typeof ProductFormSchema>;

@@ -64,24 +64,6 @@ export function SeoMetaCard() {
             </FormItem>
           )}
         />
-
-        <FormField
-          control={control}
-          name="slug"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>URL Slug</FormLabel>
-              <FormControl>
-                <Input placeholder="product-url-slug" {...field} />
-              </FormControl>
-              <FormDescription>
-                The unique part of the URL for this product (e.g.,
-                example.com/products/your-slug)
-              </FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
       </CardContent>
     </Card>
   );
