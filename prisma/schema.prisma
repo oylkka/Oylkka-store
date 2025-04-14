@@ -15,19 +15,19 @@ enum UserRole {
 }
 
 model User {
-  id             String           @id @default(auto()) @map("_id") @db.ObjectId
+  id             String          @id @default(auto()) @map("_id") @db.ObjectId
   name           String?
-  email          String?          @unique
+  email          String?         @unique
   emailVerified  DateTime?
   image          String?
   accounts       Account[]
   sessions       Session[]
-  role           UserRole         @default(USER)
+  role           UserRole        @default(USER)
   authenticators Authenticator[]
-  createdAt      DateTime         @default(now())
-  updatedAt      DateTime         @updatedAt
-  
-  products       Product[]
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+
+  products Product[]
 }
 
 model Account {
@@ -70,15 +70,15 @@ model VerificationToken {
 }
 
 model Authenticator {
-  credentialID         String @id @map("_id")
-  userId               String @db.ObjectId
+  credentialID         String  @id @map("_id")
+  userId               String  @db.ObjectId
   providerAccountId    String
   credentialPublicKey  String
   counter              Int
   credentialDeviceType String
   credentialBackedUp   Boolean
   transports           String?
-  user                 User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user                 User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 enum ProductCondition {
@@ -92,46 +92,45 @@ enum ProductCondition {
 }
 
 model Product {
-  id                   String           @id @default(auto()) @map("_id") @db.ObjectId
-  productName          String
-  description          String
-  category             String
-  subcategory          String
-  tags                 String[]
-  
-  sku                  String           @unique
-  barcode              String?
-  
-  price                Float
-  discountPrice        Float?
-  discountPercent      Float?
-  stock                Int
-  lowStockAlert        Int
-  
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  productName String
+  description String
+  category    String
+  subcategory String
+  tags        String[]
+
+  sku     String  @unique
+  barcode String?
+
+  price           Float
+  discountPrice   Float?
+  discountPercent Float?
+  stock           Int
+  lowStockAlert   Int
+
   condition            ProductCondition
   conditionDescription String?
-  
-  weight               Float?
-  dimensions           Dimensions?
-  
-  shippingClass        String?
-  freeShipping         Boolean          @default(false)
-  
-  metaTitle            String?
-  metaDescription      String?
-  slug                 String           @unique
-  
-  hasVariants          Boolean          @default(false)
-  variants             ProductVariant[]
-  attributes           Json?
-  
-  isPublished          Boolean          @default(false)
-  createdBy            String           @db.ObjectId
-  createdAt            DateTime         @default(now())
-  updatedAt            DateTime         @updatedAt
-  
-  user                 User             @relation(fields: [createdBy], references: [id])
-  
+
+  weight     Float?
+  dimensions Dimensions?
+
+  shippingClass String?
+  freeShipping  Boolean @default(false)
+
+  metaTitle       String?
+  metaDescription String?
+
+  hasVariants Boolean          @default(false)
+  variants    ProductVariant[]
+  attributes  Json?
+
+  isPublished Boolean  @default(false)
+  createdBy   String   @db.ObjectId
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  user User @relation(fields: [createdBy], references: [id])
+
   @@index([category, subcategory], name: "category_index")
   @@index([createdBy], name: "creator_index")
 }
@@ -140,7 +139,7 @@ type Dimensions {
   length Float
   width  Float
   height Float
-  unit   String  // Removed default as composite type fields cannot have default values
+  unit   String // Removed default as composite type fields cannot have default values
 }
 
 model ProductVariant {
@@ -154,25 +153,24 @@ model ProductVariant {
   product    Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
-  
+
   @@index([productId], name: "variant_product_index")
 }
 
 model Category {
-  id          String      @id @default(auto()) @map("_id") @db.ObjectId
+  id          String     @id @default(auto()) @map("_id") @db.ObjectId
   name        String
-  slug        String      @unique
+  slug        String     @unique
   description String?
-  parentId    String?     @db.ObjectId
-  parent      Category?   @relation("CategoryHierarchy", fields: [parentId], references: [id], onDelete: NoAction, onUpdate: NoAction) // Changed to NoAction
-  children    Category[]  @relation("CategoryHierarchy")
-  
-  createdAt   DateTime    @default(now())
-  updatedAt   DateTime    @updatedAt
-  
+  parentId    String?    @db.ObjectId
+  parent      Category?  @relation("CategoryHierarchy", fields: [parentId], references: [id], onDelete: NoAction, onUpdate: NoAction) // Changed to NoAction
+  children    Category[] @relation("CategoryHierarchy")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
   @@index([parentId], name: "parent_category_index")
 }
-
 
 enum OrderStatus {
   PENDING
@@ -184,9 +182,9 @@ enum OrderStatus {
 }
 
 model Order {
-  id              String         @id @default(auto()) @map("_id") @db.ObjectId
-  orderNumber     String         @unique
-  status          OrderStatus    @default(PENDING)
+  id              String      @id @default(auto()) @map("_id") @db.ObjectId
+  orderNumber     String      @unique
+  status          OrderStatus @default(PENDING)
   customerEmail   String
   customerName    String?
   items           OrderItem[]
@@ -199,36 +197,36 @@ model Order {
   paymentMethod   String?
   paymentStatus   String?
   notes           String?
-  createdAt       DateTime       @default(now())
-  updatedAt       DateTime       @updatedAt
-  
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+
   @@index([customerEmail], name: "customer_email_index")
   @@index([status], name: "order_status_index")
 }
 
 model OrderItem {
-  id           String   @id @default(auto()) @map("_id") @db.ObjectId
-  orderId      String   @db.ObjectId
-  productSku   String
-  productName  String
-  variantInfo  Json?
-  quantity     Int
-  price        Float
-  order        Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
-  
+  id          String @id @default(auto()) @map("_id") @db.ObjectId
+  orderId     String @db.ObjectId
+  productSku  String
+  productName String
+  variantInfo Json?
+  quantity    Int
+  price       Float
+  order       Order  @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
   @@index([orderId], name: "order_item_order_index")
   @@index([productSku], name: "order_item_sku_index")
 }
 
 type Address {
-  firstName   String
-  lastName    String
-  company     String?
-  address1    String
-  address2    String?
-  city        String
-  state       String
-  postalCode  String
-  country     String
-  phone       String?
+  firstName  String
+  lastName   String
+  company    String?
+  address1   String
+  address2   String?
+  city       String
+  state      String
+  postalCode String
+  country    String
+  phone      String?
 }
