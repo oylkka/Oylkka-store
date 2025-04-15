@@ -21,13 +21,13 @@ jobs:
           node-version: '20'
 
       - name: Install dependencies
-        run: pnpm install
+        run: npm install
 
       - name: Run ESLint
-        run: pnpm run lint
+        run: npm run lint
 
       # - name: Run tests
       #   run: npm test
 
       - name: Build project
-        run: pnpm run build
+        run: npm run build
