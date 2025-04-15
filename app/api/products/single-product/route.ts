@@ -273,13 +273,32 @@ export async function POST(req: NextRequest) {
     );
   }
 }
+export async function GET(req: NextRequest) {
+  const url = new URL(req.url);
+  const id = url.searchParams.get('id');
 
-export async function GET() {
+  if (!id) {
+    return new NextResponse(JSON.stringify({ error: 'Missing product ID' }), {
+      status: 400,
+    });
+  }
+
   try {
-    const response = await db.product.findFirst();
-    return new NextResponse(JSON.stringify(response), { status: 200 });
+    const product = await db.product.findUnique({
+      where: { id },
+    });
+
+    if (!product) {
+      return new NextResponse(JSON.stringify({ error: 'Product not found' }), {
+        status: 404,
+      });
+    }
+
+    return new NextResponse(JSON.stringify(product), { status: 200 });
   } catch (error) {
-    console.error('Error fetching products:', error);
-    return new NextResponse('Failed to fetch products', { status: 500 });
+    console.error('Error fetching single product:', error);
+    return new NextResponse(JSON.stringify({ error: 'Server error' }), {
+      status: 500,
+    });
   }
 }

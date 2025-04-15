@@ -1,0 +1,144 @@
+enum ProductCondition {
+  NEW
+  USED
+  LIKE_NEW
+  EXCELLENT
+  GOOD
+  FAIR
+  POOR
+  FOR_PARTS
+}
+
+enum ProductStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+  OUT_OF_STOCK
+}
+
+
+
+model Product {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  productName String
+  description String
+  category    String
+  subcategory String
+  tags        String[]
+
+  sku     String  @unique
+  barcode String?
+
+  price           Float
+  discountPrice   Float?
+  discountPercent Float?
+  stock           Int
+  lowStockAlert   Int     @default(5)
+
+  condition            ProductCondition
+  conditionDescription String?
+
+  weight      Float?
+  weightUnit  String    @default("kg")
+  dimensions  Dimensions?
+
+  shippingClass String?
+  freeShipping  Boolean @default(false)
+
+  // SEO
+  metaTitle       String?
+  metaDescription String?
+  metaKeywords    String[]
+
+  // Media
+  images         Image[]
+  videos         ProductVideo[]
+
+  // Variants and Attributes
+  hasVariants    Boolean          @default(false)
+  variants       ProductVariant[]
+  attributes     Json?
+  specifications Json?
+
+  // Status and Visibility
+  status      ProductStatus @default(DRAFT)
+  isPublished Boolean       @default(false)
+  visibility  String        @default("public") // public, private, password-protected
+
+  // Relationships
+  createdBy     String         @db.ObjectId
+  user          User           @relation(fields: [createdBy], references: [id])
+  reviews       Review[]
+  wishlistItems WishlistItem[]
+  cartItems     CartItem[]
+
+  // Timestamps
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([category, subcategory])
+  @@index([createdBy])
+  @@index([status])
+  @@fulltext([productName, description, tags])
+}
+
+
+model ProductVideo {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  productId   String   @db.ObjectId
+  product     Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  url         String
+  title       String?
+  description String?
+  thumbnail   String?
+  position    Int      @default(0)
+  createdAt   DateTime @default(now())
+
+  @@index([productId])
+}
+
+type Dimensions {
+  length Float
+  width  Float
+  height Float
+  unit   String
+}
+
+model ProductVariant {
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  productId  String   @db.ObjectId
+  sku        String   @unique
+  attributes Json
+  price      Float?
+  stock      Int
+  barcode    String?
+  images     Image[]
+  product    Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([productId])
+}
+
+model Category {
+  id          String     @id @default(auto()) @map("_id") @db.ObjectId
+  name        String
+  slug        String     @unique
+  description String?
+  image       Image?
+  icon        String?
+  parentId    String?    @db.ObjectId
+  parent      Category?  @relation("CategoryHierarchy", fields: [parentId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  children    Category[] @relation("CategoryHierarchy")
+  isActive    Boolean    @default(true)
+  
+  // SEO
+  metaTitle       String?
+  metaDescription String?
+  metaKeywords    String[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([parentId])
+}

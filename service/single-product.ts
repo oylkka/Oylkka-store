@@ -1,4 +1,4 @@
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import axios from 'axios';
 import { toast } from 'sonner';
 
@@ -18,6 +18,18 @@ export function useCreateProduct() {
             err?.response?.data?.message || 'Failed to submit product',
         }
       );
+    },
+  });
+}
+
+export function useSingleProduct({ id }: { id: string }) {
+  return useQuery({
+    queryKey: ['single-product', id],
+    queryFn: async () => {
+      const response = await axios.get(`/api/products/single-product`, {
+        params: { id },
+      });
+      return response.data;
     },
   });
 }
