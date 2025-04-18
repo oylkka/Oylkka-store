@@ -188,3 +188,6 @@ export async function POST(req: NextRequest) {
     );
   }
 }
+
+// GET endpoint to retrieve products
+
