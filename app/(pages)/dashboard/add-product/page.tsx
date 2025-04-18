@@ -15,9 +15,8 @@ import { ProductFormContext } from './product-form-context';
 import { ProductFormProvider } from './product-form-provider';
 import { ProductFormValues } from './product-form-type';
 import { ProductImagesCard } from './product-image';
-import { SeoMetaCard } from './seo-meta';
 import { ShippingDimensionsCard } from './shipping-and-dimension';
-import { VariantsOptionsCard } from './variants-and-options';
+import { VariantAttributesCard } from './variants-and-options';
 
 export default function NewProductPage() {
   return (
@@ -61,14 +60,13 @@ function NewProductForm() {
           <BasicInformationCard />
           <PriceAndStockCard />
           <ShippingDimensionsCard />
-          <VariantsOptionsCard />
+          <VariantAttributesCard />
         </div>
         <div className="space-y-6 md:col-span-4">
           {/* Right Column Cards */}
           <ProductImagesCard />
           <CategoryCard />
           <ProductDetailsCard />
-          <SeoMetaCard />
         </div>
       </div>
     </form>

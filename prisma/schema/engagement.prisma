@@ -22,7 +22,6 @@ type Image {
   publicId String
 }
 
-
 model WishlistItem {
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
   userId    String   @db.ObjectId

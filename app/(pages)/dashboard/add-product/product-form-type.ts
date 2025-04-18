@@ -1,105 +1,194 @@
-// components/product/ProductFormTypes.ts
 import { z } from 'zod';
 
 import { SkuService } from '@/service';
 
-// Define the variant option schema
-const VariantOptionSchema = z.object({
-  id: z.string(),
-  name: z.string(),
-  values: z.array(z.string()),
-});
+// Enums
+const ProductConditionEnum = z.enum([
+  'NEW',
+  'USED',
+  'LIKE_NEW',
+  'EXCELLENT',
+  'GOOD',
+  'FAIR',
+  'POOR',
+  'FOR_PARTS',
+]);
 
-export const ProductFormSchema = z.object({
-  // Basic Information
-  productname: z
-    .string()
-    .min(2, { message: 'Product name must be at least 2 characters.' }),
-  description: z
-    .string()
-    .min(2, { message: 'Description must be at least 2 characters.' }),
-  category: z
-    .string()
-    .min(2, { message: 'Category must be at least 2 characters.' }),
-  subcategory: z
-    .string()
-    .min(2, { message: 'Subcategory must be at least 2 characters.' }),
-  tags: z
-    .array(z.string())
-    .nonempty('Please add at least one tag')
-    .max(6, { message: 'You can add a maximum of 6 tags' }),
+const ProductStatusEnum = z.enum([
+  'DRAFT',
+  'PUBLISHED',
+  'ARCHIVED',
+  'OUT_OF_STOCK',
+]);
 
-  // Price & Stock
-  price: z
-    .number()
-    .min(0.01, { message: 'Price must be greater than 0' })
-    .refine((val) => val > 0, { message: 'Price is required' }),
-  discountPrice: z.number().optional(),
-  discountPercent: z.number().optional(),
-  stock: z
-    .number()
-    .min(1, { message: 'Stock must be at least 0' })
-    .refine((val) => val !== undefined, {
-      message: 'Stock quantity is required',
+// Type schemas
+const DimensionsSchema = z
+  .object({
+    length: z.number().min(0, { message: 'Length must be a positive number' }),
+    width: z.number().min(0, { message: 'Width must be a positive number' }),
+    height: z.number().min(0, { message: 'Height must be a positive number' }),
+    unit: z.string().refine((val) => ['cm', 'in', 'm'].includes(val), {
+      message: 'Dimension unit must be cm, in, or m',
     }),
-  lowStockAlert: z
-    .number()
-    .min(0, { message: 'Alert threshold must be at least 0' }),
+  })
+  .partial()
+  .refine(
+    (data) => {
+      // If any dimension field is provided, all should be provided
+      if (Object.values(data).some((val) => val !== undefined)) {
+        return (
+          data.length !== undefined &&
+          data.width !== undefined &&
+          data.height !== undefined &&
+          data.unit !== undefined
+        );
+      }
+      return true;
+    },
+    {
+      message:
+        'All dimension fields (length, width, height, unit) must be provided together or not at all',
+    }
+  );
 
-  // Shipping & Dimensions
-  weight: z
-    .number()
-    .min(0, { message: 'Weight must be at least 0' })
-    .optional(),
-  length: z
-    .number()
-    .min(0, { message: 'Length must be at least 0' })
-    .optional(),
-  width: z.number().min(0, { message: 'Width must be at least 0' }).optional(),
-  weightUnit: z
-    .string()
-    .refine((val) => ['kg', 'g', 'lb', 'oz'].includes(val), {
-      message: 'Weight unit must be kg, g, lb, or oz',
-    }),
+const AttributesSchema = z
+  .record(
+    z.string(), // Attribute key: color, size, custom-attr, etc.
+    z.union([z.string(), z.array(z.string())])
+  )
+  .optional()
+  .refine(
+    (attrs) =>
+      !attrs ||
+      Object.values(attrs).every(
+        (val) =>
+          typeof val === 'string' || (Array.isArray(val) && val.length > 0)
+      ),
+    {
+      message:
+        'Each attribute must be a string or a non-empty array of strings',
+    }
+  );
 
-  dimensionUnit: z.string().refine((val) => ['cm', 'in', 'm'].includes(val), {
-    message: 'Dimension unit must be cm, in, or m',
-  }),
-  height: z
-    .number()
-    .min(0, { message: 'Height must be at least 0' })
-    .optional(),
-  shippingClass: z.string().optional(),
-  freeShipping: z.boolean().default(false).optional(),
+// Main Product Schema
+export const ProductFormSchema = z
+  .object({
+    // Basic Information
+    productName: z
+      .string()
+      .min(2, { message: 'Product name must be at least 2 characters' }),
+    description: z
+      .string()
+      .min(10, { message: 'Description must be at least 10 characters' }),
+    category: z.string().min(1, { message: 'Category is required' }),
+    subcategory: z.string().min(1, { message: 'Subcategory is required' }),
+    tags: z
+      .array(z.string())
+      .max(10, { message: 'You can add a maximum of 10 tags' })
+      .optional()
+      .default([]),
 
-  // Variants & Options
-  variantOptions: z.array(VariantOptionSchema).optional(),
+    // Identifiers
+    sku: z
+      .string()
+      .min(1, 'SKU is required')
+      .refine((val) => SkuService.isValidSku(val), {
+        message: 'Invalid SKU format. Should follow pattern like CAT-PRD-001',
+      }),
 
-  // conditions
-  condition: z.string().min(1),
-  barcode: z
-    .string()
-    .optional()
-    .refine((val) => !val || /^[0-9]{8,14}$/.test(val), {
-      message: 'Barcode must be 8-14 digits',
-    }),
-  conditionDescription: z.string().optional(),
+    // Price & Stock
+    price: z.number().min(0.01, { message: 'Price must be greater than 0' }),
+    discountPrice: z
+      .number()
+      .min(0.01, { message: 'Discount price must be greater than 0' })
+      .optional(),
+    discountPercent: z
+      .number()
+      .min(0, { message: 'Discount percent must be at least 0' })
+      .max(100, { message: 'Discount percent cannot exceed 100%' })
+      .optional()
+      .default(0),
+    stock: z.number().int().min(0, { message: 'Stock must be at least 0' }),
+    lowStockAlert: z
+      .number()
+      .int()
+      .min(1, { message: 'Low stock alert must be at least 1' })
+      .default(5),
 
-  // SEO & Meta
-  metaTitle: z
-    .string()
-    .max(60, { message: 'Meta title should be under 60 characters' })
-    .optional(),
-  metaDescription: z
-    .string()
-    .max(160, { message: 'Meta description should be under 160 characters' })
-    .optional(),
-  sku: z
-    .string()
-    .min(1, 'SKU is required')
-    .refine((val) => SkuService.isValidSku(val), {
-      message: 'Invalid SKU format. Should follow pattern like CAT-PRD-001',
-    }),
-});
+    // Condition
+    condition: ProductConditionEnum,
+    conditionDescription: z.string().optional(),
 
-export type ProductFormValues = z.infer<typeof ProductFormSchema>;
+    // Shipping & Dimensions
+    weight: z
+      .number()
+      .min(0, { message: 'Weight must be at least 0' })
+      .optional(),
+    weightUnit: z
+      .string()
+      .refine((val) => ['kg', 'g', 'lb', 'oz'].includes(val), {
+        message: 'Weight unit must be kg, g, lb, or oz',
+      })
+      .default('kg'),
+    dimensions: DimensionsSchema.optional(),
+    freeShipping: z.boolean().default(false),
+
+    // Variants and Attributes
+
+    attributes: AttributesSchema.optional(),
+
+    // Status and Visibility
+    status: ProductStatusEnum,
+  })
+  .refine(
+    (data) => {
+      if (data.discountPrice === undefined) {
+        return true;
+      }
+      return data.discountPrice < data.price;
+    },
+    {
+      message: 'Discount price must be less than regular price',
+      path: ['discountPrice'],
+    }
+  )
+  .refine(
+    (data) => {
+      // Calculate expected discount percent if discountPrice exists
+      if (data.discountPrice) {
+        const calculatedPercent = Math.round(
+          ((data.price - data.discountPrice) / data.price) * 100
+        );
+        return data.discountPercent === calculatedPercent;
+      }
+      return true;
+    },
+    {
+      message: 'Discount percent does not match calculated value',
+      path: ['discountPercent'],
+    }
+  )
+  .refine(
+    (data) => {
+      // Require condition description for specific conditions
+      const needsDescription = [
+        'USED',
+        'GOOD',
+        'FAIR',
+        'POOR',
+        'FOR_PARTS',
+      ].includes(data.condition);
+      return (
+        !needsDescription ||
+        (data.conditionDescription && data.conditionDescription.length > 0)
+      );
+    },
+    {
+      message: 'Condition description is required for this condition',
+      path: ['conditionDescription'],
+    }
+  );
+
+// Type export
+export type ProductFormInput = z.input<typeof ProductFormSchema>;
+export type ProductFormValues = z.output<typeof ProductFormSchema>;

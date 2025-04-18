@@ -43,14 +43,14 @@ import { ProductFormValues } from './product-form-type';
 
 // Product condition options - same as before
 const PRODUCT_CONDITIONS = [
-  { value: 'new', label: 'New' },
-  { value: 'used', label: 'Used' },
-  { value: 'like-new', label: 'Like New' },
-  { value: 'excellent', label: 'Excellent' },
-  { value: 'good', label: 'Good' },
-  { value: 'fair', label: 'Fair' },
-  { value: 'poor', label: 'Poor' },
-  { value: 'for-parts', label: 'For Parts or Not Working' },
+  { value: 'NEW', label: 'New' },
+  { value: 'USED', label: 'Used' },
+  { value: 'LIKE_NEW', label: 'Like New' },
+  { value: 'EXCELLENT', label: 'Excellent' },
+  { value: 'GOOD', label: 'Good' },
+  { value: 'FAIR', label: 'Fair' },
+  { value: 'POOR', label: 'Poor' },
+  { value: 'FOR_PARTS', label: 'For Parts or Not Working' },
 ];
 
 export function ProductDetailsCard() {
@@ -59,14 +59,15 @@ export function ProductDetailsCard() {
     useSkuCheck();
 
   // Watch relevant fields
-  const productName = useWatch({ control, name: 'productname' });
+  const productName = useWatch({ control, name: 'productName' });
   const category = useWatch({ control, name: 'category' });
   const subcategory = useWatch({ control, name: 'subcategory' });
   const sku = useWatch({ control, name: 'sku' });
 
-  // Auto-generate SKU initially
+  // Only auto-generate SKU when we have all required information and no SKU exists yet
   useEffect(() => {
-    if (productName && category && !sku) {
+    // Only generate SKU if we have all required fields AND there is no existing SKU value
+    if (productName && category && subcategory && !sku) {
       const suggestedSku = SkuService.suggestSku(
         category,
         productName,
@@ -75,7 +76,7 @@ export function ProductDetailsCard() {
       setValue('sku', suggestedSku);
       checkSkuAvailability(suggestedSku);
     }
-  }, [productName, category, sku, setValue, checkSkuAvailability, subcategory]);
+  }, [productName, category, subcategory, sku, setValue, checkSkuAvailability]);
 
   // Check SKU availability when it changes
   useEffect(() => {
@@ -86,7 +87,7 @@ export function ProductDetailsCard() {
 
   // Generate a new SKU
   const handleGenerateSku = () => {
-    if (productName && category) {
+    if (productName && category && subcategory) {
       const newSku = SkuService.suggestSku(category, productName, subcategory);
       setValue('sku', newSku);
       checkSkuAvailability(newSku);
@@ -101,6 +102,9 @@ export function ProductDetailsCard() {
       checkSkuAvailability(sanitized);
     }
   };
+
+  // Check if all required fields for SKU generation are available
+  const canGenerateSku = Boolean(productName && category && subcategory);
 
   return (
     <Card>
@@ -146,13 +150,18 @@ export function ProductDetailsCard() {
                         variant="outline"
                         size="icon"
                         onClick={handleGenerateSku}
-                        disabled={!productName || !category}
+                        disabled={!canGenerateSku}
                       >
                         <RefreshCw className="h-4 w-4" />
                       </Button>
                     </TooltipTrigger>
                     <TooltipContent>
                       <p>Generate unique SKU</p>
+                      {!canGenerateSku && (
+                        <p className="text-xs text-amber-500">
+                          Requires product name, category and subcategory
+                        </p>
+                      )}
                     </TooltipContent>
                   </Tooltip>
                 </TooltipProvider>
@@ -161,26 +170,10 @@ export function ProductDetailsCard() {
                 {error ? (
                   <span className="text-sm text-red-500">{error}</span>
                 ) : (
-                  <span>A unique identifier for inventory tracking</span>
+                  <>
+                    <span>A unique identifier for inventory tracking</span>
+                  </>
                 )}
-              </FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        {/* Other fields remain the same */}
-        <FormField
-          control={control}
-          name="barcode"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Barcode (ISBN, UPC, GTIN, etc.)</FormLabel>
-              <FormControl>
-                <Input placeholder="123456789012" {...field} />
-              </FormControl>
-              <FormDescription>
-                External product identifier (if applicable)
               </FormDescription>
               <FormMessage />
             </FormItem>
@@ -195,7 +188,7 @@ export function ProductDetailsCard() {
               <FormLabel>Product Condition *</FormLabel>
               <Select onValueChange={field.onChange} value={field.value}>
                 <FormControl>
-                  <SelectTrigger>
+                  <SelectTrigger className="w-full">
                     <SelectValue placeholder="Select condition" />
                   </SelectTrigger>
                 </FormControl>

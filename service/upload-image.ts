@@ -1,3 +1,4 @@
+'use server';
 import cloudinary from '@/lib/cloudinary';
 import { Readable } from 'stream';
 

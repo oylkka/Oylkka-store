@@ -1,11 +1,9 @@
-// hooks/useProductImages.ts
 import { useState } from 'react';
 
 export interface ProductImage {
   id: string;
   file: File;
   preview: string;
-  isCover: boolean;
 }
 
 export function useProductImages(maxImages: number = 4) {
@@ -26,35 +24,18 @@ export function useProductImages(maxImages: number = 4) {
     }
 
     const newImages: ProductImage[] = [];
-
     Array.from(files).forEach((file) => {
       // Create a unique ID for each image
       const id = `img_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
       const preview = URL.createObjectURL(file);
-
-      // First image automatically becomes the cover image if no cover exists
-      const isCover =
-        productImages.length === 0 &&
-        newImages.length === 0 &&
-        !productImages.some((img) => img.isCover);
-
-      newImages.push({ id, file, preview, isCover });
+      newImages.push({ id, file, preview });
     });
 
     setProductImages([...productImages, ...newImages]);
   };
 
   const removeImage = (id: string) => {
-    const imageToRemove = productImages.find((img) => img.id === id);
-    const wasImageCover = imageToRemove?.isCover || false;
-
     const updatedImages = productImages.filter((img) => img.id !== id);
-
-    // If the removed image was the cover image, set the first remaining image as cover
-    if (wasImageCover && updatedImages.length > 0) {
-      updatedImages[0].isCover = true;
-    }
-
     setProductImages(updatedImages);
   };
 
@@ -98,15 +79,6 @@ export function useProductImages(maxImages: number = 4) {
     setDraggedImage(null);
   };
 
-  const setCoverImage = (id: string) => {
-    setProductImages((prev) =>
-      prev.map((img) => ({
-        ...img,
-        isCover: img.id === id,
-      }))
-    );
-  };
-
   return {
     productImages,
     isDragging,
@@ -117,6 +89,5 @@ export function useProductImages(maxImages: number = 4) {
     handleDragOver,
     handleDrop,
     handleDragEnd,
-    setCoverImage,
   };
 }

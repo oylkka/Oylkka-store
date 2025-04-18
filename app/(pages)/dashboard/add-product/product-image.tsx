@@ -1,6 +1,3 @@
-// components/product/ProductImagesCard.tsx
-'use client';
-
 import { ImageIcon, Upload, X } from 'lucide-react';
 import Image from 'next/image';
 import { useContext, useState } from 'react';
@@ -12,6 +9,7 @@ import { FormDescription } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { ProductImage } from '@/hooks/use-product-image';
+import { cn } from '@/lib/utils';
 
 import { ProductFormContext } from './product-form-context';
 
@@ -32,19 +30,19 @@ export function ProductImagesCard() {
       return;
     }
 
-    // Check if adding new files would exceed the limit
     if (productImages.length + files.length > 4) {
       setErrorMessage('You can only upload up to 4 images');
       return;
     }
 
-    // Check file sizes
     const oversizedFiles = Array.from(files).filter(
       (file) => file.size > MAX_IMAGE_SIZE
     );
     if (oversizedFiles.length > 0) {
       setErrorMessage(
-        `Some images exceed the maximum size of 500KB: ${oversizedFiles.map((f) => f.name).join(', ')}`
+        `Some images exceed the maximum size of 500KB: ${oversizedFiles
+          .map((f) => f.name)
+          .join(', ')}`
       );
       return;
     }
@@ -53,37 +51,17 @@ export function ProductImagesCard() {
     const newImages: ProductImage[] = [];
 
     Array.from(files).forEach((file) => {
-      // Create a unique ID for each image
       const id = `img_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
       const preview = URL.createObjectURL(file);
-
-      // First image automatically becomes the cover image if no cover exists
-      const isCover =
-        productImages.length === 0 &&
-        newImages.length === 0 &&
-        !productImages.some((img) => img.isCover);
-
-      newImages.push({ id, file, preview, isCover });
+      newImages.push({ id, file, preview });
     });
 
     setProductImages([...productImages, ...newImages]);
-
-    // Reset the input to allow selecting the same file again
     event.target.value = '';
   };
 
   const removeImage = (id: string) => {
-    const imageToRemove = productImages.find((img) => img.id === id);
-    const wasImageCover = imageToRemove?.isCover || false;
-
-    const updatedImages = productImages.filter((img) => img.id !== id);
-
-    // If the removed image was the cover image, set the first remaining image as cover
-    if (wasImageCover && updatedImages.length > 0) {
-      updatedImages[0].isCover = true;
-    }
-
-    setProductImages(updatedImages);
+    setProductImages(productImages.filter((img) => img.id !== id));
   };
 
   const handleDragStart = (image: ProductImage) => {
@@ -111,7 +89,6 @@ export function ProductImagesCard() {
       return;
     }
 
-    // Create a new array with the images reordered
     const newImages = [...productImages];
     newImages.splice(draggedIndex, 1);
     newImages.splice(targetIndex, 0, draggedImage);
@@ -126,122 +103,98 @@ export function ProductImagesCard() {
     setDraggedImage(null);
   };
 
-  const setCoverImage = (id: string) => {
-    setProductImages((prev) =>
-      prev.map((img) => ({
-        ...img,
-        isCover: img.id === id,
-      }))
-    );
-  };
-
   return (
     <Card>
-      <CardHeader className="flex flex-row items-center gap-2">
-        <ImageIcon className="h-5 w-5" />
+      <CardHeader className="flex flex-row items-center gap-2 pb-4">
+        <ImageIcon className="text-muted-foreground h-5 w-5" />
         <span className="text-lg font-semibold">Product Images</span>
       </CardHeader>
-      <CardContent>
-        <div className="space-y-4">
-          <div className="flex flex-col gap-2">
-            <Label htmlFor="image-upload">Upload Images</Label>
-            <FormDescription>
-              You can upload up to 4 images (max 500KB each). Drag images to
-              reorder or set as cover image.
-            </FormDescription>
+      <CardContent className="space-y-4">
+        <div className="flex flex-col gap-2">
+          <Label htmlFor="image-upload">Upload Images</Label>
+          <FormDescription>
+            You can upload up to 4 images (max 500KB each). Drag images to
+            reorder.
+          </FormDescription>
 
-            <div className="flex items-center gap-2">
-              <Input
-                type="file"
-                id="image-upload"
-                accept="image/*"
-                multiple
-                onChange={handleImageUpload}
-                disabled={productImages.length >= 4}
-                className="max-w-md"
-              />
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => document.getElementById('image-upload')?.click()}
-                disabled={productImages.length >= 4}
-                className="flex items-center gap-2"
-              >
-                <Upload className="h-4 w-4" />
-                Browse
-              </Button>
+          <div
+            className={cn(
+              'border-muted-foreground/25 hover:border-muted-foreground/50 relative rounded-lg border-2 border-dashed p-6 transition-colors',
+              productImages.length >= 4 && 'pointer-events-none opacity-60'
+            )}
+          >
+            <Input
+              type="file"
+              id="image-upload"
+              accept="image/*"
+              multiple
+              onChange={handleImageUpload}
+              disabled={productImages.length >= 4}
+              className="absolute inset-0 z-10 h-full w-full cursor-pointer opacity-0"
+            />
+            <div className="flex flex-col items-center justify-center gap-2 text-center">
+              <Upload className="text-muted-foreground h-8 w-8" />
+              <p className="text-muted-foreground text-sm font-medium">
+                Drop images here or click to upload
+              </p>
+              <p className="text-muted-foreground/75 text-xs">
+                {productImages.length} of 4 images uploaded
+              </p>
             </div>
-
-            {errorMessage && (
-              <div className="mt-1 text-sm text-red-500">{errorMessage}</div>
-            )}
-
-            {/* Display form validation error */}
-            {imageError && (
-              <div className="mt-1 text-sm text-red-500">{imageError}</div>
-            )}
           </div>
 
-          {/* Image Preview Section */}
-          {productImages.length > 0 && (
-            <div className="mt-4">
-              <Label>Product Images ({productImages.length}/4)</Label>
-              <div className="mt-2 grid grid-cols-2 gap-4">
-                {productImages.map((image) => (
-                  <div
-                    key={image.id}
-                    className={`relative flex flex-col items-center rounded-md border-2 p-2 ${
-                      image.isCover ? 'border-blue-500' : 'border-gray-200'
-                    } ${
-                      isDragging && draggedImage?.id === image.id
-                        ? 'opacity-50'
-                        : 'opacity-100'
-                    } `}
-                    draggable
-                    onDragStart={() => handleDragStart(image)}
-                    onDragOver={handleDragOver}
-                    onDrop={() => handleDrop(image)}
-                    onDragEnd={handleDragEnd}
-                  >
-                    <div className="relative h-32 w-full">
-                      <Image
-                        src={image.preview}
-                        alt="Product preview"
-                        className="h-full w-full rounded-md object-cover"
-                        width={120}
-                        height={120}
-                      />
-                      <Button
-                        type="button"
-                        variant="destructive"
-                        size="icon"
-                        className="absolute top-0 right-0 h-6 w-6 rounded-full"
-                        onClick={() => removeImage(image.id)}
-                      >
-                        <X className="h-4 w-4" />
-                      </Button>
-                    </div>
-
-                    <div className="mt-1 w-full text-center text-xs text-gray-500">
-                      {(image.file.size / 1024).toFixed(1)} KB
-                    </div>
-
-                    <Button
-                      type="button"
-                      variant={image.isCover ? 'default' : 'outline'}
-                      size="sm"
-                      className="mt-2 w-full"
-                      onClick={() => setCoverImage(image.id)}
-                      disabled={image.isCover}
-                    >
-                      {image.isCover ? 'Cover Image' : 'Set as Cover'}
-                    </Button>
-                  </div>
-                ))}
-              </div>
-            </div>
+          {(errorMessage || imageError) && (
+            <p className="text-destructive text-sm font-medium">
+              {errorMessage || imageError}
+            </p>
           )}
         </div>
+
+        {productImages.length > 0 && (
+          <div className="space-y-2">
+            <Label>Product Images ({productImages.length}/4)</Label>
+            <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+              {productImages.map((image) => (
+                <div
+                  key={image.id}
+                  className={cn(
+                    'group border-border relative rounded-lg border-2 transition-all',
+                    isDragging && draggedImage?.id === image.id && 'opacity-50'
+                  )}
+                  draggable
+                  onDragStart={() => handleDragStart(image)}
+                  onDragOver={handleDragOver}
+                  onDrop={() => handleDrop(image)}
+                  onDragEnd={handleDragEnd}
+                >
+                  <div className="relative aspect-square overflow-hidden rounded-md">
+                    <Image
+                      src={image.preview}
+                      alt="Product preview"
+                      width={200}
+                      height={200}
+                      className="h-full w-full object-cover transition-transform group-hover:scale-105"
+                    />
+                    <Button
+                      type="button"
+                      variant="destructive"
+                      size="icon"
+                      className="absolute top-2 right-2 h-7 w-7 opacity-0 transition-opacity group-hover:opacity-100"
+                      onClick={() => removeImage(image.id)}
+                    >
+                      <X className="h-4 w-4" />
+                    </Button>
+                  </div>
+                  <div className="p-2 text-center">
+                    <p className="text-muted-foreground text-xs">
+                      {(image.file.size / 1024).toFixed(1)} KB
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </CardContent>
     </Card>
   );

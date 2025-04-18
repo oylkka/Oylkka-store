@@ -29,7 +29,7 @@ export function BasicInformationCard() {
       <CardContent className="grid gap-6">
         <FormField
           control={control}
-          name="productname"
+          name="productName"
           render={({ field }) => (
             <FormItem>
               <FormLabel>Product Name *</FormLabel>

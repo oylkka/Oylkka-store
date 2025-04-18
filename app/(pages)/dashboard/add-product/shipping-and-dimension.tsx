@@ -87,36 +87,12 @@ export function ShippingDimensionsCard() {
           />
         </div>
 
-        <FormField
-          control={control}
-          name="shippingClass"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Shipping Class</FormLabel>
-              <Select onValueChange={field.onChange} defaultValue={field.value}>
-                <FormControl>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select shipping class" />
-                  </SelectTrigger>
-                </FormControl>
-                <SelectContent>
-                  <SelectItem value="standard">Standard</SelectItem>
-                  <SelectItem value="express">Express</SelectItem>
-                  <SelectItem value="oversized">Oversized</SelectItem>
-                  <SelectItem value="fragile">Fragile</SelectItem>
-                </SelectContent>
-              </Select>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
         <div className="space-y-2">
           <div className="flex items-center">
             <h3 className="text-sm font-medium">Dimensions</h3>
             <FormField
               control={control}
-              name="dimensionUnit"
+              name="dimensions.unit"
               render={({ field }) => (
                 <FormItem className="ml-auto">
                   <Select
@@ -143,7 +119,7 @@ export function ShippingDimensionsCard() {
           <div className="grid grid-cols-3 gap-4">
             <FormField
               control={control}
-              name="length"
+              name="dimensions.length"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Length</FormLabel>
@@ -167,7 +143,7 @@ export function ShippingDimensionsCard() {
             />
             <FormField
               control={control}
-              name="width"
+              name="dimensions.width"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Width</FormLabel>
@@ -191,7 +167,7 @@ export function ShippingDimensionsCard() {
             />
             <FormField
               control={control}
-              name="height"
+              name="dimensions.height"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Height</FormLabel>

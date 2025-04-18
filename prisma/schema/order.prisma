@@ -24,39 +24,39 @@ enum PaymentMethod {
 }
 
 model Order {
-  id              String        @id @default(auto()) @map("_id") @db.ObjectId
-  orderNumber     String        @unique
-  userId          String        @db.ObjectId
-  user            User          @relation("UserOrders", fields: [userId], references: [id])
-  status          OrderStatus   @default(PENDING)
-  paymentStatus   PaymentStatus @default(PENDING)
-  paymentMethod   PaymentMethod
-  items           OrderItem[]
-  
+  id            String        @id @default(auto()) @map("_id") @db.ObjectId
+  orderNumber   String        @unique
+  userId        String        @db.ObjectId
+  user          User          @relation("UserOrders", fields: [userId], references: [id])
+  status        OrderStatus   @default(PENDING)
+  paymentStatus PaymentStatus @default(PENDING)
+  paymentMethod PaymentMethod
+  items         OrderItem[]
+
   // Financial details
-  subtotal        Float
-  tax            Float
-  shipping       Float
-  discount       Float         @default(0)
-  total          Float
-  currency       String        @default("USD")
+  subtotal Float
+  tax      Float
+  shipping Float
+  discount Float  @default(0)
+  total    Float
+  currency String @default("USD")
 
   // Addresses
   shippingAddress Address
   billingAddress  Address?
-  
+
   // Shipping details
-  trackingNumber  String?
-  carrier         String?
-  
+  trackingNumber String?
+  carrier        String?
+
   // Additional information
-  notes           String?
-  giftMessage     String?
-  metadata        Json?
+  notes       String?
+  giftMessage String?
+  metadata    Json?
 
   // Timestamps
-  createdAt       DateTime    @default(now())
-  updatedAt       DateTime    @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@index([userId])
   @@index([status])
@@ -64,27 +64,27 @@ model Order {
 }
 
 model OrderItem {
-  id          String  @id @default(auto()) @map("_id") @db.ObjectId
-  orderId     String  @db.ObjectId
+  id          String @id @default(auto()) @map("_id") @db.ObjectId
+  orderId     String @db.ObjectId
   productSku  String
   productName String
   variantInfo Json?
   quantity    Int
   price       Float
-  tax         Float   @default(0)
-  discount    Float   @default(0)
-  order       Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  tax         Float  @default(0)
+  discount    Float  @default(0)
+  order       Order  @relation(fields: [orderId], references: [id], onDelete: Cascade)
 
   @@index([orderId])
   @@index([productSku])
 }
 
 type Address {
-  firstName   String
-  lastName    String
-  company     String?
-  address1    String
-  address2    String?
+  firstName  String
+  lastName   String
+  company    String?
+  address1   String
+  address2   String?
   city       String
   state      String
   postalCode String

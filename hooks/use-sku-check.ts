@@ -1,50 +1,56 @@
-// hooks/use-sku-check.ts
-import { useState } from 'react';
+import { useMutation } from '@tanstack/react-query';
+import axios, { AxiosError } from 'axios';
+import { useCallback } from 'react';
 import { useDebouncedCallback } from 'use-debounce';
 
+interface SkuCheckResponse {
+  available: boolean;
+  message?: string;
+}
+
 export function useSkuCheck() {
-  const [isChecking, setIsChecking] = useState(false);
-  const [isAvailable, setIsAvailable] = useState<boolean | null>(null);
-  const [error, setError] = useState<string | null>(null);
-
-  const checkSkuAvailability = useDebouncedCallback(async (sku: string) => {
-    if (!sku) {
-      setIsAvailable(null);
-      setError(null);
-      return;
-    }
-
-    try {
-      setIsChecking(true);
-      setError(null);
-
-      const response = await fetch('/api/products/check-sku', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ sku }),
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to check SKU');
+  const {
+    mutate: checkSku,
+    isPending: isChecking,
+    data,
+    error,
+  } = useMutation<SkuCheckResponse, AxiosError, string>({
+    mutationFn: async (sku: string) => {
+      const trimmedSku = sku.trim();
+      if (!trimmedSku) {
+        // Return null for empty SKU to reset the state
+        return { available: false, message: '' };
       }
 
-      const data = await response.json();
-      setIsAvailable(data.available);
-      if (!data.available) {
-        setError(data.message);
-      }
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Unknown error occurred');
-      setIsAvailable(null);
-    } finally {
-      setIsChecking(false);
-    }
-  }, 500); // Debounce to avoid too many requests
+      const response = await axios.post<SkuCheckResponse>(
+        '/api/products/check-sku',
+        { sku: trimmedSku }
+      );
+      return response.data;
+    },
+    onError: (err) => {
+      console.error('SKU check error:', err);
+    },
+  });
+
+  const debouncedCheckSkuAvailability = useDebouncedCallback(
+    (sku: string) => checkSku(sku),
+    500
+  );
+
+  const checkSkuAvailability = useCallback(
+    (sku: string) => {
+      debouncedCheckSkuAvailability(sku);
+    },
+    [debouncedCheckSkuAvailability]
+  );
 
   return {
     isChecking,
-    isAvailable,
-    error,
+    isAvailable: data?.available ?? null,
+    error: error
+      ? (error.response?.data as { message?: string })?.message || error.message
+      : null,
     checkSkuAvailability,
   };
 }
