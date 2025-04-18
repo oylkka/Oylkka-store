@@ -16,7 +16,7 @@ export default function layout({
           <header className="flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12">
             <BreadCrumb />
           </header>
-          <div className="container mx-auto mb-10 px-2 md:px-4">{children}</div>
+          <div className="container mx-auto mb-10 px-2 md:px-0">{children}</div>
           <Footer />
         </SidebarInset>
       </SidebarProvider>
