@@ -10,7 +10,8 @@ model User {
   name           String?
   email          String?         @unique
   emailVerified  DateTime?
-  image          Image?
+  image          String?
+  imageId        String?
   accounts       Account[]
   sessions       Session[]
   role           UserRole        @default(USER)
