@@ -1,13 +1,29 @@
 'use client';
 
-import { Search, ShoppingBag, SlidersHorizontal, X } from 'lucide-react';
+import {
+  ChevronDown,
+  Filter,
+  Grid3x3,
+  Heart,
+  List,
+  RefreshCw,
+  Search,
+  ShoppingBag,
+  SlidersHorizontal,
+  Star,
+  StarHalf,
+  Store,
+  X,
+} from 'lucide-react';
 import Image from 'next/image';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter } from '@/components/ui/card';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
+import { ScrollArea } from '@/components/ui/scroll-area';
 import {
   Select,
   SelectContent,
@@ -27,6 +43,8 @@ import {
   SheetTrigger,
 } from '@/components/ui/sheet';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Slider } from '@/components/ui/slider';
+import { cn } from '@/lib/utils';
 import { useProductList } from '@/service/product-list';
 
 type Product = {
@@ -43,39 +61,75 @@ type Product = {
 };
 
 export default function ShopPage() {
-  const { data: productsData, isLoading, error } = useProductList();
-  const products: Product[] = productsData?.products || [];
+  const { data, isPending, error } = useProductList();
 
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [selectedSort, setSelectedSort] = useState('featured');
-  const [isFiltersOpen, setIsFiltersOpen] = useState(false);
+  const [selectedView, setSelectedView] = useState('grid');
+  const [priceRange, setPriceRange] = useState([0, 1000]);
+  const [availableCategories, setAvailableCategories] = useState<string[]>([]);
+  const [wishlist, setWishlist] = useState<Set<string>>(new Set());
 
-  // Filter products based on search and category
-  const filteredProducts = products.filter((product) => {
-    const matchesSearch = product.productName
-      .toLowerCase()
-      .includes(searchQuery.toLowerCase());
-    const matchesCategory =
-      selectedCategory === 'all' || product.category === selectedCategory;
-    return matchesSearch && matchesCategory;
-  });
+  // Extract unique categories when data loads
+  useEffect(() => {
+    if (data?.products) {
+      const categories = new Set<string>();
+      data.products.forEach((product: Product) => {
+        if (product.category) {
+          categories.add(product.category);
+        }
+      });
+      setAvailableCategories(Array.from(categories));
+    }
+  }, [data]);
+
+  // Handle wishlist toggle
+  const toggleWishlist = (productId: string) => {
+    setWishlist((prev) => {
+      const newWishlist = new Set(prev);
+      if (newWishlist.has(productId)) {
+        newWishlist.delete(productId);
+      } else {
+        newWishlist.add(productId);
+      }
+      return newWishlist;
+    });
+  };
+
+  // Filter products based on search, category, and price
+  const filteredProducts =
+    data?.products?.filter((product: Product) => {
+      const matchesSearch = product.productName
+        .toLowerCase()
+        .includes(searchQuery.toLowerCase());
+      const matchesCategory =
+        selectedCategory === 'all' || product.category === selectedCategory;
+      const matchesPrice =
+        product.price >= priceRange[0] &&
+        (product.discountPrice || product.price) <= priceRange[1];
+
+      return matchesSearch && matchesCategory && matchesPrice;
+    }) || [];
 
   // Sort products
-  const sortedProducts = [...filteredProducts].sort((a, b) => {
-    if (selectedSort === 'price-low') {
-      const priceA = a.discountPrice !== null ? a.discountPrice : a.price;
-      const priceB = b.discountPrice !== null ? b.discountPrice : b.price;
-      return (priceA || 0) - (priceB || 0);
-    } else if (selectedSort === 'price-high') {
-      const priceA = a.discountPrice !== null ? a.discountPrice : a.price;
-      const priceB = b.discountPrice !== null ? b.discountPrice : b.price;
-      return (priceB || 0) - (priceA || 0);
+  const sortedProducts = [...filteredProducts].sort(
+    (a: Product, b: Product) => {
+      switch (selectedSort) {
+        case 'price-low':
+          return (a.discountPrice || a.price) - (b.discountPrice || b.price);
+        case 'price-high':
+          return (b.discountPrice || b.price) - (a.discountPrice || a.price);
+        case 'newest':
+          return new Date(b.id).getTime() - new Date(a.id).getTime();
+        default:
+          return 0;
+      }
     }
-    return 0; // Default: featured
-  });
+  );
 
-  if (isLoading) {
+  // Loading state
+  if (isPending) {
     return (
       <div className="container mx-auto p-6">
         <div className="mb-8 flex justify-between">
@@ -84,13 +138,19 @@ export default function ShopPage() {
         </div>
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
           {Array.from({ length: 8 }).map((_, idx) => (
-            <Skeleton key={idx} className="h-96 w-full rounded-xl" />
+            <div key={idx} className="space-y-3">
+              <Skeleton className="h-64 w-full rounded-xl" />
+              <Skeleton className="h-6 w-3/4" />
+              <Skeleton className="h-6 w-1/2" />
+              <Skeleton className="h-10 w-full" />
+            </div>
           ))}
         </div>
       </div>
     );
   }
 
+  // Error state
   if (error) {
     return (
       <div className="container mx-auto flex h-96 flex-col items-center justify-center gap-4 p-6 text-center">
@@ -101,16 +161,20 @@ export default function ShopPage() {
         <p className="text-muted-foreground max-w-md">
           We couldn&#39;t load the products. Please try again later.
         </p>
-        <Button className="mt-4">Refresh Page</Button>
+        <Button className="mt-4 gap-2">
+          <RefreshCw className="h-4 w-4" />
+          Refresh Page
+        </Button>
       </div>
     );
   }
 
-  if (!products.length) {
+  // Empty state
+  if (!data?.products || data.products.length === 0) {
     return (
       <div className="container mx-auto flex h-96 flex-col items-center justify-center gap-4 p-6 text-center">
         <div className="rounded-full bg-amber-100 p-4">
-          <ShoppingBag className="h-8 w-8 text-amber-500" />
+          <Store className="h-8 w-8 text-amber-500" />
         </div>
         <h2 className="text-2xl font-bold">No products found</h2>
         <p className="text-muted-foreground max-w-md">
@@ -124,201 +188,528 @@ export default function ShopPage() {
   }
 
   return (
-    <div className="min-h-screen">
-      <main className="container mx-auto px-4 py-8">
-        {/* Page header with search and filter controls */}
-        <div className="mb-8 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-          <div>
-            <h2 className="text-3xl font-bold tracking-tight">
-              Shop Collection
-            </h2>
-            <p className="text-muted-foreground mt-1">
-              {sortedProducts.length} products available
-            </p>
+    <div className="min-h-screen bg-slate-50/50">
+      {/* Hero Section */}
+      <div className="relative bg-gradient-to-r from-blue-600 to-indigo-700 py-16 text-white">
+        <div className="container mx-auto px-4">
+          <h1 className="mb-4 text-4xl font-bold">Shop Our Collection</h1>
+          <p className="mb-6 max-w-lg text-blue-100">
+            Discover our carefully curated products designed for quality, style,
+            and functionality.
+          </p>
+          <div className="relative max-w-xl">
+            <Input
+              type="search"
+              placeholder="Search for products..."
+              className="border-0 bg-white/20 pr-10 text-white backdrop-blur-sm placeholder:text-blue-100 focus:ring-2 focus:ring-white"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+            <Search className="absolute top-1/2 right-3 h-5 w-5 -translate-y-1/2 text-blue-100" />
           </div>
+        </div>
+        <div className="absolute right-0 bottom-0 left-0 h-16 bg-gradient-to-t from-slate-50/50 to-transparent" />
+      </div>
 
-          <div className="flex flex-wrap gap-3">
-            <div className="relative flex-1 md:w-64 md:flex-none">
-              <Search className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
-              <Input
-                type="search"
-                placeholder="Search products..."
-                className="pl-9"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-              />
-            </div>
+      <main className="container mx-auto px-4 py-8">
+        {/* Top controls */}
+        <div className="mb-8 flex flex-wrap items-center justify-between gap-4 rounded-lg bg-white p-4 shadow-sm">
+          <div className="flex items-center gap-2">
+            <Filter className="text-muted-foreground h-5 w-5" />
+            <h3 className="font-medium">Filter:</h3>
 
-            <Select value={selectedSort} onValueChange={setSelectedSort}>
-              <SelectTrigger className="w-36">
-                <SelectValue placeholder="Sort by" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="featured">Featured</SelectItem>
-                <SelectItem value="price-low">Price: Low to High</SelectItem>
-                <SelectItem value="price-high">Price: High to Low</SelectItem>
-              </SelectContent>
-            </Select>
-
-            <Sheet open={isFiltersOpen} onOpenChange={setIsFiltersOpen}>
+            <Sheet>
               <SheetTrigger asChild>
-                <Button variant="outline" className="gap-2">
+                <Button variant="outline" size="sm" className="gap-1">
                   <SlidersHorizontal className="h-4 w-4" />
-                  Filters
+                  <span className="hidden sm:inline">All Filters</span>
                 </Button>
               </SheetTrigger>
-              <SheetContent>
+              <SheetContent className="w-full max-w-sm sm:max-w-md">
                 <SheetHeader>
-                  <SheetTitle>Filters</SheetTitle>
+                  <SheetTitle>Shop Filters</SheetTitle>
                   <SheetDescription>
                     Narrow down products based on your preferences
                   </SheetDescription>
                 </SheetHeader>
-                <div className="py-6">
-                  <h3 className="mb-2 font-medium">Categories</h3>
+                <ScrollArea className="h-[calc(100vh-180px)] pr-4">
+                  <div className="py-6">
+                    <h3 className="mb-3 font-medium">Categories</h3>
+                    <div className="space-y-2">
+                      <div className="flex items-center space-x-2">
+                        <Checkbox
+                          id="all"
+                          checked={selectedCategory === 'all'}
+                          onCheckedChange={() => setSelectedCategory('all')}
+                        />
+                        <label htmlFor="all" className="text-sm font-medium">
+                          All Categories
+                        </label>
+                      </div>
+                      {availableCategories.map((category) => (
+                        <div
+                          key={category}
+                          className="flex items-center space-x-2"
+                        >
+                          <Checkbox
+                            id={category}
+                            checked={selectedCategory === category}
+                            onCheckedChange={() =>
+                              setSelectedCategory(category)
+                            }
+                          />
+                          <label
+                            htmlFor={category}
+                            className="text-sm font-medium"
+                          >
+                            {category}
+                          </label>
+                        </div>
+                      ))}
+                    </div>
 
-                  <Separator className="my-6" />
+                    <Separator className="my-6" />
 
-                  <h3 className="mb-2 font-medium">Price Range</h3>
-                  <div className="flex gap-2">
-                    <Input type="number" placeholder="Min" />
-                    <Input type="number" placeholder="Max" />
+                    <h3 className="mb-3 font-medium">Price Range</h3>
+                    <div className="mb-6 space-y-4">
+                      <Slider
+                        defaultValue={[0, 1000]}
+                        max={1000}
+                        step={10}
+                        value={priceRange}
+                        onValueChange={setPriceRange}
+                      />
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm font-medium">
+                          ${priceRange[0]}
+                        </span>
+                        <span className="text-sm font-medium">
+                          ${priceRange[1]}
+                        </span>
+                      </div>
+                    </div>
+
+                    <Separator className="my-6" />
+
+                    <h3 className="mb-3 font-medium">Product Status</h3>
+                    <div className="space-y-2">
+                      <div className="flex items-center space-x-2">
+                        <Checkbox id="in-stock" />
+                        <label
+                          htmlFor="in-stock"
+                          className="text-sm font-medium"
+                        >
+                          In Stock Only
+                        </label>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <Checkbox id="on-sale" />
+                        <label
+                          htmlFor="on-sale"
+                          className="text-sm font-medium"
+                        >
+                          On Sale
+                        </label>
+                      </div>
+                    </div>
                   </div>
-                </div>
-                <SheetFooter>
+                </ScrollArea>
+                <SheetFooter className="flex-row justify-between sm:justify-between">
+                  <SheetClose asChild>
+                    <Button variant="outline">Reset All</Button>
+                  </SheetClose>
                   <SheetClose asChild>
                     <Button>Apply Filters</Button>
                   </SheetClose>
                 </SheetFooter>
               </SheetContent>
             </Sheet>
+
+            <Select
+              value={selectedCategory}
+              onValueChange={setSelectedCategory}
+            >
+              <SelectTrigger className="w-[160px]">
+                <SelectValue placeholder="Category" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Categories</SelectItem>
+                {availableCategories.map((category) => (
+                  <SelectItem key={category} value={category}>
+                    {category}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="flex items-center gap-3">
+            <Select value={selectedSort} onValueChange={setSelectedSort}>
+              <SelectTrigger className="w-[140px]">
+                <SelectValue placeholder="Sort by" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="featured">Featured</SelectItem>
+                <SelectItem value="newest">Newest</SelectItem>
+                <SelectItem value="price-low">Price: Low to High</SelectItem>
+                <SelectItem value="price-high">Price: High to Low</SelectItem>
+              </SelectContent>
+            </Select>
+
+            <div className="hidden items-center rounded-md border bg-white md:flex">
+              <Button
+                variant="ghost"
+                size="icon"
+                className={cn(
+                  'rounded-none border-r',
+                  selectedView === 'grid' ? 'bg-muted' : ''
+                )}
+                onClick={() => setSelectedView('grid')}
+              >
+                <Grid3x3 className="h-4 w-4" />
+              </Button>
+              <Button
+                variant="ghost"
+                size="icon"
+                className={cn(selectedView === 'list' ? 'bg-muted' : '')}
+                onClick={() => setSelectedView('list')}
+              >
+                <List className="h-4 w-4" />
+              </Button>
+            </div>
           </div>
         </div>
 
         {/* Active filters */}
-        {selectedCategory !== 'all' && (
-          <div className="mb-6 flex flex-wrap gap-2">
-            <Badge variant="secondary" className="gap-1 px-3 py-1 text-sm">
-              {selectedCategory.charAt(0).toUpperCase() +
-                selectedCategory.slice(1)}
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-4 w-4 p-0"
-                onClick={() => setSelectedCategory('all')}
-              >
-                <X className="h-3 w-3" />
-              </Button>
-            </Badge>
+        {(selectedCategory !== 'all' ||
+          searchQuery ||
+          priceRange[0] > 0 ||
+          priceRange[1] < 1000) && (
+          <div className="mb-6 flex flex-wrap items-center gap-2">
+            <span className="text-sm font-medium">Active Filters:</span>
+
+            {selectedCategory !== 'all' && (
+              <Badge variant="secondary" className="gap-1 px-3 py-1 text-sm">
+                Category: {selectedCategory}
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-4 w-4 p-0 hover:bg-transparent"
+                  onClick={() => setSelectedCategory('all')}
+                >
+                  <X className="h-3 w-3" />
+                </Button>
+              </Badge>
+            )}
+
+            {searchQuery && (
+              <Badge variant="secondary" className="gap-1 px-3 py-1 text-sm">
+                Search: {searchQuery}
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-4 w-4 p-0 hover:bg-transparent"
+                  onClick={() => setSearchQuery('')}
+                >
+                  <X className="h-3 w-3" />
+                </Button>
+              </Badge>
+            )}
+
+            {(priceRange[0] > 0 || priceRange[1] < 1000) && (
+              <Badge variant="secondary" className="gap-1 px-3 py-1 text-sm">
+                Price: ${priceRange[0]} - ${priceRange[1]}
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-4 w-4 p-0 hover:bg-transparent"
+                  onClick={() => setPriceRange([0, 1000])}
+                >
+                  <X className="h-3 w-3" />
+                </Button>
+              </Badge>
+            )}
+
+            <Button
+              variant="ghost"
+              className="text-sm font-medium text-blue-600"
+              onClick={() => {
+                setSearchQuery('');
+                setSelectedCategory('all');
+                setPriceRange([0, 1000]);
+              }}
+            >
+              Clear All
+            </Button>
           </div>
         )}
 
-        {/* Products grid */}
+        {/* Results summary */}
+        <div className="mb-6">
+          <p className="text-muted-foreground">
+            Showing{' '}
+            <span className="text-foreground font-medium">
+              {sortedProducts.length}
+            </span>{' '}
+            of {data.products.length} products
+          </p>
+        </div>
+
+        {/* Products display */}
         {sortedProducts.length > 0 ? (
-          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-            {sortedProducts.map((product) => {
-              const imageUrl =
-                product.images?.[0]?.url || '/api/placeholder/400/500';
-              const price = product.price;
-              const discountPrice = product.discountPrice;
+          selectedView === 'grid' ? (
+            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+              {sortedProducts.map((product: Product) => {
+                const imageUrl =
+                  product.images?.[0]?.url || '/api/placeholder/400/500';
+                const price = product.price;
+                const discountPrice = product.discountPrice;
+                const isWishlisted = wishlist.has(product.id);
 
-              return (
-                <Card
-                  key={product.id}
-                  className="group relative overflow-hidden rounded-xl border-none shadow-md transition-all hover:shadow-xl"
-                >
-                  {/* Discount Badge */}
-                  {product.discountPercent && (
-                    <div className="absolute top-3 left-3 z-10 rounded-full bg-red-500 px-3 py-1 text-xs font-semibold text-white shadow-md">
-                      {product.discountPercent}% OFF
-                    </div>
-                  )}
-
-                  {/* Wishlist Button */}
-                  <Button
-                    variant="secondary"
-                    size="icon"
-                    className="absolute top-3 right-3 z-10 h-8 w-8 rounded-full bg-white/80 opacity-0 shadow-md backdrop-blur-sm transition-opacity group-hover:opacity-100"
+                return (
+                  <Card
+                    key={product.id}
+                    className="group overflow-hidden rounded-xl border p-0 transition-all duration-300 hover:shadow-lg"
                   >
-                    <svg
-                      width="15"
-                      height="15"
-                      viewBox="0 0 15 15"
-                      fill="none"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <path
-                        d="M7.5 13.5L7.1 13.1C3.4 9.7 1 7.5 1 4.9C1 2.7 2.7 1 4.9 1C5.9 1 6.9 1.4 7.5 2C8.1 1.4 9.1 1 10.1 1C12.3 1 14 2.7 14 4.9C14 7.5 11.6 9.7 7.9 13.1L7.5 13.5Z"
-                        stroke="currentColor"
-                        strokeWidth="1.5"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      />
-                    </svg>
-                  </Button>
+                    <div className="relative">
+                      {/* Product Image with Gradient Overlay */}
+                      <div className="relative h-72 w-full overflow-hidden">
+                        <Image
+                          src={imageUrl}
+                          alt={product.productName}
+                          fill
+                          className="object-cover transition-transform duration-500 group-hover:scale-105"
+                          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 transition-opacity group-hover:opacity-100" />
+                      </div>
 
-                  {/* Product Image */}
-                  <div className="relative h-64 w-full overflow-hidden bg-slate-100">
-                    <Image
-                      src={imageUrl}
-                      alt={product.productName}
-                      fill
-                      className="object-cover transition-transform duration-700 group-hover:scale-110"
-                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
-                    />
-                  </div>
+                      {/* Discount Badge */}
+                      {product.discountPercent &&
+                        product.discountPercent > 0 && (
+                          <Badge className="absolute top-3 left-3 bg-red-500 px-2 py-1 font-medium text-white">
+                            {product.discountPercent}% OFF
+                          </Badge>
+                        )}
 
-                  {/* Content */}
-                  <CardContent className="space-y-3 p-4">
-                    <div className="flex items-center justify-between">
-                      <Badge variant="outline" className="bg-slate-50">
-                        {product.category || 'Fashion'}
-                      </Badge>
-                      {product.stock && product.stock < 10 && (
-                        <Badge
-                          variant="secondary"
-                          className="bg-amber-50 text-amber-700"
-                        >
-                          Low Stock
-                        </Badge>
-                      )}
+                      {/* Wishlist Button */}
+                      <Button
+                        variant="secondary"
+                        size="icon"
+                        className={cn(
+                          'absolute top-3 right-3 h-8 w-8 rounded-full bg-white/80 shadow-md backdrop-blur-sm transition-all',
+                          isWishlisted
+                            ? 'text-red-500'
+                            : 'opacity-0 group-hover:opacity-100'
+                        )}
+                        onClick={() => toggleWishlist(product.id)}
+                        aria-label="Add to wishlist"
+                      >
+                        <Heart
+                          className={cn(
+                            'h-4 w-4',
+                            isWishlisted && 'fill-current'
+                          )}
+                        />
+                      </Button>
+
+                      {/* Quick Add Overlay - Appears on Hover */}
+                      <div className="absolute right-0 bottom-0 left-0 translate-y-full bg-white/95 p-3 backdrop-blur-sm transition-transform duration-300 group-hover:translate-y-0">
+                        <Button className="w-full gap-2 font-medium">
+                          <ShoppingBag className="h-4 w-4" />
+                          Add to Cart
+                        </Button>
+                      </div>
                     </div>
 
-                    <h3 className="line-clamp-1 text-lg font-medium">
-                      {product.productName}
-                    </h3>
+                    <CardContent className="p-4 pt-10">
+                      <div className="mb-2 flex items-center justify-between">
+                        <Badge
+                          variant="outline"
+                          className="bg-slate-50 text-xs font-normal"
+                        >
+                          {product.category || 'Fashion'}
+                        </Badge>
 
-                    <div className="flex items-center gap-2">
-                      {discountPrice ? (
-                        <>
-                          <span className="text-lg font-medium text-red-600">
-                            ${discountPrice.toFixed(2)}
-                          </span>
-                          <span className="text-muted-foreground text-sm line-through">
+                        {product.stock !== undefined && product.stock < 10 && (
+                          <Badge
+                            variant="secondary"
+                            className="bg-amber-50 text-xs text-amber-700"
+                          >
+                            {product.stock > 0
+                              ? `Only ${product.stock} left`
+                              : 'Out of stock'}
+                          </Badge>
+                        )}
+                      </div>
+
+                      {/* Product Rating */}
+                      <div className="mb-2 flex items-center gap-1">
+                        {[...Array(4)].map((_, i) => (
+                          <Star
+                            key={i}
+                            className="h-3 w-3 fill-yellow-400 text-yellow-400"
+                          />
+                        ))}
+                        <StarHalf className="h-3 w-3 fill-yellow-400 text-yellow-400" />
+                        <span className="text-muted-foreground ml-1 text-xs">
+                          4.5
+                        </span>
+                      </div>
+
+                      <h3 className="mb-1 line-clamp-1 text-base font-medium">
+                        {product.productName}
+                      </h3>
+
+                      <div className="mt-2 flex items-center gap-2">
+                        {discountPrice ? (
+                          <>
+                            <span className="text-lg font-semibold text-red-600">
+                              ${discountPrice.toFixed(2)}
+                            </span>
+                            <span className="text-muted-foreground text-sm line-through">
+                              ${price.toFixed(2)}
+                            </span>
+                          </>
+                        ) : (
+                          <span className="text-lg font-semibold">
                             ${price.toFixed(2)}
                           </span>
-                        </>
-                      ) : (
-                        <span className="text-lg font-medium">
-                          ${price.toFixed(2)}
-                        </span>
-                      )}
-                    </div>
-                  </CardContent>
+                        )}
+                      </div>
+                    </CardContent>
 
-                  <CardFooter className="p-4 pt-0">
-                    <Button
-                      className="group/btn w-full gap-2"
-                      // onClick={() => addToCart(product)}
-                    >
-                      <ShoppingBag className="h-4 w-4 transition-transform group-hover/btn:scale-110" />
-                      Add to Cart
-                    </Button>
-                  </CardFooter>
-                </Card>
-              );
-            })}
-          </div>
+                    <CardFooter className="flex items-center justify-between p-4 pt-0">
+                      <div className="text-muted-foreground text-xs">
+                        {product.stock !== undefined && product.stock < 10
+                          ? product.stock > 0
+                            ? '🔥 Selling fast'
+                            : '❌ Out of stock'
+                          : '✓ In stock'}
+                      </div>
+
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="hover:text-primary h-auto p-0 text-sm hover:bg-transparent"
+                      >
+                        Quick view
+                      </Button>
+                    </CardFooter>
+                  </Card>
+                );
+              })}
+            </div>
+          ) : (
+            // List view
+            <div className="space-y-4">
+              {sortedProducts.map((product: Product) => {
+                const imageUrl =
+                  product.images?.[0]?.url || '/api/placeholder/400/500';
+                const price = product.price;
+                const discountPrice = product.discountPrice;
+                const isWishlisted = wishlist.has(product.id);
+
+                return (
+                  <Card key={product.id} className="overflow-hidden">
+                    <div className="flex flex-col sm:flex-row">
+                      <div className="relative h-48 sm:h-auto sm:w-48 md:w-64">
+                        <Image
+                          src={imageUrl}
+                          alt={product.productName}
+                          fill
+                          className="object-cover"
+                          sizes="(max-width: 768px) 100vw, 200px"
+                        />
+                        {product.discountPercent &&
+                          product.discountPercent > 0 && (
+                            <Badge className="absolute top-3 left-3 bg-red-500 text-white">
+                              {product.discountPercent}% OFF
+                            </Badge>
+                          )}
+                      </div>
+
+                      <div className="flex flex-1 flex-col p-4">
+                        <div className="mb-2 flex items-center justify-between">
+                          <Badge variant="outline">
+                            {product.category || 'Fashion'}
+                          </Badge>
+
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className={cn(
+                              'h-8 w-8',
+                              isWishlisted && 'text-red-500'
+                            )}
+                            onClick={() => toggleWishlist(product.id)}
+                          >
+                            <Heart
+                              className={cn(
+                                'h-4 w-4',
+                                isWishlisted && 'fill-current'
+                              )}
+                            />
+                          </Button>
+                        </div>
+
+                        <h3 className="mb-1 line-clamp-1 text-xl font-medium">
+                          {product.productName}
+                        </h3>
+
+                        <div className="mb-2 flex items-center gap-1">
+                          {[...Array(4)].map((_, i) => (
+                            <Star
+                              key={i}
+                              className="h-4 w-4 fill-yellow-400 text-yellow-400"
+                            />
+                          ))}
+                          <StarHalf className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+                          <span className="text-muted-foreground ml-1 text-sm">
+                            4.5
+                          </span>
+                        </div>
+
+                        <p className="text-muted-foreground mb-4 line-clamp-2">
+                          High-quality product with premium materials. Perfect
+                          for everyday use.
+                        </p>
+
+                        <div className="mt-auto flex items-center justify-between">
+                          <div className="flex items-center gap-2">
+                            {discountPrice ? (
+                              <>
+                                <span className="text-xl font-semibold text-red-600">
+                                  ${discountPrice.toFixed(2)}
+                                </span>
+                                <span className="text-muted-foreground text-sm line-through">
+                                  ${price.toFixed(2)}
+                                </span>
+                              </>
+                            ) : (
+                              <span className="text-xl font-semibold">
+                                ${price.toFixed(2)}
+                              </span>
+                            )}
+                          </div>
+
+                          <div className="flex items-center gap-2">
+                            <Button variant="outline" size="sm">
+                              Quick View
+                            </Button>
+                            <Button size="sm" className="gap-2">
+                              <ShoppingBag className="h-4 w-4" />
+                              Add to Cart
+                            </Button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </Card>
+                );
+              })}
+            </div>
+          )
         ) : (
           <div className="flex h-64 flex-col items-center justify-center text-center">
             <p className="text-muted-foreground mb-4 text-lg">
@@ -329,9 +720,39 @@ export default function ShopPage() {
               onClick={() => {
                 setSearchQuery('');
                 setSelectedCategory('all');
+                setPriceRange([0, 1000]);
               }}
             >
               Clear Filters
+            </Button>
+          </div>
+        )}
+
+        {/* Pagination - if needed */}
+        {sortedProducts.length > 0 && (
+          <div className="mt-12 flex items-center justify-center gap-1">
+            <Button variant="outline" size="icon" disabled>
+              <ChevronDown className="h-4 w-4 rotate-90" />
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              className="h-8 w-8 p-0 font-medium"
+            >
+              1
+            </Button>
+            <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+              2
+            </Button>
+            <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+              3
+            </Button>
+            <span className="px-2">...</span>
+            <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+              10
+            </Button>
+            <Button variant="outline" size="icon">
+              <ChevronDown className="h-4 w-4 -rotate-90" />
             </Button>
           </div>
         )}
