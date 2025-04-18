@@ -61,6 +61,7 @@ export async function POST(req: NextRequest) {
 
     // Parse form data
     const formData = await req.formData();
+
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const productData: Record<string, any> = {};
     const imageFiles: File[] = [];
@@ -188,6 +189,3 @@ export async function POST(req: NextRequest) {
     );
   }
 }
-
-// GET endpoint to retrieve products
-

@@ -7,31 +7,10 @@ export async function GET(req: NextRequest) {
     const { searchParams } = new URL(req.url);
     const limit = parseInt(searchParams.get('limit') || '10');
     const page = parseInt(searchParams.get('page') || '1');
-    const status = searchParams.get('status');
-    const category = searchParams.get('category');
-    const search = searchParams.get('search');
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const filter: any = {};
 
-    if (status) {
-      filter.status = status;
-    }
-
-    if (category) {
-      filter.category = category;
-    }
-
-    if (search) {
-      filter.OR = [
-        { productName: { contains: search, mode: 'insensitive' } },
-        { tags: { has: search } },
-      ];
-    }
-
-    const totalProducts = await db.product.count({ where: filter });
+    const totalProducts = await db.product.count();
 
     const products = await db.product.findMany({
-      where: filter,
       skip: (page - 1) * limit,
       take: limit,
       select: {

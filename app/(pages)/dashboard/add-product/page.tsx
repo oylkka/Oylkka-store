@@ -6,6 +6,7 @@ import { useContext } from 'react';
 import { useFormContext } from 'react-hook-form';
 
 import { Button } from '@/components/ui/button';
+import { useCreateProduct } from '@/service';
 
 import { BasicInformationCard } from './basic-information';
 import { CategoryCard } from './category-and-tags';
@@ -31,6 +32,7 @@ export default function NewProductPage() {
 function NewProductForm() {
   const methods = useFormContext<ProductFormValues>();
   const { onSubmit } = useContext(ProductFormContext);
+  const { isPending } = useCreateProduct();
 
   return (
     <form onSubmit={methods.handleSubmit(onSubmit)}>
@@ -46,9 +48,15 @@ function NewProductForm() {
           <Button variant="outline" type="button">
             Discard
           </Button>
-          <Button type="submit" className="gap-2">
-            <Plus className="h-4 w-4" />
-            Save Product
+          <Button type="submit" className="gap-2" disabled={isPending}>
+            {isPending ? (
+              'Saving...'
+            ) : (
+              <>
+                <Plus className="h-4 w-4" />
+                Save Product
+              </>
+            )}
           </Button>
         </div>
       </div>
