@@ -47,6 +47,10 @@ const productSchema = z.object({
     .optional(),
   attributes: z.record(z.array(z.string())).optional(),
   sku: z.string().min(1, 'SKU is required'),
+  brand: z
+    .string()
+    .max(40, { message: 'Brand must be at most 40 characters' })
+    .default('No Brand'),
 });
 
 export async function POST(req: NextRequest) {
@@ -143,6 +147,7 @@ export async function POST(req: NextRequest) {
         conditionDescription: productData.conditionDescription,
         weight: productData.weight ? parseFloat(productData.weight) : undefined,
         weightUnit: productData.weightUnit || 'kg',
+        brand: productData.brand || 'No Brand',
         freeShipping: Boolean(productData.freeShipping),
         status: productData.status || 'DRAFT',
         tags: Array.isArray(productData.tags) ? productData.tags : [],

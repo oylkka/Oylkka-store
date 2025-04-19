@@ -115,6 +115,19 @@ export function ProductDetailsCard() {
       <CardContent className="space-y-4">
         <FormField
           control={control}
+          name="brand"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Product Brand</FormLabel>
+              <FormControl>
+                <Input {...field} placeholder="Product Brand" />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={control}
           name="sku"
           render={({ field }) => (
             <FormItem>

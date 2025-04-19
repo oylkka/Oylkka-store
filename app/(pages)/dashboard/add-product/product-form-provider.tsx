@@ -80,6 +80,7 @@ export function ProductFormProvider({ children }: ProductFormProviderProps) {
       'weightUnit',
       'freeShipping',
       'status',
+      'brand',
     ];
 
     primitiveFields.forEach((field) => {

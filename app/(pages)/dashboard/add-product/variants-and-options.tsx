@@ -497,7 +497,7 @@ export function VariantAttributesCard() {
   }, [attributesRecord, attributeTypes.length]);
 
   return (
-    <Card className="border-none shadow-lg">
+    <Card>
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-6">
         <CardTitle className="text-xl font-semibold">
           Product Variants

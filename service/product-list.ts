@@ -20,3 +20,15 @@ export function useProductList(filters: FilterOptions = {}) {
     },
   });
 }
+
+export function useRelatedProduct({ id }: { id: string }) {
+  return useQuery({
+    queryKey: ['related-product', id],
+    queryFn: async () => {
+      const response = await axios.get(`/api/products/related-products`, {
+        params: { productId: id },
+      });
+      return response.data;
+    },
+  });
+}

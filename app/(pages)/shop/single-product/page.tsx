@@ -52,6 +52,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Textarea } from '@/components/ui/textarea';
 import { cn } from '@/lib/utils';
 import { useSingleProduct } from '@/service';
+import RelatedProducts from './related-product';
 
 // Type definitions
 interface ProductImage {
@@ -1206,53 +1207,7 @@ function ProductPage() {
         </div>
 
         {/* Related Products */}
-        <div className="mt-16">
-          <div className="mb-6 flex items-center justify-between">
-            <h2 className="text-2xl font-bold">You May Also Like</h2>
-          </div>
-
-          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-4">
-            {relatedProducts.map((relatedProduct) => (
-              <Card
-                key={relatedProduct.id}
-                className="overflow-hidden transition hover:shadow-md"
-              >
-                <div className="relative aspect-square">
-                  <Image
-                    src={relatedProduct.image}
-                    alt={relatedProduct.name}
-                    fill
-                    className="object-cover"
-                  />
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="absolute top-2 right-2 bg-white/80 hover:bg-white"
-                  >
-                    <Heart className="h-4 w-4" />
-                  </Button>
-                </div>
-                <CardContent className="p-4">
-                  <h3 className="line-clamp-1 text-base font-medium">
-                    {relatedProduct.name}
-                  </h3>
-                  <div className="mt-1 flex items-center gap-2">
-                    <RatingDisplay rating={relatedProduct.rating} size="sm" />
-                    <span className="text-xs text-gray-500">
-                      {relatedProduct.rating.toFixed(1)}
-                    </span>
-                  </div>
-                  <div className="mt-2 font-medium">
-                    ${relatedProduct.price.toFixed(2)}
-                  </div>
-                  <Button className="mt-3 w-full" variant="outline" size="sm">
-                    Quick View
-                  </Button>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </div>
+        <RelatedProducts id={productId} />
       </div>
     </>
   );

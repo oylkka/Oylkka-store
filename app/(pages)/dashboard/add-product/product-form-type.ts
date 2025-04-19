@@ -116,6 +116,10 @@ export const ProductFormSchema = z
       .default(5),
 
     // Condition
+    brand: z
+      .string()
+      .max(40, { message: 'Brand must be at most 40 characters' })
+      .optional(),
     condition: ProductConditionEnum,
     conditionDescription: z.string().optional(),
 

@@ -30,6 +30,7 @@ model Product {
   stock           Int
   lowStockAlert   Int      @default(5)
 
+  brand           String?
   condition            ProductCondition
   conditionDescription String?
 
