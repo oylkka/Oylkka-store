@@ -2,6 +2,7 @@
 
 import { Eye, Heart, ShoppingBag, Star } from 'lucide-react';
 import Image from 'next/image';
+import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { Suspense, useEffect, useState } from 'react';
 
@@ -179,12 +180,14 @@ function ShopContent() {
             className="group overflow-hidden p-0 transition hover:shadow-md"
           >
             <div className="bg-muted relative aspect-square overflow-hidden">
-              <Image
-                src={product.images[0].url}
-                alt={product.productName}
-                fill
-                className="object-cover transition-transform duration-300 group-hover:scale-105"
-              />
+              <Link href={`/shop/single-product?productId=${product.id}`}>
+                <Image
+                  src={product.images[0].url}
+                  alt={product.productName}
+                  fill
+                  className="object-cover transition-transform duration-300 group-hover:scale-105"
+                />
+              </Link>
               {product.discountPercent && (
                 <Badge className="bg-primary absolute top-2 left-2 text-white">
                   -{product.discountPercent}%

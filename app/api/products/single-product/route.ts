@@ -189,3 +189,32 @@ export async function POST(req: NextRequest) {
     );
   }
 }
+
+export async function GET(req: NextRequest) {
+  try {
+    const { searchParams } = new URL(req.url);
+    const productId = searchParams.get('productId') || '';
+    const product = await db.product.findUnique({
+      where: { id: productId },
+      include: {
+        user: {
+          select: {
+            name: true,
+            email: true,
+            image: true,
+            role: true,
+            id: true,
+          },
+        },
+        reviews: true,
+      },
+    });
+    return NextResponse.json({ product });
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  } catch (error) {
+    return NextResponse.json(
+      { error: 'Internal server error' },
+      { status: 500 }
+    );
+  }
+}

@@ -27,7 +27,7 @@ export function useSingleProduct({ id }: { id: string }) {
     queryKey: ['single-product', id],
     queryFn: async () => {
       const response = await axios.get(`/api/products/single-product`, {
-        params: { id },
+        params: { productId: id },
       });
       return response.data;
     },
