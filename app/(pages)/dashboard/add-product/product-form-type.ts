@@ -108,7 +108,7 @@ export const ProductFormSchema = z
       .max(100, { message: 'Discount percent cannot exceed 100%' })
       .optional()
       .default(0),
-    stock: z.number().int().min(0, { message: 'Stock must be at least 0' }),
+    stock: z.number().int().min(1, { message: 'Stock must be at least 1' }),
     lowStockAlert: z
       .number()
       .int()

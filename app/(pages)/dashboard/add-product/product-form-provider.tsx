@@ -3,6 +3,7 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { ReactNode, useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
+import { toast } from 'sonner';
 
 import { ProductImage } from '@/hooks/use-product-image';
 import { useCreateProduct } from '@/service';
@@ -46,6 +47,7 @@ export function ProductFormProvider({ children }: ProductFormProviderProps) {
       },
       freeShipping: false,
       status: 'DRAFT',
+      brand: '',
     },
   });
 
@@ -57,7 +59,6 @@ export function ProductFormProvider({ children }: ProductFormProviderProps) {
         type: 'manual',
         message: 'At least one product image is required',
       });
-
       return;
     }
 
@@ -82,7 +83,6 @@ export function ProductFormProvider({ children }: ProductFormProviderProps) {
       'status',
       'brand',
     ];
-
     primitiveFields.forEach((field) => {
       const value = data[field];
       if (value !== undefined) {
@@ -111,7 +111,7 @@ export function ProductFormProvider({ children }: ProductFormProviderProps) {
       }
     });
 
-    // Append product images as a single array
+    // Append product images
     const imageFiles = productImages.map((img) => img.file);
     imageFiles.forEach((file) => {
       formData.append('productImages[]', file);
@@ -130,12 +130,27 @@ export function ProductFormProvider({ children }: ProductFormProviderProps) {
       }
     }
 
-    mutate(formData, {
-      onSuccess: () => {
-        setProductImages([]);
-        methods.reset();
-      },
-    });
+    // Wrap mutate in toast.promise
+    toast.promise(
+      new Promise((resolve, reject) => {
+        mutate(formData, {
+          onSuccess: (response) => {
+            toast.success('Product submitted successfully!');
+            setProductImages([]);
+            methods.reset();
+            resolve(response);
+          },
+          onError: (err) => {
+            reject(err);
+          },
+        });
+      }),
+      {
+        loading: 'Submitting product...',
+        error: (err) =>
+          err?.response?.data?.message || 'Failed to submit product',
+      }
+    );
   };
 
   return (

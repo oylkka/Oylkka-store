@@ -1,20 +1,13 @@
+import { QEUERY_KEYS } from '@/constant';
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
-interface FilterOptions {
-  search?: string;
-  color?: string;
-  size?: string;
-  sortby?: string;
-  minPrice?: string;
-  maxPrice?: string;
-}
 
-export function useProductList(filters: FilterOptions = {}) {
+export function useProductList({ currentPage = 1 }: { currentPage?: number }) {
   return useQuery({
-    queryKey: ['product-list', filters],
+    queryKey: [QEUERY_KEYS.PRODUCT_LIST, currentPage],
     queryFn: async () => {
       const response = await axios.get('/api/products/product-list', {
-        params: filters,
+        params: { currentPage },
       });
       return response.data;
     },
@@ -23,7 +16,7 @@ export function useProductList(filters: FilterOptions = {}) {
 
 export function useRelatedProduct({ id }: { id: string }) {
   return useQuery({
-    queryKey: ['related-product', id],
+    queryKey: [QEUERY_KEYS.RELATED_PRODUCT, id],
     queryFn: async () => {
       const response = await axios.get(`/api/products/related-products`, {
         params: { productId: id },

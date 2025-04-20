@@ -1,6 +1,7 @@
+import { NextRequest, NextResponse } from 'next/server';
+
 import { db } from '@/lib/db';
 import { ProductStatus } from '@/prisma/output';
-import { NextRequest, NextResponse } from 'next/server';
 
 export async function GET(req: NextRequest) {
   try {
@@ -39,7 +40,7 @@ export async function GET(req: NextRequest) {
     const relatedProducts = await db.product.findMany({
       where: {
         id: { not: productId }, // Exclude the current product
-        // TODO: Remove draft products
+        // TODO: Replace DRAFT with PUBLISHED
         status: ProductStatus.DRAFT, // Only include published products
         stock: { gt: 0 }, // Only include in-stock products
       },
@@ -58,9 +59,20 @@ export async function GET(req: NextRequest) {
         brand: true,
         condition: true,
         attributes: true,
-        images: true,
+        images: {
+          select: {
+            url: true,
+          },
+        },
         freeShipping: true,
+        stock: true,
+        reviews: {
+          select: {
+            rating: true,
+          },
+        },
       },
+      orderBy: { createdAt: 'desc' },
     });
 
     // Score each product based on similarity to the current product
@@ -89,7 +101,6 @@ export async function GET(req: NextRequest) {
       // Price similarity (customers often look in similar price ranges)
       const productPrice = product.discountPrice || product.price;
       const currentPrice = currentProduct.price;
-      const priceDifference = Math.abs(productPrice - currentPrice);
       const priceRatio =
         Math.min(productPrice, currentPrice) /
         Math.max(productPrice, currentPrice);
@@ -102,16 +113,18 @@ export async function GET(req: NextRequest) {
       }
 
       // Tag matches (common interests/features)
-      const tagMatches = product.tags.filter((tag) =>
-        currentProduct.tags.includes(tag)
-      ).length;
+      const tagMatches =
+        product.tags?.filter((tag) => currentProduct.tags?.includes(tag))
+          .length || 0;
 
       score += tagMatches * 10;
 
       // Attribute similarity (product specs)
       if (product.attributes && currentProduct.attributes) {
         try {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           const productAttrs = product.attributes as Record<string, any>;
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           const currentAttrs = currentProduct.attributes as Record<string, any>;
 
           // Count matching attribute keys and values
@@ -129,10 +142,20 @@ export async function GET(req: NextRequest) {
         }
       }
 
+      // Calculate review metrics
+      const reviewCount = product.reviews.length;
+      const averageRating =
+        reviewCount > 0
+          ? product.reviews.reduce((sum, review) => sum + review.rating, 0) /
+            reviewCount
+          : 0;
+
       return {
         ...product,
         score,
         imageUrl: product.images[0]?.url || null,
+        reviewCount,
+        rating: parseFloat(averageRating.toFixed(1)),
       };
     });
 
@@ -142,19 +165,17 @@ export async function GET(req: NextRequest) {
       .slice(0, limit);
 
     // Clean up response by removing score and restructuring
-    const responseProducts = sortedProducts.map(
-      ({ score, images, ...product }) => ({
-        ...product,
-        imageUrl: product.imageUrl,
-      })
-    );
+    const responseProducts = sortedProducts.map(({ ...product }) => ({
+      ...product,
+    }));
 
     // If we have very few products, fallback to recent products from same category
     if (responseProducts.length < 2) {
       const fallbackProducts = await db.product.findMany({
         where: {
           id: { not: productId },
-          status: ProductStatus.PUBLISHED,
+          // TODO: Replace DRAFT with PUBLISHED
+          status: ProductStatus.DRAFT,
           stock: { gt: 0 },
           category: currentProduct.category,
         },
@@ -168,32 +189,51 @@ export async function GET(req: NextRequest) {
           description: true,
           price: true,
           discountPrice: true,
+          discountPercent: true,
           category: true,
           subcategory: true,
           brand: true,
           condition: true,
           tags: true,
-          images: true,
+          sku: true,
+          stock: true,
+          freeShipping: true,
+          images: {
+            select: {
+              url: true,
+            },
+          },
+          reviews: {
+            select: {
+              rating: true,
+            },
+          },
         },
       });
 
-      const formattedFallback = fallbackProducts.map((product) => ({
-        ...product,
-        imageUrl: product.images[0]?.url || null,
-        images: undefined,
-      }));
+      // Process fallback products to add review count and rating
+      const formattedFallbacks = fallbackProducts.map((product) => {
+        const reviewCount = product.reviews.length;
+        const averageRating =
+          reviewCount > 0
+            ? product.reviews.reduce((sum, review) => sum + review.rating, 0) /
+              reviewCount
+            : 0;
 
-      return NextResponse.json({ products: formattedFallback });
+        return {
+          ...product,
+          imageUrl: product.images[0]?.url || null,
+          reviewCount,
+          rating: parseFloat(averageRating.toFixed(1)),
+          images: undefined,
+          reviews: undefined,
+        };
+      });
+
+      return NextResponse.json({ products: formattedFallbacks });
     }
 
-    return NextResponse.json({
-      products: responseProducts,
-      recommendationCriteria: {
-        category: currentProduct.category,
-        subcategory: currentProduct.subcategory,
-        matchedTags: currentProduct.tags.length > 0,
-      },
-    });
+    return NextResponse.json({ products: responseProducts });
   } catch (error) {
     console.error('Error fetching related products:', error);
     return NextResponse.json(

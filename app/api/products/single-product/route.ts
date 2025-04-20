@@ -1,57 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { z } from 'zod';
 
 import { auth } from '@/auth';
 import { db } from '@/lib/db';
 import { UploadImage } from '@/service/upload-image';
-
-// Schema for product validation
-const productSchema = z.object({
-  productName: z.string().min(3, 'Product name must be at least 3 characters'),
-  description: z.string().min(10, 'Description must be at least 10 characters'),
-  category: z.string().min(1, 'Category is required'),
-  subcategory: z.string().min(1, 'Subcategory is required'),
-  price: z.number().positive('Price must be positive'),
-  discountPrice: z
-    .number()
-    .positive('Discount price must be positive')
-    .optional(),
-  discountPercent: z.number().min(0).max(100).optional(),
-  stock: z.number().int().min(0, 'Stock cannot be negative'),
-  lowStockAlert: z.number().int().min(1).default(5),
-  condition: z.enum([
-    'NEW',
-    'USED',
-    'LIKE_NEW',
-    'EXCELLENT',
-    'GOOD',
-    'FAIR',
-    'POOR',
-    'FOR_PARTS',
-  ]),
-  conditionDescription: z.string().optional(),
-  weight: z.number().positive().optional(),
-  weightUnit: z.string().default('kg'),
-  freeShipping: z.boolean().default(false),
-  status: z
-    .enum(['DRAFT', 'PUBLISHED', 'ARCHIVED', 'OUT_OF_STOCK'])
-    .default('DRAFT'),
-  tags: z.array(z.string()).default([]),
-  dimensions: z
-    .object({
-      length: z.number().positive(),
-      width: z.number().positive(),
-      height: z.number().positive(),
-      unit: z.string(),
-    })
-    .optional(),
-  attributes: z.record(z.array(z.string())).optional(),
-  sku: z.string().min(1, 'SKU is required'),
-  brand: z
-    .string()
-    .max(40, { message: 'Brand must be at most 40 characters' })
-    .default('No Brand'),
-});
 
 export async function POST(req: NextRequest) {
   try {
@@ -85,16 +36,6 @@ export async function POST(req: NextRequest) {
           productData[key] = value;
         }
       }
-    }
-
-    // Validate product data
-    const validatedData = productSchema.safeParse(productData);
-
-    if (!validatedData.success) {
-      return NextResponse.json(
-        { error: 'Validation failed', details: validatedData.error.format() },
-        { status: 400 }
-      );
     }
 
     // Ensure SKU is unique
@@ -214,7 +155,7 @@ export async function GET(req: NextRequest) {
         reviews: true,
       },
     });
-    return NextResponse.json({ product });
+    return NextResponse.json({ product }, { status: 200 });
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
   } catch (error) {
     return NextResponse.json(

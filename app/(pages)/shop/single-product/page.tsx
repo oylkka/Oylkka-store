@@ -52,6 +52,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Textarea } from '@/components/ui/textarea';
 import { cn } from '@/lib/utils';
 import { useSingleProduct } from '@/service';
+
 import RelatedProducts from './related-product';
 
 // Type definitions
@@ -380,38 +381,6 @@ function ProductPage() {
     },
   ];
 
-  // Related products
-  const relatedProducts = product.relatedProducts || [
-    {
-      id: 'rel1',
-      name: 'Similar Product 1',
-      price: 129.99,
-      image: '/api/placeholder/200/200',
-      rating: 4.7,
-    },
-    {
-      id: 'rel2',
-      name: 'Similar Product 2',
-      price: 149.99,
-      image: '/api/placeholder/200/200',
-      rating: 4.5,
-    },
-    {
-      id: 'rel3',
-      name: 'Similar Product 3',
-      price: 139.99,
-      image: '/api/placeholder/200/200',
-      rating: 4.8,
-    },
-    {
-      id: 'rel4',
-      name: 'Similar Product 4',
-      price: 119.99,
-      image: '/api/placeholder/200/200',
-      rating: 4.6,
-    },
-  ];
-
   return (
     <>
       <div className="container mx-auto px-4 py-8">
@@ -427,7 +396,9 @@ function ProductPage() {
           <div className="space-y-8">
             <div>
               <div className="mb-2 flex items-center justify-between">
-                <Badge variant="outline">No Brand</Badge>
+                <Badge variant="outline">
+                  {product.brand ? product.brand : 'No Brand'}
+                </Badge>
 
                 <div className="flex items-center gap-4">
                   <Button variant="ghost" size="icon" onClick={shareProduct}>
