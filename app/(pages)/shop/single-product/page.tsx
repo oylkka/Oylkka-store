@@ -24,7 +24,6 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from '@/components/ui/accordion';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -38,22 +37,19 @@ import {
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
-import { Progress } from '@/components/ui/progress';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Textarea } from '@/components/ui/textarea';
 import { cn } from '@/lib/utils';
 import { useSingleProduct } from '@/service';
 
 import RelatedProducts from './related-product';
+import ProductReviews from './review';
 
 // Type definitions
 interface ProductImage {
@@ -274,9 +270,6 @@ function ProductPage() {
   const [selectedSize, setSelectedSize] = useState<string>('');
   const [quantity, setQuantity] = useState<number>(1);
   const [inWishlist, setInWishlist] = useState<boolean>(false);
-  const [reviewDialogOpen, setReviewDialogOpen] = useState<boolean>(false);
-  const [reviewRating, setReviewRating] = useState<number>(5);
-  const [reviewComment, setReviewComment] = useState<string>('');
 
   const product = data?.product as Product | undefined;
 
@@ -301,12 +294,6 @@ function ProductPage() {
     toast('Added to cart');
   };
 
-  const submitReview = () => {
-    toast('Review submitted');
-    setReviewDialogOpen(false);
-    setReviewComment('');
-  };
-
   const shareProduct = () => {
     toast('Share link copied');
   };
@@ -328,58 +315,6 @@ function ProductPage() {
   // Calculate average rating and review counts
   const avgRating = product.rating || 4.5;
   const reviewCount = product.reviewCount || product.reviews?.length || 0;
-
-  // Distribution of ratings for visualization
-  const ratingDistribution = [
-    { stars: 5, count: 65 },
-    { stars: 4, count: 25 },
-    { stars: 3, count: 7 },
-    { stars: 2, count: 2 },
-    { stars: 1, count: 1 },
-  ];
-
-  // Demo reviews for illustration (in a real app, these would come from the API)
-  const mockReviews = product.reviews || [
-    {
-      id: '1',
-      userId: '101',
-      rating: 5,
-      comment:
-        'This product exceeds all my expectations! The quality is exceptional and the design is perfect for my needs. I would highly recommend it to anyone looking for something reliable and stylish.',
-      createdAt: new Date(2025, 3, 15).toISOString(),
-      user: {
-        name: 'Sarah Johnson',
-        image: '/api/placeholder/40/40',
-      },
-      helpful: 12,
-    },
-    {
-      id: '2',
-      userId: '102',
-      rating: 4,
-      comment:
-        'Beautiful product, just as pictured. Shipping was fast too! The only reason Im giving 4 stars instead of 5 is because the packaging could be improved.',
-      createdAt: new Date(2025, 3, 10).toISOString(),
-      user: {
-        name: 'Emily Chen',
-        image: '/api/placeholder/40/40',
-      },
-      helpful: 8,
-    },
-    {
-      id: '3',
-      userId: '103',
-      rating: 5,
-      comment:
-        'Ive been using this product for two weeks now and Im completely satisfied. The materials are high quality and it looks even better in person than in the photos.',
-      createdAt: new Date(2025, 2, 28).toISOString(),
-      user: {
-        name: 'Michael Patel',
-        image: '/api/placeholder/40/40',
-      },
-      helpful: 15,
-    },
-  ];
 
   return (
     <>
@@ -889,219 +824,7 @@ function ProductPage() {
               )}
             </TabsContent>
             <TabsContent value="reviews" className="rounded-b-lg border p-6">
-              <div className="space-y-8">
-                <div className="flex flex-col gap-6 md:flex-row">
-                  {/* Review Summary */}
-                  <div className="w-full md:w-1/3">
-                    <div className="rounded-lg bg-gray-50 p-6">
-                      <h3 className="mb-4 text-xl font-bold">
-                        Customer Reviews
-                      </h3>
-                      <div className="mb-6 text-center">
-                        <div className="text-5xl font-bold">
-                          {avgRating.toFixed(1)}
-                        </div>
-                        <div className="mt-2">
-                          <RatingDisplay rating={avgRating} size="lg" />
-                        </div>
-                        <p className="mt-1 text-sm text-gray-500">
-                          Based on {reviewCount} reviews
-                        </p>
-                      </div>
-
-                      <div className="space-y-2">
-                        {ratingDistribution.map((item) => (
-                          <div
-                            key={item.stars}
-                            className="flex items-center gap-2"
-                          >
-                            <div className="w-12 text-sm">
-                              {item.stars} stars
-                            </div>
-                            <Progress
-                              value={(item.count / reviewCount) * 100}
-                              className="h-2"
-                            />
-                            <div className="w-10 text-right text-sm text-gray-500">
-                              {item.count}
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-
-                      <Dialog
-                        open={reviewDialogOpen}
-                        onOpenChange={setReviewDialogOpen}
-                      >
-                        <DialogTrigger asChild>
-                          <Button className="mt-6 w-full">
-                            Write a Review
-                          </Button>
-                        </DialogTrigger>
-                        <DialogContent className="sm:max-w-[525px]">
-                          <DialogHeader>
-                            <DialogTitle>Write a Review</DialogTitle>
-                            <DialogDescription>
-                              Share your experience with this product
-                            </DialogDescription>
-                          </DialogHeader>
-                          <div className="grid gap-4 py-4">
-                            <div className="space-y-2">
-                              <Label htmlFor="rating">Rating</Label>
-                              <div className="flex gap-2">
-                                {[1, 2, 3, 4, 5].map((rating) => (
-                                  <Button
-                                    key={rating}
-                                    type="button"
-                                    variant="outline"
-                                    size="icon"
-                                    className={cn(
-                                      'h-10 w-10',
-                                      reviewRating >= rating && 'bg-yellow-100'
-                                    )}
-                                    onClick={() => setReviewRating(rating)}
-                                  >
-                                    <Star
-                                      className={cn(
-                                        'h-5 w-5',
-                                        reviewRating >= rating
-                                          ? 'fill-yellow-400 text-yellow-400'
-                                          : 'text-gray-300'
-                                      )}
-                                    />
-                                  </Button>
-                                ))}
-                              </div>
-                            </div>
-                            <div className="space-y-2">
-                              <Label htmlFor="comment">Your Review</Label>
-                              <Textarea
-                                id="comment"
-                                value={reviewComment}
-                                onChange={(e) =>
-                                  setReviewComment(e.target.value)
-                                }
-                                placeholder="Share your thoughts about this product..."
-                                rows={4}
-                              />
-                            </div>
-                          </div>
-                          <DialogFooter>
-                            <Button
-                              type="button"
-                              variant="outline"
-                              onClick={() => setReviewDialogOpen(false)}
-                            >
-                              Cancel
-                            </Button>
-                            <Button type="button" onClick={submitReview}>
-                              Submit Review
-                            </Button>
-                          </DialogFooter>
-                        </DialogContent>
-                      </Dialog>
-                    </div>
-                  </div>
-
-                  {/* Review List */}
-                  <div className="w-full md:w-2/3">
-                    <div className="mb-6 flex items-center justify-between">
-                      <h3 className="text-xl font-bold">Recent Reviews</h3>
-                      <div className="flex gap-2">
-                        <Button variant="outline" size="sm">
-                          Most Recent
-                        </Button>
-                        <Button variant="ghost" size="sm">
-                          Highest Rated
-                        </Button>
-                      </div>
-                    </div>
-
-                    {mockReviews.length > 0 ? (
-                      <div className="space-y-6">
-                        {mockReviews.map((review) => (
-                          <Card key={review.id} className="overflow-hidden">
-                            <CardHeader className="bg-gray-50 pb-3">
-                              <div className="flex items-center justify-between">
-                                <div className="flex items-center gap-3">
-                                  <Avatar>
-                                    <AvatarImage
-                                      src={review.user.image}
-                                      alt={review.user.name}
-                                    />
-                                    <AvatarFallback>
-                                      {review.user.name.charAt(0)}
-                                    </AvatarFallback>
-                                  </Avatar>
-                                  <div>
-                                    <p className="font-medium">
-                                      {review.user.name}
-                                    </p>
-                                    <div className="flex items-center">
-                                      <RatingDisplay
-                                        rating={review.rating}
-                                        size="sm"
-                                      />
-                                      <span className="ml-2 text-xs text-gray-500">
-                                        {new Date(
-                                          review.createdAt
-                                        ).toLocaleDateString('en-US', {
-                                          year: 'numeric',
-                                          month: 'short',
-                                          day: 'numeric',
-                                        })}
-                                      </span>
-                                    </div>
-                                  </div>
-                                </div>
-                                <Badge variant="outline">
-                                  Verified Purchase
-                                </Badge>
-                              </div>
-                            </CardHeader>
-                            <CardContent className="pt-4">
-                              <p className="text-gray-700">{review.comment}</p>
-                              <div className="mt-4 flex items-center justify-between">
-                                <Button
-                                  variant="ghost"
-                                  size="sm"
-                                  className="text-gray-500"
-                                >
-                                  {review.helpful} people found this helpful
-                                </Button>
-                                <div className="flex gap-2">
-                                  <Button variant="ghost" size="sm">
-                                    Helpful
-                                  </Button>
-                                  <Button variant="ghost" size="sm">
-                                    Report
-                                  </Button>
-                                </div>
-                              </div>
-                            </CardContent>
-                          </Card>
-                        ))}
-                      </div>
-                    ) : (
-                      <div className="rounded-lg border border-dashed p-8 text-center">
-                        <p className="text-gray-500">
-                          No reviews yet. Be the first to review this product!
-                        </p>
-                        <Button
-                          className="mt-4"
-                          onClick={() => setReviewDialogOpen(true)}
-                        >
-                          Write a Review
-                        </Button>
-                      </div>
-                    )}
-
-                    <div className="mt-6 flex justify-center">
-                      <Button variant="outline">Load More Reviews</Button>
-                    </div>
-                  </div>
-                </div>
-              </div>
+              <ProductReviews avgRating={4.7} reviewCount={10} />
             </TabsContent>
             <TabsContent value="faq" className="rounded-b-lg border p-6">
               <h3 className="mb-4 text-xl font-bold">
