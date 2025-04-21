@@ -46,7 +46,7 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { cn } from '@/lib/utils';
-import { useSingleProduct } from '@/service';
+import { useAddToCart, useSingleProduct } from '@/service';
 
 import RelatedProducts from './related-product';
 import ProductReviews from './review';
@@ -289,9 +289,13 @@ function ProductPage() {
     setInWishlist(!inWishlist);
     toast('Item has been added to your wishlist');
   };
+  const { mutate: addToCart, isPending: isCartPending } = useAddToCart();
 
-  const addToCart = () => {
-    toast('Added to cart');
+  const handleAddToCart = () => {
+    addToCart({
+      productId: data.product.id,
+      quantity,
+    });
   };
 
   const shareProduct = () => {
@@ -565,9 +569,14 @@ function ProductPage() {
 
               {/* Action Buttons */}
               <div className="flex gap-4 pt-4">
-                <Button className="flex-1 py-6" size="lg" onClick={addToCart}>
+                <Button
+                  className="flex-1 cursor-pointer py-6"
+                  size="lg"
+                  onClick={handleAddToCart}
+                  disabled={isCartPending}
+                >
                   <ShoppingCart className="mr-2 h-5 w-5" />
-                  Add to Cart
+                  {isPending ? 'Adding...' : 'Add to Cart'}
                 </Button>
                 <Button
                   variant={inWishlist ? 'destructive' : 'outline'}

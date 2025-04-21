@@ -1,6 +1,6 @@
 'use client';
 
-import { Check, Heart, ShoppingBag, Star, Truck } from 'lucide-react';
+import { Heart, ShoppingBag, Star, Truck } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useState } from 'react';
@@ -9,6 +9,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
+import { useAddToCart } from '@/service';
 
 export interface ProductCardType {
   id: string;
@@ -26,7 +27,13 @@ export interface ProductCardType {
 
 export function ProductCard({ product }: { product: ProductCardType }) {
   const [isWishlisted, setIsWishlisted] = useState(false);
-  const [isInCart, setIsInCart] = useState(false);
+
+  const { mutate: addToCart, isPending } = useAddToCart();
+  const handleAddToCart = () => {
+    addToCart({
+      productId: product.id,
+    });
+  };
 
   // Calculate the final price
   const finalPrice = product.discountPrice || product.price;
@@ -140,22 +147,12 @@ export function ProductCard({ product }: { product: ProductCardType }) {
           <Button
             variant="outline"
             size="sm"
-            onClick={() => setIsInCart(!isInCart)}
-            className={`h-9 flex-1 text-xs font-medium ${
-              isInCart
-                ? 'border-green-200 bg-green-50 text-green-600 hover:bg-green-100'
-                : 'border-primary/30 bg-primary/5 text-primary hover:bg-primary/10 hover:text-primary'
-            }`}
+            onClick={handleAddToCart}
+            disabled={isPending}
+            className="border-primary/30 bg-primary/5 text-primary hover:bg-primary/10 hover:text-primary h-9 flex-1 cursor-pointer text-xs font-medium"
           >
-            {isInCart ? (
-              <>
-                <Check className="mr-1 h-3 w-3" /> Added to Cart
-              </>
-            ) : (
-              <>
-                <ShoppingBag className="mr-1 h-3 w-3" /> Add to Cart
-              </>
-            )}
+            <ShoppingBag className="mr-1 h-3 w-3" />{' '}
+            {isPending ? 'Adding...' : 'Add to Cart'}
           </Button>
         </div>
       </CardContent>
