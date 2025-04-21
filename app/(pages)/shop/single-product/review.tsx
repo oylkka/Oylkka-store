@@ -1,6 +1,10 @@
+import { zodResolver } from '@hookform/resolvers/zod';
 import { ImagePlus, Star, X } from 'lucide-react';
 import Image from 'next/image';
 import React, { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { toast } from 'sonner';
+import * as z from 'zod';
 
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
@@ -15,10 +19,19 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog';
-import { Label } from '@/components/ui/label';
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form';
 import { Progress } from '@/components/ui/progress';
 import { Textarea } from '@/components/ui/textarea';
 import { cn } from '@/lib/utils';
+import { useCreateReview } from '@/service';
 
 // Type definitions
 interface ProductReview {
@@ -38,8 +51,20 @@ interface ProductReviewsProps {
   avgRating: number;
   reviewCount: number;
   reviews?: ProductReview[];
-  onSubmitReview?: (rating: number, comment: string) => void;
+  productId: string;
+  onReviewAdded?: (review: ProductReview) => void;
 }
+
+// Form validation schema
+const reviewFormSchema = z.object({
+  rating: z.number().min(1, 'Please select a rating').max(5),
+  comment: z
+    .string()
+    .min(5, 'Please write a review with at least 5 characters'),
+  images: z.array(z.instanceof(File)).optional(),
+});
+
+type ReviewFormValues = z.infer<typeof reviewFormSchema>;
 
 // Rating Display Component
 export const RatingDisplay: React.FC<{
@@ -157,14 +182,16 @@ const mockReviews: ProductReview[] = [
 const ProductReviews: React.FC<ProductReviewsProps> = ({
   avgRating = 4.3,
   reviewCount = 100,
-  reviews = mockReviews,
-  onSubmitReview,
+  reviews: initialReviews = mockReviews,
+  productId,
+  onReviewAdded,
 }) => {
   const [reviewDialogOpen, setReviewDialogOpen] = useState<boolean>(false);
-  const [reviewRating, setReviewRating] = useState<number>(5);
-  const [reviewComment, setReviewComment] = useState<string>('');
-  const [reviewImages, setReviewImages] = useState<File[]>([]);
+  const [reviews, setReviews] = useState<ProductReview[]>(initialReviews);
   const fileInputRef = React.useRef<HTMLInputElement>(null);
+
+  // Use the provided hook for creating reviews
+  const { mutateAsync: createReview, isPending } = useCreateReview();
 
   // Distribution of ratings for visualization
   const ratingDistribution = [
@@ -175,28 +202,82 @@ const ProductReviews: React.FC<ProductReviewsProps> = ({
     { stars: 1, count: 1 },
   ];
 
+  // Set up form with react-hook-form and zod validation
+  const form = useForm<ReviewFormValues>({
+    resolver: zodResolver(reviewFormSchema),
+    defaultValues: {
+      rating: 5,
+      comment: '',
+      images: [],
+    },
+  });
+
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(event.target.files || []);
-    const remainingSlots = 3 - reviewImages.length;
+    const currentImages = form.getValues('images') || [];
+    const remainingSlots = 3 - currentImages.length;
     const newImages = files.slice(0, remainingSlots);
 
-    setReviewImages((prev) => [...prev, ...newImages]);
+    form.setValue('images', [...currentImages, ...newImages], {
+      shouldValidate: true,
+    });
+
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
     }
   };
 
   const removeImage = (index: number) => {
-    setReviewImages((prev) => prev.filter((_, i) => i !== index));
+    const currentImages = form.getValues('images') || [];
+    const updatedImages = currentImages.filter((_, i) => i !== index);
+    form.setValue('images', updatedImages, { shouldValidate: true });
   };
 
-  const submitReview = () => {
-    if (onSubmitReview) {
-      onSubmitReview(reviewRating, reviewComment);
+  const onSubmit = async (data: ReviewFormValues) => {
+    try {
+      // Show loading toast
+      toast.loading('Submitting your review...', { id: 'submit-review' });
+
+      // Create FormData object
+      const formData = new FormData();
+      formData.append('productId', productId);
+      formData.append('rating', data.rating.toString());
+      formData.append('comment', data.comment);
+
+      // Append images if any
+      if (data.images && data.images.length > 0) {
+        data.images.forEach((image) => {
+          formData.append(`images`, image);
+        });
+      }
+
+      // Submit review using the mutation hook
+      const response = await createReview(formData);
+
+      // Handle success
+      toast.success('Review submitted successfully!', { id: 'submit-review' });
+
+      // Add the new review to the reviews state
+      if (response && response.review) {
+        const newReview = response.review as ProductReview;
+        setReviews((prevReviews) => [newReview, ...prevReviews]);
+
+        // Call the onReviewAdded callback if provided
+        if (onReviewAdded) {
+          onReviewAdded(newReview);
+        }
+      }
+
+      // Close the dialog
+      setReviewDialogOpen(false);
+
+      // Reset the form
+      form.reset();
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    } catch (error) {
+      // Handle error
+      toast.error('Failed to submit review. Please try again.');
     }
-    setReviewDialogOpen(false);
-    setReviewComment('');
-    setReviewImages([]);
   };
 
   return (
@@ -242,90 +323,136 @@ const ProductReviews: React.FC<ProductReviewsProps> = ({
                     Share your experience with this product
                   </DialogDescription>
                 </DialogHeader>
-                <div className="grid gap-4 py-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="rating">Rating</Label>
-                    <div className="flex gap-2">
-                      {[1, 2, 3, 4, 5].map((rating) => (
-                        <Button
-                          key={rating}
-                          type="button"
-                          variant="outline"
-                          size="icon"
-                          className={cn(
-                            'h-10 w-10',
-                            reviewRating >= rating && 'bg-yellow-100'
-                          )}
-                          onClick={() => setReviewRating(rating)}
-                        >
-                          <Star
-                            className={cn(
-                              'h-5 w-5',
-                              reviewRating >= rating
-                                ? 'fill-yellow-400 text-yellow-400'
-                                : 'text-gray-300'
-                            )}
-                          />
-                        </Button>
-                      ))}
-                    </div>
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="comment">Your Review</Label>
-                    <Textarea
-                      id="comment"
-                      value={reviewComment}
-                      onChange={(e) => setReviewComment(e.target.value)}
-                      placeholder="Share your thoughts about this product..."
-                      rows={4}
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label>Photos</Label>
-                    <div className="flex flex-wrap gap-2">
-                      {reviewImages.map((file, index) => (
-                        <ImagePreview
-                          key={index}
-                          file={file}
-                          onRemove={() => removeImage(index)}
-                        />
-                      ))}
-                      {reviewImages.length < 3 && (
-                        <>
-                          <input
-                            type="file"
-                            ref={fileInputRef}
-                            className="hidden"
-                            accept="image/*"
-                            multiple
-                            onChange={handleImageUpload}
-                          />
-                          <button
-                            onClick={() => fileInputRef.current?.click()}
-                            className="flex h-20 w-20 items-center justify-center rounded-lg border border-dashed border-gray-300 hover:border-gray-400"
-                          >
-                            <ImagePlus className="h-6 w-6 text-gray-400" />
-                          </button>
-                        </>
-                      )}
-                    </div>
-                    <p className="text-sm text-gray-500">
-                      Upload up to 3 images (optional)
-                    </p>
-                  </div>
-                </div>
-                <DialogFooter>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={() => setReviewDialogOpen(false)}
+
+                <Form {...form}>
+                  <form
+                    onSubmit={form.handleSubmit(onSubmit)}
+                    className="space-y-6"
                   >
-                    Cancel
-                  </Button>
-                  <Button type="button" onClick={submitReview}>
-                    Submit Review
-                  </Button>
-                </DialogFooter>
+                    <FormField
+                      control={form.control}
+                      name="rating"
+                      render={({ field }) => (
+                        <FormItem className="space-y-2">
+                          <FormLabel>Rating</FormLabel>
+                          <FormControl>
+                            <div className="flex gap-2">
+                              {[1, 2, 3, 4, 5].map((rating) => (
+                                <Button
+                                  key={rating}
+                                  type="button"
+                                  variant="outline"
+                                  size="icon"
+                                  className={cn(
+                                    'h-10 w-10',
+                                    field.value >= rating && 'bg-yellow-100'
+                                  )}
+                                  onClick={() => field.onChange(rating)}
+                                >
+                                  <Star
+                                    className={cn(
+                                      'h-5 w-5',
+                                      field.value >= rating
+                                        ? 'fill-yellow-400 text-yellow-400'
+                                        : 'text-gray-300'
+                                    )}
+                                  />
+                                </Button>
+                              ))}
+                            </div>
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="comment"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Your Review</FormLabel>
+                          <FormControl>
+                            <Textarea
+                              placeholder="Share your thoughts about this product..."
+                              rows={4}
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormDescription>
+                            Tell others what you think about this product
+                          </FormDescription>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="images"
+                      render={() => (
+                        <FormItem>
+                          <FormLabel>Photos</FormLabel>
+                          <FormControl>
+                            <div className="flex flex-wrap gap-2">
+                              {(form.getValues('images') || []).map(
+                                (file, index) => (
+                                  <ImagePreview
+                                    key={index}
+                                    file={file}
+                                    onRemove={() => removeImage(index)}
+                                  />
+                                )
+                              )}
+                              {(form.getValues('images') || []).length < 3 && (
+                                <>
+                                  <input
+                                    type="file"
+                                    ref={fileInputRef}
+                                    className="hidden"
+                                    accept="image/*"
+                                    multiple
+                                    onChange={handleImageUpload}
+                                  />
+                                  <button
+                                    type="button"
+                                    onClick={() =>
+                                      fileInputRef.current?.click()
+                                    }
+                                    className="flex h-20 w-20 items-center justify-center rounded-lg border border-dashed border-gray-300 hover:border-gray-400"
+                                  >
+                                    <ImagePlus className="h-6 w-6 text-gray-400" />
+                                  </button>
+                                </>
+                              )}
+                            </div>
+                          </FormControl>
+                          <FormDescription>
+                            Upload up to 3 images (optional)
+                          </FormDescription>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <DialogFooter>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={() => {
+                          setReviewDialogOpen(false);
+                          form.reset();
+                        }}
+                        disabled={isPending}
+                      >
+                        Cancel
+                      </Button>
+                      <Button type="submit" disabled={isPending}>
+                        {isPending ? 'Submitting...' : 'Submit Review'}
+                      </Button>
+                    </DialogFooter>
+                  </form>
+                </Form>
               </DialogContent>
             </Dialog>
           </div>

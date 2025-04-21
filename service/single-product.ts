@@ -26,3 +26,16 @@ export function useSingleProduct({ id }: { id: string }) {
     },
   });
 }
+
+export function useCreateReview() {
+  return useMutation({
+    mutationFn: async (formData: FormData) => {
+      const res = await axios.post('/api/products/review', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+      return res.data;
+    },
+  });
+}
