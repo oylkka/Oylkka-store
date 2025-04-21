@@ -7,7 +7,6 @@ import {
   Minus,
   Package,
   Plus,
-  Share2,
   Shield,
   ShoppingCart,
   Star,
@@ -50,6 +49,7 @@ import { useAddToCart, useSingleProduct } from '@/service';
 
 import RelatedProducts from './related-product';
 import ProductReviews from './review';
+import Share from './share-product';
 
 // Type definitions
 interface ProductImage {
@@ -298,10 +298,6 @@ function ProductPage() {
     });
   };
 
-  const shareProduct = () => {
-    toast('Share link copied');
-  };
-
   if (isPending) {
     return <LoadingSkeleton />;
   }
@@ -340,9 +336,7 @@ function ProductPage() {
                 </Badge>
 
                 <div className="flex items-center gap-4">
-                  <Button variant="ghost" size="icon" onClick={shareProduct}>
-                    <Share2 className="h-5 w-5" />
-                  </Button>
+                  <Share productId={data.productId} />
                   <Button
                     variant="ghost"
                     size="icon"
