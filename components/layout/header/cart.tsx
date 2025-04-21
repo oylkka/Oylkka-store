@@ -1,8 +1,6 @@
-import { ShoppingBag } from 'lucide-react';
 import Link from 'next/link';
 
 import { auth } from '@/auth';
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
   Sheet,
@@ -11,31 +9,17 @@ import {
   SheetFooter,
   SheetHeader,
   SheetTitle,
-  SheetTrigger,
 } from '@/components/ui/sheet';
 
+import CartBadge from './cart-button-badge';
 import CartClient from './cart-client';
-
 
 export default async function Cart() {
   const session = await auth();
-  const cartItemCount = 3;
+
   return (
     <Sheet>
-      <SheetTrigger asChild>
-        <Button variant="ghost" size="icon" className="relative">
-          <ShoppingBag className="h-5 w-5" />
-          {cartItemCount > 0 && (
-            <Badge
-              variant="destructive"
-              className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full p-0 text-xs"
-            >
-              {cartItemCount}
-            </Badge>
-          )}
-          <span className="sr-only">Shopping cart</span>
-        </Button>
-      </SheetTrigger>
+      <CartBadge />
       <SheetContent>
         <SheetHeader>
           <SheetTitle>Shopping Cart</SheetTitle>
