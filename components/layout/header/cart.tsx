@@ -36,7 +36,7 @@ export default async function Cart() {
 
         <SheetFooter>
           <SheetClose asChild>
-            <Link href="/checkout">
+            <Link href="/cart/checkout">
               <Button className="w-full">CHECKOUT</Button>
             </Link>
           </SheetClose>
