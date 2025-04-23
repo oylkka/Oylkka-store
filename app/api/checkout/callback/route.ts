@@ -33,7 +33,7 @@ export async function GET(req: NextRequest) {
         });
       }
 
-      return NextResponse.redirect(`${myUrl}/cancel`, 303);
+      return NextResponse.redirect(`${myUrl}/dashboard/order/cancel`, 303);
     }
 
     const orderNumber = executePaymentResponse.merchantInvoiceNumber;
@@ -46,7 +46,7 @@ export async function GET(req: NextRequest) {
     if (!order) {
       console.error('Order not found for:', orderNumber);
       return NextResponse.redirect(
-        `${myUrl}/cancel?error=order_not_found`,
+        `${myUrl}/dashboard/order/cancel?error=order_not_found`,
         303
       );
     }
@@ -72,7 +72,7 @@ export async function GET(req: NextRequest) {
     });
 
     return NextResponse.redirect(
-      `${myUrl}/success?orderId=${updatedOrder.orderNumber}`,
+      `${myUrl}/dashboard/order/order-confimation?orderId=${updatedOrder.orderNumber}`,
       303
     );
   } catch (error) {
