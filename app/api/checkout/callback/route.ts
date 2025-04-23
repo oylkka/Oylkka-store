@@ -72,7 +72,7 @@ export async function GET(req: NextRequest) {
     });
 
     return NextResponse.redirect(
-      `${myUrl}/dashboard/order/order-confimation?orderId=${updatedOrder.orderNumber}`,
+      `${myUrl}/dashboard/order/order-confirmation?orderId=${updatedOrder.orderNumber}`,
       303
     );
   } catch (error) {
