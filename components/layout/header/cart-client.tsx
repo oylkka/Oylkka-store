@@ -47,7 +47,9 @@ export default function CartClient() {
   };
 
   const handleUpdateQuantity = (itemId: string, newQuantity: number) => {
-    if (newQuantity < 1) {return;}
+    if (newQuantity < 1) {
+      return;
+    }
     updateQuantity.mutate({ itemId, quantity: newQuantity });
   };
 
@@ -61,7 +63,7 @@ export default function CartClient() {
 
   return (
     <div>
-      <ScrollArea className="h-[55vh] space-y-4">
+      <ScrollArea className="h-[50vh] space-y-4 md:h-[55vh]">
         {data.map((item: CartItem) => (
           <div key={item.id} className="grid grid-cols-12 gap-3 border-b pb-4">
             <div className="col-span-3">

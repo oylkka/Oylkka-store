@@ -21,7 +21,7 @@ export default async function Cart() {
     <Sheet>
       <CartBadge />
       <SheetContent>
-        <SheetHeader>
+        <SheetHeader className="px-4 py-2 md:py-4">
           <SheetTitle>Shopping Cart</SheetTitle>
         </SheetHeader>
         <div className="mx-4">
