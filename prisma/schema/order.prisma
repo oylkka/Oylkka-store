@@ -21,6 +21,7 @@ enum PaymentMethod {
   STRIPE
   BANK_TRANSFER
   CASH_ON_DELIVERY
+  BKASH
 }
 
 model Order {
@@ -71,7 +72,6 @@ model OrderItem {
   variantInfo Json?
   quantity    Int
   price       Float
-  tax         Float  @default(0)
   discount    Float  @default(0)
   order       Order  @relation(fields: [orderId], references: [id], onDelete: Cascade)
 
@@ -80,16 +80,20 @@ model OrderItem {
 }
 
 type Address {
-  firstName  String
-  lastName   String
-  company    String?
+  name   String
   address1   String
-  address2   String?
   city       String
-  state      String
+  district      String
   postalCode String
-  country    String
-  phone      String?
-  email      String?
+  phone      String
+  email      String
   isDefault  Boolean @default(false)
+}
+
+model BkashToken {
+  id          String @id @default(auto()) @map("_id") @db.ObjectId
+  token       String
+  // Timestamps
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }

@@ -1,9 +1,11 @@
 'use client';
 
-import { CreditCard, ShoppingBag, Tag } from 'lucide-react';
+import { ShoppingBag, Tag, X } from 'lucide-react';
 import Image from 'next/image';
 import { useState } from 'react';
+import { toast } from 'sonner';
 
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -18,47 +20,95 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { useUserCart } from '@/service';
 
 // Types
-type CartProduct = {
+interface CartItem {
   id: string;
-  productId: string;
+  productId?: string;
   productName: string;
   price: number;
-  discountPrice: number | null;
+  discountPrice?: number | null;
   quantity: number;
-  imageUrl: string;
-};
+  imageUrl?: string;
+}
 
-export default function OrderSummary() {
-  const { isPending, data, isError } = useUserCart();
+interface OrderSummaryProps {
+  cartItems?: CartItem[];
+  shippingCost?: number;
+  isLoading?: boolean;
+  onPromoCodeApplied?: (code: string, discountPercent: number) => void;
+}
+
+export default function OrderSummary({
+  cartItems,
+  shippingCost = 120,
+  isLoading = false,
+  onPromoCodeApplied,
+}: OrderSummaryProps) {
   const [promoCode, setPromoCode] = useState<string>('');
-  const shippingThreshold = 1000;
+  const [appliedPromoCode, setAppliedPromoCode] = useState<string>('');
+  const [discount, setDiscount] = useState<number>(0);
+  const shippingThreshold = 2000;
 
-  // Handle promo code
+  const { isPending, data: fetchedCartData, isError } = useUserCart();
+
+  const data = cartItems || fetchedCartData;
+
   const handlePromoCodeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setPromoCode(e.target.value);
   };
 
   const applyPromoCode = () => {
-    if (promoCode) {
-      setPromoCode('');
+    if (!promoCode) {
+      toast.error('Please enter a promo code');
+      return;
     }
+
+    if (appliedPromoCode) {
+      toast.error('You can only apply one promo code at a time');
+      return;
+    }
+
+    const upperCaseCode = promoCode.toUpperCase();
+
+    if (upperCaseCode === 'WELCOME10') {
+      setDiscount(10);
+      setAppliedPromoCode(upperCaseCode);
+      if (onPromoCodeApplied) {
+        onPromoCodeApplied(upperCaseCode, 10);
+      }
+      toast.success('10% discount applied!');
+    } else if (upperCaseCode === 'FREESHIP') {
+      setAppliedPromoCode(upperCaseCode);
+      if (onPromoCodeApplied) {
+        onPromoCodeApplied(upperCaseCode, 0);
+      }
+      toast.success('Free shipping applied!');
+    } else {
+      toast.error('Invalid promo code');
+    }
+
+    setPromoCode('');
   };
 
-  // Calculate costs
+  const removePromoCode = () => {
+    setAppliedPromoCode('');
+    setDiscount(0);
+    if (onPromoCodeApplied) {
+      onPromoCodeApplied('', 0);
+    }
+    toast.success('Promo code removed');
+  };
+
   const subtotal =
-    data?.reduce((acc: number, item: CartProduct) => {
+    data?.reduce((acc: number, item: CartItem) => {
       const price = item.discountPrice ?? item.price;
       return acc + price * item.quantity;
     }, 0) ?? 0;
 
-  const taxRate = 0.07;
-  const tax = subtotal * taxRate;
-  const shipping = subtotal > 0 ? 5 : 0;
-  const total = subtotal + tax + shipping;
-  const shippingCost = 10;
+  const finalShippingCost = subtotal >= shippingThreshold ? 0 : shippingCost;
+  const discountAmount = (subtotal * discount) / 100;
+  const total = subtotal + finalShippingCost - discountAmount;
 
-  // Loading state
-  if (isPending) {
+  if (isPending || isLoading) {
     return (
       <div className="lg:col-span-1">
         <Card>
@@ -160,7 +210,7 @@ export default function OrderSummary() {
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
-            {data.map((item: CartProduct) => (
+            {data.map((item: CartItem) => (
               <div key={item.id} className="flex items-center justify-between">
                 <div className="flex items-center space-x-3">
                   {item.imageUrl && (
@@ -175,29 +225,17 @@ export default function OrderSummary() {
                     </div>
                   )}
                   <div>
-                    <div className="flex items-start">
-                      <span className="mr-1 font-medium">{item.quantity}x</span>
-                      <span className="line-clamp-2 max-w-[150px]">
-                        {item.productName}
-                      </span>
+                    <div className="text-sm font-medium">
+                      {item.productName}
                     </div>
-                    {item.discountPrice && (
-                      <div className="flex items-center text-xs text-green-600">
-                        <Tag className="mr-1 h-3 w-3" />
-                        <span className="text-muted-foreground mr-1 line-through">
-                          ${item.price.toFixed(2)}
-                        </span>
-                        <span>${item.discountPrice.toFixed(2)}</span>
-                      </div>
-                    )}
+                    <div className="text-muted-foreground text-xs">
+                      Qty: {item.quantity}
+                    </div>
                   </div>
                 </div>
-                <span className="font-medium">
-                  $
-                  {((item.discountPrice ?? item.price) * item.quantity).toFixed(
-                    2
-                  )}
-                </span>
+                <div className="text-sm font-medium">
+                  ৳{(item.discountPrice ?? item.price) * item.quantity}
+                </div>
               </div>
             ))}
 
@@ -206,44 +244,73 @@ export default function OrderSummary() {
             <div className="space-y-2 text-sm">
               <div className="flex justify-between">
                 <span>Subtotal</span>
-                <span>${subtotal.toFixed(2)}</span>
+                <span>৳{subtotal.toFixed(2)}</span>
               </div>
               <div className="flex justify-between">
                 <span>Shipping</span>
-                {subtotal >= shippingThreshold ? (
-                  <p className="line-through">${shippingCost}</p>
-                ) : (
-                  <p>${shippingCost}</p>
-                )}
+                <span>
+                  {finalShippingCost === 0 ? 'Free' : `৳${finalShippingCost}`}
+                </span>
               </div>
-              <div className="flex justify-between">
-                <span>Tax (7%)</span>
-                <span>${tax.toFixed(2)}</span>
-              </div>
+              {discount > 0 && (
+                <div className="flex justify-between text-green-600">
+                  <span>Discount ({discount}%)</span>
+                  <span>-৳{discountAmount.toFixed(2)}</span>
+                </div>
+              )}
             </div>
 
             <Separator />
 
             <div className="flex justify-between text-lg font-semibold">
               <span>Total</span>
-              <span>${total.toFixed(2)}</span>
+              <span>৳{total.toFixed(2)}</span>
             </div>
           </div>
         </CardContent>
         <CardFooter className="flex-col space-y-4">
           <div className="bg-muted w-full rounded-md p-4">
-            <div className="mb-2 flex items-center justify-between">
-              <span className="text-sm font-medium">Promo Code</span>
-              <CreditCard className="text-muted-foreground h-4 w-4" />
-            </div>
-            <div className="flex space-x-2">
-              <Input
-                placeholder="Enter promo code"
-                value={promoCode}
-                onChange={handlePromoCodeChange}
-              />
-              <Button onClick={applyPromoCode}>Apply</Button>
-            </div>
+            {appliedPromoCode ? (
+              <div className="mb-4">
+                <div className="mb-2 flex items-center justify-between">
+                  <span className="text-sm font-medium">
+                    Applied promo code:
+                  </span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <Badge variant="outline" className="bg-green-50 px-3 py-1">
+                    <Tag className="mr-2 h-3 w-3 text-green-600" />
+                    <span className="text-green-700">{appliedPromoCode}</span>
+                  </Badge>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={removePromoCode}
+                    className="text-red-500 hover:bg-red-50 hover:text-red-700"
+                  >
+                    <X className="h-4 w-4" />
+                    <span className="ml-1">Remove</span>
+                  </Button>
+                </div>
+              </div>
+            ) : (
+              <>
+                <div className="mb-2 flex items-center">
+                  <Tag className="text-muted-foreground mr-2 h-4 w-4" />
+                  <span className="text-sm font-medium">
+                    Have a promo code?
+                  </span>
+                </div>
+                <div className="flex space-x-2">
+                  <Input
+                    placeholder="Enter code"
+                    value={promoCode}
+                    onChange={handlePromoCodeChange}
+                  />
+                  <Button onClick={applyPromoCode}>Apply</Button>
+                </div>
+              </>
+            )}
           </div>
         </CardFooter>
       </Card>
