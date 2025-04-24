@@ -25,6 +25,7 @@ export async function GET(req: NextRequest) {
         subcategory: true,
         freeShipping: true,
         discountPercent: true,
+        updatedAt: true,
         images: {
           select: {
             url: true,

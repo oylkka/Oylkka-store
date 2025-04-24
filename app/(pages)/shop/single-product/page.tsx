@@ -827,7 +827,7 @@ function ProductPage() {
               )}
             </TabsContent>
             <TabsContent value="reviews" className="rounded-b-lg border p-6">
-              <ProductReviews avgRating={0} reviewCount={0} productId=""  />
+              <ProductReviews avgRating={0} reviewCount={0} productId="" />
             </TabsContent>
             <TabsContent value="faq" className="rounded-b-lg border p-6">
               <h3 className="mb-4 text-xl font-bold">

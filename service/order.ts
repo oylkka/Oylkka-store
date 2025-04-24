@@ -6,9 +6,12 @@ export function useOrderConfirmation({ id }: { id: string }) {
   return useQuery({
     queryKey: [QEUERY_KEYS.ORDER_CONFIRMATION, id],
     queryFn: async () => {
-      const response = await axios.get(`/api/dashboard/user/order/single-order`, {
-        params: { orderId: id },
-      });
+      const response = await axios.get(
+        `/api/dashboard/user/order/single-order`,
+        {
+          params: { orderId: id },
+        }
+      );
       return response.data;
     },
   });

@@ -4,4 +4,5 @@ export const QEUERY_KEYS = {
   RELATED_PRODUCT: 'related-product',
   USER_CART: 'user-cart',
   ORDER_CONFIRMATION: 'order-confirmation',
+  ADMIN_ORDER_LIST: 'admin-order-list',
 };

@@ -141,7 +141,9 @@ export default function CheckoutPage() {
 
   // Calculate subtotal from cart items
   const calculateSubtotal = () => {
-    if (!cartData) {return 0;}
+    if (!cartData) {
+      return 0;
+    }
     return cartData.reduce((acc: number, item: CartItem) => {
       const price = item.discountPrice ?? item.price;
       return acc + price * item.quantity;

@@ -202,19 +202,19 @@ export async function NavMain() {
       items: [
         {
           title: 'All Orders',
-          url: '/admin/orders/all',
+          url: '/dashboard/admin/orders',
         },
         {
           title: 'Pending Orders',
-          url: '/admin/orders/pending',
+          url: '/dashboard/admin/orders?status=PENDING',
         },
         {
           title: 'Shipped Orders',
-          url: '/admin/orders/shipped',
+          url: '/dashboard/admin/orders?status=SHIPPED',
         },
         {
           title: 'Returns & Refunds',
-          url: '/admin/orders/returns',
+          url: '/dashboard/admin/orders?status=REFUNDED',
         },
       ],
     },

@@ -156,7 +156,7 @@ export default function OrderConfirmationPage() {
                 Return to Home
               </Button>
             </Link>
-            <Button className="flex items-center">  
+            <Button className="flex items-center">
               <Package className="mr-2 h-4 w-4" />
               Track Order
             </Button>
