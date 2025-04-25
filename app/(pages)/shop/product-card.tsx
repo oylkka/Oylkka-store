@@ -9,7 +9,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
-import { useAddToCart } from '@/service';
+import { useAddToCart } from '@/services';
 
 export interface ProductCardType {
   id: string;

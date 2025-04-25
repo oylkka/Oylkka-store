@@ -9,7 +9,7 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { Skeleton } from '@/components/ui/skeleton';
-import { useOrderConfirmation } from '@/service/order';
+import { useOrderConfirmation } from '@/services/order';
 
 function formatDate(dateString: string) {
   return new Date(dateString).toLocaleString('en-BD', {

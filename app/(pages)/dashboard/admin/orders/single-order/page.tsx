@@ -5,7 +5,7 @@ import { Suspense } from 'react';
 
 import { Avatar } from '@/components/ui/avatar';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { useSignleOrderInfo } from '@/service';
+import { useSignleOrderInfo } from '@/services';
 
 function OrderDetailsContent() {
   const searchParams = useSearchParams();

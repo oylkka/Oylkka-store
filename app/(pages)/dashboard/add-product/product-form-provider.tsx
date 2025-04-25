@@ -6,7 +6,7 @@ import { FormProvider, useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 
 import { ProductImage } from '@/hooks/use-product-image';
-import { useCreateProduct } from '@/service';
+import { useCreateProduct } from '@/services';
 
 import { ProductFormContext } from './product-form-context';
 import {

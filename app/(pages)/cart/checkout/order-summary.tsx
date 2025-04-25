@@ -17,7 +17,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { Separator } from '@/components/ui/separator';
 import { Skeleton } from '@/components/ui/skeleton';
-import { useUserCart } from '@/service';
+import { useUserCart } from '@/services';
 
 // Types
 interface CartItem {

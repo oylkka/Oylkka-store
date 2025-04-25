@@ -45,7 +45,7 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { cn } from '@/lib/utils';
-import { useAddToCart, useSingleProduct } from '@/service';
+import { useAddToCart, useSingleProduct } from '@/services';
 
 import RelatedProducts from './related-product';
 import ProductReviews from './review';

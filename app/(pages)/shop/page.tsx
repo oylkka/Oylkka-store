@@ -5,7 +5,7 @@ import { Suspense } from 'react';
 
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
-import { useProductList } from '@/service';
+import { useProductList } from '@/services';
 import { ProductCardType } from '@/types';
 
 import ProductListPagination from './pagination';

@@ -4,7 +4,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { auth } from '@/auth'; // Import your auth module
 import { bkashConfig } from '@/lib/bkash';
 import { db } from '@/lib/db';
-import { createPayment } from '@/service/bkash';
+import { createPayment } from '@/services/bkash';
 
 interface CartItem {
   id: string;

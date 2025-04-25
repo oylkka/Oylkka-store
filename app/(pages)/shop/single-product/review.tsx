@@ -31,7 +31,7 @@ import {
 import { Progress } from '@/components/ui/progress';
 import { Textarea } from '@/components/ui/textarea';
 import { cn } from '@/lib/utils';
-import { useCreateReview } from '@/service';
+import { useCreateReview } from '@/services';
 
 // Type definitions
 interface ProductReview {

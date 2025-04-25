@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-import { SkuService } from '@/service';
+import { SkuService } from '@/services';
 
 // Enums
 const ProductConditionEnum = z.enum([

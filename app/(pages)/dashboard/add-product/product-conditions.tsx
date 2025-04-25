@@ -37,7 +37,7 @@ import {
   TooltipTrigger,
 } from '@/components/ui/tooltip';
 import { useSkuCheck } from '@/hooks/use-sku-check';
-import { SkuService } from '@/service';
+import { SkuService } from '@/services';
 
 import { ProductFormValues } from './product-form-type';
 

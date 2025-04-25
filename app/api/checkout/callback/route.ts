@@ -4,7 +4,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { bkashConfig } from '@/lib/bkash';
 import { db } from '@/lib/db';
 import { OrderStatus, PaymentStatus } from '@/prisma/output';
-import { executePayment } from '@/service/bkash';
+import { executePayment } from '@/services/bkash';
 
 export async function GET(req: NextRequest) {
   try {

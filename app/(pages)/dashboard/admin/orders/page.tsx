@@ -32,7 +32,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { useAdminOrderList } from '@/service';
+import { useAdminOrderList } from '@/services';
 import { AdminOrderListType } from '@/types';
 
 import OrdersPagination from './orders-pagination';

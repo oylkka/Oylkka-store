@@ -36,7 +36,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { Progress } from '@/components/ui/progress';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { useUserCart } from '@/service';
+import { useUserCart } from '@/services';
 
 import OrderSummary from './order-summary';
 

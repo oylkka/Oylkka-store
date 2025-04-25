@@ -6,7 +6,7 @@ import { useContext } from 'react';
 import { useFormContext } from 'react-hook-form';
 
 import { Button } from '@/components/ui/button';
-import { useCreateProduct } from '@/service';
+import { useCreateProduct } from '@/services';
 
 import { BasicInformationCard } from './basic-information';
 import { CategoryCard } from './category-and-tags';

@@ -10,7 +10,7 @@ import {
   useRemoveFromCart,
   useUpdateCartQuantity,
   useUserCart,
-} from '@/service';
+} from '@/services';
 
 type CartItem = {
   id: string;

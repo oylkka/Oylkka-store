@@ -9,7 +9,7 @@ import {
 } from '@/components/ui/carousel';
 import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';
-import { useRelatedProduct } from '@/service/product-list';
+import { useRelatedProduct } from '@/services/product-list';
 import { ProductCardType } from '@/types';
 
 import { ProductCard } from '../product-card';

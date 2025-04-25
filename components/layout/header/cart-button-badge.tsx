@@ -6,7 +6,7 @@ import { ShoppingBag } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { SheetTrigger } from '@/components/ui/sheet';
-import { useUserCart } from '@/service';
+import { useUserCart } from '@/services';
 
 export default function CartBadge() {
   // Fetch cart data using the same hook from CartClient
