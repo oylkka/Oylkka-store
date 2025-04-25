@@ -1,0 +1,45 @@
+// Shop-related models
+
+model Shop {
+  id               String        @id @default(auto()) @map("_id") @db.ObjectId
+  name             String
+  slug             String        @unique
+  description      String?
+  logo             Image?
+  bannerImage      Image?
+  ownerId          String        @unique @db.ObjectId
+  owner            User          @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  products         Product[]     @relation("ShopProducts")
+  isVerified       Boolean       @default(false)
+  verificationDate DateTime?
+  commissionRate   Float         @default(5.0) // Platform's commission percentage
+  shopEmail        String?
+  shopPhone        String?
+  address          Address?
+  bankInfo         BankInfo?
+  socialLinks      SocialLinks?
+  policies         ShopPolicies?
+  rating           Float         @default(0)
+  totalSales       Int           @default(0)
+  status           ShopStatus    @default(PENDING)
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @updatedAt
+
+  // Shop analytics
+  views     Int            @default(0)
+  followers ShopFollower[]
+
+  @@index([status])
+  @@fulltext([name, description])
+}
+
+model ShopFollower {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  shopId    String   @db.ObjectId
+  shop      Shop     @relation(fields: [shopId], references: [id], onDelete: Cascade)
+  userId    String   @db.ObjectId
+  createdAt DateTime @default(now())
+
+  @@unique([shopId, userId])
+  @@index([shopId])
+}

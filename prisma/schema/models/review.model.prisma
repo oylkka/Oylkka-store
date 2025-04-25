@@ -1,0 +1,23 @@
+// Review-related models
+
+model Review {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  productId String   @db.ObjectId
+  userId    String   @db.ObjectId
+  orderId   String?  @db.ObjectId // Link to the original order
+  rating    Int
+  title     String?
+  content   String
+  images    Image[]
+  verified  Boolean  @default(false) // Verified purchase
+  helpful   Int      @default(0)
+  reported  Boolean  @default(false)
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([productId])
+  @@index([userId])
+  @@index([verified])
+}
