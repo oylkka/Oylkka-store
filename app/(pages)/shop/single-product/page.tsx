@@ -374,13 +374,13 @@ function ProductPage() {
                 {product.discountPrice ? (
                   <>
                     <span className="text-2xl font-bold text-gray-900">
-                      ${product.discountPrice.toFixed(2)}
+                      ৳{product.discountPrice.toFixed(2)}
                     </span>
                     <span className="text-lg text-gray-500 line-through">
-                      ${product.price.toFixed(2)}
+                      ৳{product.price.toFixed(2)}
                     </span>
                     <Badge className="bg-red-500 hover:bg-red-600">
-                      Save $
+                      Save ৳
                       {(product.price - (product.discountPrice || 0)).toFixed(
                         2
                       )}

@@ -32,7 +32,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { useAdminOrderList } from '@/service/admin/order-list';
+import { useAdminOrderList } from '@/service';
 import { AdminOrderListType } from '@/types';
 
 import OrdersPagination from './orders-pagination';
@@ -236,6 +236,11 @@ function OrdersContent() {
                     data.orders.map((order: AdminOrderListType) => (
                       <TableRow
                         key={order.id}
+                        onClick={() =>
+                          router.push(
+                            `/dashboard/admin/orders/single-order?orderId=${order.id}`
+                          )
+                        }
                         className="cursor-pointer hover:bg-gray-50"
                       >
                         <TableCell className="font-medium">

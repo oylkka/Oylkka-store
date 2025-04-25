@@ -105,11 +105,11 @@ export function ProductCard({ product }: { product: ProductCardType }) {
         {/* Price display */}
         <div className="flex items-center gap-2">
           <span className="text-lg font-bold text-gray-900">
-            ${finalPrice.toFixed(2)}
+            ৳{finalPrice.toFixed(2)}
           </span>
           {product.discountPrice && (
             <span className="text-sm text-gray-400 line-through">
-              ${product.price.toFixed(2)}
+              ৳{product.price.toFixed(2)}
             </span>
           )}
 

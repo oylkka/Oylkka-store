@@ -5,4 +5,5 @@ export const QEUERY_KEYS = {
   USER_CART: 'user-cart',
   ORDER_CONFIRMATION: 'order-confirmation',
   ADMIN_ORDER_LIST: 'admin-order-list',
+  SINGLE_ORDER_INFO: 'single-order-info',
 };
