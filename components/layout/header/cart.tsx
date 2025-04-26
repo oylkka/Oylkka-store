@@ -1,6 +1,5 @@
 import Link from 'next/link';
 
-import { auth } from '@/auth';
 import { Button } from '@/components/ui/button';
 import {
   Sheet,
@@ -10,6 +9,7 @@ import {
   SheetHeader,
   SheetTitle,
 } from '@/components/ui/sheet';
+import { auth } from '@/features/auth/auth';
 
 import CartBadge from './cart-button-badge';
 import CartClient from './cart-client';

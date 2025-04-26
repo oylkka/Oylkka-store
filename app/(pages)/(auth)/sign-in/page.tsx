@@ -1,6 +1,6 @@
 import { redirect } from 'next/navigation';
 
-import { auth } from '@/auth';
+import { auth } from '@/features/auth/auth';
 
 import SignIn from './sign-in';
 

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { v4 as uuidv4 } from 'uuid';
 
-import { auth } from '@/auth'; // Import your auth module
+import { auth } from '@/features/auth/auth'; // Import your auth module
 import { bkashConfig } from '@/lib/bkash';
 import { db } from '@/lib/db';
 import { createPayment } from '@/services/bkash';

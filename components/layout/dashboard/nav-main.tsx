@@ -9,7 +9,6 @@ import {
   Users,
 } from 'lucide-react';
 
-import { auth } from '@/auth';
 import {
   Collapsible,
   CollapsibleContent,
@@ -25,6 +24,7 @@ import {
   SidebarMenuSubButton,
   SidebarMenuSubItem,
 } from '@/components/ui/sidebar';
+import { auth } from '@/features/auth/auth';
 
 interface SubItem {
   title: string;

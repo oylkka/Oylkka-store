@@ -1,4 +1,4 @@
-import { auth } from '@/auth';
+import { auth } from '@/features/auth/auth';
 
 import { NavUserDropdown } from './nav-user-dropdown';
 

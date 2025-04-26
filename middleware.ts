@@ -1,6 +1,6 @@
 import NextAuth from 'next-auth';
 import { NextResponse } from 'next/server';
-import authConfig from './auth.config';
+import authConfig from './features/auth/auth.config';
 
 // Initialize NextAuth with the given configuration.
 // Expose the auth middleware function for protecting routes.
@@ -14,10 +14,16 @@ const publicRoutes = ['/sign-in', '/sign-up'];
 
 /**
  * List of protected routes that require the user to be authenticated.
- * Routes in this list should redirect unauthenticated users to the sign-in page.
  * @type {string[]}
  */
 const protectedRoutes = ['/dashboard', '/profile'];
+
+/**
+ * Routes exempt from onboarding check - the onboarding page itself
+ * and routes that don't require onboarding completion
+ * @type {string[]}
+ */
+const onboardingExemptRoutes = ['/onboarding', ...publicRoutes];
 
 /**
  * Prefix used to identify API routes.
@@ -34,6 +40,7 @@ const apiPrefix = '/api';
  *  - Allows signed-in users to be redirected away from sign-in/up pages.
  *  - Redirects unauthenticated users attempting to access protected pages.
  *  - Redirects authenticated users from the home page to their dashboard.
+ *  - Redirects users who haven't completed onboarding to the onboarding page.
  *
  * @param {Request} req - The incoming Next.js request object.
  * @returns {NextResponse} - The response with appropriate redirection or next middleware.
@@ -42,6 +49,8 @@ export default auth(async (req) => {
   const { nextUrl } = req;
   // Determine if the user is authenticated based on auth data provided in the request.
   const isLoggedIn = !!req.auth;
+  // Check if the user has completed onboarding
+  const hasOnboarded = req.auth?.user?.hasOnboarded ?? true;
   // Check if the request is targeting an API route.
   const isApiRoute = nextUrl.pathname.startsWith(apiPrefix);
   // Check if the request targets a public route.
@@ -50,6 +59,11 @@ export default auth(async (req) => {
   const isProtectedRoute = protectedRoutes.some((route) =>
     nextUrl.pathname.startsWith(route)
   );
+  // Check if the route is exempt from onboarding check
+  const isOnboardingExempt =
+    onboardingExemptRoutes.some((route) =>
+      nextUrl.pathname.startsWith(route)
+    ) || isApiRoute;
 
   // ============================================================
   // API Routes
@@ -70,6 +84,10 @@ export default auth(async (req) => {
   // to prevent unnecessary access.
   if (isPublicRoute) {
     if (isLoggedIn) {
+      // Check if user has completed onboarding first
+      if (!hasOnboarded) {
+        return NextResponse.redirect(new URL('/onboarding', nextUrl.origin));
+      }
       // Redirect logged-in user to the dashboard.
       return NextResponse.redirect(new URL('/dashboard', nextUrl.origin));
     }
@@ -86,6 +104,27 @@ export default auth(async (req) => {
     const signInUrl = new URL('/sign-in', nextUrl.origin);
     signInUrl.searchParams.set('callbackUrl', nextUrl.toString());
     return NextResponse.redirect(signInUrl);
+  }
+
+  // ============================================================
+  // Onboarding Check
+  // ============================================================
+  // If user is logged in but hasn't completed onboarding, redirect to onboarding
+  // unless they're already on an onboarding-exempt route
+  if (isLoggedIn && !hasOnboarded && !isOnboardingExempt) {
+    return NextResponse.redirect(new URL('/onboarding', nextUrl.origin));
+  }
+
+  // If user is already onboarded but trying to access the onboarding page again
+  // if (
+  //   isLoggedIn &&
+  //   hasOnboarded &&
+  //   nextUrl.pathname.startsWith('/onboarding')
+  // ) {
+  //   return NextResponse.redirect(new URL('/dashboard', nextUrl.origin));
+  // }
+  if (!isLoggedIn && nextUrl.pathname.startsWith('/onboarding')) {
+    return NextResponse.redirect(new URL('/sign-in', nextUrl.origin));
   }
 
   // ============================================================

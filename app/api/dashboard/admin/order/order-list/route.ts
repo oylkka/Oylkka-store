@@ -1,7 +1,7 @@
 import { subHours } from 'date-fns';
 import { NextRequest, NextResponse } from 'next/server';
 
-import { auth } from '@/auth';
+import { auth } from '@/features/auth/auth';
 import { db } from '@/lib/db';
 
 export async function GET(req: NextRequest) {

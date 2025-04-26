@@ -3,6 +3,7 @@
 model User {
   id            String    @id @default(auto()) @map("_id") @db.ObjectId
   name          String?
+  username     String?   @unique
   email         String?   @unique
   image         String?
   imageId       String?
@@ -11,6 +12,7 @@ model User {
   phoneVerified Boolean   @default(false)
   accounts      Account[]
   sessions      Session[]
+  hasOnboarded Boolean   @default(false)
   role          UserRole  @default(CUSTOMER)
   isActive      Boolean   @default(true)
   createdAt     DateTime  @default(now())

@@ -6,7 +6,6 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 
-import { auth } from '@/auth';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import {
@@ -17,6 +16,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { auth } from '@/features/auth/auth';
 import { getInitials } from '@/utils';
 
 import { SignOut } from './logout';
