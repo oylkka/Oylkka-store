@@ -1,0 +1,49 @@
+// Order-related enums
+
+enum OrderStatus {
+  PENDING
+  PROCESSING
+  SHIPPED
+  DELIVERED
+  CANCELLED
+  REFUNDED
+  PARTIALLY_REFUNDED
+}
+
+enum PaymentStatus {
+  PENDING
+  PAID
+  FAILED
+  REFUNDED
+  PARTIALLY_REFUNDED
+}
+
+enum PaymentMethod {
+  CREDIT_CARD
+  PAYPAL
+  STRIPE
+  BANK_TRANSFER
+  CASH_ON_DELIVERY
+  BKASH
+  WALLET
+}
+
+enum OrderItemStatus {
+  PROCESSING
+  SHIPPED
+  DELIVERED
+  CANCELLED
+  RETURNED
+}
+
+enum DiscountType {
+  PERCENTAGE
+  FIXED
+}
+
+enum CouponScope {
+  ALL
+  CATEGORY
+  PRODUCT
+  SHOP
+}

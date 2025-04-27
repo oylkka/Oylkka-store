@@ -1,0 +1,12 @@
+// Main schema.prisma file - includes generator and datasource configuration
+
+datasource db {
+  provider = "mongodb"
+  url      = env("MONGODB_URI")
+}
+
+generator client {
+  provider        = "prisma-client-js"
+  output          = "../output"
+  previewFeatures = ["prismaSchemaFolder"]
+}
