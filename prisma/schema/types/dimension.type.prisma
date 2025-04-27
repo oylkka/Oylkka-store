@@ -1,7 +1,0 @@
-// types/dimension.type.prisma
-type Dimensions {
-  length Float
-  width  Float
-  height Float
-  unit   String
-}

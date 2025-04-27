@@ -1,8 +1,0 @@
-// Shop-related enums
-
-enum ShopStatus {
-  ACTIVE
-  PENDING
-  SUSPENDED
-  CLOSED
-}
