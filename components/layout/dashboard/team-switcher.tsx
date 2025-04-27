@@ -1,17 +1,18 @@
-'use client';
+"use client";
 
-import { ChevronsUpDown, ShoppingBag } from 'lucide-react';
-import Link from 'next/link';
+import { ChevronsUpDown, ShoppingBag } from "lucide-react";
+import Link from "next/link";
 
 import {
   DropdownMenu,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+} from "@/components/ui/dropdown-menu";
+
 import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-} from '@/components/ui/sidebar';
+} from "@/components/ui/sidebar";
 
 export function TeamSwitcher() {
   return (

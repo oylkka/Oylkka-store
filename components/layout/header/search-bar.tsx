@@ -1,10 +1,10 @@
-'use client';
+"use client";
 
-import { zodResolver } from '@hookform/resolvers/zod';
-import { Search, X } from 'lucide-react';
-import { useRouter } from 'next/navigation';
-import { useForm } from 'react-hook-form';
-import { z } from 'zod';
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Search, X } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
 
 import {
   Form,
@@ -12,12 +12,12 @@ import {
   FormField,
   FormItem,
   FormMessage,
-} from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
 
 const FormSchema = z.object({
   search: z.string().min(2, {
-    message: 'Search must be at least 2 characters.',
+    message: "Search must be at least 2 characters.",
   }),
 });
 
@@ -31,7 +31,7 @@ export default function SearchBar({ isMobile = false }: SearchBarProps) {
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
-      search: '',
+      search: "",
     },
   });
 
@@ -40,7 +40,7 @@ export default function SearchBar({ isMobile = false }: SearchBarProps) {
   };
 
   const clearInput = () => {
-    form.setValue('search', '');
+    form.setValue("search", "");
   };
 
   return (
@@ -58,7 +58,7 @@ export default function SearchBar({ isMobile = false }: SearchBarProps) {
                       {...field}
                       placeholder="Search products..."
                       className={`bg-muted focus-visible:ring-primary h-10 min-w-max rounded-full border-none pr-10 pl-10 ring-offset-0 focus-visible:ring-1 focus-visible:ring-offset-0 ${
-                        isMobile ? 'h-9' : ''
+                        isMobile ? "h-9" : ""
                       }`}
                       autoComplete="off"
                     />

@@ -7,14 +7,15 @@ import {
   ShoppingCart,
   Tag,
   Users,
-} from 'lucide-react';
+} from "lucide-react";
 
-import { auth } from '@/auth';
+import { auth } from "@/features/auth/auth";
+
 import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
-} from '@/components/ui/collapsible';
+} from "@/components/ui/collapsible";
 import {
   SidebarGroup,
   SidebarGroupLabel,
@@ -24,7 +25,7 @@ import {
   SidebarMenuSub,
   SidebarMenuSubButton,
   SidebarMenuSubItem,
-} from '@/components/ui/sidebar';
+} from "@/components/ui/sidebar";
 
 interface SubItem {
   title: string;
@@ -41,92 +42,92 @@ interface NavItem {
 
 export async function NavMain() {
   const session = await auth();
-  const isAdmin = session?.user?.role === 'ADMIN';
+  const isAdmin = session?.user?.role === "ADMIN";
 
   // Common navigation items for all users
   const commonNavItems: NavItem[] = [
     {
-      title: 'Shop',
-      url: '/shop',
+      title: "Shop",
+      url: "/shop",
       icon: ShoppingCart,
       isActive: true,
       items: [
         {
-          title: 'All Products',
-          url: '/shop/all',
+          title: "All Products",
+          url: "/shop/all",
         },
         {
-          title: 'New Arrivals',
-          url: '/shop/new',
+          title: "New Arrivals",
+          url: "/shop/new",
         },
         {
-          title: 'Featured',
-          url: '/shop/featured',
+          title: "Featured",
+          url: "/shop/featured",
         },
         {
-          title: 'Best Sellers',
-          url: '/shop/best-sellers',
+          title: "Best Sellers",
+          url: "/shop/best-sellers",
         },
       ],
     },
     {
-      title: 'Categories',
-      url: '/categories',
+      title: "Categories",
+      url: "/categories",
       icon: Tag,
       items: [
         {
-          title: 'Clothing',
-          url: '/categories/clothing',
+          title: "Clothing",
+          url: "/categories/clothing",
         },
         {
-          title: 'Accessories',
-          url: '/categories/accessories',
+          title: "Accessories",
+          url: "/categories/accessories",
         },
         {
-          title: 'Footwear',
-          url: '/categories/footwear',
+          title: "Footwear",
+          url: "/categories/footwear",
         },
         {
-          title: 'Home & Living',
-          url: '/categories/home',
+          title: "Home & Living",
+          url: "/categories/home",
         },
       ],
     },
     {
-      title: 'My Orders',
-      url: '/orders',
+      title: "My Orders",
+      url: "/orders",
       icon: Package,
       items: [
         {
-          title: 'Active Orders',
-          url: '/orders/active',
+          title: "Active Orders",
+          url: "/orders/active",
         },
         {
-          title: 'Order History',
-          url: '/orders/history',
+          title: "Order History",
+          url: "/orders/history",
         },
         {
-          title: 'Returns',
-          url: '/orders/returns',
+          title: "Returns",
+          url: "/orders/returns",
         },
       ],
     },
     {
-      title: 'Promotions',
-      url: '/promotions',
+      title: "Promotions",
+      url: "/promotions",
       icon: BadgePercent,
       items: [
         {
-          title: 'Current Deals',
-          url: '/promotions/deals',
+          title: "Current Deals",
+          url: "/promotions/deals",
         },
         {
-          title: 'Clearance',
-          url: '/promotions/clearance',
+          title: "Clearance",
+          url: "/promotions/clearance",
         },
         {
-          title: 'Seasonal',
-          url: '/promotions/seasonal',
+          title: "Seasonal",
+          url: "/promotions/seasonal",
         },
       ],
     },
@@ -135,86 +136,86 @@ export async function NavMain() {
   // Admin-only navigation items
   const adminNavItems: NavItem[] = [
     {
-      title: 'Dashboard',
-      url: '/admin/dashboard',
+      title: "Dashboard",
+      url: "/admin/dashboard",
       icon: BarChart2,
       items: [
         {
-          title: 'Sales Overview',
-          url: '/admin/dashboard/sales',
+          title: "Sales Overview",
+          url: "/admin/dashboard/sales",
         },
         {
-          title: 'Inventory',
-          url: '/admin/dashboard/inventory',
+          title: "Inventory",
+          url: "/admin/dashboard/inventory",
         },
         {
-          title: 'Analytics',
-          url: '/admin/dashboard/analytics',
+          title: "Analytics",
+          url: "/admin/dashboard/analytics",
         },
       ],
     },
     {
-      title: 'Product Management',
-      url: '/admin/products',
+      title: "Product Management",
+      url: "/admin/products",
       icon: Package,
       items: [
         {
-          title: 'Add Product',
-          url: '/dashboard/add-product',
+          title: "Add Product",
+          url: "/dashboard/add-product",
         },
         {
-          title: 'Edit Products',
-          url: '/admin/products/edit',
+          title: "Edit Products",
+          url: "/admin/products/edit",
         },
         {
-          title: 'Categories',
-          url: '/admin/products/categories',
+          title: "Categories",
+          url: "/admin/products/categories",
         },
         {
-          title: 'Inventory',
-          url: '/admin/products/inventory',
+          title: "Inventory",
+          url: "/admin/products/inventory",
         },
       ],
     },
     {
-      title: 'Customer Management',
-      url: '/admin/customers',
+      title: "Customer Management",
+      url: "/admin/customers",
       icon: Users,
       items: [
         {
-          title: 'Customer List',
-          url: '/admin/customers/list',
+          title: "Customer List",
+          url: "/admin/customers/list",
         },
         {
-          title: 'Customer Reports',
-          url: '/admin/customers/reports',
+          title: "Customer Reports",
+          url: "/admin/customers/reports",
         },
         {
-          title: 'Support Tickets',
-          url: '/admin/customers/tickets',
+          title: "Support Tickets",
+          url: "/admin/customers/tickets",
         },
       ],
     },
     {
-      title: 'Order Management',
-      url: '/admin/orders',
+      title: "Order Management",
+      url: "/admin/orders",
       icon: ShoppingCart,
       items: [
         {
-          title: 'All Orders',
-          url: '/dashboard/admin/orders',
+          title: "All Orders",
+          url: "/dashboard/admin/orders",
         },
         {
-          title: 'Pending Orders',
-          url: '/dashboard/admin/orders?status=PENDING',
+          title: "Pending Orders",
+          url: "/dashboard/admin/orders?status=PENDING",
         },
         {
-          title: 'Shipped Orders',
-          url: '/dashboard/admin/orders?status=SHIPPED',
+          title: "Shipped Orders",
+          url: "/dashboard/admin/orders?status=SHIPPED",
         },
         {
-          title: 'Returns & Refunds',
-          url: '/dashboard/admin/orders?status=REFUNDED',
+          title: "Returns & Refunds",
+          url: "/dashboard/admin/orders?status=REFUNDED",
         },
       ],
     },
@@ -222,35 +223,35 @@ export async function NavMain() {
 
   // Account settings for all users with some admin-specific options
   const accountSettingsItem: NavItem = {
-    title: 'Account',
-    url: '/account',
+    title: "Account",
+    url: "/account",
     icon: Settings,
     items: [
       {
-        title: 'Profile',
-        url: '/account/profile',
+        title: "Profile",
+        url: "/account/profile",
       },
       {
-        title: 'Addresses',
-        url: '/account/addresses',
+        title: "Addresses",
+        url: "/account/addresses",
       },
       {
-        title: 'Payment Methods',
-        url: '/account/payment',
+        title: "Payment Methods",
+        url: "/account/payment",
       },
       {
-        title: 'Wishlist',
-        url: '/account/wishlist',
+        title: "Wishlist",
+        url: "/account/wishlist",
       },
       ...(isAdmin
         ? [
             {
-              title: 'Store Settings',
-              url: '/admin/settings/store',
+              title: "Store Settings",
+              url: "/admin/settings/store",
             },
             {
-              title: 'Security',
-              url: '/admin/settings/security',
+              title: "Security",
+              url: "/admin/settings/security",
             },
           ]
         : []),
@@ -267,7 +268,7 @@ export async function NavMain() {
   return (
     <SidebarGroup>
       <SidebarGroupLabel>
-        {isAdmin ? 'Store Management' : 'Shopping'}
+        {isAdmin ? "Store Management" : "Shopping"}
       </SidebarGroupLabel>
       <SidebarMenu>
         {navItems.map((item) => (

@@ -1,0 +1,109 @@
+model Category {
+  id          String     @id @default(auto()) @map("_id") @db.ObjectId
+  name        String
+  slug        String     @unique
+  description String?
+  image       Image?
+  parentId    String?    @db.ObjectId
+  parent      Category?  @relation("SubCategories", fields: [parentId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  children    Category[] @relation("SubCategories")
+  products    Product[]
+  featured    Boolean    @default(false)
+  order       Int        @default(0)
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  @@index([parentId])
+  @@fulltext([name, description])
+}
+
+model Product {
+  id                   String            @id @default(auto()) @map("_id") @db.ObjectId
+  productName          String
+  slug                 String            @unique
+  description          String
+  shortDescription     String?
+  categoryId           String            @db.ObjectId
+  // Add onUpdate: NoAction here
+  category             Category          @relation(fields: [categoryId], references: [id], onUpdate: NoAction)
+  tags                 String[]
+  sku                  String            @unique
+  price                Float
+  discountPrice        Float?
+  discountPercent      Float?
+  stock                Int
+  brand                String?
+  condition            ProductCondition
+  conditionDescription String?
+  weight               Float?
+  weightUnit           String            @default("kg")
+  dimensions           Dimensions?
+  freeShipping         Boolean           @default(false)
+  // Media
+  images               Image[]
+  videos               Video[]
+  // Variants and Attributes
+  attributes           Json? // For storing color, size, etc.
+  variants             ProductVariant[]
+  // SEO
+  metaTitle            String?
+  metaDescription      String?
+  // Status and Visibility
+  status               ProductStatus     @default(DRAFT)
+  featured             Boolean           @default(false)
+  // Multi-vendor specific
+  shopId               String?           @db.ObjectId
+  shop                 Shop?             @relation("ShopProducts", fields: [shopId], references: [id], onUpdate: NoAction)
+  // Relationships
+  createdBy            String            @db.ObjectId
+  user                 User              @relation(fields: [createdBy], references: [id], onUpdate: NoAction)
+  reviews              Review[]
+  wishlistItems        WishlistItem[]
+  cartItems            CartItem[]
+  questions            ProductQuestion[]
+  // Analytics
+  views                Int               @default(0)
+  // Timestamps
+  createdAt            DateTime          @default(now())
+  updatedAt            DateTime          @updatedAt
+
+  @@index([categoryId])
+  @@index([createdBy])
+  @@index([shopId])
+  @@index([status])
+  @@fulltext([productName, description, tags])
+}
+
+model ProductVariant {
+  id            String   @id @default(auto()) @map("_id") @db.ObjectId
+  productId     String   @db.ObjectId
+  // Add onUpdate: NoAction here
+  product       Product  @relation(fields: [productId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  name          String
+  sku           String   @unique
+  price         Float
+  discountPrice Float?
+  stock         Int
+  attributes    Json // {color: "red", size: "XL"}
+  images        Image[]
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([productId])
+}
+
+model ProductQuestion {
+  id         String    @id @default(auto()) @map("_id") @db.ObjectId
+  productId  String    @db.ObjectId
+  // Add onUpdate: NoAction here
+  product    Product   @relation(fields: [productId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  userId     String    @db.ObjectId
+  question   String
+  answer     String?
+  answeredAt DateTime?
+  answeredBy String?   @db.ObjectId
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+
+  @@index([productId])
+}

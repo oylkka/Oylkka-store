@@ -1,4 +1,9 @@
-import * as React from 'react';
+import * as React from "react";
+
+
+import { NavMain } from "./nav-main";
+import { NavUser } from "./nav-user";
+import { TeamSwitcher } from "./team-switcher";
 
 import {
   Sidebar,
@@ -6,11 +11,7 @@ import {
   SidebarFooter,
   SidebarHeader,
   SidebarRail,
-} from '@/components/ui/sidebar';
-
-import { NavMain } from './nav-main';
-import { NavUser } from './nav-user';
-import { TeamSwitcher } from './team-switcher';
+} from "@/components/ui/sidebar";
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   return (

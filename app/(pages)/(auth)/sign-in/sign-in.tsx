@@ -1,19 +1,17 @@
-// app/signin/SignInClient.tsx
-'use client';
+"use client";
 
-import { motion } from 'framer-motion';
-import { Loader2 } from 'lucide-react';
-import { signIn } from 'next-auth/react';
-import { useState } from 'react';
+import { Loader2 } from "lucide-react";
+import { signIn } from "next-auth/react";
+import { useState } from "react";
 
-import { Button } from '@/components/ui/button';
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from '@/components/ui/card';
+} from "@/components/ui/card";
 
 export default function SignIn() {
   const [isLoadingGoogle, setIsLoadingGoogle] = useState(false);
@@ -24,9 +22,9 @@ export default function SignIn() {
     setIsLoadingGoogle(true);
     setError(null);
     try {
-      await signIn('google', { callbackUrl: '/dashboard' });
+      await signIn("google", { callbackUrl: "/dashboard" });
     } catch {
-      setError('Failed to sign in with Google. Please try again.');
+      setError("Failed to sign in with Google. Please try again.");
 
       setIsLoadingGoogle(false);
     }
@@ -36,21 +34,16 @@ export default function SignIn() {
     setIsLoadingGitHub(true);
     setError(null);
     try {
-      await signIn('github', { callbackUrl: '/dashboard' });
+      await signIn("github", { callbackUrl: "/dashboard" });
     } catch {
-      setError('Failed to sign in with GitHub. Please try again.');
+      setError("Failed to sign in with GitHub. Please try again.");
       setIsLoadingGitHub(false);
     }
   };
 
   return (
-    <div className="flex min-h-[70vh] items-center justify-center bg-gradient-to-br from-gray-50 via-gray-100 to-gray-200 p-4 sm:p-6 dark:from-gray-900 dark:via-gray-800 dark:to-gray-700">
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, ease: 'easeOut' }}
-        className="w-full max-w-md"
-      >
+    <div className="flex min-h-[70vh] items-center justify-center">
+      <div className="w-full max-w-md">
         <Card className="hover:shadow-3xl border-none shadow-2xl transition-all duration-300 dark:shadow-gray-800/50">
           <CardHeader className="space-y-2 pb-6 text-center">
             <CardTitle className="text-3xl font-bold tracking-tight">
@@ -62,13 +55,9 @@ export default function SignIn() {
           </CardHeader>
           <CardContent className="space-y-6">
             {error && (
-              <motion.p
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                className="rounded-md bg-red-50 px-4 py-2 text-center text-sm text-red-500 dark:bg-red-900/20"
-              >
+              <p className="rounded-md bg-red-50 px-4 py-2 text-center text-sm text-red-500 dark:bg-red-900/20">
                 {error}
-              </motion.p>
+              </p>
             )}
             <div className="grid gap-4">
               <Button
@@ -133,7 +122,7 @@ export default function SignIn() {
             </div>
           </CardContent>
         </Card>
-      </motion.div>
+      </div>
     </div>
   );
 }

@@ -1,11 +1,11 @@
-'use client';
+"use client";
 
-import { Menu, ShoppingBag } from 'lucide-react';
-import Link from 'next/link';
-import { useState } from 'react';
+import { Menu, ShoppingBag } from "lucide-react";
+import Link from "next/link";
+import { useState } from "react";
 
-import { Button } from '@/components/ui/button';
-import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
+import { Button } from "@/components/ui/button";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 
 export default function HeaderClient() {
   const [isOpen, setIsOpen] = useState(false);
@@ -32,7 +32,7 @@ export default function HeaderClient() {
             <div className="space-y-3">
               <div className="font-semibold">Products</div>
               <div className="ml-4 flex flex-col space-y-2">
-                {['clothing', 'accessories', 'footwear'].map((type) => (
+                {["clothing", "accessories", "footwear"].map((type) => (
                   <Link
                     key={type}
                     href={`/products/${type}`}

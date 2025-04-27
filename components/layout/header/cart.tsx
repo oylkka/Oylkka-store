@@ -1,6 +1,5 @@
 import Link from 'next/link';
 
-import { auth } from '@/auth';
 import { Button } from '@/components/ui/button';
 import {
   Sheet,
@@ -10,28 +9,19 @@ import {
   SheetHeader,
   SheetTitle,
 } from '@/components/ui/sheet';
-
-import CartBadge from './cart-button-badge';
-import CartClient from './cart-client';
+import { auth } from '@/features/auth/auth';
 
 export default async function Cart() {
   const session = await auth();
 
   return (
     <Sheet>
-      <CartBadge />
       <SheetContent>
         <SheetHeader className="px-4 py-2 md:py-4">
           <SheetTitle>Shopping Cart</SheetTitle>
         </SheetHeader>
         <div className="mx-4">
-          {session ? (
-            <div>
-              <CartClient />
-            </div>
-          ) : (
-            <div>Sign in to see your cart</div>
-          )}
+          {session ? <div>Cart</div> : <div>Sign in to see your cart</div>}
         </div>
 
         <SheetFooter>
