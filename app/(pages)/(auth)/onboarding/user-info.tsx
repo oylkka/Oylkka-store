@@ -82,7 +82,6 @@ function AvatarUpload({
       setValue('avatar', file);
       const previewUrl = URL.createObjectURL(file);
       setAvatarSrc(previewUrl);
-      toast.success('Avatar updated successfully');
     } catch (error) {
       toast.error('Failed to upload image');
       console.error('Upload error:', error);

@@ -1,6 +1,6 @@
-import type { NextAuthConfig } from "next-auth";
-import Github from "next-auth/providers/github";
-import Google from "next-auth/providers/google";
+import type { NextAuthConfig } from 'next-auth';
+import Github from 'next-auth/providers/github';
+import Google from 'next-auth/providers/google';
 
 export default {
   providers: [
@@ -24,7 +24,7 @@ export default {
       }
 
       // Handle session update (e.g., after onboarding)
-      if (trigger === "update" && session) {
+      if (trigger === 'update' && session) {
         // Update name and image if provided
         if (session.name) {
           token.name = session.name;
@@ -41,9 +41,6 @@ export default {
         if (session.username) {
           token.username = session.username;
         }
-        if (session.phone) {
-          token.phone = session.phone;
-        }
         if (session.email) {
           token.email = session.email;
         }
@@ -57,7 +54,6 @@ export default {
       session.user.role = token.role as string;
       session.user.hasOnboarded = token.hasOnboarded as boolean;
       session.user.username = token.username as string;
-      session.user.phone = token.phone as string;
 
       // Make sure name and image are properly set
       session.user.name = token.name;
@@ -67,6 +63,6 @@ export default {
     },
   },
   session: {
-    strategy: "jwt",
+    strategy: 'jwt',
   },
 } satisfies NextAuthConfig;

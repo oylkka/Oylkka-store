@@ -3,11 +3,11 @@ import {
   MessageSquare,
   Settings,
   UserIcon,
-} from "lucide-react";
-import Link from "next/link";
+} from 'lucide-react';
+import Link from 'next/link';
 
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -15,10 +15,11 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { auth } from "@/features/auth/auth";
+} from '@/components/ui/dropdown-menu';
+import { auth } from '@/features/auth/auth';
+import { getInitials } from '@/lib/utils';
 
-import { SignOut } from "./logout";
+import { SignOut } from './logout';
 
 export default async function UserDropDown() {
   const session = await auth();
@@ -30,7 +31,9 @@ export default async function UserDropDown() {
             <DropdownMenuTrigger asChild>
               <Avatar className="cursor-pointer">
                 <AvatarImage src={session.user.image!} alt="@shadcn" />
-                <AvatarFallback>{session.user.name}</AvatarFallback>
+                <AvatarFallback>
+                  {getInitials(session.user.name)}
+                </AvatarFallback>
               </Avatar>
             </DropdownMenuTrigger>
             <DropdownMenuContent className="w-56" forceMount sideOffset={8}>

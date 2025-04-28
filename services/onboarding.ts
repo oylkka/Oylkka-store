@@ -1,35 +1,9 @@
-// hooks/useOnboardingMutation.ts
-"use client";
+'use client';
 
-import { OnboardingFormValues } from "@/schemas";
-import { useMutation } from "@tanstack/react-query";
-import { toast } from "sonner";
-
-// Helper function to clean form data
-function cleanFormData<T extends Record<string, any>>(data: T): Partial<T> {
-  const cleanedData: Partial<T> = {};
-
-  for (const key in data) {
-    const value = data[key];
-
-    if (typeof value === "string") {
-      if (value.trim() !== "") {
-        cleanedData[key] = value;
-      }
-    } else if ((value as any) instanceof File) {
-      cleanedData[key] = value;
-    } else if (typeof value === "object" && value !== null) {
-      const nested = cleanFormData(value);
-      if (Object.keys(nested).length > 0) {
-        cleanedData[key] = nested as any;
-      }
-    } else if (value !== undefined && value !== null) {
-      cleanedData[key] = value;
-    }
-  }
-
-  return cleanedData;
-}
+import { cleanFormData } from '@/lib/utils';
+import { OnboardingFormValues } from '@/schemas';
+import { useMutation } from '@tanstack/react-query';
+import { toast } from 'sonner';
 
 // Function to handle file and non-file form data
 function prepareFormData(data: OnboardingFormValues): FormData {
@@ -38,13 +12,13 @@ function prepareFormData(data: OnboardingFormValues): FormData {
 
   // Handle flat fields
   for (const [key, value] of Object.entries(cleanedData)) {
-    if (key === "socialLinks" || value === undefined || value === null) {
+    if (key === 'socialLinks' || value === undefined || value === null) {
       continue;
     }
 
     if (value instanceof File) {
       formData.append(key, value);
-    } else if (typeof value === "object") {
+    } else if (typeof value === 'object') {
       // Skip objects for now
     } else {
       formData.append(key, String(value));
@@ -54,7 +28,7 @@ function prepareFormData(data: OnboardingFormValues): FormData {
   // Handle social links separately
   if (cleanedData.socialLinks) {
     for (const [platform, url] of Object.entries(cleanedData.socialLinks)) {
-      if (url && typeof url === "string" && url.trim() !== "") {
+      if (url && typeof url === 'string' && url.trim() !== '') {
         formData.append(`socialLinks[${platform}]`, url);
       }
     }
@@ -67,15 +41,15 @@ function prepareFormData(data: OnboardingFormValues): FormData {
 async function submitOnboardingData(data: OnboardingFormValues): Promise<any> {
   const formData = prepareFormData(data);
 
-  const res = await fetch("/api/auth/onboarding", {
-    method: "POST",
+  const res = await fetch('/api/auth/onboarding', {
+    method: 'POST',
     body: formData,
   });
 
   const responseData = await res.json();
 
   if (!res.ok) {
-    throw new Error(responseData.message || "Failed to submit form");
+    throw new Error(responseData.message || 'Failed to submit form');
   }
 
   return responseData;
@@ -88,15 +62,18 @@ export function useOnboardingMutation(options: {
 }) {
   return useMutation({
     mutationFn: submitOnboardingData,
+    onMutate: () => {
+      // Show loading toast before starting the mutation
+      toast.loading('Saving profile...', { id: 'onboarding' });
+    },
     onSuccess: (data) => {
-      toast.success("Profile completed successfully!");
+      toast.success('Profile completed successfully!', { id: 'onboarding' });
       if (options.onSuccess) {
         options.onSuccess(data);
       }
     },
     onError: (error: Error) => {
-      console.error("Form submission error:", error);
-      toast.error(error.message || "Failed to complete profile");
+      toast.error(error.message || 'Failed to complete profile', { id: 'onboarding' });
       if (options.onError) {
         options.onError(error);
       }

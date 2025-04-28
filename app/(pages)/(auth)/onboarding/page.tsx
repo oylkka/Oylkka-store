@@ -1,19 +1,19 @@
-"use client";
+'use client';
 
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useRouter } from "next/navigation";
-import { useSession } from "next-auth/react";
-import { useEffect } from "react";
-import { useForm } from "react-hook-form";
-import { z } from "zod";
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useRouter } from 'next/navigation';
+import { useSession } from 'next-auth/react';
+import { useEffect } from 'react';
+import { useForm } from 'react-hook-form';
+import { z } from 'zod';
 
-import { Button } from "@/components/ui/button";
-import { Form } from "@/components/ui/form";
-import { onboardingSchema } from "@/schemas";
-import { useOnboardingMutation } from "@/services";
+import { Button } from '@/components/ui/button';
+import { Form } from '@/components/ui/form';
+import { onboardingSchema } from '@/schemas';
+import { useOnboardingMutation } from '@/services';
 
-import ShopInfoSection from "./shop-info-section";
-import UserInfo from "./user-info";
+import ShopInfoSection from './shop-info-section';
+import UserInfo from './user-info';
 
 export default function InputForm() {
   const session = useSession();
@@ -23,25 +23,25 @@ export default function InputForm() {
   const form = useForm<z.infer<typeof onboardingSchema>>({
     resolver: zodResolver(onboardingSchema),
     defaultValues: {
-      id: "",
-      name: "",
-      username: "",
-      email: "",
-      role: "CUSTOMER",
-      phone: "",
-      shopName: "",
-      shopSlug: "",
-      shopCategory: "",
-      shopAddress: "",
-      shopDescription: "",
-      shopEmail: "",
-      shopPhone: "",
+      id: '',
+      name: '',
+      username: '',
+      email: '',
+      role: 'CUSTOMER',
+      phone: '',
+      shopName: '',
+      shopSlug: '',
+      shopCategory: '',
+      shopAddress: '',
+      shopDescription: '',
+      shopEmail: '',
+      shopPhone: '',
       socialLinks: {
-        facebook: "",
-        instagram: "",
-        twitter: "",
-        linkedin: "",
-        website: "",
+        facebook: '',
+        instagram: '',
+        twitter: '',
+        linkedin: '',
+        website: '',
       },
     },
   });
@@ -52,10 +52,10 @@ export default function InputForm() {
       form.reset({
         ...form.getValues(),
         id: session.data.user.id,
-        name: session.data.user.name || "",
-        email: session.data.user.email || "",
+        name: session.data.user.name || '',
+        email: session.data.user.email || '',
         avatar: session.data.user.image,
-        role: session.data.user.role || "CUSTOMER",
+        role: session.data.user.role || 'CUSTOMER',
       });
     }
   }, [session.data?.user, form]);
@@ -64,7 +64,7 @@ export default function InputForm() {
   const { mutate, isPending } = useOnboardingMutation({
     onSuccess: () => {
       // Redirect or update UI on success
-      router.push("/dashboard");
+      router.push('/dashboard');
     },
   });
 
@@ -74,7 +74,7 @@ export default function InputForm() {
   }
 
   // Check if the role is vendor to show shop info section
-  const isVendor = form.watch("role") === "VENDOR";
+  const isVendor = form.watch('role') === 'VENDOR';
 
   return (
     <div className="container mx-auto py-8">
@@ -113,7 +113,7 @@ export default function InputForm() {
                   Saving...
                 </span>
               ) : (
-                "Save Profile"
+                'Save Profile'
               )}
             </Button>
           </div>

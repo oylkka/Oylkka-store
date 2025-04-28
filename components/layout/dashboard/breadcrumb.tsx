@@ -3,8 +3,6 @@
 import { usePathname } from "next/navigation";
 import React from "react";
 
-import { Separator } from "@/components/ui/separator";
-
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -12,6 +10,7 @@ import {
   BreadcrumbList,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
+import { Separator } from "@/components/ui/separator";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 
 export default function BreadCrumb() {

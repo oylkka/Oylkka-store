@@ -1,17 +1,57 @@
-"use client";
+'use client';
 
-import Image from "next/image";
-import { useState } from "react";
-import { useFormContext } from "react-hook-form";
+import Image from 'next/image';
+import { useEffect, useState } from 'react';
+import { useFormContext } from 'react-hook-form';
 
-import { OnboardingFormValues } from "@/schemas";
+import { OnboardingFormValues } from '@/schemas';
 
 export default function ShopBrandingSection() {
-  const { setValue } = useFormContext<OnboardingFormValues>();
-  const [logoPreview, setLogoPreview] = useState<string | null>(null);
-  const [bannerPreview, setBannerPreview] = useState<string | null>(null);
+  const { setValue, watch } = useFormContext<OnboardingFormValues>();
+
+  // Watch for form values instead of using local state
+  const shopLogo = watch('shopLogo');
+  const shopBanner = watch('shopBanner');
+
+  // Track upload states
   const [logoUploading, setLogoUploading] = useState(false);
   const [bannerUploading, setBannerUploading] = useState(false);
+
+  // States for preview URLs
+  const [logoPreviewUrl, setLogoPreviewUrl] = useState<string | null>(null);
+  const [bannerPreviewUrl, setBannerPreviewUrl] = useState<string | null>(null);
+
+  // Update preview URLs when form values change
+  useEffect(() => {
+    // Clean up previous object URLs to prevent memory leaks
+    if (logoPreviewUrl) {
+      URL.revokeObjectURL(logoPreviewUrl);
+    }
+    if (bannerPreviewUrl) {
+      URL.revokeObjectURL(bannerPreviewUrl);
+    }
+
+    // Create new object URLs from the File objects
+    if (shopLogo instanceof File) {
+      const url = URL.createObjectURL(shopLogo);
+      setLogoPreviewUrl(url);
+    }
+
+    if (shopBanner instanceof File) {
+      const url = URL.createObjectURL(shopBanner);
+      setBannerPreviewUrl(url);
+    }
+
+    // Cleanup function to revoke object URLs when component unmounts or dependencies change
+    return () => {
+      if (logoPreviewUrl) {
+        URL.revokeObjectURL(logoPreviewUrl);
+      }
+      if (bannerPreviewUrl) {
+        URL.revokeObjectURL(bannerPreviewUrl);
+      }
+    };
+  }, [shopLogo, shopBanner, bannerPreviewUrl, logoPreviewUrl]);
 
   const handleLogoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -21,18 +61,13 @@ export default function ShopBrandingSection() {
       // Validate file
       const maxSize = 500 * 1024; // 500KB
       if (file.size > maxSize) {
-        alert("Logo image should not exceed 500KB");
+        alert('Logo image should not exceed 500KB');
         setLogoUploading(false);
         return;
       }
 
-      const reader = new FileReader();
-      reader.onload = () => {
-        setLogoPreview(reader.result as string);
-        setValue("shopLogo", file);
-        setTimeout(() => setLogoUploading(false), 500);
-      };
-      reader.readAsDataURL(file);
+      setValue('shopLogo', file);
+      setTimeout(() => setLogoUploading(false), 500);
     }
   };
 
@@ -44,18 +79,13 @@ export default function ShopBrandingSection() {
       // Validate file
       const maxSize = 1024 * 1024; // 1MB
       if (file.size > maxSize) {
-        alert("Banner image should not exceed 1MB");
+        alert('Banner image should not exceed 1MB');
         setBannerUploading(false);
         return;
       }
 
-      const reader = new FileReader();
-      reader.onload = () => {
-        setBannerPreview(reader.result as string);
-        setValue("shopBanner", file);
-        setTimeout(() => setBannerUploading(false), 500);
-      };
-      reader.readAsDataURL(file);
+      setValue('shopBanner', file);
+      setTimeout(() => setBannerUploading(false), 500);
     }
   };
 
@@ -78,11 +108,11 @@ export default function ShopBrandingSection() {
                 onChange={handleLogoChange}
                 disabled={logoUploading}
               />
-              {logoPreview ? (
+              {logoPreviewUrl ? (
                 <Image
                   height={300}
                   width={300}
-                  src={logoPreview}
+                  src={logoPreviewUrl}
                   alt="Logo preview"
                   className="h-full w-full object-contain p-2"
                 />
@@ -145,7 +175,7 @@ export default function ShopBrandingSection() {
           <div className="hover:border-primary relative overflow-hidden rounded-md border border-gray-300 transition-all hover:shadow-sm">
             <div
               className="relative"
-              style={{ paddingTop: "31.25%" /* 16:5 aspect ratio */ }}
+              style={{ paddingTop: '31.25%' /* 16:5 aspect ratio */ }}
             >
               <input
                 id="banner-upload"
@@ -155,11 +185,11 @@ export default function ShopBrandingSection() {
                 onChange={handleBannerChange}
                 disabled={bannerUploading}
               />
-              {bannerPreview ? (
+              {bannerPreviewUrl ? (
                 <Image
                   height={300}
                   width={300}
-                  src={bannerPreview}
+                  src={bannerPreviewUrl}
                   alt="Banner preview"
                   className="absolute inset-0 h-full w-full object-cover"
                 />
