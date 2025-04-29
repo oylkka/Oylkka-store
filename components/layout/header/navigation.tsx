@@ -1,10 +1,10 @@
-"use client";
+'use client';
 
-import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import { useEffect, useRef, useState } from 'react';
 
-import { cn } from "@/lib/utils";
+import { cn } from '@/lib/utils';
 
 type NavItem = {
   label: string;
@@ -12,12 +12,12 @@ type NavItem = {
 };
 
 const navItems: NavItem[] = [
-  { label: "Overview", href: "/" },
-  { label: "Shop", href: "/shop" },
-  { label: "Activity", href: "/activity" },
-  { label: "Domains", href: "/domains" },
-  { label: "Usage", href: "/usage" },
-  { label: "Monitoring", href: "/monitoring" },
+  { label: 'Overview', href: '/' },
+  { label: 'Shop', href: '/shop' },
+  { label: 'Activity', href: '/activity' },
+  { label: 'Domains', href: '/domains' },
+  { label: 'Usage', href: '/usage' },
+  { label: 'Monitoring', href: '/monitoring' },
 ];
 
 export default function Navigation() {
@@ -31,7 +31,7 @@ export default function Navigation() {
 
   // Determine active index based on current path
   const activeIndex = navItems.findIndex(
-    (item) => item.href === (pathname === "/" ? "/" : pathname),
+    (item) => item.href === (pathname === '/' ? '/' : pathname)
   );
 
   useEffect(() => {
@@ -68,7 +68,7 @@ export default function Navigation() {
           setActiveStyle({
             transform: `translateX(${prevLeft}px)`,
             width: `${offsetWidth}px`,
-            transition: "none",
+            transition: 'none',
           });
 
           // Trigger reflow
@@ -79,7 +79,7 @@ export default function Navigation() {
             setActiveStyle({
               transform: `translateX(${offsetLeft}px)`,
               width: `${offsetWidth}px`,
-              transition: "all 300ms cubic-bezier(0.4, 0, 0.2, 1)",
+              transition: 'all 300ms cubic-bezier(0.4, 0, 0.2, 1)',
             });
           });
         }
@@ -120,8 +120,8 @@ export default function Navigation() {
                 key={index}
                 href={item.href}
                 className={cn(
-                  "focus-visible:ring-primary rounded-md outline-none focus-visible:ring-2",
-                  "transition-colors duration-300",
+                  'focus-visible:ring-primary rounded-md outline-none focus-visible:ring-2',
+                  'transition-colors duration-300'
                 )}
               >
                 <div
@@ -129,10 +129,10 @@ export default function Navigation() {
                     tabRefs.current[index] = el;
                   }}
                   className={cn(
-                    "cursor-pointer px-3 py-2",
+                    'cursor-pointer px-3 py-2',
                     index === activeIndex
-                      ? "text-[#0e0e10] dark:text-white"
-                      : "text-[#0e0f1199] hover:text-[#0e0e10]/80 dark:text-[#ffffff99] dark:hover:text-white/80",
+                      ? 'text-[#0e0e10] dark:text-white'
+                      : 'text-[#0e0f1199] hover:text-[#0e0e10]/80 dark:text-[#ffffff99] dark:hover:text-white/80'
                   )}
                   onMouseEnter={() => setHoveredIndex(index)}
                   onMouseLeave={() => setHoveredIndex(null)}

@@ -1,4 +1,4 @@
-import { ShoppingBag } from "lucide-react";
+import { ShoppingBag } from 'lucide-react';
 
 import {
   Card,
@@ -6,13 +6,13 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+} from '@/components/ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
-import ShopBasicInfo from "./shop-basic-info";
-import ShopBrandingSection from "./shop-branding-info";
-import ShopContactSection from "./shop-contact-section";
-import ShopPreview from "./shop-preview-section";
+import ShopBasicInfo from './shop-basic-info';
+import ShopBrandingSection from './shop-branding-info';
+import ShopContactSection from './shop-contact-section';
+import ShopPreview from './shop-preview-section';
 
 export default function ShopInfoSection() {
   return (

@@ -1,18 +1,18 @@
-"use server";
+'use server';
 
-import { db } from "@/lib/db";
-import { revalidatePath } from "next/cache";
-import { z } from "zod";
+import { db } from '@/lib/db';
+import { revalidatePath } from 'next/cache';
+import { z } from 'zod';
 
 // Define schema for the slug check
 const slugCheckSchema = z.object({
   shopSlug: z
     .string()
-    .min(3, "Slug must be at least 3 characters")
-    .max(50, "Slug cannot exceed 50 characters")
+    .min(3, 'Slug must be at least 3 characters')
+    .max(50, 'Slug cannot exceed 50 characters')
     .regex(
       /^[a-z0-9-]+$/,
-      "Slug can only contain lowercase letters, numbers, and hyphens",
+      'Slug can only contain lowercase letters, numbers, and hyphens'
     ),
 });
 
@@ -27,10 +27,10 @@ export type SlugCheckResult = {
  */
 export async function checkSlugUniqueness(
   prevState: SlugCheckResult | null,
-  formData: FormData,
+  formData: FormData
 ): Promise<SlugCheckResult> {
   // Get the slug from form data
-  const shopSlug = formData.get("shopSlug") as string;
+  const shopSlug = formData.get('shopSlug') as string;
 
   try {
     // Validate the slug format using zod
@@ -63,7 +63,7 @@ export async function checkSlugUniqueness(
   } catch (error) {
     // Handle validation errors
     if (error instanceof z.ZodError) {
-      const errorMessage = error.errors.map((e) => e.message).join(", ");
+      const errorMessage = error.errors.map((e) => e.message).join(', ');
       return {
         success: false,
         message: errorMessage,
@@ -71,10 +71,10 @@ export async function checkSlugUniqueness(
     }
 
     // Handle other errors
-    console.error("Slug check error:", error);
+    console.error('Slug check error:', error);
     return {
       success: false,
-      message: "An error occurred while checking the slug availability.",
+      message: 'An error occurred while checking the slug availability.',
     };
   }
 }
@@ -84,7 +84,7 @@ export async function checkSlugUniqueness(
  */
 export async function updateShopSlug(
   shopId: string,
-  newSlug: string,
+  newSlug: string
 ): Promise<SlugCheckResult> {
   try {
     // Validate the slug format
@@ -129,7 +129,7 @@ export async function updateShopSlug(
   } catch (error) {
     // Handle validation errors
     if (error instanceof z.ZodError) {
-      const errorMessage = error.errors.map((e) => e.message).join(", ");
+      const errorMessage = error.errors.map((e) => e.message).join(', ');
       return {
         success: false,
         message: errorMessage,
@@ -137,10 +137,10 @@ export async function updateShopSlug(
     }
 
     // Handle other errors
-    console.error("Slug update error:", error);
+    console.error('Slug update error:', error);
     return {
       success: false,
-      message: "An error occurred while updating the shop slug.",
+      message: 'An error occurred while updating the shop slug.',
     };
   }
 }

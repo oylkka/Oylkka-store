@@ -1,7 +1,7 @@
-"use client";
+'use client';
 
-import { Building, Link, MapPin, Tag } from "lucide-react";
-import { useFormContext } from "react-hook-form";
+import { Building, Link, MapPin, Tag } from 'lucide-react';
+import { useFormContext } from 'react-hook-form';
 
 import {
   FormControl,
@@ -9,40 +9,40 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
+} from '@/components/ui/form';
+import { Input } from '@/components/ui/input';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { Textarea } from "@/components/ui/textarea";
-import { OnboardingFormValues } from "@/schemas";
+} from '@/components/ui/select';
+import { Textarea } from '@/components/ui/textarea';
+import { OnboardingFormValues } from '@/schemas';
 
-import { SlugUniquenessChecker } from "./check-slug-uniqueness";
+import { SlugUniquenessChecker } from './check-slug-uniqueness';
 
 // Shop categories
 const SHOP_CATEGORIES = [
-  { value: "electronics", label: "Electronics & Tech" },
-  { value: "fashion", label: "Fashion & Apparel" },
-  { value: "home", label: "Home & Garden" },
-  { value: "beauty", label: "Beauty & Personal Care" },
-  { value: "health", label: "Health & Wellness" },
-  { value: "toys", label: "Toys & Games" },
-  { value: "food", label: "Food & Groceries" },
-  { value: "art", label: "Art & Collectibles" },
-  { value: "jewelry", label: "Jewelry & Accessories" },
-  { value: "sports", label: "Sports & Outdoors" },
-  { value: "other", label: "Other" },
+  { value: 'electronics', label: 'Electronics & Tech' },
+  { value: 'fashion', label: 'Fashion & Apparel' },
+  { value: 'home', label: 'Home & Garden' },
+  { value: 'beauty', label: 'Beauty & Personal Care' },
+  { value: 'health', label: 'Health & Wellness' },
+  { value: 'toys', label: 'Toys & Games' },
+  { value: 'food', label: 'Food & Groceries' },
+  { value: 'art', label: 'Art & Collectibles' },
+  { value: 'jewelry', label: 'Jewelry & Accessories' },
+  { value: 'sports', label: 'Sports & Outdoors' },
+  { value: 'other', label: 'Other' },
 ];
 
 export default function ShopBasicInfo() {
   const { control } = useFormContext<OnboardingFormValues>();
 
   return (
-    <div className="space-y-6 mt-6">
+    <div className="mt-6 space-y-6">
       <div className="grid gap-6 md:grid-cols-2">
         <FormField
           control={control}
@@ -79,8 +79,8 @@ export default function ShopBasicInfo() {
                       // Transform input to valid slug format
                       const value = e.target.value
                         .toLowerCase()
-                        .replace(/\s+/g, "-")
-                        .replace(/[^a-z0-9-]/g, "");
+                        .replace(/\s+/g, '-')
+                        .replace(/[^a-z0-9-]/g, '');
                       field.onChange(value);
                     }}
                   />
@@ -103,7 +103,7 @@ export default function ShopBasicInfo() {
                 <Tag className="text-muted-foreground h-4 w-4" />
                 Shop Category *
               </FormLabel>
-              <Select onValueChange={field.onChange} value={field.value || ""}>
+              <Select onValueChange={field.onChange} value={field.value || ''}>
                 <FormControl>
                   <SelectTrigger>
                     <SelectValue placeholder="Select your shop category" />

@@ -1,17 +1,17 @@
-"use client";
+'use client';
 
-import { AlertCircle, CheckCircle, Loader2 } from "lucide-react";
-import { useEffect, useState, useTransition } from "react";
-import { useFormContext, useWatch } from "react-hook-form";
-import { useDebounce } from "use-debounce";
+import { AlertCircle, CheckCircle, Loader2 } from 'lucide-react';
+import { useEffect, useState, useTransition } from 'react';
+import { useFormContext, useWatch } from 'react-hook-form';
+import { useDebounce } from 'use-debounce';
 
-import { checkSlugUniqueness, SlugCheckResult } from "@/actions";
-import { OnboardingFormValues } from "@/schemas";
+import { checkSlugUniqueness, SlugCheckResult } from '@/actions';
+import { OnboardingFormValues } from '@/schemas';
 
 export function SlugUniquenessChecker() {
   const { control, setError, clearErrors } =
     useFormContext<OnboardingFormValues>();
-  const shopSlug = useWatch({ control, name: "shopSlug" });
+  const shopSlug = useWatch({ control, name: 'shopSlug' });
   const [debouncedSlug] = useDebounce(shopSlug, 500);
 
   const [isPending, startTransition] = useTransition();
@@ -26,7 +26,7 @@ export function SlugUniquenessChecker() {
 
     // Check slug uniqueness
     const formData = new FormData();
-    formData.append("shopSlug", debouncedSlug);
+    formData.append('shopSlug', debouncedSlug);
 
     startTransition(async () => {
       const checkResult = await checkSlugUniqueness(null, formData);
@@ -34,12 +34,12 @@ export function SlugUniquenessChecker() {
 
       // Set or clear form error based on the result
       if (!checkResult.success || checkResult.isUnique === false) {
-        setError("shopSlug", {
-          type: "manual",
+        setError('shopSlug', {
+          type: 'manual',
           message: checkResult.message,
         });
       } else {
-        clearErrors("shopSlug");
+        clearErrors('shopSlug');
       }
     });
   }, [debouncedSlug, setError, clearErrors]);
@@ -50,10 +50,10 @@ export function SlugUniquenessChecker() {
   }
 
   return (
-    <div className="mt-1.5 text-sm flex items-center gap-1.5">
+    <div className="mt-1.5 flex items-center gap-1.5 text-sm">
       {isPending ? (
         <>
-          <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
+          <Loader2 className="text-muted-foreground h-4 w-4 animate-spin" />
           <span className="text-muted-foreground">
             Checking availability...
           </span>

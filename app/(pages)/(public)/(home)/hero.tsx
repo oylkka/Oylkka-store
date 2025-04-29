@@ -1,18 +1,18 @@
-"use client";
-import Image, { StaticImageData } from "next/image";
-import Link from "next/link";
-import React, { useEffect, useRef, useState } from "react";
+'use client';
+import Image, { StaticImageData } from 'next/image';
+import Link from 'next/link';
+import React, { useEffect, useRef, useState } from 'react';
 
-import image1 from "@/assets/hero-slider-1.jpg";
-import image2 from "@/assets/hero-slider-2.jpg";
-import image3 from "@/assets/hero-slider-3.jpg";
-import img2 from "@/assets/hero2-image1.webp";
-import img1 from "@/assets/hero2-image2.webp";
-import img3 from "@/assets/hero2-image3.jpg";
-import img4 from "@/assets/hero2-image4.jpg";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
+import image1 from '@/assets/hero-slider-1.jpg';
+import image2 from '@/assets/hero-slider-2.jpg';
+import image3 from '@/assets/hero-slider-3.jpg';
+import img2 from '@/assets/hero2-image1.webp';
+import img1 from '@/assets/hero2-image2.webp';
+import img3 from '@/assets/hero2-image3.jpg';
+import img4 from '@/assets/hero2-image4.jpg';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
 
 interface Slide {
   id: number;
@@ -29,7 +29,7 @@ interface Slide {
     link: string;
   };
   badge?: string;
-  theme: "light" | "dark";
+  theme: 'light' | 'dark';
 }
 
 export default function HeroSection() {
@@ -42,52 +42,52 @@ export default function HeroSection() {
   const slides: Slide[] = [
     {
       id: 1,
-      title: "Summer Collection",
-      subtitle: "2024",
+      title: 'Summer Collection',
+      subtitle: '2024',
       description:
-        "Discover the latest trends for the season with up to 30% off on selected items.",
+        'Discover the latest trends for the season with up to 30% off on selected items.',
       image: image1,
       primaryCta: {
-        text: "Shop Now",
-        link: "/collections/summer",
+        text: 'Shop Now',
+        link: '/collections/summer',
       },
       secondaryCta: {
-        text: "Learn More",
-        link: "/about-collection",
+        text: 'Learn More',
+        link: '/about-collection',
       },
-      badge: "New Arrivals",
-      theme: "light",
+      badge: 'New Arrivals',
+      theme: 'light',
     },
     {
       id: 2,
-      title: "Premium Accessories",
-      subtitle: "Exclusive Collection",
+      title: 'Premium Accessories',
+      subtitle: 'Exclusive Collection',
       description:
-        "Elevate your style with our handcrafted accessories made from premium materials.",
+        'Elevate your style with our handcrafted accessories made from premium materials.',
       image: image2,
       primaryCta: {
-        text: "Explore",
-        link: "/collections/accessories",
+        text: 'Explore',
+        link: '/collections/accessories',
       },
-      theme: "dark",
+      theme: 'dark',
     },
     {
       id: 3,
-      title: "Limited Edition",
-      subtitle: "Designer Collaboration",
+      title: 'Limited Edition',
+      subtitle: 'Designer Collaboration',
       description:
-        "Our exclusive designer collaboration is now available. Limited quantities only.",
+        'Our exclusive designer collaboration is now available. Limited quantities only.',
       image: image3,
       primaryCta: {
-        text: "Shop Collection",
-        link: "/collections/limited-edition",
+        text: 'Shop Collection',
+        link: '/collections/limited-edition',
       },
       secondaryCta: {
-        text: "View Lookbook",
-        link: "/lookbook",
+        text: 'View Lookbook',
+        link: '/lookbook',
       },
-      badge: "Limited Stock",
-      theme: "light",
+      badge: 'Limited Stock',
+      theme: 'light',
     },
   ];
 
@@ -168,10 +168,10 @@ export default function HeroSection() {
           <div
             key={slide.id}
             className={cn(
-              "absolute inset-0 h-full w-full transition-opacity duration-1000",
+              'absolute inset-0 h-full w-full transition-opacity duration-1000',
               index === currentSlide
-                ? "opacity-100"
-                : "pointer-events-none opacity-0",
+                ? 'opacity-100'
+                : 'pointer-events-none opacity-0'
             )}
           >
             <div className="absolute inset-0 overflow-hidden">
@@ -184,10 +184,10 @@ export default function HeroSection() {
               />
               <div
                 className={cn(
-                  "absolute inset-0",
-                  slide.theme === "light"
-                    ? "bg-black/30"
-                    : "bg-gradient-to-r from-black/70 via-black/50 to-black/30",
+                  'absolute inset-0',
+                  slide.theme === 'light'
+                    ? 'bg-black/30'
+                    : 'bg-gradient-to-r from-black/70 via-black/50 to-black/30'
                 )}
               />
             </div>
@@ -195,8 +195,8 @@ export default function HeroSection() {
             <div className="relative z-10 flex h-full items-center">
               <div
                 className={cn(
-                  "container mx-auto flex px-2 md:px-0",
-                  index === 2 ? "justify-end text-end" : "justify-start",
+                  'container mx-auto flex px-2 md:px-0',
+                  index === 2 ? 'justify-end text-end' : 'justify-start'
                 )}
               >
                 <div className="max-w-md space-y-2 md:max-w-lg md:space-y-4 lg:max-w-xl">
@@ -204,7 +204,7 @@ export default function HeroSection() {
                     <Badge
                       className="md:mb-2 md:rounded-md md:px-3 md:py-1 md:text-sm md:font-medium"
                       variant={
-                        slide.theme === "light" ? "secondary" : "default"
+                        slide.theme === 'light' ? 'secondary' : 'default'
                       }
                     >
                       {slide.badge}
@@ -244,10 +244,10 @@ export default function HeroSection() {
             <button
               key={index}
               className={cn(
-                "h-2 w-2 rounded-full transition-all",
+                'h-2 w-2 rounded-full transition-all',
                 index === currentSlide
-                  ? "w-8 bg-white"
-                  : "bg-white/50 hover:bg-white/80",
+                  ? 'w-8 bg-white'
+                  : 'bg-white/50 hover:bg-white/80'
               )}
               onClick={() => goToSlide(index)}
               aria-label={`Go to slide ${index + 1}`}
@@ -260,24 +260,24 @@ export default function HeroSection() {
         <div className="grid grid-cols-2 gap-3 md:grid-cols-4 lg:gap-6">
           {[
             {
-              name: "Women",
+              name: 'Women',
               image: img1,
-              link: "/category/women",
+              link: '/category/women',
             },
             {
-              name: "Men",
+              name: 'Men',
               image: img2,
-              link: "/category/men",
+              link: '/category/men',
             },
             {
-              name: "Accessories",
+              name: 'Accessories',
               image: img3,
-              link: "/category/accessories",
+              link: '/category/accessories',
             },
             {
-              name: "Footwear",
+              name: 'Footwear',
               image: img4,
-              link: "/category/footwear",
+              link: '/category/footwear',
             },
           ].map((category, index) => (
             <Link

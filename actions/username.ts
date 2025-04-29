@@ -1,7 +1,7 @@
-"use server";
+'use server';
 
-import { auth } from "@/features/auth/auth";
-import { db } from "@/lib/db";
+import { auth } from '@/features/auth/auth';
+import { db } from '@/lib/db';
 
 export interface UsernameCheckResult {
   available: boolean;
@@ -11,20 +11,20 @@ export interface UsernameCheckResult {
 }
 
 export async function checkUsername(
-  username: string,
+  username: string
 ): Promise<UsernameCheckResult> {
   // Validate input
   if (!username) {
     return {
       available: false,
-      error: "Username is required",
+      error: 'Username is required',
     };
   }
 
   if (username.length < 3) {
     return {
       available: false,
-      message: "Username must be at least 3 characters",
+      message: 'Username must be at least 3 characters',
     };
   }
 
@@ -34,7 +34,7 @@ export async function checkUsername(
     if (!session) {
       return {
         available: false,
-        error: "Unauthorized",
+        error: 'Unauthorized',
       };
     }
 
@@ -55,22 +55,22 @@ export async function checkUsername(
 
     // Reserved usernames that can't be used
     const reservedUsernames = [
-      "admin",
-      "root",
-      "system",
-      "moderator",
-      "support",
-      "help",
-      "info",
-      "contact",
-      "about",
-      "login",
-      "signup",
-      "register",
-      "account",
-      "profile",
-      "settings",
-      "dashboard",
+      'admin',
+      'root',
+      'system',
+      'moderator',
+      'support',
+      'help',
+      'info',
+      'contact',
+      'about',
+      'login',
+      'signup',
+      'register',
+      'account',
+      'profile',
+      'settings',
+      'dashboard',
     ];
 
     const isReserved = reservedUsernames.includes(username.toLowerCase());
@@ -99,17 +99,17 @@ export async function checkUsername(
         available: false,
         suggestions: suggestions,
         message: isReserved
-          ? "This username is reserved"
-          : "This username is already taken",
+          ? 'This username is reserved'
+          : 'This username is already taken',
       };
     }
 
     return { available: true };
   } catch (error) {
-    console.error("Username check error:", error);
+    console.error('Username check error:', error);
     return {
       available: false,
-      error: "Failed to check username",
+      error: 'Failed to check username',
     };
   }
 }

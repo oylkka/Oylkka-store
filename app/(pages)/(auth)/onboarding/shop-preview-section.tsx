@@ -1,8 +1,8 @@
-"use client";
+'use client';
 
-import { useFormContext, useWatch } from "react-hook-form";
+import { useFormContext, useWatch } from 'react-hook-form';
 
-import { OnboardingFormValues } from "@/schemas";
+import { OnboardingFormValues } from '@/schemas';
 
 export default function ShopPreview() {
   const { control } = useFormContext<OnboardingFormValues>();
@@ -10,35 +10,35 @@ export default function ShopPreview() {
   // Watch form fields for preview updates
   const shopName = useWatch({
     control: control,
-    name: "shopName",
+    name: 'shopName',
   });
   const shopAddress = useWatch({
     control: control,
-    name: "shopAddress",
+    name: 'shopAddress',
   });
   const shopDescription = useWatch({
     control: control,
-    name: "shopDescription",
+    name: 'shopDescription',
   });
   const shopCategory = useWatch({
     control: control,
-    name: "shopCategory",
+    name: 'shopCategory',
   });
 
   // Get category label from value
   const getCategoryLabel = (value: string) => {
     const categories = {
-      electronics: "Electronics & Tech",
-      fashion: "Fashion & Apparel",
-      home: "Home & Garden",
-      beauty: "Beauty & Personal Care",
-      health: "Health & Wellness",
-      toys: "Toys & Games",
-      food: "Food & Groceries",
-      art: "Art & Collectibles",
-      jewelry: "Jewelry & Accessories",
-      sports: "Sports & Outdoors",
-      other: "Other",
+      electronics: 'Electronics & Tech',
+      fashion: 'Fashion & Apparel',
+      home: 'Home & Garden',
+      beauty: 'Beauty & Personal Care',
+      health: 'Health & Wellness',
+      toys: 'Toys & Games',
+      food: 'Food & Groceries',
+      art: 'Art & Collectibles',
+      jewelry: 'Jewelry & Accessories',
+      sports: 'Sports & Outdoors',
+      other: 'Other',
     };
     return categories[value as keyof typeof categories] || value;
   };
@@ -56,7 +56,7 @@ export default function ShopPreview() {
         <div className="relative h-32 bg-gradient-to-r from-blue-300/30 via-blue-300/20 to-blue-300/10">
           <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2">
             <div className="flex h-16 w-16 items-center justify-center rounded-full border-4 border-white bg-blue-100/20 font-medium text-blue-500 shadow-sm">
-              {shopName ? shopName.substring(0, 2).toUpperCase() : "SP"}
+              {shopName ? shopName.substring(0, 2).toUpperCase() : 'SP'}
             </div>
           </div>
         </div>
@@ -64,7 +64,7 @@ export default function ShopPreview() {
         <div className="flex flex-col items-center px-4 pt-10 text-center">
           <div className="flex items-center gap-1">
             <h3 className="text-xl font-semibold">
-              {shopName || "Your Shop Name"}
+              {shopName || 'Your Shop Name'}
             </h3>
             {shopName && (
               <svg
@@ -117,7 +117,7 @@ export default function ShopPreview() {
         <div className="px-4 py-3 text-center">
           <p className="line-clamp-3 text-sm text-gray-500">
             {shopDescription ||
-              "Your shop description will appear here. Make it compelling and informative to attract customers."}
+              'Your shop description will appear here. Make it compelling and informative to attract customers.'}
           </p>
 
           <div className="mt-4 grid grid-cols-3 gap-2">

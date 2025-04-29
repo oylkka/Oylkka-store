@@ -1,4 +1,4 @@
-import { PrismaClient } from "../prisma/output";
+import { PrismaClient } from '../prisma/output';
 
 /* eslint-disable no-var */
 declare global {
@@ -8,6 +8,6 @@ declare global {
 
 export const db = globalThis.prisma || new PrismaClient();
 
-if (process.env.NODE_ENV !== "production") {
+if (process.env.NODE_ENV !== 'production') {
   globalThis.prisma = db;
 }

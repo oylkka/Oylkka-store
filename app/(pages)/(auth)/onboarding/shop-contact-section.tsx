@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import {
   Facebook,
@@ -8,8 +8,8 @@ import {
   Mail,
   Phone,
   Twitter,
-} from "lucide-react";
-import { useFormContext } from "react-hook-form";
+} from 'lucide-react';
+import { useFormContext } from 'react-hook-form';
 
 import {
   FormControl,
@@ -17,9 +17,9 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { OnboardingFormValues } from "@/schemas";
+} from '@/components/ui/form';
+import { Input } from '@/components/ui/input';
+import { OnboardingFormValues } from '@/schemas';
 
 export default function ShopContactSection() {
   const { control } = useFormContext<OnboardingFormValues>();

@@ -1,25 +1,25 @@
-import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
-import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
+import type { Metadata } from 'next';
+import { Geist, Geist_Mono } from 'next/font/google';
 
-import { Toaster } from "@/components/ui/sonner";
-import TanstackProvider from "@/context/tanstack-provider";
-import "./globals.css";
+import { Toaster } from '@/components/ui/sonner';
+import TanstackProvider from '@/context/tanstack-provider';
+import './globals.css';
 
 const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
+  variable: '--font-geist-sans',
+  subsets: ['latin'],
 });
 
 const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
+  variable: '--font-geist-mono',
+  subsets: ['latin'],
 });
 
 export const metadata: Metadata = {
-  title: "Oylkka | Effortless Online Shopping",
+  title: 'Oylkka | Effortless Online Shopping',
   description:
-    "Oylkka: Effortless Online Shopping – your go‑to destination for seamless e‑commerce experiences.",
+    'Oylkka: Effortless Online Shopping – your go‑to destination for seamless e‑commerce experiences.',
 };
 
 export default function RootLayout({

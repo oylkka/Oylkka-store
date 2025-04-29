@@ -1,1 +1,1 @@
-export * from "./onboarding-schema";
+export * from './onboarding-schema';

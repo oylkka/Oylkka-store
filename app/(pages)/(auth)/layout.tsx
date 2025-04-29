@@ -1,7 +1,7 @@
-import { SessionProvider } from "next-auth/react";
+import { SessionProvider } from 'next-auth/react';
 
-import Footer from "@/components/layout/footer";
-import Header from "@/components/layout/header";
+import Footer from '@/components/layout/footer';
+import Header from '@/components/layout/header';
 
 export default function layout({
   children,

@@ -1,6 +1,6 @@
-"use client";
+'use client';
 
-import { signOutAction } from "@/actions";
+import { signOutAction } from '@/actions';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -11,8 +11,8 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
-import { Button } from "@/components/ui/button";
+} from '@/components/ui/alert-dialog';
+import { Button } from '@/components/ui/button';
 
 export function SignOut() {
   return (

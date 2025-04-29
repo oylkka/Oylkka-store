@@ -1,10 +1,10 @@
-import React from "react";
+import React from 'react';
 
-import Cart from "./cart";
-import HeaderClient from "./header-client";
-import Navigation from "./navigation";
-import SearchBar from "./search-bar";
-import UserDropDown from "./user";
+import Cart from './cart';
+import HeaderClient from './header-client';
+import Navigation from './navigation';
+import SearchBar from './search-bar';
+import UserDropDown from './user';
 
 type HeaderProps = {
   navigation?: boolean;
@@ -15,7 +15,7 @@ export default function Header({ navigation = true }: HeaderProps) {
     <header className="bg-background/95 supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50 w-full border-b backdrop-blur">
       <div
         className={`container mx-auto flex h-16 items-center justify-between pr-2 ${
-          !navigation ? "md:px-2" : "md:px-0"
+          !navigation ? 'md:px-2' : 'md:px-0'
         }`}
       >
         <HeaderClient />

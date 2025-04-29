@@ -3,6 +3,7 @@
 import { cleanFormData } from '@/lib/utils';
 import { OnboardingFormValues } from '@/schemas';
 import { useMutation } from '@tanstack/react-query';
+import { useSession } from 'next-auth/react';
 import { toast } from 'sonner';
 
 // Function to handle file and non-file form data
@@ -60,20 +61,30 @@ export function useOnboardingMutation(options: {
   onSuccess?: (data: any) => Promise<void> | void;
   onError?: (error: Error) => void;
 }) {
+  const { update } = useSession();
   return useMutation({
     mutationFn: submitOnboardingData,
     onMutate: () => {
       // Show loading toast before starting the mutation
       toast.loading('Saving profile...', { id: 'onboarding' });
     },
-    onSuccess: (data) => {
+    onSuccess: async (data) => {
+      await update({
+        name: data.data.name,
+        username: data.data.username,
+        role: data.data.role,
+        image: data.data.image,
+        hasOnboarded: data.data.hasOnboarded,
+      });
       toast.success('Profile completed successfully!', { id: 'onboarding' });
       if (options.onSuccess) {
         options.onSuccess(data);
       }
     },
     onError: (error: Error) => {
-      toast.error(error.message || 'Failed to complete profile', { id: 'onboarding' });
+      toast.error(error.message || 'Failed to complete profile', {
+        id: 'onboarding',
+      });
       if (options.onError) {
         options.onError(error);
       }

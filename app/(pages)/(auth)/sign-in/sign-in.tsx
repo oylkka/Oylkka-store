@@ -1,17 +1,17 @@
-"use client";
+'use client';
 
-import { Loader2 } from "lucide-react";
-import { signIn } from "next-auth/react";
-import { useState } from "react";
+import { Loader2 } from 'lucide-react';
+import { signIn } from 'next-auth/react';
+import { useState } from 'react';
 
-import { Button } from "@/components/ui/button";
+import { Button } from '@/components/ui/button';
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
+} from '@/components/ui/card';
 
 export default function SignIn() {
   const [isLoadingGoogle, setIsLoadingGoogle] = useState(false);
@@ -22,9 +22,9 @@ export default function SignIn() {
     setIsLoadingGoogle(true);
     setError(null);
     try {
-      await signIn("google", { callbackUrl: "/dashboard" });
+      await signIn('google', { callbackUrl: '/dashboard' });
     } catch {
-      setError("Failed to sign in with Google. Please try again.");
+      setError('Failed to sign in with Google. Please try again.');
 
       setIsLoadingGoogle(false);
     }
@@ -34,9 +34,9 @@ export default function SignIn() {
     setIsLoadingGitHub(true);
     setError(null);
     try {
-      await signIn("github", { callbackUrl: "/dashboard" });
+      await signIn('github', { callbackUrl: '/dashboard' });
     } catch {
-      setError("Failed to sign in with GitHub. Please try again.");
+      setError('Failed to sign in with GitHub. Please try again.');
       setIsLoadingGitHub(false);
     }
   };
