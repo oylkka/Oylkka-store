@@ -17,15 +17,17 @@ export default {
     async jwt({ token, user, trigger, session }) {
       // Initial sign in
       if (user) {
+        // Safely add properties to token, checking if they exist first
         token.id = user.id;
-        token.role = user.role;
-        token.hasOnboarded = user.hasOnboarded;
-        token.username = user.username;
+        token.role = user.role || 'CUSTOMER'; // Default if not available
+        token.hasOnboarded =
+          typeof user.hasOnboarded === 'boolean' ? user.hasOnboarded : false;
+        token.username = user.username || null;
       }
 
       // Handle session update (e.g., after onboarding)
       if (trigger === 'update' && session) {
-        // Update name and image if provided
+        // Update properties if provided
         if (session.name) {
           token.name = session.name;
         }
@@ -50,14 +52,19 @@ export default {
     },
 
     async session({ session, token }) {
-      session.user.id = token.id;
-      session.user.role = token.role as string;
-      session.user.hasOnboarded = token.hasOnboarded as boolean;
-      session.user.username = token.username as string;
+      if (!session.user) {
+        session.user = {};
+      }
+
+      // Ensure all properties exist before assigning them
+      session.user.id = token.id as string;
+      session.user.role = (token.role as string) || 'CUSTOMER';
+      session.user.hasOnboarded = (token.hasOnboarded as boolean) || false;
+      session.user.username = (token.username as string) || null;
 
       // Make sure name and image are properly set
-      session.user.name = token.name;
-      session.user.image = token.picture;
+      session.user.name = token.name || null;
+      session.user.image = token.picture || null;
 
       return session;
     },

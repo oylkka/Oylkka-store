@@ -30,8 +30,6 @@ model User {
 
   // For loyalty program
   points       Int     @default(0)
-  referralCode String? @unique
-  referredBy   String? @db.ObjectId
 
   // For customer service
   supportTickets  SupportTicket[] @relation("TicketCreator")
