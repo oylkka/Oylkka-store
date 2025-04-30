@@ -77,6 +77,11 @@ export async function NavMain() {
       ],
       items: [
         {
+          title: 'My Shop',
+          url: '/dashboard/vendor/my-shop',
+          roles: ['VENDOR'],
+        },
+        {
           title: 'All Products',
           url: '/shop/all',
         },

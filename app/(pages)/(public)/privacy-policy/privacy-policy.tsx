@@ -54,10 +54,11 @@ const PrivacyPolicy = () => {
           </div>
 
           <p className="mb-4">
-            Welcome to oylkka.com (the &#34;Site&#34;) operated by Oylkka Inc. We
-            respect your privacy and are committed to protecting your personal
-            information. This Privacy Policy explains how we collect, use,
-            disclose, and safeguard your information when you visit our website.
+            Welcome to oylkka.com (the &#34;Site&#34;) operated by Oylkka Inc.
+            We respect your privacy and are committed to protecting your
+            personal information. This Privacy Policy explains how we collect,
+            use, disclose, and safeguard your information when you visit our
+            website.
           </p>
 
           <p className="mb-4">
@@ -192,7 +193,9 @@ const PrivacyPolicy = () => {
                   <li>Display your profile information (if applicable)</li>
                   <li>Process payments</li>
                   <li>Conduct analytics and research</li>
-                  <li>Send marketing communications (if you&#39;ve opted in)</li>
+                  <li>
+                    Send marketing communications (if you&#39;ve opted in)
+                  </li>
                   <li>Prevent fraud and improve security</li>
                   <li>Comply with legal obligations</li>
                 </ul>
@@ -478,8 +481,8 @@ const PrivacyPolicy = () => {
                 <p>
                   We may update our Privacy Policy from time to time. We will
                   notify you of any changes by posting the new Privacy Policy on
-                  this page and updating the &#34;Last Updated&#34; date. You are
-                  advised to review this Privacy Policy periodically for any
+                  this page and updating the &#34;Last Updated&#34; date. You
+                  are advised to review this Privacy Policy periodically for any
                   changes.
                 </p>
               </div>

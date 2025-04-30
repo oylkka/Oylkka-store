@@ -24,10 +24,10 @@ export default function ShopBrandingSection() {
   // Update preview URLs when form values change
   useEffect(() => {
     // Clean up previous object URLs to prevent memory leaks
-    if (logoPreviewUrl) {
+    if (logoPreviewUrl && logoPreviewUrl.startsWith('blob:')) {
       URL.revokeObjectURL(logoPreviewUrl);
     }
-    if (bannerPreviewUrl) {
+    if (bannerPreviewUrl && bannerPreviewUrl.startsWith('blob:')) {
       URL.revokeObjectURL(bannerPreviewUrl);
     }
 
@@ -44,14 +44,14 @@ export default function ShopBrandingSection() {
 
     // Cleanup function to revoke object URLs when component unmounts or dependencies change
     return () => {
-      if (logoPreviewUrl) {
+      if (logoPreviewUrl && logoPreviewUrl.startsWith('blob:')) {
         URL.revokeObjectURL(logoPreviewUrl);
       }
-      if (bannerPreviewUrl) {
+      if (bannerPreviewUrl && bannerPreviewUrl.startsWith('blob:')) {
         URL.revokeObjectURL(bannerPreviewUrl);
       }
     };
-  }, [shopLogo, shopBanner, bannerPreviewUrl, logoPreviewUrl]);
+  }, [bannerPreviewUrl, logoPreviewUrl, shopLogo, shopBanner]);
 
   const handleLogoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -109,13 +109,16 @@ export default function ShopBrandingSection() {
                 disabled={logoUploading}
               />
               {logoPreviewUrl ? (
-                <Image
-                  height={300}
-                  width={300}
-                  src={logoPreviewUrl}
-                  alt="Logo preview"
-                  className="h-full w-full object-contain p-2"
-                />
+                <div className="relative h-full w-full">
+                  {/* Using unoptimized prop for blob URLs */}
+                  <Image
+                    src={logoPreviewUrl}
+                    alt="Logo preview"
+                    className="object-contain p-2"
+                    fill
+                    unoptimized={logoPreviewUrl.startsWith('blob:')}
+                  />
+                </div>
               ) : (
                 <div className="flex flex-col items-center justify-center text-center">
                   {logoUploading ? (
@@ -186,13 +189,16 @@ export default function ShopBrandingSection() {
                 disabled={bannerUploading}
               />
               {bannerPreviewUrl ? (
-                <Image
-                  height={300}
-                  width={300}
-                  src={bannerPreviewUrl}
-                  alt="Banner preview"
-                  className="absolute inset-0 h-full w-full object-cover"
-                />
+                <div className="absolute inset-0 h-full w-full">
+                  {/* Using unoptimized prop for blob URLs */}
+                  <Image
+                    src={bannerPreviewUrl}
+                    alt="Banner preview"
+                    className="object-cover"
+                    fill
+                    unoptimized={bannerPreviewUrl.startsWith('blob:')}
+                  />
+                </div>
               ) : (
                 <div className="absolute inset-0 flex h-full w-full flex-col items-center justify-center bg-gray-50 text-center">
                   {bannerUploading ? (

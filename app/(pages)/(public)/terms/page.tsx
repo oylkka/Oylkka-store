@@ -1,3 +1,6 @@
+import Footer from '@/components/layout/footer';
+import Header from '@/components/layout/header';
+
 import TermsAndConditions from './terms-and-conditions';
 
 export const metadata = {
@@ -7,5 +10,11 @@ export const metadata = {
 };
 
 export default function TermsAndConditionsPage() {
-  return <TermsAndConditions />;
+  return (
+    <>
+      <Header />
+      <TermsAndConditions />
+      <Footer />
+    </>
+  );
 }
