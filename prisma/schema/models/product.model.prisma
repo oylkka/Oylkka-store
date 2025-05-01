@@ -24,7 +24,6 @@ model Product {
   description          String
   shortDescription     String?
   categoryId           String            @db.ObjectId
-  // Add onUpdate: NoAction here
   category             Category          @relation(fields: [categoryId], references: [id], onUpdate: NoAction)
   tags                 String[]
   sku                  String            @unique
