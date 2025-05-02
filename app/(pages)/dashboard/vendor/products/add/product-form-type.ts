@@ -20,34 +20,34 @@ import { z } from 'zod';
 // ]);
 
 // Type schemas
-// const DimensionsSchema = z
-//   .object({
-//     length: z.number().min(0, { message: 'Length must be a positive number' }),
-//     width: z.number().min(0, { message: 'Width must be a positive number' }),
-//     height: z.number().min(0, { message: 'Height must be a positive number' }),
-//     unit: z.string().refine((val) => ['cm', 'in', 'm'].includes(val), {
-//       message: 'Dimension unit must be cm, in, or m',
-//     }),
-//   })
-//   .partial()
-//   .refine(
-//     (data) => {
-//       // If any dimension field is provided, all should be provided
-//       if (Object.values(data).some((val) => val !== undefined)) {
-//         return (
-//           data.length !== undefined &&
-//           data.width !== undefined &&
-//           data.height !== undefined &&
-//           data.unit !== undefined
-//         );
-//       }
-//       return true;
-//     },
-//     {
-//       message:
-//         'All dimension fields (length, width, height, unit) must be provided together or not at all',
-//     }
-//   );
+const DimensionsSchema = z
+  .object({
+    length: z.number().min(0, { message: 'Length must be a positive number' }),
+    width: z.number().min(0, { message: 'Width must be a positive number' }),
+    height: z.number().min(0, { message: 'Height must be a positive number' }),
+    unit: z.string().refine((val) => ['cm', 'in', 'm'].includes(val), {
+      message: 'Dimension unit must be cm, in, or m',
+    }),
+  })
+  .partial()
+  .refine(
+    (data) => {
+      // If any dimension field is provided, all should be provided
+      if (Object.values(data).some((val) => val !== undefined)) {
+        return (
+          data.length !== undefined &&
+          data.width !== undefined &&
+          data.height !== undefined &&
+          data.unit !== undefined
+        );
+      }
+      return true;
+    },
+    {
+      message:
+        'All dimension fields (length, width, height, unit) must be provided together or not at all',
+    }
+  );
 
 // const AttributesSchema = z
 //   .record(
@@ -98,45 +98,41 @@ export const ProductFormSchema = z.object({
   //   }),
 
   // Price & Stock
-  // price: z.number().min(0.01, { message: 'Price must be greater than 0' }),
-  // discountPrice: z
-  //   .number()
-  //   .min(0.01, { message: 'Discount price must be greater than 0' })
-  //   .optional(),
-  // discountPercent: z
-  //   .number()
-  //   .min(0, { message: 'Discount percent must be at least 0' })
-  //   .max(100, { message: 'Discount percent cannot exceed 100%' })
-  //   .optional()
-  //   .default(0),
-  // stock: z.number().int().min(1, { message: 'Stock must be at least 1' }),
-  // lowStockAlert: z
-  //   .number()
-  //   .int()
-  //   .min(1, { message: 'Low stock alert must be at least 1' })
-  //   .default(5),
+  price: z.number().min(0.01, { message: 'Price must be greater than 0' }),
+  discountPrice: z
+    .number()
+    .min(0.01, { message: 'Discount price must be greater than 0' })
+    .optional(),
+  discountPercent: z
+    .number()
+    .min(0, { message: 'Discount percent must be at least 0' })
+    .max(100, { message: 'Discount percent cannot exceed 100%' })
+    .optional()
+    .default(0),
+  stock: z.number().int().min(1, { message: 'Stock must be at least 1' }),
+  lowStockAlert: z
+    .number()
+    .int()
+    .min(1, { message: 'Low stock alert must be at least 1' })
+    .default(5),
 
   // Condition
-  // brand: z
-  //   .string()
-  //   .max(40, { message: 'Brand must be at most 40 characters' })
-  //   .optional(),
   // condition: ProductConditionEnum,
   // conditionDescription: z.string().optional(),
 
   // Shipping & Dimensions
-  // weight: z
-  //   .number()
-  //   .min(0, { message: 'Weight must be at least 0' })
-  //   .optional(),
-  // weightUnit: z
-  //   .string()
-  //   .refine((val) => ['kg', 'g', 'lb', 'oz'].includes(val), {
-  //     message: 'Weight unit must be kg, g, lb, or oz',
-  //   })
-  //   .default('kg'),
-  // dimensions: DimensionsSchema.optional(),
-  // freeShipping: z.boolean().default(false),
+  weight: z
+    .number()
+    .min(0, { message: 'Weight must be at least 0' })
+    .optional(),
+  weightUnit: z
+    .string()
+    .refine((val) => ['kg', 'g', 'lb', 'oz'].includes(val), {
+      message: 'Weight unit must be kg, g, lb, or oz',
+    })
+    .default('kg'),
+  dimensions: DimensionsSchema.optional(),
+  freeShipping: z.boolean().default(false),
 
   // Variants and Attributes
 

@@ -272,9 +272,10 @@ export function BasicInformationCard() {
           name="tags"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Enter your tech stack.</FormLabel>
+              <FormLabel>Enter your product tags.</FormLabel>
               <FormControl>
                 <TagsInput
+                  className="border"
                   value={field.value}
                   onValueChange={field.onChange}
                   placeholder="Enter your tags"

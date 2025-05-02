@@ -1,13 +1,12 @@
 'use client';
 
+import { useCreateProduct } from '@/services';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { ReactNode } from 'react';
+import { ReactNode, useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 
-// import { ProductImage } from '@/hooks/use-product-image';
-import { useCreateProduct } from '@/services';
-
+import { ProductImage } from '@/hooks/use-product-image';
 import { ProductFormContext } from './product-form-context';
 import {
   ProductFormInput,
@@ -20,6 +19,7 @@ interface ProductFormProviderProps {
 }
 
 export function ProductFormProvider({ children }: ProductFormProviderProps) {
+  const [productImages, setProductImages] = useState<ProductImage[]>([]);
   const methods = useForm<ProductFormInput>({
     resolver: zodResolver(ProductFormSchema),
     defaultValues: {
@@ -29,36 +29,35 @@ export function ProductFormProvider({ children }: ProductFormProviderProps) {
       category: '',
       brand: '',
       tags: [],
-      // price: 0,
-      // stock: 0,
-      // lowStockAlert: 5,
+      price: 0,
+      stock: 0,
+      lowStockAlert: 5,
       // sku: '',
       // condition: 'NEW',
       // conditionDescription: '',
-      // weight: 0,
-      // weightUnit: 'kg',
-      // dimensions: {
-      //   length: 0,
-      //   width: 0,
-      //   height: 0,
-      //   unit: 'cm',
-      // },
-      // freeShipping: false,
+      weight: 0,
+      weightUnit: 'kg',
+      dimensions: {
+        length: 0,
+        width: 0,
+        height: 0,
+        unit: 'cm',
+      },
+      freeShipping: false,
       // status: 'DRAFT',
-      // brand: '',
     },
   });
 
   const { mutate } = useCreateProduct();
 
   const onSubmit = (data: ProductFormValues) => {
-    // if (productImages.length === 0) {
-    //   methods.setError('root.images', {
-    //     type: 'manual',
-    //     message: 'At least one product image is required',
-    //   });
-    //   return;
-    // }
+    if (productImages.length === 0) {
+      methods.setError('root.images', {
+        type: 'manual',
+        message: 'At least one product image is required',
+      });
+      return;
+    }
 
     const formData = new FormData();
 
@@ -70,18 +69,18 @@ export function ProductFormProvider({ children }: ProductFormProviderProps) {
       'category',
       'brand',
       'tags',
-      // 'price',
-      // 'discountPrice',
-      // 'discountPercent',
-      // 'stock',
-      // 'lowStockAlert',
-      // 'category',
-      // 'subcategory',
+      'price',
+      'discountPrice',
+      'discountPercent',
+      'stock',
+      'lowStockAlert',
+      'weight',
+      'weightUnit',
+      'dimensions',
+      'freeShipping',
       // 'sku',
       // 'condition',
       // 'conditionDescription',
-      // 'weightUnit',
-      // 'freeShipping',
       // 'status',
     ];
     primitiveFields.forEach((field) => {
@@ -92,31 +91,31 @@ export function ProductFormProvider({ children }: ProductFormProviderProps) {
     });
 
     // Append arrays
-    // const arrayFields: (keyof ProductFormValues)[] = ['tags'];
-    // arrayFields.forEach((field) => {
-    //   const value = data[field];
-    //   if (Array.isArray(value) && value.length > 0) {
-    //     formData.append(field, JSON.stringify(value));
-    //   }
-    // });
+    const arrayFields: (keyof ProductFormValues)[] = ['tags'];
+    arrayFields.forEach((field) => {
+      const value = data[field];
+      if (Array.isArray(value) && value.length > 0) {
+        formData.append(field, JSON.stringify(value));
+      }
+    });
 
     // Append objects
-    // const objectFields: (keyof ProductFormValues)[] = [
-    //   'dimensions',
-    //   'attributes',
-    // ];
-    // objectFields.forEach((field) => {
-    //   const value = data[field];
-    //   if (value && typeof value === 'object' && Object.keys(value).length > 0) {
-    //     formData.append(field, JSON.stringify(value));
-    //   }
-    // });
+    const objectFields: (keyof ProductFormValues)[] = [
+      'dimensions',
+      // 'attributes',
+    ];
+    objectFields.forEach((field) => {
+      const value = data[field];
+      if (value && typeof value === 'object' && Object.keys(value).length > 0) {
+        formData.append(field, JSON.stringify(value));
+      }
+    });
 
     // Append product images
-    // const imageFiles = productImages.map((img) => img.file);
-    // imageFiles.forEach((file) => {
-    //   formData.append('productImages[]', file);
-    // });
+    const imageFiles = productImages.map((img) => img.file);
+    imageFiles.forEach((file) => {
+      formData.append('productImages[]', file);
+    });
 
     // Clean up empty attribute values before submit
     // if (data.attributes) {
@@ -157,10 +156,8 @@ export function ProductFormProvider({ children }: ProductFormProviderProps) {
   return (
     <ProductFormContext.Provider
       value={{
-        // selectedCategory,
-        // setSelectedCategory,
-        // productImages,
-        // setProductImages,
+        productImages,
+        setProductImages,
         onSubmit,
       }}
     >

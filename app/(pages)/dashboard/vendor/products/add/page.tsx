@@ -8,9 +8,12 @@ import { Button } from '@/components/ui/button';
 import { useCreateProduct } from '@/services';
 
 import { BasicInformationCard } from './basic-information';
+import PricingAndInventory from './pricing-and-inventory';
+import { ProductDimensions } from './product-dimension';
 import { ProductFormContext } from './product-form-context';
 import { ProductFormProvider } from './product-form-provider';
 import { ProductFormValues } from './product-form-type';
+import { ProductImagesCard } from './product-image';
 
 export default function NewProductPage() {
   return (
@@ -59,13 +62,14 @@ function NewProductForm() {
         <div className="space-y-6 md:col-span-8">
           {/* Left Column Cards */}
           <BasicInformationCard />
-          {/* <PriceAndStockCard />
-          <ShippingDimensionsCard />
-          <VariantAttributesCard /> */}
+          <PricingAndInventory />
+          <ProductDimensions />
+          {/* <VariantAttributesCard />  */}
         </div>
         <div className="space-y-6 md:col-span-4">
           {/* Right Column Cards */}
-          {/* <ProductImagesCard />
+          <ProductImagesCard />
+          {/* 
           <CategoryCard />
           <ProductDetailsCard /> */}
         </div>
