@@ -26,9 +26,9 @@ export function ProductFormProvider({ children }: ProductFormProviderProps) {
       productName: '',
       description: '',
       slug: '',
-      // category: '',
-      // subcategory: '',
-      // tags: [],
+      category: '',
+      brand: '',
+      tags: [],
       // price: 0,
       // stock: 0,
       // lowStockAlert: 5,
@@ -67,6 +67,9 @@ export function ProductFormProvider({ children }: ProductFormProviderProps) {
       'productName',
       'description',
       'slug',
+      'category',
+      'brand',
+      'tags',
       // 'price',
       // 'discountPrice',
       // 'discountPercent',
@@ -80,7 +83,6 @@ export function ProductFormProvider({ children }: ProductFormProviderProps) {
       // 'weightUnit',
       // 'freeShipping',
       // 'status',
-      // 'brand',
     ];
     primitiveFields.forEach((field) => {
       const value = data[field];

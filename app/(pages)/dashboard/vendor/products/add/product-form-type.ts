@@ -78,13 +78,16 @@ export const ProductFormSchema = z.object({
     .string()
     .min(10, { message: 'Description must be at least 10 characters' }),
   slug: z.string().min(1, { message: 'Slug is required' }),
-  // category: z.string().min(1, { message: 'Category is required' }),
-  // subcategory: z.string().min(1, { message: 'Subcategory is required' }),
-  // tags: z
-  //   .array(z.string())
-  //   .max(10, { message: 'You can add a maximum of 10 tags' })
-  //   .optional()
-  //   .default([]),
+  category: z.string().min(1, { message: 'Category is required' }),
+  brand: z
+    .string()
+    .min(1, { message: 'Brand is required' })
+    .max(40, { message: 'Brand must be at most 40 characters' }),
+  tags: z
+    .array(z.string())
+    .max(10, { message: 'You can add a maximum of 10 tags' })
+    .optional()
+    .default([]),
 
   // Identifiers
   // sku: z

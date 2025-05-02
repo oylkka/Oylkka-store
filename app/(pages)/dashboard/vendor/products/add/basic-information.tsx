@@ -2,7 +2,7 @@
 import { Check, LayoutGrid, Loader2, XCircle } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { useFormContext, useWatch } from 'react-hook-form';
-import slugify from 'slugify'; // Import the slugify package
+import slugify from 'slugify';
 
 import { checkSlugUnique } from '@/actions';
 import { Button } from '@/components/ui/button';
@@ -18,9 +18,24 @@ import {
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { Skeleton } from '@/components/ui/skeleton';
+import { TagsInput } from '@/components/ui/tags-input';
+import { useProductCategories } from '@/services';
 import { ProductFormValues } from './product-form-type';
 
 export function BasicInformationCard() {
+  const {
+    isPending,
+    data: productCategories,
+    isError,
+  } = useProductCategories();
   const { control, setValue } = useFormContext<ProductFormValues>();
   const [isCheckingSlug, setIsCheckingSlug] = useState(false);
   const [slugStatus, setSlugStatus] = useState<{
@@ -30,8 +45,9 @@ export function BasicInformationCard() {
 
   // For debouncing slug check
   const slugCheckTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const lastCheckedSlug = useRef<string>('');
 
-  // Watch product name to auto-generate slug
+  // Watch product name and slug
   const productName = useWatch({
     control,
     name: 'productName',
@@ -44,11 +60,13 @@ export function BasicInformationCard() {
 
   // Function to check slug uniqueness
   const checkSlug = async (slugToCheck: string) => {
-    if (!slugToCheck) {
+    if (!slugToCheck || slugToCheck === lastCheckedSlug.current) {
       return;
     }
 
+    lastCheckedSlug.current = slugToCheck;
     setIsCheckingSlug(true);
+
     try {
       const result = await checkSlugUnique(slugToCheck);
       setSlugStatus({
@@ -65,51 +83,35 @@ export function BasicInformationCard() {
   // Auto-generate slug when product name changes
   useEffect(() => {
     if (productName) {
-      // Use the slugify package with options
       const newSlug = slugify(productName, {
-        lower: true, // Convert to lowercase
-        strict: true, // Strip special characters
-        trim: true, // Trim leading/trailing spaces
+        lower: true,
+        strict: true,
+        trim: true,
       });
-
       setValue('slug', newSlug, { shouldValidate: true });
-
-      // Reset slug status and prepare to check
-      setSlugStatus({ isUnique: null, suggestions: [] });
-
-      // Automatically check the new slug with debouncing
-      if (slugCheckTimeoutRef.current) {
-        clearTimeout(slugCheckTimeoutRef.current);
-      }
-
-      slugCheckTimeoutRef.current = setTimeout(() => {
-        checkSlug(newSlug);
-      }, 500); // Wait 500ms after typing stops before checking
     }
   }, [productName, setValue]);
 
-  // Check slug uniqueness when manually edited
+  // Handle slug checking with debounce
   useEffect(() => {
-    if (slug && !isCheckingSlug) {
-      // Don't check if we're already checking or if the slug is empty
-      if (slugCheckTimeoutRef.current) {
-        clearTimeout(slugCheckTimeoutRef.current);
-      }
+    if (!slug || isCheckingSlug) return;
 
-      slugCheckTimeoutRef.current = setTimeout(() => {
-        checkSlug(slug);
-      }, 500); // Wait 500ms after typing stops before checking
+    if (slug === lastCheckedSlug.current) return;
+
+    if (slugCheckTimeoutRef.current) {
+      clearTimeout(slugCheckTimeoutRef.current);
     }
-  }, [slug, isCheckingSlug]);
 
-  // Cleanup timeout on unmount
-  useEffect(() => {
+    slugCheckTimeoutRef.current = setTimeout(() => {
+      checkSlug(slug);
+    }, 500);
+
     return () => {
       if (slugCheckTimeoutRef.current) {
         clearTimeout(slugCheckTimeoutRef.current);
       }
     };
-  }, []);
+  }, [slug, isCheckingSlug]);
 
   // Apply suggested slug
   const applySuggestion = (suggestion: string) => {
@@ -206,10 +208,81 @@ export function BasicInformationCard() {
               <FormControl>
                 <Textarea
                   placeholder="Describe your product in detail"
-                  className="min-h-32"
+                  className="min-h-28"
                   {...field}
                 />
               </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-6">
+          <FormField
+            control={control}
+            name="category"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Category *</FormLabel>
+                {isPending ? (
+                  <Skeleton className="h-8 w-full" />
+                ) : isError ? (
+                  <div>Error</div>
+                ) : (
+                  <Select
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                  >
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select your product category" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {productCategories.map(
+                        (category: { id: string; name: string }) => (
+                          <SelectItem key={category.id} value={category.id}>
+                            {category.name}
+                          </SelectItem>
+                        )
+                      )}
+                    </SelectContent>
+                  </Select>
+                )}
+
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={control}
+            name="brand"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Brand *</FormLabel>
+                <FormControl>
+                  <Input placeholder="Brand" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
+        <FormField
+          control={control}
+          name="tags"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Enter your tech stack.</FormLabel>
+              <FormControl>
+                <TagsInput
+                  value={field.value}
+                  onValueChange={field.onChange}
+                  placeholder="Enter your tags"
+                />
+              </FormControl>
+              <FormDescription>
+                Write your product tag then press enter
+              </FormDescription>
               <FormMessage />
             </FormItem>
           )}
