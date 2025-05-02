@@ -44,6 +44,8 @@ export function ProductFormProvider({ children }: ProductFormProviderProps) {
         unit: 'cm',
       },
       freeShipping: false,
+      meteTitle: '',
+      meteDescription: '',
       // status: 'DRAFT',
     },
   });
@@ -78,6 +80,9 @@ export function ProductFormProvider({ children }: ProductFormProviderProps) {
       'weightUnit',
       'dimensions',
       'freeShipping',
+      'meteTitle',
+      'meteDescription',
+
       // 'sku',
       // 'condition',
       // 'conditionDescription',

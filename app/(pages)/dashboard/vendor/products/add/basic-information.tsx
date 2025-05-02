@@ -208,7 +208,7 @@ export function BasicInformationCard() {
               <FormControl>
                 <Textarea
                   placeholder="Describe your product in detail"
-                  className="min-h-28"
+                  rows={4}
                   {...field}
                 />
               </FormControl>

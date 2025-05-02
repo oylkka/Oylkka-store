@@ -133,6 +133,8 @@ export const ProductFormSchema = z.object({
     .default('kg'),
   dimensions: DimensionsSchema.optional(),
   freeShipping: z.boolean().default(false),
+  meteTitle: z.string().optional(),
+  meteDescription: z.string().optional(),
 
   // Variants and Attributes
 
