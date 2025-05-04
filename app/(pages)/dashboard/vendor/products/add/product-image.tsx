@@ -153,7 +153,7 @@ export function ProductImagesCard() {
         {productImages.length > 0 && (
           <div className="space-y-2">
             <Label>Product Images ({productImages.length}/4)</Label>
-            <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+            <div className="grid grid-cols-2 gap-4">
               {productImages.map((image) => (
                 <div
                   key={image.id}

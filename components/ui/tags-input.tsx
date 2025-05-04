@@ -1,20 +1,13 @@
 'use client';
 
-import { Badge } from '@/components/ui/badge';
-import { Input } from '@/components/ui/input';
-import { cn } from '@/lib/utils';
 import { X as RemoveIcon } from 'lucide-react';
 import React from 'react';
 
-/**
- * used for identifying the split char and use will pasting
- */
+import { Badge } from '@/components/ui/badge';
+import { Input } from '@/components/ui/input';
+import { cn } from '@/lib/utils';
+
 const SPLITTER_REGEX = /[\n#?=&\t,./-]+/;
-
-/**
- * used for formatting the pasted element for the correct value format to be added
- */
-
 const FORMATTING_REGEX = /^[^a-zA-Z0-9]*|[^a-zA-Z0-9]*$/g;
 
 interface TagsInputProps extends React.HTMLAttributes<HTMLDivElement> {
@@ -27,7 +20,7 @@ interface TagsInputProps extends React.HTMLAttributes<HTMLDivElement> {
 
 interface TagsInputContextProps {
   value: string[];
-  onValueChange: (value: any) => void;
+  onValueChange: (value: string[]) => void;
   inputValue: string;
   setInputValue: React.Dispatch<React.SetStateAction<string>>;
   activeIndex: number;
@@ -39,7 +32,6 @@ const TagInputContext = React.createContext<TagsInputContextProps | null>(null);
 export const TagsInput = React.forwardRef<HTMLDivElement, TagsInputProps>(
   (
     {
-      children,
       value,
       onValueChange,
       placeholder,
@@ -67,7 +59,7 @@ export const TagsInput = React.forwardRef<HTMLDivElement, TagsInputProps>(
           onValueChange([...value, val]);
         }
       },
-      [value]
+      [value, onValueChange, parseMaxItems]
     );
 
     const RemoveValue = React.useCallback(
@@ -76,7 +68,7 @@ export const TagsInput = React.forwardRef<HTMLDivElement, TagsInputProps>(
           onValueChange(value.filter((item) => item !== val));
         }
       },
-      [value]
+      [value, onValueChange, parseMinItems]
     );
 
     const handlePaste = React.useCallback(
@@ -97,7 +89,7 @@ export const TagsInput = React.forwardRef<HTMLDivElement, TagsInputProps>(
         onValueChange(newValue);
         setInputValue('');
       },
-      [value]
+      [value, onValueChange, parseMaxItems]
     );
 
     const handleSelect = React.useCallback(
@@ -107,41 +99,22 @@ export const TagsInput = React.forwardRef<HTMLDivElement, TagsInputProps>(
           target.selectionStart ?? 0,
           target.selectionEnd ?? 0
         );
-
         setSelectedValue(selection);
         setIsValueSelected(selection === inputValue);
       },
       [inputValue]
     );
 
-    // ? suggest : a refactor rather then using a useEffect
-
     React.useEffect(() => {
       const VerifyDisable = () => {
-        if (value.length - 1 >= parseMinItems) {
-          setDisableButton(false);
-        } else {
-          setDisableButton(true);
-        }
-        if (value.length + 1 <= parseMaxItems) {
-          setDisableInput(false);
-        } else {
-          setDisableInput(true);
-        }
+        setDisableButton(value.length - 1 < parseMinItems);
+        setDisableInput(value.length + 1 > parseMaxItems);
       };
       VerifyDisable();
-    }, [value]);
-
-    // ? check: Under build , default option support
-    // * support : for the uncontrolled && controlled ui
-
-    /*  React.useEffect(() => {
-      if (!defaultOptions) return;
-      onValueChange([...value, ...defaultOptions]);
-    }, []); */
+    }, [value, parseMinItems, parseMaxItems]);
 
     const handleKeyDown = React.useCallback(
-      async (e: React.KeyboardEvent<HTMLInputElement>) => {
+      (e: React.KeyboardEvent<HTMLInputElement>) => {
         e.stopPropagation();
 
         const moveNext = () => {
@@ -165,9 +138,8 @@ export const TagsInput = React.forwardRef<HTMLDivElement, TagsInputProps>(
               : activeIndex - 1;
           setActiveIndex(newIndex);
         };
-        const target = e.currentTarget;
 
-        // ? Suggest : the multi select should support the same pattern
+        const target = e.currentTarget;
 
         switch (e.key) {
           case 'ArrowLeft':
@@ -175,10 +147,8 @@ export const TagsInput = React.forwardRef<HTMLDivElement, TagsInputProps>(
               if (value.length > 0 && activeIndex !== -1) {
                 moveNext();
               }
-            } else {
-              if (value.length > 0 && target.selectionStart === 0) {
-                movePrev();
-              }
+            } else if (value.length > 0 && target.selectionStart === 0) {
+              movePrev();
             }
             break;
 
@@ -187,10 +157,8 @@ export const TagsInput = React.forwardRef<HTMLDivElement, TagsInputProps>(
               if (value.length > 0 && target.selectionStart === 0) {
                 movePrev();
               }
-            } else {
-              if (value.length > 0 && activeIndex !== -1) {
-                moveNext();
-              }
+            } else if (value.length > 0 && activeIndex !== -1) {
+              moveNext();
             }
             break;
 
@@ -200,19 +168,17 @@ export const TagsInput = React.forwardRef<HTMLDivElement, TagsInputProps>(
               if (activeIndex !== -1 && activeIndex < value.length) {
                 RemoveValue(value[activeIndex]);
                 moveCurrent();
-              } else {
-                if (target.selectionStart === 0) {
-                  if (selectedValue === inputValue || isValueSelected) {
-                    RemoveValue(value[value.length - 1]);
-                  }
-                }
+              } else if (
+                target.selectionStart === 0 &&
+                (selectedValue === inputValue || isValueSelected)
+              ) {
+                RemoveValue(value[value.length - 1]);
               }
             }
             break;
 
           case 'Escape':
-            const newIndex = activeIndex === -1 ? value.length - 1 : -1;
-            setActiveIndex(newIndex);
+            setActiveIndex(activeIndex === -1 ? value.length - 1 : -1);
             break;
 
           case 'Enter':
@@ -224,7 +190,16 @@ export const TagsInput = React.forwardRef<HTMLDivElement, TagsInputProps>(
             break;
         }
       },
-      [activeIndex, value, inputValue, RemoveValue]
+      [
+        activeIndex,
+        value,
+        inputValue,
+        dir,
+        selectedValue,
+        isValueSelected,
+        RemoveValue,
+        onValueChangeHandler,
+      ]
     );
 
     const mousePreventDefault = React.useCallback((e: React.MouseEvent) => {
@@ -256,22 +231,20 @@ export const TagsInput = React.forwardRef<HTMLDivElement, TagsInputProps>(
           dir={dir}
           className={cn(
             'bg-background ring-muted flex flex-wrap items-center gap-1 overflow-hidden rounded-lg p-1 ring-1',
-            {
-              'focus-within:ring-ring': activeIndex === -1,
-            },
+            { 'focus-within:ring-ring': activeIndex === -1 },
             className
           )}
         >
           {value.map((item, index) => (
             <Badge
-              tabIndex={activeIndex !== -1 ? 0 : activeIndex}
+              tabIndex={activeIndex !== -1 ? 0 : -1}
               key={item}
               aria-disabled={disableButton}
               data-active={activeIndex === index}
               className={cn(
                 "data-[active='true']:ring-muted-foreground relative flex items-center gap-1 truncate rounded px-1 aria-disabled:cursor-not-allowed aria-disabled:opacity-50 data-[active='true']:ring-2"
               )}
-              variant={'secondary'}
+              variant="secondary"
             >
               <span className="text-xs">{item}</span>
               <button

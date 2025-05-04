@@ -17,6 +17,7 @@ export async function GET() {
       return NextResponse.json('Not Found', { status: 404 });
     }
     return NextResponse.json(categories, { status: 200 });
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
   } catch (error) {
     return NextResponse.json('Internal Server Error', { status: 500 });
   }

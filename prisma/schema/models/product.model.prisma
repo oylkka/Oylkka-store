@@ -22,7 +22,6 @@ model Product {
   productName          String
   slug                 String            @unique
   description          String
-  shortDescription     String?
   categoryId           String            @db.ObjectId
   category             Category          @relation(fields: [categoryId], references: [id], onUpdate: NoAction)
   tags                 String[]
@@ -42,7 +41,7 @@ model Product {
   images               Image[]
   videos               Video[]
   // Variants and Attributes
-  attributes           Json? // For storing color, size, etc.
+  attributes           Json?
   variants             ProductVariant[]
   // SEO
   metaTitle            String?
@@ -76,15 +75,15 @@ model Product {
 model ProductVariant {
   id            String   @id @default(auto()) @map("_id") @db.ObjectId
   productId     String   @db.ObjectId
-  // Add onUpdate: NoAction here
   product       Product  @relation(fields: [productId], references: [id], onDelete: Cascade, onUpdate: NoAction)
   name          String
   sku           String   @unique
   price         Float
   discountPrice Float?
+  discountPercent      Float?
   stock         Int
-  attributes    Json // {color: "red", size: "XL"}
-  images        Image[]
+  attributes    Json?
+  image        Image?
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 

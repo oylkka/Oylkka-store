@@ -1,12 +1,14 @@
 'use client';
 
-import { useCreateProduct } from '@/services';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { ReactNode, useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 
 import { ProductImage } from '@/hooks/use-product-image';
+import { cleanFormData } from '@/lib/utils';
+import { useCreateProduct } from '@/services';
+
 import { ProductFormContext } from './product-form-context';
 import {
   ProductFormInput,
@@ -32,9 +34,9 @@ export function ProductFormProvider({ children }: ProductFormProviderProps) {
       price: 0,
       stock: 0,
       lowStockAlert: 5,
-      // sku: '',
-      // condition: 'NEW',
-      // conditionDescription: '',
+      sku: '',
+      condition: 'NEW',
+      conditionDescription: '',
       weight: 0,
       weightUnit: 'kg',
       dimensions: {
@@ -44,9 +46,11 @@ export function ProductFormProvider({ children }: ProductFormProviderProps) {
         unit: 'cm',
       },
       freeShipping: false,
-      meteTitle: '',
-      meteDescription: '',
-      // status: 'DRAFT',
+      metaTitle: '',
+      metaDescription: '',
+      attributes: {},
+      status: 'DRAFT',
+      featured: false,
     },
   });
 
@@ -61,88 +65,64 @@ export function ProductFormProvider({ children }: ProductFormProviderProps) {
       return;
     }
 
+    const cleaned = cleanFormData(data);
     const formData = new FormData();
 
-    // Append primitives
-    const primitiveFields: (keyof ProductFormValues)[] = [
-      'productName',
-      'description',
-      'slug',
-      'category',
-      'brand',
-      'tags',
-      'price',
-      'discountPrice',
-      'discountPercent',
-      'stock',
-      'lowStockAlert',
-      'weight',
-      'weightUnit',
-      'dimensions',
-      'freeShipping',
-      'meteTitle',
-      'meteDescription',
+    // Append primitive and object fields
+    for (const key in cleaned) {
+      const value = cleaned[key as keyof typeof cleaned];
 
-      // 'sku',
-      // 'condition',
-      // 'conditionDescription',
-      // 'status',
-    ];
-    primitiveFields.forEach((field) => {
-      const value = data[field];
-      if (value !== undefined) {
-        formData.append(field, String(value));
+      // Handle tags
+      if (key === 'tags' && Array.isArray(value)) {
+        (value as string[]).forEach((tag) => {
+          formData.append('tags', tag);
+        });
       }
-    });
 
-    // Append arrays
-    const arrayFields: (keyof ProductFormValues)[] = ['tags'];
-    arrayFields.forEach((field) => {
-      const value = data[field];
-      if (Array.isArray(value) && value.length > 0) {
-        formData.append(field, JSON.stringify(value));
+      // Handle other special cases
+      else if (
+        key === 'variants' ||
+        key === 'attributes' ||
+        key === 'dimensions'
+      ) {
+        formData.append(key, JSON.stringify(value));
       }
-    });
 
-    // Append objects
-    const objectFields: (keyof ProductFormValues)[] = [
-      'dimensions',
-      // 'attributes',
-    ];
-    objectFields.forEach((field) => {
-      const value = data[field];
-      if (value && typeof value === 'object' && Object.keys(value).length > 0) {
-        formData.append(field, JSON.stringify(value));
+      // Handle file inside variants
+      else if (key === 'variants') {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const variants = value as any[];
+        variants.forEach((variant, index) => {
+          if (variant.image instanceof File) {
+            formData.append(`variants[${index}].image`, variant.image);
+          }
+        });
       }
-    });
+
+      // Handle objects
+      else if (typeof value === 'object' && !(value instanceof File)) {
+        formData.append(key, JSON.stringify(value));
+      }
+
+      // Handle primitives
+      else if (value !== undefined && value !== null) {
+        formData.append(key, String(value));
+      }
+    }
 
     // Append product images
-    const imageFiles = productImages.map((img) => img.file);
-    imageFiles.forEach((file) => {
-      formData.append('productImages[]', file);
+    productImages.forEach((img) => {
+      formData.append('productImages', img.file);
     });
 
-    // Clean up empty attribute values before submit
-    // if (data.attributes) {
-    //   for (const key in data.attributes) {
-    //     const val = data.attributes[key];
-    //     if (
-    //       (typeof val === 'string' && val.trim() === '') ||
-    //       (Array.isArray(val) && val.length === 0)
-    //     ) {
-    //       delete data.attributes[key];
-    //     }
-    //   }
-    // }
-
-    // Wrap mutate in toast.promise
+    // Submit
     toast.promise(
       new Promise((resolve, reject) => {
         mutate(formData, {
           onSuccess: (response) => {
             toast.success('Product submitted successfully!');
-            // setProductImages([]);
-            // methods.reset();
+            setProductImages([]);
+            methods.reset();
             resolve(response);
           },
           onError: (err) => {

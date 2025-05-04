@@ -42,15 +42,6 @@ import { useProductCategories } from '@/services';
 
 import { ImageUpload } from './image-upload';
 
-export const categories = [
-  { id: '1', name: 'Electronics' },
-  { id: '2', name: 'Clothing' },
-  { id: '3', name: 'Books' },
-  { id: '4', name: 'Home & Kitchen' },
-  { id: '5', name: 'Beauty & Personal Care' },
-  { id: '6', name: 'Sports & Outdoors' },
-];
-
 const FormSchema = z.object({
   name: z.string().min(2, {
     message: 'Name must be at least 2 characters.',

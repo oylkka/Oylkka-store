@@ -1,3 +1,5 @@
+import { useFormContext } from 'react-hook-form';
+
 import {
   Card,
   CardContent,
@@ -14,7 +16,7 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { useFormContext } from 'react-hook-form';
+
 import { ProductFormValues } from './product-form-type';
 
 export default function ProductSeo() {
@@ -31,7 +33,7 @@ export default function ProductSeo() {
         <div className="space-y-4">
           <FormField
             control={control}
-            name="meteTitle"
+            name="metaTitle"
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Meta Title</FormLabel>
@@ -45,7 +47,7 @@ export default function ProductSeo() {
 
           <FormField
             control={control}
-            name="meteDescription"
+            name="metaDescription"
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Meta Description</FormLabel>

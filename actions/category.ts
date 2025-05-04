@@ -100,7 +100,6 @@ export async function checkCategorySlugUniqueness(
       suggestions,
     };
   } catch (error) {
-    console.error('Error checking slug uniqueness:', error);
     return {
       isUnique: false,
       slug: '',
@@ -170,7 +169,6 @@ export async function createCategory(formData: FormData) {
 
     return { success: true, category: newCategory };
   } catch (err) {
-    console.error('❌ Error creating category:', err);
     return { success: false, message: (err as Error).message };
   }
 }

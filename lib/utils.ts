@@ -29,14 +29,18 @@ export function cleanFormData<T extends Record<string, any>>(
       if (value.trim() !== '') {
         cleanedData[key] = value;
       }
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } else if ((value as any) instanceof File) {
+    } else if (Array.isArray(value)) {
       cleanedData[key] = value;
     } else if (typeof value === 'object' && value !== null) {
-      const nested = cleanFormData(value);
-      if (Object.keys(nested).length > 0) {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        cleanedData[key] = nested as any;
+      // Narrow the type before checking instanceof
+      if ((value as File) instanceof File) {
+        cleanedData[key] = value;
+      } else {
+        const nested = cleanFormData(value);
+        if (Object.keys(nested).length > 0) {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          cleanedData[key] = nested as any;
+        }
       }
     } else if (value !== undefined && value !== null) {
       cleanedData[key] = value;

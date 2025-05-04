@@ -8,8 +8,6 @@ type SlugCheckResult = {
 
 export async function checkSlugUnique(slug: string): Promise<SlugCheckResult> {
   // Enhanced logging
-  console.log('==== Server: checkSlugUnique called ====');
-  console.log(`Server: Checking slug: "${slug}"`);
 
   if (!slug) {
     console.log('Server: Empty slug received, returning not unique');

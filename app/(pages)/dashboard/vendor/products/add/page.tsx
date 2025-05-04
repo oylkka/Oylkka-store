@@ -9,12 +9,15 @@ import { useCreateProduct } from '@/services';
 
 import { BasicInformationCard } from './basic-information';
 import PricingAndInventory from './pricing-and-inventory';
+import { ProductCondition } from './product-condition';
 import { ProductDimensions } from './product-dimension';
 import { ProductFormContext } from './product-form-context';
 import { ProductFormProvider } from './product-form-provider';
 import { ProductFormValues } from './product-form-type';
 import { ProductImagesCard } from './product-image';
 import ProductSeo from './product-seo';
+import ProductStatus from './product-status';
+import ProductVariant from './product-variant';
 
 export default function NewProductPage() {
   return (
@@ -65,15 +68,14 @@ function NewProductForm() {
           <BasicInformationCard />
           <PricingAndInventory />
           <ProductDimensions />
-          {/* <VariantAttributesCard />  */}
+          <ProductVariant />
         </div>
         <div className="space-y-6 md:col-span-4">
           {/* Right Column Cards */}
           <ProductImagesCard />
+          <ProductStatus />
+          <ProductCondition />
           <ProductSeo />
-          {/* 
-          <CategoryCard />
-          <ProductDetailsCard /> */}
         </div>
       </div>
     </form>

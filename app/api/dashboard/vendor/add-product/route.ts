@@ -1,56 +1,219 @@
 import { NextRequest, NextResponse } from 'next/server';
 
+import { auth } from '@/features/auth/auth';
+import { UploadImage } from '@/features/cloudinary';
+import { db } from '@/lib/db';
+
+// Helper function to extract all values as an array of strings from FormData
+function getArrayValue(formData: FormData, key: string): string[] {
+  const values = formData.getAll(key);
+  return values.map((value) => (typeof value === 'string' ? value : ''));
+}
+
+// Helper function to handle file values
+function getFileValues(formData: FormData, key: string): File[] {
+  const files = formData.getAll(key);
+  return files.filter((file) => file instanceof File) as File[];
+}
+
+// Helper function to clean and map form data dynamically
+function mapFormData(formData: FormData) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const mappedData: Record<string, any> = {};
+
+  formData.forEach((value, key) => {
+    if (typeof value === 'string') {
+      mappedData[key] = value;
+    } else if (Array.isArray(value)) {
+      mappedData[key] = value.map((item) =>
+        typeof item === 'string' ? item : ''
+      );
+    } else if (value instanceof File) {
+      mappedData[key] = value; // For single file fields
+    }
+  });
+
+  // Handle arrays (e.g., productImages or tags)
+  formData.forEach((value, key) => {
+    if (key === 'productImages') {
+      mappedData[key] = getFileValues(formData, key);
+    } else if (key === 'tags') {
+      mappedData[key] = getArrayValue(formData, key);
+    }
+  });
+
+  // Parse variants JSON if present
+  if (mappedData.variantsData) {
+    try {
+      mappedData.variants = JSON.parse(mappedData.variantsData);
+    } catch (error) {
+      console.error('Failed to parse variants data:', error);
+      mappedData.variants = [];
+    }
+  } else {
+    mappedData.variants = [];
+  }
+
+  // Handle variant images separately
+  mappedData.variantImages = {};
+  formData.forEach((value, key) => {
+    if (key.startsWith('variantImage_') && value instanceof File) {
+      const variantId = key.replace('variantImage_', '');
+      mappedData.variantImages[variantId] = value;
+    }
+  });
+
+  return mappedData;
+}
+
 export async function POST(req: NextRequest) {
   try {
+    const session = await auth();
+    if (!session || session.user.role !== 'VENDOR') {
+      return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
+    }
+
+    const shop = await db.shop.findUnique({
+      where: { ownerId: session.user.id },
+      select: { id: true },
+    });
+
+    if (!shop) {
+      return NextResponse.json(
+        { message: 'Create a shop first' },
+        { status: 404 }
+      );
+    }
+
     const formData = await req.formData();
-    const parsedData: Record<string, any> = {};
+    const mappedData = mapFormData(formData);
 
-    for (const [key, value] of formData.entries()) {
-      const isFile = value instanceof File;
-
-      // Normalize key (strip trailing [] if present)
-      const cleanKey = key.endsWith('[]') ? key.slice(0, -2) : key;
-
-      if (isFile) {
-        const fileInfo = {
-          filename: value.name,
-          type: value.type,
-          size: value.size,
-        };
-
-        if (parsedData[cleanKey]) {
-          parsedData[cleanKey].push(fileInfo);
-        } else {
-          parsedData[cleanKey] = [fileInfo];
-        }
-      } else {
-        let parsedValue: any;
-        const valStr = value as string;
-
+    // Upload main product images
+    const productImageUploads = await Promise.all(
+      mappedData.productImages.map(async (file: File) => {
         try {
-          parsedValue = JSON.parse(valStr);
-        } catch {
-          parsedValue = valStr;
+          const result = await UploadImage(file, 'products');
+          return {
+            url: result.secure_url,
+            publicId: result.public_id,
+          };
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        } catch (error) {
+          return null;
         }
+      })
+    );
 
-        if (parsedData[cleanKey]) {
-          // If key already exists, turn into array
-          if (!Array.isArray(parsedData[cleanKey])) {
-            parsedData[cleanKey] = [parsedData[cleanKey]];
-          }
-          parsedData[cleanKey].push(parsedValue);
-        } else {
-          parsedData[cleanKey] = parsedValue;
-        }
+    // Filter out null values (failed uploads)
+    const productImages = productImageUploads.filter((img) => img !== null);
+
+    // Upload variant images (if any)
+    const variantImageUploads: Record<
+      string,
+      { url: string; publicId: string }
+    > = {};
+    for (const [variantId, file] of Object.entries(mappedData.variantImages)) {
+      try {
+        const result = await UploadImage(file as File, 'product-variants');
+        variantImageUploads[variantId] = {
+          url: result.secure_url,
+          publicId: result.public_id,
+        };
+      } catch (error) {
+        console.error(
+          `❌ Variant image upload failed for variant ${variantId}:`,
+          error
+        );
       }
     }
 
-    console.log('📝 Parsed Form Data:\n' + JSON.stringify(parsedData, null, 2));
+    // Convert string values to appropriate types
+    const price = parseFloat(mappedData.price) || 0;
+    const discountPrice = mappedData.discountPrice
+      ? parseFloat(mappedData.discountPrice)
+      : null;
+    const discountPercent = mappedData.discountPercent
+      ? parseFloat(mappedData.discountPercent)
+      : null;
+    const stock = parseInt(mappedData.stock) || 0;
+    const weight = mappedData.weight ? parseFloat(mappedData.weight) : null;
+    const freeShipping = mappedData.freeShipping === 'true';
+    const featured = mappedData.featured === 'true';
 
-    await new Promise((resolve) => setTimeout(resolve, 2000));
-    return NextResponse.json('Success', { status: 200 });
+    // Prepare variant data
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const variantsData = mappedData.variants.map((variant: any) => {
+      const variantId = variant.id || String(Math.random());
+      return {
+        name: variant.name || '',
+        sku: variant.sku || '',
+        price: parseFloat(variant.price) || price,
+        discountPrice: variant.discountPrice
+          ? parseFloat(variant.discountPrice)
+          : null,
+        discountPercent: variant.discountPercent
+          ? parseFloat(variant.discountPercent)
+          : null,
+        stock: parseInt(variant.stock) || 0,
+        attributes: variant.attributes || {},
+        image: variantImageUploads[variantId]
+          ? {
+              url: variantImageUploads[variantId].url,
+              publicId: variantImageUploads[variantId].publicId,
+            }
+          : null,
+      };
+    });
+
+    // Create product with variants
+    const product = await db.product.create({
+      data: {
+        productName: mappedData.productName,
+        slug: mappedData.slug,
+        description: mappedData.description,
+        categoryId: mappedData.category,
+        tags: mappedData.tags || [],
+        sku: mappedData.sku,
+        price,
+        discountPrice,
+        discountPercent,
+        stock,
+        brand: mappedData.brand || null,
+        condition: mappedData.condition,
+        conditionDescription: mappedData.conditionDescription || null,
+        weight,
+        weightUnit: mappedData.weightUnit || 'kg',
+        dimensions: mappedData.dimensions
+          ? JSON.parse(mappedData.dimensions)
+          : null,
+        freeShipping,
+        attributes: mappedData.attributes
+          ? JSON.parse(mappedData.attributes)
+          : null,
+        metaTitle: mappedData.metaTitle || null,
+        metaDescription: mappedData.metaDescription || null,
+        status: mappedData.status || 'DRAFT',
+        featured,
+        shopId: shop.id,
+        createdBy: session.user.id,
+        images: productImages,
+        variants: {
+          createMany: {
+            data: variantsData,
+          },
+        },
+      },
+    });
+
+    return NextResponse.json(
+      { message: 'Product created successfully', productId: product.id },
+      { status: 201 }
+    );
   } catch (error) {
-    console.error('❌ Error parsing form data:', error);
-    return NextResponse.json('Internal Server Error', { status: 500 });
+    console.error('❌ Product creation error:', error);
+    return NextResponse.json(
+      { message: 'Internal Server Error', error: (error as Error).message },
+      { status: 500 }
+    );
   }
 }

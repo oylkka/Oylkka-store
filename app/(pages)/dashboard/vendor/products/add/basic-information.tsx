@@ -16,8 +16,6 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-
 import {
   Select,
   SelectContent,
@@ -27,7 +25,9 @@ import {
 } from '@/components/ui/select';
 import { Skeleton } from '@/components/ui/skeleton';
 import { TagsInput } from '@/components/ui/tags-input';
+import { Textarea } from '@/components/ui/textarea';
 import { useProductCategories } from '@/services';
+
 import { ProductFormValues } from './product-form-type';
 
 export function BasicInformationCard() {
@@ -94,9 +94,9 @@ export function BasicInformationCard() {
 
   // Handle slug checking with debounce
   useEffect(() => {
-    if (!slug || isCheckingSlug) return;
+    if (!slug || isCheckingSlug) {return;}
 
-    if (slug === lastCheckedSlug.current) return;
+    if (slug === lastCheckedSlug.current) {return;}
 
     if (slugCheckTimeoutRef.current) {
       clearTimeout(slugCheckTimeoutRef.current);
