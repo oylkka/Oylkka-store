@@ -150,10 +150,10 @@ export const ProductFormSchema = z
         message:
           'Slug should only contain lowercase letters, numbers, and hyphens',
       }),
-    tags: z
+      tags: z
       .array(z.string())
+      .min(1, { message: 'At least one tag is required' })
       .max(10, { message: 'You can add a maximum of 10 tags' })
-      .optional()
       .default([]),
 
     // Identifiers

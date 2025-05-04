@@ -4,57 +4,61 @@ import { auth } from '@/features/auth/auth';
 import { UploadImage } from '@/features/cloudinary';
 import { db } from '@/lib/db';
 
-// Helper function to extract all values as an array of strings from FormData
+interface Variant {
+  id?: string;
+  name?: string;
+  sku?: string;
+  price?: string;
+  discountPrice?: string;
+  discountPercent?: string;
+  stock?: string;
+  attributes?: Record<string, string>;
+}
 function getArrayValue(formData: FormData, key: string): string[] {
   const values = formData.getAll(key);
   return values.map((value) => (typeof value === 'string' ? value : ''));
 }
 
-// Helper function to handle file values
 function getFileValues(formData: FormData, key: string): File[] {
   const files = formData.getAll(key);
   return files.filter((file) => file instanceof File) as File[];
 }
 
-// Helper function to clean and map form data dynamically
 function mapFormData(formData: FormData) {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const mappedData: Record<string, any> = {};
 
+  // Handle all base key-value pairs
   formData.forEach((value, key) => {
     if (typeof value === 'string') {
       mappedData[key] = value;
-    } else if (Array.isArray(value)) {
-      mappedData[key] = value.map((item) =>
-        typeof item === 'string' ? item : ''
-      );
     } else if (value instanceof File) {
-      mappedData[key] = value; // For single file fields
+      mappedData[key] = value;
     }
   });
 
-  // Handle arrays (e.g., productImages or tags)
-  formData.forEach((value, key) => {
-    if (key === 'productImages') {
-      mappedData[key] = getFileValues(formData, key);
-    } else if (key === 'tags') {
-      mappedData[key] = getArrayValue(formData, key);
-    }
-  });
+  // Explicitly parse known arrays and files
+  if (formData.has('productImages')) {
+    mappedData.productImages = getFileValues(formData, 'productImages');
+  }
 
-  // Parse variants JSON if present
-  if (mappedData.variantsData) {
+  if (formData.has('tags')) {
+    mappedData.tags = getArrayValue(formData, 'tags');
+  }
+
+  // ✅ Correctly handle parsing `variants`
+  if (mappedData.variants) {
     try {
-      mappedData.variants = JSON.parse(mappedData.variantsData);
+      mappedData.variants = JSON.parse(mappedData.variants);
     } catch (error) {
-      console.error('Failed to parse variants data:', error);
+      console.error('❌ Failed to parse variants:', error);
       mappedData.variants = [];
     }
   } else {
     mappedData.variants = [];
   }
 
-  // Handle variant images separately
+  // Handle variant images (if any)
   mappedData.variantImages = {};
   formData.forEach((value, key) => {
     if (key.startsWith('variantImage_') && value instanceof File) {
@@ -88,9 +92,9 @@ export async function POST(req: NextRequest) {
     const formData = await req.formData();
     const mappedData = mapFormData(formData);
 
-    // Upload main product images
+    // Upload product images
     const productImageUploads = await Promise.all(
-      mappedData.productImages.map(async (file: File) => {
+      (mappedData.productImages || []).map(async (file: File) => {
         try {
           const result = await UploadImage(file, 'products');
           return {
@@ -103,31 +107,31 @@ export async function POST(req: NextRequest) {
         }
       })
     );
+    const productImages = productImageUploads.filter(Boolean);
 
-    // Filter out null values (failed uploads)
-    const productImages = productImageUploads.filter((img) => img !== null);
-
-    // Upload variant images (if any)
+    // Upload variant images only if the variant has an image
     const variantImageUploads: Record<
       string,
       { url: string; publicId: string }
     > = {};
     for (const [variantId, file] of Object.entries(mappedData.variantImages)) {
-      try {
-        const result = await UploadImage(file as File, 'product-variants');
-        variantImageUploads[variantId] = {
-          url: result.secure_url,
-          publicId: result.public_id,
-        };
-      } catch (error) {
-        console.error(
-          `❌ Variant image upload failed for variant ${variantId}:`,
-          error
-        );
+      if (file instanceof File) {
+        try {
+          const result = await UploadImage(file as File, 'product-variants');
+          variantImageUploads[variantId] = {
+            url: result.secure_url,
+            publicId: result.public_id,
+          };
+        } catch (error) {
+          console.error(
+            `❌ Variant image upload failed for ${variantId}:`,
+            error
+          );
+        }
       }
     }
 
-    // Convert string values to appropriate types
+    // Parse product data
     const price = parseFloat(mappedData.price) || 0;
     const discountPrice = mappedData.discountPrice
       ? parseFloat(mappedData.discountPrice)
@@ -140,32 +144,36 @@ export async function POST(req: NextRequest) {
     const freeShipping = mappedData.freeShipping === 'true';
     const featured = mappedData.featured === 'true';
 
-    // Prepare variant data
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const variantsData = mappedData.variants.map((variant: any) => {
-      const variantId = variant.id || String(Math.random());
-      return {
-        name: variant.name || '',
-        sku: variant.sku || '',
-        price: parseFloat(variant.price) || price,
-        discountPrice: variant.discountPrice
-          ? parseFloat(variant.discountPrice)
-          : null,
-        discountPercent: variant.discountPercent
-          ? parseFloat(variant.discountPercent)
-          : null,
-        stock: parseInt(variant.stock) || 0,
-        attributes: variant.attributes || {},
-        image: variantImageUploads[variantId]
-          ? {
-              url: variantImageUploads[variantId].url,
-              publicId: variantImageUploads[variantId].publicId,
-            }
-          : null,
-      };
-    });
+    // Map variant data
+    const variantsData = (mappedData.variants || []).map(
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (variant: any, index: number) => {
+        const variantId = variant.id || `auto-${index}`;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const variantData: any = {
+          name: variant.name || '',
+          sku: variant.sku || '',
+          price: parseFloat(variant.price) || price,
+          discountPrice: variant.discountPrice
+            ? parseFloat(variant.discountPrice)
+            : null,
+          discountPercent: variant.discountPercent
+            ? parseFloat(variant.discountPercent)
+            : null,
+          stock: parseInt(variant.stock) || 0,
+          attributes: variant.attributes || {},
+        };
 
-    // Create product with variants
+        // Only add the image if the variant has one
+        if (variantImageUploads[variantId]) {
+          variantData.image = variantImageUploads[variantId];
+        }
+
+        return variantData;
+      }
+    );
+
+    // Create product
     const product = await db.product.create({
       data: {
         productName: mappedData.productName,
@@ -180,39 +188,34 @@ export async function POST(req: NextRequest) {
         stock,
         brand: mappedData.brand || null,
         condition: mappedData.condition,
-        conditionDescription: mappedData.conditionDescription || null,
-        weight,
-        weightUnit: mappedData.weightUnit || 'kg',
-        dimensions: mappedData.dimensions
-          ? JSON.parse(mappedData.dimensions)
-          : null,
-        freeShipping,
-        attributes: mappedData.attributes
-          ? JSON.parse(mappedData.attributes)
-          : null,
-        metaTitle: mappedData.metaTitle || null,
-        metaDescription: mappedData.metaDescription || null,
-        status: mappedData.status || 'DRAFT',
-        featured,
+        conditionDescription: mappedData.conditionDescription || '',
         shopId: shop.id,
-        createdBy: session.user.id,
+        featured,
+        freeShipping,
+        weight,
         images: productImages,
-        variants: {
-          createMany: {
-            data: variantsData,
-          },
-        },
+        createdBy: session.user.id,
       },
     });
 
+    // Create variants
+    if (variantsData.length > 0) {
+      await db.productVariant.createMany({
+        data: variantsData.map((variant: Variant) => ({
+          ...variant,
+          productId: product.id,
+        })),
+      });
+    }
+
     return NextResponse.json(
-      { message: 'Product created successfully', productId: product.id },
+      { message: 'Product created successfully' },
       { status: 201 }
     );
   } catch (error) {
     console.error('❌ Product creation error:', error);
     return NextResponse.json(
-      { message: 'Internal Server Error', error: (error as Error).message },
+      { message: 'Something went wrong' },
       { status: 500 }
     );
   }

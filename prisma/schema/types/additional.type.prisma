@@ -12,7 +12,7 @@ type SocialLinks {
   facebook  String?
   instagram String?
   twitter   String?
-  linkedin    String?
+  linkedin  String?
 }
 
 type ShopPolicies {

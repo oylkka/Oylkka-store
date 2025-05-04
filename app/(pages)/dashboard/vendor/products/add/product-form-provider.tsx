@@ -51,6 +51,7 @@ export function ProductFormProvider({ children }: ProductFormProviderProps) {
       attributes: {},
       status: 'DRAFT',
       featured: false,
+      variants: [],
     },
   });
 
@@ -121,8 +122,8 @@ export function ProductFormProvider({ children }: ProductFormProviderProps) {
         mutate(formData, {
           onSuccess: (response) => {
             toast.success('Product submitted successfully!');
-            setProductImages([]);
-            methods.reset();
+            // setProductImages([]);
+            // methods.reset();
             resolve(response);
           },
           onError: (err) => {
