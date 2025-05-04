@@ -1,6 +1,5 @@
 'use client';
 
-import Image from 'next/image';
 import { useEffect, useState } from 'react';
 import { useFormContext } from 'react-hook-form';
 
@@ -111,12 +110,11 @@ export default function ShopBrandingSection() {
               {logoPreviewUrl ? (
                 <div className="relative h-full w-full">
                   {/* Using unoptimized prop for blob URLs */}
-                  <Image
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
                     src={logoPreviewUrl}
                     alt="Logo preview"
-                    className="object-contain p-2"
-                    fill
-                    unoptimized={logoPreviewUrl.startsWith('blob:')}
+                    className="h-full w-full object-contain p-2"
                   />
                 </div>
               ) : (
@@ -190,13 +188,11 @@ export default function ShopBrandingSection() {
               />
               {bannerPreviewUrl ? (
                 <div className="absolute inset-0 h-full w-full">
-                  {/* Using unoptimized prop for blob URLs */}
-                  <Image
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
                     src={bannerPreviewUrl}
-                    alt="Banner preview"
-                    className="object-cover"
-                    fill
-                    unoptimized={bannerPreviewUrl.startsWith('blob:')}
+                    alt="Logo preview"
+                    className="h-full w-full object-contain p-2"
                   />
                 </div>
               ) : (

@@ -6,10 +6,6 @@ import React, { useEffect, useRef, useState } from 'react';
 import image1 from '@/assets/hero-slider-1.jpg';
 import image2 from '@/assets/hero-slider-2.jpg';
 import image3 from '@/assets/hero-slider-3.jpg';
-import img2 from '@/assets/hero2-image1.webp';
-import img1 from '@/assets/hero2-image2.webp';
-import img3 from '@/assets/hero2-image3.jpg';
-import img4 from '@/assets/hero2-image4.jpg';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -252,55 +248,6 @@ export default function HeroSection() {
               onClick={() => goToSlide(index)}
               aria-label={`Go to slide ${index + 1}`}
             />
-          ))}
-        </div>
-      </div>
-
-      <div className="container mx-auto px-2 py-8 md:px-0 md:py-12">
-        <div className="grid grid-cols-2 gap-3 md:grid-cols-4 lg:gap-6">
-          {[
-            {
-              name: 'Women',
-              image: img1,
-              link: '/category/women',
-            },
-            {
-              name: 'Men',
-              image: img2,
-              link: '/category/men',
-            },
-            {
-              name: 'Accessories',
-              image: img3,
-              link: '/category/accessories',
-            },
-            {
-              name: 'Footwear',
-              image: img4,
-              link: '/category/footwear',
-            },
-          ].map((category, index) => (
-            <Link
-              key={index}
-              href={category.link}
-              className="group relative overflow-hidden rounded-lg"
-            >
-              <div className="bg-muted aspect-[3/4] w-full overflow-hidden rounded-lg">
-                <Image
-                  src={category.image}
-                  alt={category.name}
-                  width={300}
-                  height={400}
-                  className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
-                <div className="absolute right-0 bottom-0 left-0 p-4">
-                  <h3 className="text-lg font-semibold text-white md:text-xl">
-                    {category.name}
-                  </h3>
-                </div>
-              </div>
-            </Link>
           ))}
         </div>
       </div>

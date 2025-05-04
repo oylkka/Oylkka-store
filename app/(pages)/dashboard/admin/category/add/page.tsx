@@ -38,7 +38,7 @@ import {
 } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
 import { Textarea } from '@/components/ui/textarea';
-import { useProductCategories } from '@/services';
+import { useAdminProductCategories } from '@/services';
 
 import { ImageUpload } from './image-upload';
 
@@ -61,7 +61,7 @@ const FormSchema = z.object({
 });
 
 export default function AddCategory() {
-  const { isPending, data, isError, refetch } = useProductCategories();
+  const { isPending, data, isError, refetch } = useAdminProductCategories();
   const [isCheckingSlug, setIsCheckingSlug] = useState(false);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [slugSuggestions, setSlugSuggestions] = useState<string[]>([]);

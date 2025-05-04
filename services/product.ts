@@ -71,9 +71,9 @@ export function useCreateProduct() {
   });
 }
 
-export function useProductCategories() {
+export function useAdminProductCategories() {
   return useQuery({
-    queryKey: [QEUERY_KEYS.PRODUCT_CATEGORIES],
+    queryKey: [QEUERY_KEYS.ADMIN_PRODUCT_CATEGORIES],
     queryFn: async () => {
       const response = await axios.get(`/api/dashboard/admin/product-category`);
       return response.data;

@@ -390,7 +390,7 @@ export async function NavMain() {
         },
         {
           title: 'Add Product',
-          url: '/vendor/products/add',
+          url: '/dashboard/vendor/products/add',
         },
         {
           title: 'Bulk Upload',
