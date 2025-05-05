@@ -1,5 +1,6 @@
 'use client';
 
+import Autoplay from 'embla-carousel-autoplay';
 import Image from 'next/image';
 import Link from 'next/link';
 
@@ -37,19 +38,24 @@ export default function Categories() {
           align: 'start',
           loop: true,
         }}
+        plugins={[
+          Autoplay({
+            delay: 3000,
+          }),
+        ]}
         className="w-full"
       >
         <CarouselContent className="-ml-2 md:-ml-4">
           {categories.map((category: CategoriesType) => (
             <CarouselItem
               key={category.slug}
-              className="basis-full pl-2 sm:basis-1/2 md:basis-1/3 md:pl-4 lg:basis-1/4"
+              className="basis-1/2 pl-2 md:basis-1/3 md:pl-4 lg:basis-1/4"
             >
               <Link
                 href={`/products/category/${category.slug}`}
                 className="group relative block overflow-hidden rounded-lg"
               >
-                <div className="bg-muted aspect-[3/4] w-full overflow-hidden rounded-lg">
+                <div className="bg-muted aspect-square w-full overflow-hidden rounded-lg md:aspect-[3/4]">
                   <Image
                     src={category.image.url}
                     alt={category.image.alt}
@@ -62,7 +68,7 @@ export default function Categories() {
                     <h3 className="text-lg font-semibold text-white md:text-xl">
                       {category.name}
                     </h3>
-                    <p className="mt-1 translate-y-2 text-sm text-white/80 opacity-0 transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100">
+                    <p className="mt-1 line-clamp-2 hidden translate-y-2 text-sm text-white/80 opacity-0 transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100 md:block">
                       {category.description}
                     </p>
                   </div>
@@ -87,6 +93,11 @@ function CategoriesSkeleton() {
           align: 'start',
           loop: true,
         }}
+        plugins={[
+          Autoplay({
+            delay: 3000,
+          }),
+        ]}
         className="w-full"
       >
         <CarouselContent className="-ml-2 md:-ml-4">
