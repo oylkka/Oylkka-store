@@ -1,6 +1,7 @@
 'use client';
 
 import { Building, Link, MapPin, Tag } from 'lucide-react';
+import { useEffect } from 'react';
 import { useFormContext } from 'react-hook-form';
 
 import {
@@ -19,9 +20,23 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
-import { OnboardingFormValues } from '@/schemas';
+import type { OnboardingFormValues } from '@/schemas';
 
 import { SlugUniquenessChecker } from './check-slug-uniqueness';
+
+// Slugify function to convert text to URL-friendly format
+function slugify(text: string): string {
+  return text
+    .toString()
+    .toLowerCase()
+    .trim()
+    .replace(/\s+/g, '-') // Replace spaces with -
+    .replace(/&/g, '-and-') // Replace & with 'and'
+    .replace(/[^\w-]+/g, '') // Remove all non-word characters except hyphens
+    .replace(/--+/g, '-') // Replace multiple - with single -
+    .replace(/^-+/, '') // Trim - from start of text
+    .replace(/-+$/, ''); // Trim - from end of text
+}
 
 // Shop categories
 const SHOP_CATEGORIES = [
@@ -39,7 +54,23 @@ const SHOP_CATEGORIES = [
 ];
 
 export default function ShopBasicInfo() {
-  const { control } = useFormContext<OnboardingFormValues>();
+  const { control, watch, setValue } = useFormContext<OnboardingFormValues>();
+
+  // Watch for shop name changes to auto-generate slug
+  const shopName = watch('shopName');
+
+  // Auto-generate slug when shop name changes - simplified and optimized
+  useEffect(() => {
+    if (shopName) {
+      // Only update if there's a shop name
+      const newSlug = slugify(shopName);
+
+      // Use a timeout to avoid blocking the UI
+      setTimeout(() => {
+        setValue('shopSlug', newSlug);
+      }, 0);
+    }
+  }, [shopName, setValue]);
 
   return (
     <div className="mt-6 space-y-6">
@@ -76,12 +107,8 @@ export default function ShopBasicInfo() {
                     placeholder="your-shop-slug"
                     {...field}
                     onChange={(e) => {
-                      // Transform input to valid slug format
-                      const value = e.target.value
-                        .toLowerCase()
-                        .replace(/\s+/g, '-')
-                        .replace(/[^a-z0-9-]/g, '');
-                      field.onChange(value);
+                      // Just set the value directly - slugify is already applied
+                      field.onChange(slugify(e.target.value));
                     }}
                   />
                 </FormControl>
