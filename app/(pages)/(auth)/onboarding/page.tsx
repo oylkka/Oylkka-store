@@ -4,13 +4,12 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { Loader2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
-import { useEffect } from 'react';
-import { useForm } from 'react-hook-form';
+import { useEffect, useState } from 'react';
+import { FormProvider, useForm } from 'react-hook-form';
 import type { z } from 'zod';
 
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
-import { Form } from '@/components/ui/form';
 import { onboardingSchema } from '@/schemas';
 import { useOnboardingMutation } from '@/services';
 
@@ -20,6 +19,8 @@ import UserInfo from './user-info';
 export default function InputForm() {
   const session = useSession();
   const router = useRouter();
+  // Add state to track vendor role separately from form state
+  const [isVendor, setIsVendor] = useState(false);
 
   // Initialize form with default values
   const form = useForm<z.infer<typeof onboardingSchema>>({
@@ -51,16 +52,33 @@ export default function InputForm() {
   // Load user data from session
   useEffect(() => {
     if (session.data?.user) {
+      const userRole = session.data.user.role || 'CUSTOMER';
       form.reset({
         ...form.getValues(),
         id: session.data.user.id,
         name: session.data.user.name || '',
         email: session.data.user.email || '',
         avatar: session.data.user.image,
-        role: session.data.user.role || 'CUSTOMER',
+        role: userRole,
       });
+
+      // Set vendor state based on user role
+      setIsVendor(userRole === 'VENDOR');
     }
   }, [session.data?.user, form]);
+
+  // Watch for role changes and update isVendor state
+  useEffect(() => {
+    const subscription = form.watch((value, { name }) => {
+      if (name === 'role' || name === undefined) {
+        const role = value.role;
+        setIsVendor(role === 'VENDOR');
+      }
+    });
+
+    return () => subscription.unsubscribe();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [form.watch]);
 
   // Setup mutation for form submission
   const { mutate, isPending, isError, error } = useOnboardingMutation({
@@ -74,9 +92,6 @@ export default function InputForm() {
   function onSubmit(data: z.infer<typeof onboardingSchema>) {
     mutate(data);
   }
-
-  // Check if the role is vendor to show shop info section
-  const isVendor = form.watch('role') === 'VENDOR';
 
   return (
     <div className="container mx-auto py-8">
@@ -97,7 +112,7 @@ export default function InputForm() {
         </Alert>
       )}
 
-      <Form {...form}>
+      <FormProvider {...form}>
         <form
           onSubmit={form.handleSubmit(onSubmit)}
           className="container mx-auto max-w-5xl space-y-8"
@@ -131,7 +146,7 @@ export default function InputForm() {
             </Button>
           </div>
         </form>
-      </Form>
+      </FormProvider>
     </div>
   );
 }

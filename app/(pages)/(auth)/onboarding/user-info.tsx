@@ -3,8 +3,14 @@
 import { AlertCircle, Camera, Check, Loader2, User } from 'lucide-react';
 import Image from 'next/image';
 import { useSession } from 'next-auth/react';
-import { JSX, useCallback, useEffect, useState, useTransition } from 'react';
-import { Control, useFormContext } from 'react-hook-form';
+import {
+  type JSX,
+  useCallback,
+  useEffect,
+  useState,
+  useTransition,
+} from 'react';
+import { type Control, useFormContext } from 'react-hook-form';
 import { toast } from 'sonner';
 import { useDebounce } from 'use-debounce';
 
@@ -33,7 +39,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { OnboardingFormValues } from '@/schemas';
+import type { OnboardingFormValues } from '@/schemas';
 
 interface AvatarUploadProps {
   avatarSrc: string | null;
@@ -96,7 +102,7 @@ function AvatarUpload({
         <div className="flex h-36 w-36 items-center justify-center overflow-hidden rounded-full bg-slate-100 text-4xl text-slate-400 shadow-md transition-all duration-300 group-hover:scale-105">
           {avatarSrc ? (
             <Image
-              src={avatarSrc}
+              src={avatarSrc || '/placeholder.svg'}
               alt="Profile"
               height={400}
               width={400}
@@ -442,7 +448,9 @@ export default function UserInfo(): JSX.Element {
                   Account Type <span className="text-red-500">*</span>
                 </FormLabel>
                 <Select
-                  onValueChange={field.onChange}
+                  onValueChange={(value) => {
+                    field.onChange(value);
+                  }}
                   defaultValue={field.value}
                 >
                   <FormControl>

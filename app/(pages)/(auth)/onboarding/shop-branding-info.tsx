@@ -1,7 +1,7 @@
 'use client';
 
 import { Upload, X } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { toast } from 'sonner';
 
@@ -10,6 +10,10 @@ import type { OnboardingFormValues } from '@/schemas';
 
 export default function ShopBrandingSection() {
   const { setValue, watch } = useFormContext<OnboardingFormValues>();
+  const fileInputRefs = useRef({
+    logo: null as HTMLInputElement | null,
+    banner: null as HTMLInputElement | null,
+  });
 
   // Watch for form values instead of using local state
   const shopLogo = watch('shopLogo');
@@ -57,6 +61,9 @@ export default function ShopBrandingSection() {
   }, [shopLogo, shopBanner]);
 
   const handleLogoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+
     const file = e.target.files?.[0];
     if (file) {
       setLogoUploading(true);
@@ -69,12 +76,15 @@ export default function ShopBrandingSection() {
         return;
       }
 
-      setValue('shopLogo', file);
+      setValue('shopLogo', file, { shouldDirty: true });
       setTimeout(() => setLogoUploading(false), 500);
     }
   };
 
   const handleBannerChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+
     const file = e.target.files?.[0];
     if (file) {
       setBannerUploading(true);
@@ -87,19 +97,29 @@ export default function ShopBrandingSection() {
         return;
       }
 
-      setValue('shopBanner', file);
+      setValue('shopBanner', file, { shouldDirty: true });
       setTimeout(() => setBannerUploading(false), 500);
     }
   };
 
-  const removeLogo = () => {
-    setValue('shopLogo', undefined);
+  const removeLogo = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setValue('shopLogo', undefined, { shouldDirty: true });
     setLogoPreviewUrl(null);
+    if (fileInputRefs.current.logo) {
+      fileInputRefs.current.logo.value = '';
+    }
   };
 
-  const removeBanner = () => {
-    setValue('shopBanner', undefined);
+  const removeBanner = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setValue('shopBanner', undefined, { shouldDirty: true });
     setBannerPreviewUrl(null);
+    if (fileInputRefs.current.banner) {
+      fileInputRefs.current.banner.value = '';
+    }
   };
 
   return (
@@ -126,6 +146,7 @@ export default function ShopBrandingSection() {
                   variant="destructive"
                   className="absolute top-2 right-2 h-6 w-6"
                   onClick={removeLogo}
+                  type="button"
                 >
                   <X className="h-4 w-4" />
                 </Button>
@@ -133,12 +154,16 @@ export default function ShopBrandingSection() {
             ) : (
               <div className="relative flex h-40 w-40 cursor-pointer flex-col items-center justify-center rounded-md border-2 border-dashed border-gray-300 bg-gray-50 transition-all hover:bg-gray-100">
                 <input
+                  ref={(el) => {
+                    fileInputRefs.current.logo = el;
+                  }}
                   id="logo-upload"
                   type="file"
                   accept="image/*"
                   className="absolute inset-0 cursor-pointer opacity-0"
                   onChange={handleLogoChange}
                   disabled={logoUploading}
+                  onClick={(e) => e.stopPropagation()}
                 />
                 {logoUploading ? (
                   <div className="border-primary h-6 w-6 animate-spin rounded-full border-2 border-t-transparent" />
@@ -197,6 +222,7 @@ export default function ShopBrandingSection() {
                   variant="destructive"
                   className="absolute top-2 right-2 h-6 w-6"
                   onClick={removeBanner}
+                  type="button"
                 >
                   <X className="h-4 w-4" />
                 </Button>
@@ -209,12 +235,16 @@ export default function ShopBrandingSection() {
                 style={{ paddingTop: '31.25%' /* 16:5 aspect ratio */ }}
               >
                 <input
+                  ref={(el) => {
+                    fileInputRefs.current.banner = el;
+                  }}
                   id="banner-upload"
                   type="file"
                   accept="image/*"
                   className="absolute inset-0 z-10 cursor-pointer opacity-0"
                   onChange={handleBannerChange}
                   disabled={bannerUploading}
+                  onClick={(e) => e.stopPropagation()}
                 />
                 <div className="absolute inset-0 flex h-full w-full flex-col items-center justify-center bg-gray-50 text-center">
                   {bannerUploading ? (
