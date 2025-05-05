@@ -1,9 +1,12 @@
 'use client';
 
+import { Upload, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useFormContext } from 'react-hook-form';
+import { toast } from 'sonner';
 
-import { OnboardingFormValues } from '@/schemas';
+import { Button } from '@/components/ui/button';
+import type { OnboardingFormValues } from '@/schemas';
 
 export default function ShopBrandingSection() {
   const { setValue, watch } = useFormContext<OnboardingFormValues>();
@@ -22,26 +25,26 @@ export default function ShopBrandingSection() {
 
   // Update preview URLs when form values change
   useEffect(() => {
-    // Clean up previous object URLs to prevent memory leaks
-    if (logoPreviewUrl && logoPreviewUrl.startsWith('blob:')) {
-      URL.revokeObjectURL(logoPreviewUrl);
-    }
-    if (bannerPreviewUrl && bannerPreviewUrl.startsWith('blob:')) {
-      URL.revokeObjectURL(bannerPreviewUrl);
-    }
-
-    // Create new object URLs from the File objects
+    // Only create new object URLs when the File objects change
     if (shopLogo instanceof File) {
+      // Clean up previous URL before creating a new one
+      if (logoPreviewUrl && logoPreviewUrl.startsWith('blob:')) {
+        URL.revokeObjectURL(logoPreviewUrl);
+      }
       const url = URL.createObjectURL(shopLogo);
       setLogoPreviewUrl(url);
     }
 
     if (shopBanner instanceof File) {
+      // Clean up previous URL before creating a new one
+      if (bannerPreviewUrl && bannerPreviewUrl.startsWith('blob:')) {
+        URL.revokeObjectURL(bannerPreviewUrl);
+      }
       const url = URL.createObjectURL(shopBanner);
       setBannerPreviewUrl(url);
     }
 
-    // Cleanup function to revoke object URLs when component unmounts or dependencies change
+    // Cleanup function to revoke object URLs when component unmounts
     return () => {
       if (logoPreviewUrl && logoPreviewUrl.startsWith('blob:')) {
         URL.revokeObjectURL(logoPreviewUrl);
@@ -50,7 +53,8 @@ export default function ShopBrandingSection() {
         URL.revokeObjectURL(bannerPreviewUrl);
       }
     };
-  }, [bannerPreviewUrl, logoPreviewUrl, shopLogo, shopBanner]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [shopLogo, shopBanner]);
 
   const handleLogoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -60,7 +64,7 @@ export default function ShopBrandingSection() {
       // Validate file
       const maxSize = 500 * 1024; // 500KB
       if (file.size > maxSize) {
-        alert('Logo image should not exceed 500KB');
+        toast.error('Logo image should not exceed 500KB');
         setLogoUploading(false);
         return;
       }
@@ -78,7 +82,7 @@ export default function ShopBrandingSection() {
       // Validate file
       const maxSize = 1024 * 1024; // 1MB
       if (file.size > maxSize) {
-        alert('Banner image should not exceed 1MB');
+        toast.error('Banner image should not exceed 1MB');
         setBannerUploading(false);
         return;
       }
@@ -88,63 +92,69 @@ export default function ShopBrandingSection() {
     }
   };
 
+  const removeLogo = () => {
+    setValue('shopLogo', undefined);
+    setLogoPreviewUrl(null);
+  };
+
+  const removeBanner = () => {
+    setValue('shopBanner', undefined);
+    setBannerPreviewUrl(null);
+  };
+
   return (
     <div className="space-y-6">
-      <div className="rounded-lg border border-dashed p-6">
-        <h3 className="mb-2 text-lg font-semibold">Shop Logo</h3>
+      {/* Logo Upload Section */}
+      <div className="rounded-lg border p-6">
+        <h3 className="mb-2 text-base font-semibold">Shop Logo</h3>
         <p className="text-muted-foreground mb-4 text-sm">
           Upload a logo to represent your brand
         </p>
 
         <div className="grid gap-6 md:grid-cols-2">
           <div className="space-y-4">
-            <div className="relative flex h-32 w-32 cursor-pointer items-center justify-center rounded-md border-2 border-dashed border-gray-300 bg-gray-50 transition-all hover:bg-gray-100">
-              <input
-                id="logo-upload"
-                type="file"
-                accept="image/*"
-                className="absolute inset-0 cursor-pointer opacity-0"
-                onChange={handleLogoChange}
-                disabled={logoUploading}
-              />
-              {logoPreviewUrl ? (
-                <div className="relative h-full w-full">
-                  {/* Using unoptimized prop for blob URLs */}
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={logoPreviewUrl}
-                    alt="Logo preview"
-                    className="h-full w-full object-contain p-2"
-                  />
-                </div>
-              ) : (
-                <div className="flex flex-col items-center justify-center text-center">
-                  {logoUploading ? (
-                    <div className="border-primary h-6 w-6 animate-spin rounded-full border-2 border-t-transparent" />
-                  ) : (
-                    <>
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="text-muted-foreground mb-2 h-10 w-10"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                        strokeWidth={2}
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
-                        />
-                      </svg>
-                      <span className="text-muted-foreground text-xs">
-                        Click to upload
-                      </span>
-                    </>
-                  )}
-                </div>
-              )}
-            </div>
+            {logoPreviewUrl ? (
+              <div className="relative h-40 w-40 overflow-hidden rounded-md border-2 border-dashed border-gray-300 bg-gray-50">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={logoPreviewUrl || '/placeholder.svg'}
+                  alt="Logo preview"
+                  className="h-full w-full object-contain p-2"
+                />
+                <Button
+                  size="icon"
+                  variant="destructive"
+                  className="absolute top-2 right-2 h-6 w-6"
+                  onClick={removeLogo}
+                >
+                  <X className="h-4 w-4" />
+                </Button>
+              </div>
+            ) : (
+              <div className="relative flex h-40 w-40 cursor-pointer flex-col items-center justify-center rounded-md border-2 border-dashed border-gray-300 bg-gray-50 transition-all hover:bg-gray-100">
+                <input
+                  id="logo-upload"
+                  type="file"
+                  accept="image/*"
+                  className="absolute inset-0 cursor-pointer opacity-0"
+                  onChange={handleLogoChange}
+                  disabled={logoUploading}
+                />
+                {logoUploading ? (
+                  <div className="border-primary h-6 w-6 animate-spin rounded-full border-2 border-t-transparent" />
+                ) : (
+                  <>
+                    <Upload className="text-muted-foreground mb-2 h-10 w-10" />
+                    <span className="text-muted-foreground text-sm font-medium">
+                      Upload Logo
+                    </span>
+                    <span className="text-muted-foreground mt-1 text-xs">
+                      Click or drag & drop
+                    </span>
+                  </>
+                )}
+              </div>
+            )}
             <p className="text-muted-foreground text-xs">
               Recommended size: 250x250 pixels (square)
             </p>
@@ -152,93 +162,86 @@ export default function ShopBrandingSection() {
 
           <div className="flex flex-col justify-center">
             <h4 className="mb-2 text-sm font-medium">Logo Guidelines:</h4>
-            <ul className="text-muted-foreground text-xs">
-              <li className="mb-1">
-                • PNG or JPG format (transparent background preferred)
-              </li>
-              <li className="mb-1">• Maximum file size: 500KB</li>
-              <li className="mb-1">
-                • Should be clearly visible at small sizes
-              </li>
+            <ul className="text-muted-foreground space-y-1 text-xs">
+              <li>• PNG or JPG format (transparent background preferred)</li>
+              <li>• Maximum file size: 500KB</li>
+              <li>• Should be clearly visible at small sizes</li>
               <li>• Keep it simple and recognizable</li>
             </ul>
           </div>
         </div>
       </div>
 
-      <div className="rounded-lg border border-dashed p-6">
-        <h3 className="mb-2 text-lg font-semibold">Shop Banner</h3>
+      {/* Banner Upload Section */}
+      <div className="rounded-lg border p-6">
+        <h3 className="mb-2 text-base font-semibold">Shop Banner</h3>
         <p className="text-muted-foreground mb-4 text-sm">
           Add a banner image to showcase your shop
         </p>
 
         <div className="space-y-4">
-          <div className="hover:border-primary relative overflow-hidden rounded-md border border-gray-300 transition-all hover:shadow-sm">
-            <div
-              className="relative"
-              style={{ paddingTop: '31.25%' /* 16:5 aspect ratio */ }}
-            >
-              <input
-                id="banner-upload"
-                type="file"
-                accept="image/*"
-                className="absolute inset-0 z-10 cursor-pointer opacity-0"
-                onChange={handleBannerChange}
-                disabled={bannerUploading}
-              />
-              {bannerPreviewUrl ? (
-                <div className="absolute inset-0 h-full w-full">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={bannerPreviewUrl}
-                    alt="Logo preview"
-                    className="h-full w-full object-contain p-2"
-                  />
-                </div>
-              ) : (
+          {bannerPreviewUrl ? (
+            <div className="relative overflow-hidden rounded-md border border-gray-300">
+              <div
+                className="relative"
+                style={{ paddingTop: '31.25%' /* 16:5 aspect ratio */ }}
+              >
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={bannerPreviewUrl || '/placeholder.svg'}
+                  alt="Banner preview"
+                  className="absolute inset-0 h-full w-full object-cover"
+                />
+                <Button
+                  size="icon"
+                  variant="destructive"
+                  className="absolute top-2 right-2 h-6 w-6"
+                  onClick={removeBanner}
+                >
+                  <X className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
+          ) : (
+            <div className="hover:border-primary relative overflow-hidden rounded-md border border-gray-300 transition-all hover:shadow-sm">
+              <div
+                className="relative"
+                style={{ paddingTop: '31.25%' /* 16:5 aspect ratio */ }}
+              >
+                <input
+                  id="banner-upload"
+                  type="file"
+                  accept="image/*"
+                  className="absolute inset-0 z-10 cursor-pointer opacity-0"
+                  onChange={handleBannerChange}
+                  disabled={bannerUploading}
+                />
                 <div className="absolute inset-0 flex h-full w-full flex-col items-center justify-center bg-gray-50 text-center">
                   {bannerUploading ? (
                     <div className="border-primary h-8 w-8 animate-spin rounded-full border-2 border-t-transparent" />
                   ) : (
                     <>
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="text-muted-foreground mb-2 h-10 w-10"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                        strokeWidth={2}
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
-                        />
-                      </svg>
-                      <span className="text-muted-foreground text-sm">
-                        Upload a banner image
+                      <Upload className="text-muted-foreground mb-2 h-10 w-10" />
+                      <span className="text-muted-foreground text-sm font-medium">
+                        Upload Banner
                       </span>
                       <span className="text-muted-foreground mt-1 text-xs">
-                        (Recommended size: 1600x500 pixels)
+                        Recommended size: 1600x500 pixels
                       </span>
                     </>
                   )}
                 </div>
-              )}
+              </div>
             </div>
-          </div>
+          )}
 
           <div className="rounded-md bg-gray-50 p-3">
             <h4 className="mb-2 text-sm font-medium">Banner Tips:</h4>
-            <ul className="text-muted-foreground text-xs">
-              <li className="mb-1">
-                • High-quality image that represents your brand
-              </li>
-              <li className="mb-1">• Include key products or services</li>
-              <li className="mb-1">
-                • Ensure text is readable if included in the image
-              </li>
-              <li>• Consistent with your brand colors and style</li>
+            <ul className="text-muted-foreground space-y-1 text-xs">
+              <li>• High-quality image that represents your brand</li>
+              <li>• Include key products or services</li>
+              <li>• Ensure text is readable if included in the image</li>
+              <li>• Maximum file size: 1MB</li>
             </ul>
           </div>
         </div>

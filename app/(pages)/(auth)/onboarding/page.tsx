@@ -1,12 +1,14 @@
 'use client';
 
 import { zodResolver } from '@hookform/resolvers/zod';
+import { Loader2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
-import { z } from 'zod';
+import type { z } from 'zod';
 
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { Form } from '@/components/ui/form';
 import { onboardingSchema } from '@/schemas';
@@ -61,7 +63,7 @@ export default function InputForm() {
   }, [session.data?.user, form]);
 
   // Setup mutation for form submission
-  const { mutate, isPending } = useOnboardingMutation({
+  const { mutate, isPending, isError, error } = useOnboardingMutation({
     onSuccess: () => {
       // Redirect or update UI on success
       router.push('/dashboard');
@@ -84,6 +86,17 @@ export default function InputForm() {
       <p className="text-muted-foreground mb-8 text-center">
         Please provide your information to get started
       </p>
+
+      {isError && (
+        <Alert variant="destructive" className="mb-6">
+          <AlertTitle>Error</AlertTitle>
+          <AlertDescription>
+            {error?.message ||
+              'There was an error saving your profile. Please try again.'}
+          </AlertDescription>
+        </Alert>
+      )}
+
       <Form {...form}>
         <form
           onSubmit={form.handleSubmit(onSubmit)}
@@ -109,7 +122,7 @@ export default function InputForm() {
             >
               {isPending ? (
                 <span className="flex items-center gap-2">
-                  <span className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+                  <Loader2 className="h-4 w-4 animate-spin" />
                   Saving...
                 </span>
               ) : (

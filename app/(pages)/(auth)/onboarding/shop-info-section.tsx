@@ -7,7 +7,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Separator } from '@/components/ui/separator';
 
 import ShopBasicInfo from './shop-basic-info';
 import ShopBrandingSection from './shop-branding-info';
@@ -27,25 +27,33 @@ export default function ShopInfoSection() {
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <div className="grid gap-6 lg:grid-cols-3">
-          <div className="lg:col-span-2">
-            <Tabs defaultValue="basic">
-              <TabsList className="grid w-full grid-cols-3">
-                <TabsTrigger value="basic">Basic</TabsTrigger>
-                <TabsTrigger value="branding">Branding</TabsTrigger>
-                <TabsTrigger value="contact">Contact</TabsTrigger>
-              </TabsList>
-              <TabsContent value="basic">
-                <ShopBasicInfo />
-              </TabsContent>
-              <TabsContent value="branding">
-                <ShopBrandingSection />
-              </TabsContent>
-              <TabsContent value="contact">
-                <ShopContactSection />
-              </TabsContent>
-            </Tabs>
+        <div className="grid gap-8 lg:grid-cols-3">
+          <div className="space-y-8 lg:col-span-2">
+            {/* Basic Info Section */}
+            <div>
+              <h3 className="mb-4 text-lg font-medium">Basic Information</h3>
+              <ShopBasicInfo />
+            </div>
+
+            <Separator />
+
+            {/* Branding Section */}
+            <div>
+              <h3 className="mb-4 text-lg font-medium">Shop Branding</h3>
+              <ShopBrandingSection />
+            </div>
+
+            <Separator />
+
+            {/* Contact Section */}
+            <div>
+              <h3 className="mb-4 text-lg font-medium">
+                Contact & Social Media
+              </h3>
+              <ShopContactSection />
+            </div>
           </div>
+
           <div className="hidden lg:block">
             <ShopPreview />
           </div>
