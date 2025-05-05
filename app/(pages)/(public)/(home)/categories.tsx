@@ -1,6 +1,5 @@
 'use client';
 
-import { Loader2 } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 
@@ -8,9 +7,8 @@ import {
   Carousel,
   CarouselContent,
   CarouselItem,
-  CarouselNext,
-  CarouselPrevious,
 } from '@/components/ui/carousel';
+import { Skeleton } from '@/components/ui/skeleton';
 import { CategoriesType } from '@/lib/types';
 import { useProductCategories } from '@/services';
 
@@ -18,11 +16,7 @@ export default function Categories() {
   const { isPending, data: categories, isError } = useProductCategories();
 
   if (isPending) {
-    return (
-      <div className="flex h-64 w-full items-center justify-center">
-        <Loader2 className="text-primary h-10 w-10 animate-spin" />
-      </div>
-    );
+    return <CategoriesSkeleton />;
   }
 
   if (isError) {
@@ -77,10 +71,42 @@ export default function Categories() {
             </CarouselItem>
           ))}
         </CarouselContent>
-        <div className="mt-4 flex justify-center gap-2">
-          <CarouselPrevious />
-          <CarouselNext />
-        </div>
+      </Carousel>
+    </div>
+  );
+}
+
+function CategoriesSkeleton() {
+  // Create an array of 8 items to represent loading categories
+  const skeletonItems = Array.from({ length: 8 }, (_, i) => i);
+
+  return (
+    <div className="container mx-auto px-2 py-8 md:px-0 md:py-12">
+      <Carousel
+        opts={{
+          align: 'start',
+          loop: true,
+        }}
+        className="w-full"
+      >
+        <CarouselContent className="-ml-2 md:-ml-4">
+          {skeletonItems.map((index) => (
+            <CarouselItem
+              key={index}
+              className="basis-full pl-2 sm:basis-1/2 md:basis-1/3 md:pl-4 lg:basis-1/4"
+            >
+              <div className="group relative block overflow-hidden rounded-lg">
+                <div className="bg-muted aspect-[3/4] w-full overflow-hidden rounded-lg">
+                  <Skeleton className="h-full w-full" />
+                  <div className="absolute right-0 bottom-0 left-0 p-4">
+                    <Skeleton className="mb-2 h-6 w-3/4" />
+                    <Skeleton className="h-4 w-full" />
+                  </div>
+                </div>
+              </div>
+            </CarouselItem>
+          ))}
+        </CarouselContent>
       </Carousel>
     </div>
   );

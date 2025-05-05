@@ -80,3 +80,39 @@ export function useAdminProductCategories() {
     },
   });
 }
+
+export function useProductList({ currentPage = 1 }: { currentPage?: number }) {
+  return useQuery({
+    queryKey: [QEUERY_KEYS.PRODUCT_LIST, currentPage],
+    queryFn: async () => {
+      const response = await axios.get('/api/public/product-list', {
+        params: { currentPage },
+      });
+      return response.data;
+    },
+  });
+}
+
+export function useSingleProduct({ slug }: { slug: string }) {
+  return useQuery({
+    queryKey: [QEUERY_KEYS.SINGLE_PRODUCT, slug],
+    queryFn: async () => {
+      const response = await axios.get(`/api/public/single-product`, {
+        params: { slug: slug },
+      });
+      return response.data;
+    },
+  });
+}
+
+export function useRelatedProduct({ slug }: { slug: string }) {
+  return useQuery({
+    queryKey: [QEUERY_KEYS.RELATED_PRODUCT, slug],
+    queryFn: async () => {
+      const response = await axios.get(`/api/public/related-products`, {
+        params: { slug: slug },
+      });
+      return response.data;
+    },
+  });
+}
