@@ -8,17 +8,26 @@ export async function GET(req: NextRequest) {
     const slug = searchParams.get('slug') || '';
     const product = await db.product.findUnique({
       where: { slug },
+
       include: {
-        user: {
+        shop: {
           select: {
             name: true,
-            email: true,
-            image: true,
-            role: true,
-            id: true,
+            slug: true,
+            logo: {
+              select: {
+                url: true,
+              },
+            },
+            bannerImage: {
+              select: {
+                url: true,
+              },
+            },
+            isVerified: true,
           },
         },
-        reviews: true,
+        variants: true,
       },
     });
     return NextResponse.json({ product }, { status: 200 });

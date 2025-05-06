@@ -1,19 +1,19 @@
 'use client';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { ReactNode, useState } from 'react';
+import { type ReactNode, useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 
-import { ProductImage } from '@/hooks/use-product-image';
+import type { ProductImage } from '@/hooks/use-product-image';
 import { cleanFormData } from '@/lib/utils';
 import { useCreateProduct } from '@/services';
 
 import { ProductFormContext } from './product-form-context';
 import {
-  ProductFormInput,
+  type ProductFormInput,
   ProductFormSchema,
-  ProductFormValues,
+  type ProductFormValues,
 } from './product-form-type';
 
 interface ProductFormProviderProps {
@@ -89,22 +89,6 @@ export function ProductFormProvider({ children }: ProductFormProviderProps) {
         formData.append(key, JSON.stringify(value));
       }
 
-      // Handle file inside variants
-      else if (key === 'variants') {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const variants = value as any[];
-        variants.forEach((variant, index) => {
-          if (variant.image instanceof File) {
-            formData.append(`variants[${index}].image`, variant.image);
-          }
-        });
-      }
-
-      // Handle objects
-      else if (typeof value === 'object' && !(value instanceof File)) {
-        formData.append(key, JSON.stringify(value));
-      }
-
       // Handle primitives
       else if (value !== undefined && value !== null) {
         formData.append(key, String(value));
@@ -115,6 +99,17 @@ export function ProductFormProvider({ children }: ProductFormProviderProps) {
     productImages.forEach((img) => {
       formData.append('productImages', img.file);
     });
+
+    // Handle variant images separately
+    if (cleaned.variants && Array.isArray(cleaned.variants)) {
+      cleaned.variants.forEach((variant, index) => {
+        if (variant.image instanceof File) {
+          // Use the variant ID or index as identifier
+          const variantId = variant.id || `variant-${index}`;
+          formData.append(`variantImage_${variantId}`, variant.image);
+        }
+      });
+    }
 
     // Submit
     toast.promise(

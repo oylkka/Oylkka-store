@@ -1,6 +1,8 @@
+'use client';
+
 import { Maximize2 } from 'lucide-react';
 import Image from 'next/image';
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -23,16 +25,30 @@ import { cn } from '@/lib/utils';
 interface ProductImage {
   url: string;
   publicId: string;
+  alt?: string | null;
 }
 export const ImageGallery: React.FC<{
   images: ProductImage[];
   productName: string;
   discountPercent: number;
-}> = ({ images, productName, discountPercent }) => {
-  const [selectedImage, setSelectedImage] = useState(0);
+  activeIndex?: number;
+  onImageChange?: (index: number) => void;
+}> = ({
+  images,
+  productName,
+  discountPercent,
+  activeIndex = 0,
+  onImageChange,
+}) => {
+  const [selectedImage, setSelectedImage] = useState(activeIndex);
   const [magnify, setMagnify] = useState(false);
   const [magnifyPosition, setMagnifyPosition] = useState({ x: 0, y: 0 });
   const imageContainerRef = useRef<HTMLDivElement>(null);
+
+  // Update selected image when activeIndex changes from parent
+  useEffect(() => {
+    setSelectedImage(activeIndex);
+  }, [activeIndex]);
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     if (!imageContainerRef.current) {
@@ -45,6 +61,13 @@ export const ImageGallery: React.FC<{
     const y = ((e.clientY - top) / height) * 100;
 
     setMagnifyPosition({ x, y });
+  };
+
+  const handleThumbnailClick = (index: number) => {
+    setSelectedImage(index);
+    if (onImageChange) {
+      onImageChange(index);
+    }
   };
 
   return (
@@ -62,8 +85,8 @@ export const ImageGallery: React.FC<{
         >
           <Image
             src={images[selectedImage]?.url || '/api/placeholder/600/600'}
-            alt={productName}
-            className="object-contain"
+            alt={`${productName} - ${images[selectedImage]?.alt || `view ${selectedImage + 1}`}`}
+            className="object-contain transition-opacity duration-300"
             fill
             priority
             sizes="(max-width: 768px) 100vw, 50vw"
@@ -71,7 +94,7 @@ export const ImageGallery: React.FC<{
 
           {magnify && (
             <div
-              className="pointer-events-none absolute inset-0"
+              className="pointer-events-none absolute inset-0 transition-opacity duration-200"
               style={{
                 backgroundImage: `url(${images[selectedImage]?.url})`,
                 backgroundPosition: `${magnifyPosition.x}% ${magnifyPosition.y}%`,
@@ -100,11 +123,11 @@ export const ImageGallery: React.FC<{
           </DialogTrigger>
         </div>
 
-        <DialogContent>
+        <DialogContent className="max-w-4xl">
           <div className="h-full w-full">
             <Image
               src={images[selectedImage]?.url || '/api/placeholder/800/800'}
-              alt={productName}
+              alt={`${productName} - ${images[selectedImage]?.alt || `view ${selectedImage + 1}`}`}
               className="object-contain"
               width={2000}
               height={2000}
@@ -116,7 +139,7 @@ export const ImageGallery: React.FC<{
       <Carousel className="w-full">
         <CarouselContent>
           {images.map((image, index) => (
-            <CarouselItem key={image.publicId} className="basis-1/5">
+            <CarouselItem key={image.publicId || index} className="basis-1/5">
               <div
                 className={cn(
                   'relative h-24 cursor-pointer rounded-md border-2 transition-all',
@@ -124,11 +147,11 @@ export const ImageGallery: React.FC<{
                     ? 'border-primary ring-primary/20 ring-2'
                     : 'border-transparent'
                 )}
-                onClick={() => setSelectedImage(index)}
+                onClick={() => handleThumbnailClick(index)}
               >
                 <Image
-                  src={image.url}
-                  alt={`${productName} - view ${index + 1}`}
+                  src={image.url || '/placeholder.svg'}
+                  alt={`${productName} - ${image.alt || `view ${index + 1}`}`}
                   className="rounded-md object-cover"
                   fill
                   sizes="100px"

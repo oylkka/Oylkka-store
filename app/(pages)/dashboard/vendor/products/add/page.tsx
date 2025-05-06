@@ -13,7 +13,7 @@ import { ProductCondition } from './product-condition';
 import { ProductDimensions } from './product-dimension';
 import { ProductFormContext } from './product-form-context';
 import { ProductFormProvider } from './product-form-provider';
-import { ProductFormValues } from './product-form-type';
+import type { ProductFormValues } from './product-form-type';
 import { ProductImagesCard } from './product-image';
 import ProductSeo from './product-seo';
 import ProductStatus from './product-status';

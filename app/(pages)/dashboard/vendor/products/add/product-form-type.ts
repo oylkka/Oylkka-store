@@ -98,15 +98,16 @@ const VariantAttributesSchema = z
 // Enhanced Product Variant Schema
 export const ProductVariantSchema = z
   .object({
+    id: z.string().optional(), // Add ID field for tracking variants
     name: z.string().min(1, { message: 'Variant name is required' }),
-    sku: z
-      .string()
-      .min(1, { message: 'SKU is required' }),
+    sku: z.string().min(1, { message: 'SKU is required' }),
     price: z.number().min(0.01, { message: 'Price must be greater than 0' }),
     discountPrice: z
       .union([
         z.number().min(0, { message: 'Discount price must be non-negative' }),
-        z.string().transform((val) => (val === '' ? 0 : parseFloat(val))),
+        z
+          .string()
+          .transform((val) => (val === '' ? 0 : Number.parseFloat(val))),
       ])
       .optional()
       .default(0),
@@ -114,8 +115,7 @@ export const ProductVariantSchema = z
       .number()
       .int({ message: 'Stock must be a whole number' })
       .min(0, { message: 'Stock cannot be negative' }),
-      // i thik the next line will couse issue. as we don't have attribues in variant currently
-     attributes: VariantAttributesSchema,
+    attributes: VariantAttributesSchema,
     image: z.any().optional().nullable(),
   })
   .refine(
@@ -150,7 +150,7 @@ export const ProductFormSchema = z
         message:
           'Slug should only contain lowercase letters, numbers, and hyphens',
       }),
-      tags: z
+    tags: z
       .array(z.string())
       .min(1, { message: 'At least one tag is required' })
       .max(10, { message: 'You can add a maximum of 10 tags' })

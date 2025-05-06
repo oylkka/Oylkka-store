@@ -14,7 +14,6 @@ import { useRelatedProduct } from '@/services';
 
 import { ProductCard } from '../product-card';
 
-
 export default function RelatedProducts({ slug }: { slug: string }) {
   const { isPending, data, isError } = useRelatedProduct({ slug });
 

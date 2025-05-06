@@ -94,9 +94,13 @@ export function BasicInformationCard() {
 
   // Handle slug checking with debounce
   useEffect(() => {
-    if (!slug || isCheckingSlug) {return;}
+    if (!slug || isCheckingSlug) {
+      return;
+    }
 
-    if (slug === lastCheckedSlug.current) {return;}
+    if (slug === lastCheckedSlug.current) {
+      return;
+    }
 
     if (slugCheckTimeoutRef.current) {
       clearTimeout(slugCheckTimeoutRef.current);
@@ -239,8 +243,8 @@ export function BasicInformationCard() {
                     </FormControl>
                     <SelectContent>
                       {productCategories.map(
-                        (category: { id: string; name: string }) => (
-                          <SelectItem key={category.id} value={category.id}>
+                        (category: { slug: string; name: string }) => (
+                          <SelectItem key={category.slug} value={category.slug}>
                             {category.name}
                           </SelectItem>
                         )

@@ -173,13 +173,25 @@ export async function POST(req: NextRequest) {
       }
     );
 
+    const categoryId = await db.category.findUnique({
+      where: { slug: mappedData.category },
+      select: { id: true },
+    });
+
+    if (!categoryId) {
+      return NextResponse.json(
+        { message: 'Category not found' },
+        { status: 404 }
+      );
+    }
+
     // Create product
     const product = await db.product.create({
       data: {
         productName: mappedData.productName,
         slug: mappedData.slug,
         description: mappedData.description,
-        categoryId: mappedData.category,
+        categoryId: categoryId.id,
         tags: mappedData.tags || [],
         sku: mappedData.sku,
         price,

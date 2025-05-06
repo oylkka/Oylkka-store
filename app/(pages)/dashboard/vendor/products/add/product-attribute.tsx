@@ -1,5 +1,5 @@
 'use client';
-import { Check, ChevronsUpDown, Plus, Trash2, X } from 'lucide-react';
+import { Plus, Trash2, X } from 'lucide-react';
 import React, { useMemo, useState } from 'react';
 import { HexColorPicker } from 'react-colorful';
 import { useFormContext } from 'react-hook-form';
@@ -12,6 +12,7 @@ import {
   CommandGroup,
   CommandInput,
   CommandItem,
+  CommandList,
 } from '@/components/ui/command';
 import { FormItem, FormLabel } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
@@ -20,10 +21,14 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover';
-import { Separator } from '@/components/ui/separator';
 import { cn } from '@/lib/utils';
 
-import { ProductFormValues } from './product-form-type';
+import type { ProductFormValues } from './product-form-type';
+
+type AttributeHierarchy = {
+  primary: string | null;
+  secondary: string[];
+};
 
 const ATTRIBUTE_TYPES = [
   { value: 'color', label: 'Color' },
@@ -84,8 +89,12 @@ export function ProductAttributes() {
   const [selectedColors, setSelectedColors] = useState<Record<string, string>>(
     {}
   );
-  const [openCombobox, setOpenCombobox] = useState<Record<string, boolean>>({});
   const [attributeTypes, setAttributeTypes] = useState<string[]>([]);
+  const [attributeHierarchy, setAttributeHierarchy] =
+    useState<AttributeHierarchy>({
+      primary: null,
+      secondary: [],
+    });
 
   const rawAttributes = watch('attributes');
 
@@ -182,6 +191,31 @@ export function ProductAttributes() {
     setNewValues((prev) => ({ ...prev, [attrType]: '' }));
   };
 
+  const addMultipleAttributeValues = (attrType: string, values: string[]) => {
+    // Get current values for this attribute type
+    const currentValues = attributesRecord[attrType] || [];
+
+    // Filter out duplicates
+    const newValues = values.filter((value) => !currentValues.includes(value));
+
+    if (newValues.length === 0) {
+      return;
+    }
+
+    // Update the form
+    setValue(
+      'attributes',
+      {
+        ...attributesRecord,
+        [attrType]: [
+          ...(Array.isArray(currentValues) ? currentValues : []),
+          ...newValues,
+        ],
+      },
+      { shouldValidate: true }
+    );
+  };
+
   const removeAttributeValue = (attrType: string, index: number) => {
     const currentValues = attributesRecord[attrType] || [];
     if (!Array.isArray(currentValues)) {
@@ -208,226 +242,40 @@ export function ProductAttributes() {
     return found ? found[0] : null;
   };
 
-  const renderAttributeInput = (attrType: string) => {
-    if (attrType.toLowerCase() === 'color') {
-      return (
-        <div className="mt-4 space-y-4">
-          <div className="flex flex-col gap-3">
-            <div className="flex gap-2">
-              <Popover>
-                <PopoverTrigger asChild>
-                  <Button
-                    variant="outline"
-                    className="flex w-32 items-center gap-2"
-                  >
-                    <div
-                      className="h-4 w-4 rounded-sm ring-1 ring-gray-200 ring-inset"
-                      style={{
-                        backgroundColor: selectedColors[attrType] || '#000000',
-                      }}
-                    />
-                    <span>Pick Color</span>
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-4">
-                  <HexColorPicker
-                    color={selectedColors[attrType] || '#000000'}
-                    onChange={(color) =>
-                      setSelectedColors((prev) => ({
-                        ...prev,
-                        [attrType]: color,
-                      }))
-                    }
-                  />
-                  <div className="mt-4 grid grid-cols-8 gap-1.5">
-                    {COMMON_COLORS.map((color) => (
-                      <button
-                        key={color}
-                        type="button"
-                        className={cn(
-                          'flex h-6 w-6 cursor-pointer items-center justify-center rounded-md transition-all',
-                          'hover:ring-primary ring-1 ring-gray-200 ring-inset hover:ring-2'
-                        )}
-                        style={{ backgroundColor: color }}
-                        onClick={() =>
-                          setSelectedColors((prev) => ({
-                            ...prev,
-                            [attrType]: color,
-                          }))
-                        }
-                      >
-                        {selectedColors[attrType] === color && (
-                          <Check
-                            className={cn('h-4 w-4 stroke-2', {
-                              'text-black':
-                                color === '#FFFFFF' || color === '#FFFF00',
-                              'text-white':
-                                color !== '#FFFFFF' && color !== '#FFFF00',
-                            })}
-                          />
-                        )}
-                      </button>
-                    ))}
-                  </div>
-                  <div className="mt-4 flex gap-2">
-                    <Input
-                      type="text"
-                      value={selectedColors[attrType] || ''}
-                      onChange={(e) =>
-                        setSelectedColors((prev) => ({
-                          ...prev,
-                          [attrType]: e.target.value,
-                        }))
-                      }
-                      className="h-9"
-                      placeholder="#000000"
-                    />
-                    <Button
-                      type="button"
-                      onClick={() =>
-                        addAttributeValue(attrType, selectedColors[attrType])
-                      }
-                    >
-                      Add
-                    </Button>
-                  </div>
-                </PopoverContent>
-              </Popover>
-              <Popover
-                open={openCombobox[attrType]}
-                onOpenChange={(open) =>
-                  setOpenCombobox((prev) => ({ ...prev, [attrType]: open }))
-                }
-              >
-                <PopoverTrigger asChild>
-                  <Button
-                    variant="outline"
-                    role="combobox"
-                    aria-expanded={openCombobox[attrType]}
-                    className="w-[200px] justify-between"
-                  >
-                    {selectedColors[attrType]
-                      ? `Preset: ${
-                          getColorName(selectedColors[attrType]) ||
-                          'Custom Color'
-                        }`
-                      : 'Select preset color...'}
-                    <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-[200px] p-0">
-                  <Command>
-                    <CommandInput placeholder="Search color..." />
-                    <CommandEmpty>No color found.</CommandEmpty>
-                    <CommandGroup className="max-h-[300px] overflow-y-auto">
-                      {Object.entries(COLOR_NAME_TO_HEX).map(([name, hex]) => (
-                        <CommandItem
-                          key={name}
-                          value={name}
-                          onSelect={() => {
-                            setSelectedColors((prev) => ({
-                              ...prev,
-                              [attrType]: hex,
-                            }));
-                            addAttributeValue(attrType, hex);
-                            setOpenCombobox((prev) => ({
-                              ...prev,
-                              [attrType]: false,
-                            }));
-                          }}
-                          className="flex items-center gap-2"
-                        >
-                          <div
-                            className="h-4 w-4 rounded-sm"
-                            style={{ backgroundColor: hex }}
-                          />
-                          {name}
-                        </CommandItem>
-                      ))}
-                    </CommandGroup>
-                  </Command>
-                </PopoverContent>
-              </Popover>
-            </div>
-          </div>
-        </div>
-      );
+  const setPrimaryAttribute = (attrType: string) => {
+    if (attributeHierarchy.primary === attrType) {
+      // Toggle off if already selected
+      setAttributeHierarchy({
+        ...attributeHierarchy,
+        primary: null,
+      });
+    } else {
+      // Set as primary and ensure it's not in secondary
+      setAttributeHierarchy({
+        primary: attrType,
+        secondary: attributeHierarchy.secondary.filter(
+          (attr) => attr !== attrType
+        ),
+      });
     }
+  };
 
-    if (['size', 'material', 'style'].includes(attrType.toLowerCase())) {
-      const presets =
-        ATTRIBUTE_PRESETS[
-          attrType.toLowerCase() as keyof typeof ATTRIBUTE_PRESETS
-        ] || [];
-
-      return (
-        <div className="mt-4 space-y-4">
-          {presets.length > 0 && (
-            <>
-              <div className="flex flex-wrap gap-2">
-                {presets.map((preset) => (
-                  <Button
-                    key={preset}
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    className="h-8 text-sm"
-                    onClick={() => addAttributeValue(attrType, preset)}
-                  >
-                    {preset}
-                  </Button>
-                ))}
-              </div>
-              <Separator />
-            </>
-          )}
-          <div className="flex gap-2">
-            <Input
-              placeholder={`Add new ${attrType.toLowerCase()}`}
-              className="w-full"
-              value={newValues[attrType] || ''}
-              onChange={(e) =>
-                setNewValues((prev) => ({
-                  ...prev,
-                  [attrType]: e.target.value,
-                }))
-              }
-              onKeyDown={(e) => {
-                if (e.key === 'Enter') {
-                  e.preventDefault();
-                  addAttributeValue(attrType);
-                }
-              }}
-            />
-            <Button type="button" onClick={() => addAttributeValue(attrType)}>
-              Add
-            </Button>
-          </div>
-        </div>
-      );
+  const setSecondaryAttribute = (attrType: string) => {
+    if (attributeHierarchy.secondary.includes(attrType)) {
+      // Toggle off if already selected
+      setAttributeHierarchy({
+        ...attributeHierarchy,
+        secondary: attributeHierarchy.secondary.filter(
+          (attr) => attr !== attrType
+        ),
+      });
+    } else if (attributeHierarchy.primary !== attrType) {
+      // Add to secondary if not the primary
+      setAttributeHierarchy({
+        ...attributeHierarchy,
+        secondary: [...attributeHierarchy.secondary, attrType],
+      });
     }
-
-    return (
-      <div className="mt-4 flex gap-2">
-        <Input
-          placeholder="Add new value"
-          className="w-full"
-          value={newValues[attrType] || ''}
-          onChange={(e) =>
-            setNewValues((prev) => ({ ...prev, [attrType]: e.target.value }))
-          }
-          onKeyDown={(e) => {
-            if (e.key === 'Enter') {
-              e.preventDefault();
-              addAttributeValue(attrType);
-            }
-          }}
-        />
-        <Button type="button" onClick={() => addAttributeValue(attrType)}>
-          Add
-        </Button>
-      </div>
-    );
   };
 
   const renderAttributeValue = (
@@ -486,6 +334,138 @@ export function ProductAttributes() {
     );
   };
 
+  const renderQuickAddButtons = (attrType: string) => {
+    const type = attrType.toLowerCase();
+
+    if (type === 'color') {
+      return (
+        <div className="mt-2 mb-3">
+          <p className="text-muted-foreground mb-2 text-xs">
+            Quick add common colors:
+          </p>
+          <div className="flex flex-wrap gap-2">
+            {COMMON_COLORS.map((color, idx) => {
+              const colorName = getColorName(color);
+              const buttonLabel = colorName || color;
+
+              return (
+                <Button
+                  key={idx}
+                  type="button"
+                  size="sm"
+                  variant="outline"
+                  className="h-8 rounded-md px-2"
+                  onClick={() => addAttributeValue(type, color)}
+                >
+                  <div
+                    className="mr-1.5 h-4 w-4 rounded-sm ring-1 ring-gray-200 ring-inset"
+                    style={{ backgroundColor: color }}
+                  />
+                  <span className="text-xs">{buttonLabel}</span>
+                </Button>
+              );
+            })}
+            <Button
+              type="button"
+              size="sm"
+              variant="outline"
+              className="h-8 px-2"
+              onClick={() => {
+                const colorValues = Object.values(COLOR_NAME_TO_HEX);
+                addMultipleAttributeValues(type, colorValues);
+              }}
+            >
+              <span className="text-xs">Add All Colors</span>
+            </Button>
+          </div>
+        </div>
+      );
+    }
+
+    if (ATTRIBUTE_PRESETS[type as keyof typeof ATTRIBUTE_PRESETS]) {
+      const presets = ATTRIBUTE_PRESETS[type as keyof typeof ATTRIBUTE_PRESETS];
+
+      return (
+        <div className="mt-2 mb-3">
+          <p className="text-muted-foreground mb-2 text-xs">
+            Quick add {type} presets:
+          </p>
+          <div className="flex flex-wrap gap-2">
+            {presets.map((value, idx) => (
+              <Button
+                key={idx}
+                type="button"
+                size="sm"
+                variant="outline"
+                className="h-8 px-2"
+                onClick={() => addAttributeValue(type, value)}
+              >
+                <span className="text-xs">{value}</span>
+              </Button>
+            ))}
+            <Button
+              type="button"
+              size="sm"
+              variant="outline"
+              className="h-8 px-2"
+              onClick={() => addMultipleAttributeValues(type, presets)}
+            >
+              <span className="text-xs">
+                Add All{' '}
+                {ATTRIBUTE_TYPES.find((t) => t.value === type)?.label || type}
+              </span>
+            </Button>
+          </div>
+        </div>
+      );
+    }
+
+    return null;
+  };
+
+  const renderAttributeInput = (attrType: string) => {
+    const isColor = attrType.toLowerCase() === 'color';
+
+    return (
+      <div className="mt-4 flex items-center gap-2">
+        <Input
+          type="text"
+          placeholder={`Add ${attrType} value`}
+          value={newValues[attrType] || ''}
+          onChange={(e) =>
+            setNewValues((prev) => ({ ...prev, [attrType]: e.target.value }))
+          }
+          onKeyDown={(e) => {
+            if (e.key === 'Enter') {
+              addAttributeValue(attrType);
+            }
+          }}
+        />
+        {isColor ? (
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button type="button" variant="outline" size="sm">
+                Pick Color
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-56 p-0" align="end">
+              <HexColorPicker
+                color={selectedColors[attrType] || '#000'}
+                onChange={(color) => {
+                  setSelectedColors((prev) => ({ ...prev, [attrType]: color }));
+                  setNewValues((prev) => ({ ...prev, [attrType]: color }));
+                }}
+              />
+            </PopoverContent>
+          </Popover>
+        ) : null}
+        <Button type="button" onClick={() => addAttributeValue(attrType)}>
+          Add
+        </Button>
+      </div>
+    );
+  };
+
   // Initialize attributeTypes from existing attributes
   React.useEffect(() => {
     if (
@@ -495,6 +475,16 @@ export function ProductAttributes() {
       setAttributeTypes(Object.keys(attributesRecord));
     }
   }, [attributesRecord, attributeTypes.length]);
+
+  React.useEffect(() => {
+    if (typeof window !== 'undefined') {
+      // Use a custom event to communicate with the parent component
+      const event = new CustomEvent('attributeHierarchyChange', {
+        detail: attributeHierarchy,
+      });
+      window.dispatchEvent(event);
+    }
+  }, [attributeHierarchy]);
 
   return (
     <>
@@ -516,19 +506,21 @@ export function ProductAttributes() {
             <PopoverContent className="w-56 p-0" align="end">
               <Command>
                 <CommandInput placeholder="Search attribute type..." />
-                <CommandEmpty>No attribute type found.</CommandEmpty>
-                <CommandGroup>
-                  {ATTRIBUTE_TYPES.filter(
-                    (type) => !attributeTypes.includes(type.value)
-                  ).map((type) => (
-                    <CommandItem
-                      key={type.value}
-                      onSelect={() => addAttribute(type.value)}
-                    >
-                      {type.label}
-                    </CommandItem>
-                  ))}
-                </CommandGroup>
+                <CommandList>
+                  <CommandEmpty>No attribute type found.</CommandEmpty>
+                  <CommandGroup>
+                    {ATTRIBUTE_TYPES.filter(
+                      (type) => !attributeTypes.includes(type.value)
+                    ).map((type) => (
+                      <CommandItem
+                        key={type.value}
+                        onSelect={() => addAttribute(type.value)}
+                      >
+                        {type.label}
+                      </CommandItem>
+                    ))}
+                  </CommandGroup>
+                </CommandList>
               </Command>
             </PopoverContent>
           </Popover>
@@ -565,6 +557,43 @@ export function ProductAttributes() {
                 </Button>
               </div>
 
+              <div className="mt-2 flex items-center gap-2">
+                <Button
+                  type="button"
+                  size="sm"
+                  variant={
+                    attributeHierarchy.primary === attrType
+                      ? 'default'
+                      : 'outline'
+                  }
+                  className="h-7 px-2"
+                  onClick={() => setPrimaryAttribute(attrType)}
+                >
+                  Primary
+                </Button>
+                <Button
+                  type="button"
+                  size="sm"
+                  variant={
+                    attributeHierarchy.secondary.includes(attrType)
+                      ? 'default'
+                      : 'outline'
+                  }
+                  className="h-7 px-2"
+                  onClick={() => setSecondaryAttribute(attrType)}
+                  disabled={attributeHierarchy.primary === attrType}
+                >
+                  Secondary
+                </Button>
+                <span className="text-muted-foreground text-xs">
+                  {attributeHierarchy.primary === attrType
+                    ? 'Main attribute for variant grouping'
+                    : attributeHierarchy.secondary.includes(attrType)
+                      ? 'Sub-attribute within primary groups'
+                      : ''}
+                </span>
+              </div>
+
               <div className="mt-6">
                 <FormLabel className="text-sm font-medium">Values</FormLabel>
                 {attributesRecord[attrType]?.length > 0 ? (
@@ -579,6 +608,7 @@ export function ProductAttributes() {
                     No values added yet
                   </p>
                 )}
+                {renderQuickAddButtons(attrType)}
                 {renderAttributeInput(attrType)}
               </div>
             </div>
