@@ -45,7 +45,7 @@ import { Separator } from '@/components/ui/separator';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import type { Product, ProductVariant } from '@/lib/types';
 import { cn } from '@/lib/utils';
-import { useSingleProduct } from '@/services';
+import { useAddToCart, useSingleProduct } from '@/services';
 import { getColorName } from '@/utils/color-utils';
 
 import { ColorSwatch } from './color-swatch';
@@ -68,6 +68,7 @@ function ProductPage({ slug }: { slug: string }) {
   const [availableSizes, setAvailableSizes] = useState<string[]>([]);
   const [availableColors, setAvailableColors] = useState<string[]>([]);
   const [activeImageIndex, setActiveImageIndex] = useState<number>(0);
+  const { mutate: addToCart, isPending: isCartPending } = useAddToCart();
 
   // Map colors to images for better UX
   const [colorToImageMap, setColorToImageMap] = useState<
@@ -194,8 +195,11 @@ function ProductPage({ slug }: { slug: string }) {
       return;
     }
 
-    // Add to cart logic would go here
-    toast.success(`Added ${quantity} ${product?.productName} to your cart`);
+    addToCart({
+      productId: data.product.id,
+      quantity,
+      variantId: selectedVariant?.id,
+    });
   };
 
   const handleImageChange = (index: number) => {
@@ -534,7 +538,7 @@ function ProductPage({ slug }: { slug: string }) {
                   className="flex-1 cursor-pointer py-6"
                   size="lg"
                   onClick={handleAddToCart}
-                  disabled={currentStock <= 0}
+                  disabled={currentStock <= 0 || isCartPending}
                 >
                   <ShoppingCart className="mr-2 h-5 w-5" />
                   {currentStock <= 0 ? 'Out of Stock' : 'Add to Cart'}
