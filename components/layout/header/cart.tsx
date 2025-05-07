@@ -11,17 +11,27 @@ import {
 } from '@/components/ui/sheet';
 import { auth } from '@/features/auth/auth';
 
+import CartBadge from './cart-badge';
+import CartClient from './cart-client';
+
 export default async function Cart() {
   const session = await auth();
 
   return (
     <Sheet>
+      <CartBadge />
       <SheetContent>
         <SheetHeader className="px-4 py-2 md:py-4">
           <SheetTitle>Shopping Cart</SheetTitle>
         </SheetHeader>
         <div className="mx-4">
-          {session ? <div>Cart</div> : <div>Sign in to see your cart</div>}
+          {session ? (
+            <div>
+              <CartClient />
+            </div>
+          ) : (
+            <div>Sign in to see your cart</div>
+          )}
         </div>
 
         <SheetFooter>
