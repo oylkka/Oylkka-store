@@ -12,6 +12,7 @@ export interface ProductCardType {
   id: string;
   slug: string;
   productName: string;
+  stock: number;
   imageUrl: string;
   price: number;
   category: {

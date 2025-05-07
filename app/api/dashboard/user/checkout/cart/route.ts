@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { z } from 'zod';
 
 import { auth } from '@/features/auth/auth';
 import { db } from '@/lib/db';
@@ -50,138 +49,89 @@ export async function GET() {
   }
 }
 
-
-
-// Define a schema for request validation
-const cartItemSchema = z.object({
-  productId: z.string().min(1, 'Product ID is required'),
-  quantity: z
-    .number()
-    .int()
-    .positive('Quantity must be a positive number')
-    .default(1),
-  variantId: z.string().optional(),
-});
-
 export async function POST(req: NextRequest) {
   try {
-    // Authentication check
     const session = await auth();
-    if (!session?.user?.id) {
-      return NextResponse.json(
-        { error: 'Authentication required' },
-        { status: 401 }
-      );
+    if (!session || !session.user) {
+      return new NextResponse('Unauthorized', { status: 401 });
     }
 
-    // Parse request parameters
-    const { searchParams } = new URL(req.url);
+    const body = await req.json();
+    const { productId, quantity = 1, variantId } = body;
 
-    // Parse and validate input data
-    const validationResult = cartItemSchema.safeParse({
-      productId: searchParams.get('productId'),
-      quantity: searchParams.get('quantity')
-        ? parseInt(searchParams.get('quantity')!)
-        : 1,
-      variantId: searchParams.get('variantId') || undefined,
-    });
-
-    if (!validationResult.success) {
-      return NextResponse.json(
-        { error: 'Invalid input', details: validationResult.error.errors },
-        { status: 400 }
-      );
+    if (!productId) {
+      return new NextResponse('Product ID is required', { status: 400 });
     }
 
-    const { productId, quantity, variantId } = validationResult.data;
-
-    // Verify product exists
     const product = await db.product.findUnique({
       where: { id: productId },
+      include: { variants: true },
     });
 
     if (!product) {
-      return NextResponse.json({ error: 'Product not found' }, { status: 404 });
+      return new NextResponse('Product not found', { status: 404 });
     }
 
-    // Verify variant exists and belongs to product if provided
-    if (variantId) {
-      const variant = await db.productVariant.findUnique({
-        where: { id: variantId },
-      });
+    let selectedVariantId = variantId;
 
-      if (!variant) {
-        return NextResponse.json(
-          { error: 'Variant not found' },
-          { status: 404 }
-        );
+    if (product.variants.length > 0) {
+      if (!variantId) {
+        // If product has variants but variantId is missing, select default variant
+        const defaultVariant = product.variants.find((v) => v.stock > 0);
+        if (!defaultVariant) {
+          return new NextResponse('No available variants in stock', {
+            status: 400,
+          });
+        }
+        selectedVariantId = defaultVariant.id;
       }
 
-      if (variant.productId !== productId) {
-        return NextResponse.json(
-          { error: 'Variant does not belong to the specified product' },
-          { status: 400 }
-        );
-      }
-    }
-
-    // Check if product is in stock or available for purchase
-    if (product.stock < quantity) {
-      return NextResponse.json(
-        { error: 'Product is not available for purchase' },
-        { status: 400 }
+      const selectedVariant = product.variants.find(
+        (v) => v.id === selectedVariantId
       );
+      if (!selectedVariant) {
+        return new NextResponse('Variant not found', { status: 404 });
+      }
+
+      if (selectedVariant.stock < quantity) {
+        return new NextResponse('Not enough stock available', { status: 400 });
+      }
+    } else {
+      // Product has no variants, check overall product stock
+      if (product.stock < quantity) {
+        return new NextResponse('Not enough stock available', { status: 400 });
+      }
     }
 
-    // Check existing cart item
+    // Check if item already in cart
     const existingCartItem = await db.cartItem.findFirst({
       where: {
         userId: session.user.id,
         productId,
-        variantId,
+        variantId: selectedVariantId ?? null,
       },
     });
 
-    let cartItem;
-    let isNewItem = false;
-
     if (existingCartItem) {
-      // Update existing cart item
-      cartItem = await db.cartItem.update({
+      await db.cartItem.update({
         where: { id: existingCartItem.id },
         data: { quantity: existingCartItem.quantity + quantity },
       });
     } else {
-      // Create new cart item
-      isNewItem = true;
-      cartItem = await db.cartItem.create({
+      await db.cartItem.create({
         data: {
           userId: session.user.id,
           productId,
-          variantId,
+          variantId: selectedVariantId ?? null,
           quantity,
         },
       });
     }
 
-    // Get total cart items count for response
-    const cartItemsCount = await db.cartItem.count({
-      where: { userId: session.user.id },
-    });
-
-    // Return success response with cart item and metadata
-    return NextResponse.json({
-      success: true,
-      message: isNewItem ? 'Item added to cart' : 'Cart item quantity updated',
-      cartItem,
-      cartItemsCount,
-    });
+    return new NextResponse('Item added to cart', { status: 201 });
   } catch (error) {
-    console.error('Cart add error:', error);
-    return NextResponse.json(
-      { error: 'Failed to add item to cart' },
-      { status: 500 }
-    );
+    console.error('Error adding to cart:', error);
+    return new NextResponse('Internal Server Error', { status: 500 });
   }
 }
 

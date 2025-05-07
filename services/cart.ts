@@ -33,9 +33,11 @@ export function useAddToCart() {
     }: AddToCartParams) => {
       return toast.promise(
         axios
-          .post(
-            `/api/dashboard/user/checkout/cart?productId=${productId}&quantity=${quantity}&variantId=${variantId}`
-          )
+          .post('/api/dashboard/user/checkout/cart', {
+            productId,
+            quantity,
+            variantId,
+          })
           .then((res) => res.data),
         {
           loading: `Adding product to cart...`,
