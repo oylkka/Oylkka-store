@@ -1,5 +1,3 @@
-import type React from 'react';
-
 import { Badge } from '@/components/ui/badge';
 
 interface StockStatusProps {
@@ -7,10 +5,10 @@ interface StockStatusProps {
   lowStockThreshold?: number;
 }
 
-export const StockStatus: React.FC<StockStatusProps> = ({
+export const StockStatus = ({
   stock,
   lowStockThreshold = 10,
-}) => {
+}: StockStatusProps) => {
   if (stock <= 0) {
     return <Badge variant="destructive">Out of Stock</Badge>;
   }

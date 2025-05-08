@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/features/auth/auth';
 import { db } from '@/lib/db';
 
-// GET: Fetch user cart items
+// GET: Fetch user cart items with product and variant data
 export async function GET() {
   try {
     const session = await auth();
@@ -15,40 +15,84 @@ export async function GET() {
       where: {
         userId: session.user.id,
       },
-      include: {
+      select: {
+        id: true,
+        productId: true,
+        variantId: true,
+        quantity: true,
+        // Include product data using select
         product: {
           select: {
-            id: true,
             productName: true,
+            slug: true,
             price: true,
-            discountPrice: true,
-            images: {
-              select: {
-                url: true,
-              },
-            },
+            images: true,
           },
         },
       },
     });
 
-    const simplifiedCart = cartItems.map((item) => ({
-      id: item.id,
-      productId: item.productId,
-      quantity: item.quantity,
-      productName: item.product.productName,
-      price: item.product.price,
-      discountPrice: item.product.discountPrice,
-      imageUrl: item.product.images?.[0]?.url || '/fallback-image.png',
-    }));
+    // Process each cart item to simplify the structure and handle image logic
+    const simplifiedCartItems = await Promise.all(
+      cartItems.map(async (item) => {
+        // Get the default product image (first one in the array)
+        const productImage =
+          item.product.images && item.product.images.length > 0
+            ? item.product.images[0]
+            : null;
 
-    return NextResponse.json(simplifiedCart);
+        let finalImage = productImage;
+        let variantData = null;
+
+        // If there's a variant, fetch it
+        if (item.variantId) {
+          const variant = await db.productVariant.findUnique({
+            where: { id: item.variantId },
+            select: {
+              sku: true,
+              name: true,
+              price: true,
+              image: true,
+            },
+          });
+
+          // Use variant data
+          variantData = {
+            sku: variant?.sku,
+            name: variant?.name,
+            price: variant?.price,
+          };
+
+          // Use variant image if available
+          if (variant?.image) {
+            finalImage = variant.image;
+          }
+        }
+
+        // Construct simplified response
+        return {
+          id: item.id,
+          productId: item.productId,
+          variantId: item.variantId,
+          quantity: item.quantity,
+          name: item.product.productName,
+          slug: item.product.slug,
+          price: variantData ? variantData.price : item.product.price,
+          image: finalImage,
+          // Only include variant info if it exists
+          ...(variantData && {
+            variantName: variantData.name,
+          }),
+        };
+      })
+    );
+
+    return NextResponse.json(simplifiedCartItems);
   } catch (error) {
     console.error('Error fetching cart:', error);
     return new NextResponse('Internal Server Error', { status: 500 });
   }
 }
-
 export async function POST(req: NextRequest) {
   try {
     const session = await auth();

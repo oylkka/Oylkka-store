@@ -181,8 +181,10 @@ export function BasicInformationCard() {
                   </div>
                 </FormControl>
                 {!isCheckingSlug && slugStatus.isUnique === false && (
-                  <FormDescription className="text-red-500">
-                    This slug is already taken. Try one of these:
+                  <div className="text-sm">
+                    <p className="text-red-500">
+                      This slug is already taken. Try one of these:
+                    </p>
                     <div className="mt-2 flex flex-wrap gap-2">
                       {slugStatus.suggestions.map((suggestion) => (
                         <Button
@@ -196,7 +198,7 @@ export function BasicInformationCard() {
                         </Button>
                       ))}
                     </div>
-                  </FormDescription>
+                  </div>
                 )}
                 <FormMessage />
               </FormItem>

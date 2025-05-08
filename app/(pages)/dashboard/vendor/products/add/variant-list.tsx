@@ -1,5 +1,6 @@
 'use client';
 
+import colorNamer from 'color-namer';
 import { ImagePlus, TrashIcon, X } from 'lucide-react';
 import { useMemo } from 'react';
 
@@ -57,6 +58,71 @@ export default function VariantList({
     });
   };
 
+  // Enhanced function to get a readable name for a color hex value
+  const getReadableColorName = (colorValue: string): string => {
+    // Check if it's a hex color
+    if (/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/.test(colorValue)) {
+      try {
+        // Get color names from color-namer
+        const names = colorNamer(colorValue);
+
+        // Try to get the most accurate and readable color name
+        // Start with the most recognized naming systems
+
+        // First priority: Use 'basic' names as they're most common
+        if (names.basic && names.basic.length > 0) {
+          return capitalizeColorName(names.basic[0].name);
+        }
+
+        // Second priority: Use 'ntc' (Name That Color) which has good names
+        if (names.ntc && names.ntc.length > 0) {
+          return capitalizeColorName(names.ntc[0].name);
+        }
+
+        // Third priority: Try roygbiv which focuses on standard color names
+        if (names.roygbiv && names.roygbiv.length > 0) {
+          return capitalizeColorName(names.roygbiv[0].name);
+        }
+
+        // Fourth priority: Use pantone for more technical color names
+        if (names.pantone && names.pantone.length > 0) {
+          return capitalizeColorName(names.pantone[0].name);
+        }
+      } catch (error) {
+        console.error('Error getting color name:', error);
+      }
+    }
+
+    // Return the original value if it's not a hex color or if there was an error
+    return colorValue;
+  };
+
+  // Function to properly capitalize color names
+  const capitalizeColorName = (name: string): string => {
+    // Handle multi-word color names
+    return name
+      .split(' ')
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(' ');
+  };
+
+  // Format attribute name for display
+  const formatAttributeName = (name: string): string => {
+    return name.charAt(0).toUpperCase() + name.slice(1);
+  };
+
+  // Function to format attribute value for display
+  const formatAttributeValue = (key: string, value: string): string => {
+    // If this is a color attribute and has a hex value, get a readable name
+    if (
+      key.toLowerCase() === 'color' &&
+      /^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/.test(value)
+    ) {
+      return getReadableColorName(value);
+    }
+    return value;
+  };
+
   const groupVariantsByPrimaryAttribute = () => {
     if (variants.length === 0) {
       return {};
@@ -103,20 +169,33 @@ export default function VariantList({
       }
 
       const value = variant.attributes[primaryAttribute];
-      grouped[value] = grouped[value] || [];
-      grouped[value].push(variant);
+
+      // If this is a color attribute with hex value, use the readable name as the group key
+      const groupKey =
+        primaryAttribute.toLowerCase() === 'color' &&
+        /^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/.test(value)
+          ? getReadableColorName(value)
+          : value;
+
+      grouped[groupKey] = grouped[groupKey] || [];
+      grouped[groupKey].push(variant);
     });
 
-    return grouped;
+    return { primaryAttribute, groups: grouped };
   };
 
   // Use the grouping function with useMemo
-
-  const groupedVariants = useMemo(
+  const groupingResult = useMemo(
     () => groupVariantsByPrimaryAttribute(),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [variants]
   );
+
+  // Extract the primary attribute and groups from the result
+  const { primaryAttribute, groups: groupedVariants } = groupingResult as {
+    primaryAttribute?: string;
+    groups: Record<string, typeof variants>;
+  };
 
   if (variants.length === 0) {
     return (
@@ -140,11 +219,38 @@ export default function VariantList({
     <div className="mt-4 space-y-6">
       <Separator className="my-4" />
 
+      {primaryAttribute && (
+        <div className="mb-4">
+          <p className="text-sm text-gray-500">
+            Variants grouped by {formatAttributeName(primaryAttribute)}
+          </p>
+        </div>
+      )}
+
       {Object.entries(groupedVariants).map(([group, groupVariants]) => (
         <div key={group} className="space-y-4">
           {group !== 'ungrouped' && (
             <div className="flex items-center gap-2">
-              <h3 className="text-lg font-semibold">{group}</h3>
+              <h3 className="text-lg font-semibold">
+                {/* If this is a color group, show a color preview swatch */}
+                {primaryAttribute &&
+                  primaryAttribute.toLowerCase() === 'color' &&
+                  groupVariants.length > 0 &&
+                  groupVariants[0].attributes &&
+                  groupVariants[0].attributes[primaryAttribute] &&
+                  /^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/.test(
+                    groupVariants[0].attributes[primaryAttribute]
+                  ) && (
+                    <span
+                      className="mr-2 inline-block h-4 w-4 rounded-full border"
+                      style={{
+                        backgroundColor:
+                          groupVariants[0].attributes[primaryAttribute],
+                      }}
+                    />
+                  )}
+                {group}
+              </h3>
               <Badge variant="outline" className="text-xs">
                 {groupVariants.length} variant
                 {groupVariants.length !== 1 ? 's' : ''}
@@ -244,8 +350,25 @@ export default function VariantList({
                         <div className="flex flex-wrap gap-2">
                           {Object.entries(variant.attributes).map(
                             ([key, value]) => (
-                              <Badge key={key} variant="secondary">
-                                {key}: {value as string}
+                              <Badge
+                                key={key}
+                                variant="secondary"
+                                className="items-center"
+                              >
+                                {/* For color attributes, add a color swatch */}
+                                {key.toLowerCase() === 'color' &&
+                                  /^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/.test(
+                                    value as string
+                                  ) && (
+                                    <span
+                                      className="mr-1 inline-block h-3 w-3 rounded-full"
+                                      style={{
+                                        backgroundColor: value as string,
+                                      }}
+                                    />
+                                  )}
+                                {formatAttributeName(key)}:{' '}
+                                {formatAttributeValue(key, value as string)}
                               </Badge>
                             )
                           )}

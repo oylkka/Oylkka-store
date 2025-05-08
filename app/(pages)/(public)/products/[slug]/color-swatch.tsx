@@ -1,7 +1,6 @@
 'use client';
 
 import { Check } from 'lucide-react';
-import type React from 'react';
 
 import { cn } from '@/lib/utils';
 
@@ -15,7 +14,7 @@ interface ColorSwatchProps {
   disabled?: boolean;
 }
 
-export const ColorSwatch: React.FC<ColorSwatchProps> = ({
+export const ColorSwatch = ({
   color,
   isSelected,
   onClick,
@@ -23,7 +22,7 @@ export const ColorSwatch: React.FC<ColorSwatchProps> = ({
   onMouseLeave,
   label,
   disabled = false,
-}) => {
+}: ColorSwatchProps) => {
   // Determine if the color is light to use dark text for the checkmark
   const isLightColor = (color: string): boolean => {
     // Convert hex to RGB

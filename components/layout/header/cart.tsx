@@ -8,6 +8,7 @@ import {
   SheetFooter,
   SheetHeader,
   SheetTitle,
+  SheetTrigger,
 } from '@/components/ui/sheet';
 import { auth } from '@/features/auth/auth';
 
@@ -19,28 +20,39 @@ export default async function Cart() {
 
   return (
     <Sheet>
-      <CartBadge />
-      <SheetContent>
+      <SheetTrigger asChild>
+        <CartBadge />
+      </SheetTrigger>
+
+      <SheetContent className="flex w-full flex-col sm:max-w-md">
         <SheetHeader className="px-4 py-2 md:py-4">
           <SheetTitle>Shopping Cart</SheetTitle>
         </SheetHeader>
-        <div className="mx-4">
+
+        <div className="mx-4 flex-1 overflow-auto">
           {session ? (
-            <div>
-              <CartClient />
-            </div>
+            <CartClient />
           ) : (
-            <div>Sign in to see your cart</div>
+            <div className="flex h-[50vh] flex-col items-center justify-center space-y-4 p-8 text-center">
+              <p className="text-muted-foreground">Sign in to see your cart</p>
+              <Link href="/auth/signin">
+                <Button variant="outline" size="sm">
+                  Sign In
+                </Button>
+              </Link>
+            </div>
           )}
         </div>
 
-        <SheetFooter>
-          <SheetClose asChild>
-            <Link href="/cart/checkout">
-              <Button className="w-full">CHECKOUT</Button>
-            </Link>
-          </SheetClose>
-        </SheetFooter>
+        {session && (
+          <SheetFooter className="mt-auto px-4 py-4">
+            <SheetClose asChild>
+              <Link href="/cart/checkout" className="w-full">
+                <Button className="w-full font-medium">CHECKOUT</Button>
+              </Link>
+            </SheetClose>
+          </SheetFooter>
+        )}
       </SheetContent>
     </Sheet>
   );

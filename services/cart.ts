@@ -9,7 +9,7 @@ export function useUserCart() {
   return useQuery({
     queryKey: [QEUERY_KEYS.USER_CART],
     queryFn: async () => {
-      const response = await axios.get(`/api/dashboard/user/checkout/cart`);
+      const response = await axios.get(`/api/checkout/cart`);
       return response.data;
     },
   });
@@ -33,7 +33,7 @@ export function useAddToCart() {
     }: AddToCartParams) => {
       return toast.promise(
         axios
-          .post('/api/dashboard/user/checkout/cart', {
+          .post('/api/checkout/cart', {
             productId,
             quantity,
             variantId,
@@ -67,7 +67,7 @@ export function useRemoveFromCart() {
     mutationFn: async (cartItemId: string) => {
       return toast.promise(
         axios
-          .delete(`/api/dashboard/user/checkout/cart?cartItemId=${cartItemId}`)
+          .delete(`/api/checkout/cart?cartItemId=${cartItemId}`)
           .then((res) => res.data),
         {
           loading: 'Removing item...',
@@ -103,7 +103,7 @@ export function useUpdateCartQuantity() {
     async ({ itemId, quantity }: UpdateQuantityParams) => {
       return toast.promise(
         axios
-          .patch('/api/dashboard/user/checkout/cart', { itemId, quantity })
+          .patch('/api/checkout/cart', { itemId, quantity })
           .then((res) => res.data),
         {
           loading: 'Updating quantity...',

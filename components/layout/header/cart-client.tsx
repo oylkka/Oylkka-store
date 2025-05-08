@@ -2,6 +2,7 @@
 
 import { Minus, Plus, X } from 'lucide-react';
 import Image from 'next/image';
+import Link from 'next/link';
 
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
@@ -14,11 +15,18 @@ import {
 
 type CartItem = {
   id: string;
-  productName: string;
-  imageUrl?: string;
+  productId: string;
+  name: string;
+  slug: string;
+  image: {
+    url: string;
+    alt: string;
+  };
   price: number;
   discountPrice?: number;
   quantity: number;
+  variantName: string;
+  variantId?: string;
 };
 
 export default function CartClient() {
@@ -65,11 +73,14 @@ export default function CartClient() {
     <div>
       <ScrollArea className="h-[50vh] space-y-4 md:h-[55vh]">
         {data.map((item: CartItem) => (
-          <div key={item.id} className="grid grid-cols-12 gap-3 border-b pb-4">
+          <div
+            key={item.variantId || item.productId}
+            className="grid grid-cols-12 gap-3 border-b pb-4"
+          >
             <div className="col-span-3">
               <Image
-                src={item.imageUrl || '/fallback-image.png'}
-                alt={item.productName}
+                src={item.image.url}
+                alt={item.name}
                 className="border object-cover md:h-16 md:w-16"
                 width={200}
                 height={200}
@@ -77,7 +88,17 @@ export default function CartClient() {
             </div>
             <div className="col-span-9 space-y-3">
               <div className="flex justify-between gap-4">
-                <p className="font-bold">{item.productName}</p>
+                <div>
+                  <Link
+                    href={`/products/${item.slug}`}
+                    className="line-clamp-1 font-bold"
+                  >
+                    {item.name}
+                  </Link>
+                  <p className="text-muted-foreground text-sm">
+                    {item.variantName}
+                  </p>
+                </div>
                 <button
                   onClick={() => handleRemoveItem(item.id)}
                   disabled={removeItem.isPending}

@@ -103,3 +103,65 @@ export interface Product {
 export interface ProductResponse {
   product: Product;
 }
+
+export interface ShippingAddress {
+  email: string;
+  name: string;
+  address: string;
+  apartment: string;
+  city: string;
+  district: string;
+  postalCode: string;
+  phone: string;
+}
+
+export interface PaymentData {
+  cart: CartItem[];
+  shipping: {
+    address: ShippingAddress;
+    method: string;
+    cost: number;
+    freeShippingApplied: boolean;
+  };
+  payment: {
+    method: string;
+  };
+  pricing: {
+    subtotal: number;
+    shippingCost: number;
+    discount: {
+      code: string;
+      percentage: number;
+      amount: number;
+    };
+    total: number;
+  };
+}
+
+export interface CartItem {
+  id: string;
+  productId: string;
+  quantity: number;
+  productName: string;
+  price: number;
+  discountPrice: number | null;
+  imageUrl: string;
+}
+
+export interface BkashConfig {
+  base_url?: string;
+  username?: string;
+  password?: string;
+  app_key?: string;
+  app_secret?: string;
+}
+
+export interface PaymentDetails {
+  amount: number;
+  callbackURL: string;
+  orderID: string;
+  reference: string;
+  name: string;
+  email: string;
+  phone: string;
+}

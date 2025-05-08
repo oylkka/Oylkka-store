@@ -2,7 +2,7 @@
 
 import { Maximize2 } from 'lucide-react';
 import Image from 'next/image';
-import { useEffect, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -13,13 +13,7 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from '@/components/ui/carousel';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
 import { cn } from '@/lib/utils';
 
 interface ProductImage {
@@ -27,28 +21,31 @@ interface ProductImage {
   publicId: string;
   alt?: string | null;
 }
-export const ImageGallery: React.FC<{
+
+interface ProductGalleryProps {
   images: ProductImage[];
   productName: string;
-  discountPercent: number;
+  discountPercent?: number;
   activeIndex?: number;
   onImageChange?: (index: number) => void;
-}> = ({
+}
+
+export default function ProductGallery({
   images,
   productName,
-  discountPercent,
+  discountPercent = 0,
   activeIndex = 0,
   onImageChange,
-}) => {
+}: ProductGalleryProps) {
   const [selectedImage, setSelectedImage] = useState(activeIndex);
   const [magnify, setMagnify] = useState(false);
   const [magnifyPosition, setMagnifyPosition] = useState({ x: 0, y: 0 });
   const imageContainerRef = useRef<HTMLDivElement>(null);
 
   // Update selected image when activeIndex changes from parent
-  useEffect(() => {
+  if (selectedImage !== activeIndex) {
     setSelectedImage(activeIndex);
-  }, [activeIndex]);
+  }
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     if (!imageContainerRef.current) {
@@ -73,9 +70,6 @@ export const ImageGallery: React.FC<{
   return (
     <div className="space-y-4">
       <Dialog>
-        <DialogHeader>
-          <DialogTitle className="hidden" />
-        </DialogHeader>
         <div
           ref={imageContainerRef}
           className="relative h-[500px] w-full cursor-zoom-in overflow-hidden rounded-lg bg-gray-50"
@@ -84,7 +78,10 @@ export const ImageGallery: React.FC<{
           onMouseLeave={() => setMagnify(false)}
         >
           <Image
-            src={images[selectedImage]?.url || '/api/placeholder/600/600'}
+            src={
+              images[selectedImage]?.url ||
+              '/placeholder.svg?height=600&width=600'
+            }
             alt={`${productName} - ${images[selectedImage]?.alt || `view ${selectedImage + 1}`}`}
             className="object-contain transition-opacity duration-300"
             fill
@@ -126,7 +123,10 @@ export const ImageGallery: React.FC<{
         <DialogContent className="max-w-4xl">
           <div className="h-full w-full">
             <Image
-              src={images[selectedImage]?.url || '/api/placeholder/800/800'}
+              src={
+                images[selectedImage]?.url ||
+                '/placeholder.svg?height=800&width=800'
+              }
               alt={`${productName} - ${images[selectedImage]?.alt || `view ${selectedImage + 1}`}`}
               className="object-contain"
               width={2000}
@@ -150,7 +150,7 @@ export const ImageGallery: React.FC<{
                 onClick={() => handleThumbnailClick(index)}
               >
                 <Image
-                  src={image.url || '/placeholder.svg'}
+                  src={image.url || '/placeholder.svg?height=100&width=100'}
                   alt={`${productName} - ${image.alt || `view ${index + 1}`}`}
                   className="rounded-md object-cover"
                   fill
@@ -165,4 +165,4 @@ export const ImageGallery: React.FC<{
       </Carousel>
     </div>
   );
-};
+}

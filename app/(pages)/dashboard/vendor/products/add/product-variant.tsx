@@ -1,5 +1,6 @@
 'use client';
 
+import colorNamer from 'color-namer';
 import { useEffect, useMemo, useState } from 'react';
 import { useFieldArray, useFormContext, useWatch } from 'react-hook-form';
 
@@ -60,19 +61,134 @@ export default function ProductVariant() {
   const attributeOptions = useMemo(() => {
     const options: Record<string, string[]> = {};
 
-    // Check if attributes exists and is an object before using Object.entries
-    if (attributes && typeof attributes === 'object') {
-      Object.entries(attributes).forEach(([key, value]) => {
-        if (Array.isArray(value)) {
-          options[key] = value;
-        } else if (typeof value === 'string') {
-          options[key] = [value];
-        }
-      });
-    }
+    Object.entries(attributes).forEach(([key, value]) => {
+      if (Array.isArray(value)) {
+        options[key] = value;
+      } else if (typeof value === 'string') {
+        options[key] = [value];
+      }
+    });
 
     return options;
   }, [attributes]);
+
+  // Enhanced function to get a readable name for a color hex value
+  const getReadableColorName = (colorValue: string): string => {
+    // Check if it's a hex color
+    if (/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/.test(colorValue)) {
+      try {
+        // Get color names from color-namer
+        const names = colorNamer(colorValue);
+
+        // Try to get the most accurate and readable color name
+        // Start with the most recognized naming systems
+
+        // First priority: Use 'basic' names as they're most common
+        if (names.basic && names.basic.length > 0) {
+          return capitalizeColorName(names.basic[0].name);
+        }
+
+        // Second priority: Use 'ntc' (Name That Color) which has good names
+        if (names.ntc && names.ntc.length > 0) {
+          return capitalizeColorName(names.ntc[0].name);
+        }
+
+        // Third priority: Try roygbiv which focuses on standard color names
+        if (names.roygbiv && names.roygbiv.length > 0) {
+          return capitalizeColorName(names.roygbiv[0].name);
+        }
+
+        // Fourth priority: Use pantone for more technical color names
+        if (names.pantone && names.pantone.length > 0) {
+          return capitalizeColorName(names.pantone[0].name);
+        }
+      } catch (error) {
+        console.error('Error getting color name:', error);
+      }
+    }
+
+    // Return the original value if it's not a hex color or if there was an error
+    return colorValue;
+  };
+
+  // Function to properly capitalize color names
+  const capitalizeColorName = (name: string): string => {
+    // Handle multi-word color names
+    return name
+      .split(' ')
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(' ');
+  };
+
+  // Format attribute name for display
+  const formatAttributeName = (name: string): string => {
+    return name.charAt(0).toUpperCase() + name.slice(1);
+  };
+
+  // Improved function to create a readable variant name
+  const createVariantName = (
+    attributes: Record<string, string>,
+    primary: string | null
+  ): string => {
+    if (!attributes) {
+      return 'Variant';
+    }
+
+    // If we have a primary attribute, use it as the main identifier
+    if (primary && attributes[primary]) {
+      const primaryValue = attributes[primary];
+      const formattedName = formatAttributeName(primary);
+
+      // If the primary attribute is color and the value is a hex code, use a readable name
+      if (primary.toLowerCase() === 'color') {
+        const colorName = getReadableColorName(primaryValue);
+        return `${formattedName}: ${colorName}`;
+      }
+
+      return `${formattedName}: ${primaryValue}`;
+    }
+
+    // With no primary attribute, build a more readable combined name
+    const attributePairs = Object.entries(attributes).map(([key, value]) => {
+      const formattedKey = formatAttributeName(key);
+
+      // Special handling for color attributes
+      if (key.toLowerCase() === 'color') {
+        return `${formattedKey}: ${getReadableColorName(value)}`;
+      }
+
+      return `${formattedKey}: ${value}`;
+    });
+
+    // Join with commas for better readability
+    return attributePairs.join(', ');
+  };
+
+  // Helper function to create a short code for SKU generation
+  const createAttributeCode = (
+    attributeName: string,
+    attributeValue: string
+  ): string => {
+    // For color attributes, use the first 2 chars of the readable name for the code
+    if (
+      attributeName.toLowerCase() === 'color' &&
+      /^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/.test(attributeValue)
+    ) {
+      const colorName = getReadableColorName(attributeValue);
+      // Take first two letters of each word for multi-word color names
+      const code = colorName
+        .split(' ')
+        .map((word) => word.charAt(0))
+        .join('')
+        .toUpperCase();
+
+      // Ensure we have at least 2 characters
+      return code.length >= 2 ? code : code.padEnd(2, 'X');
+    }
+
+    // For non-color attributes, use first 2 chars of attribute name + value
+    return `${attributeName.substring(0, 2)}${attributeValue.substring(0, 2)}`.toUpperCase();
+  };
 
   const generateAllVariants = () => {
     if (Object.keys(attributeOptions).length === 0) {
@@ -123,9 +239,7 @@ export default function ProductVariant() {
           };
 
           const attributeCodes = Object.entries(allAttributes)
-            .map(([key, value]) =>
-              `${key.substring(0, 2)}${value.substring(0, 2)}`.toUpperCase()
-            )
+            .map(([key, value]) => createAttributeCode(key, value))
             .join('-');
 
           const baseSku = productSku
@@ -150,9 +264,12 @@ export default function ProductVariant() {
             // Generate a unique ID for the variant
             const variantId = `variant-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
 
+            // Create a readable variant name
+            const variantName = createVariantName(allAttributes, primary);
+
             append({
-              id: variantId, // Add a unique ID for each variant
-              name: `${primary.charAt(0).toUpperCase() + primary.slice(1)}: ${primaryValue}`,
+              id: variantId,
+              name: variantName,
               sku: finalSku,
               price: productPrice,
               discountPrice: 0,
@@ -168,8 +285,7 @@ export default function ProductVariant() {
           [primary]: primaryValue,
         };
 
-        const attributeCodes =
-          `${primary.substring(0, 2)}${primaryValue.substring(0, 2)}`.toUpperCase();
+        const attributeCodes = createAttributeCode(primary, primaryValue);
 
         const baseSku = productSku
           ? `${productSku}-${attributeCodes}`
@@ -191,9 +307,12 @@ export default function ProductVariant() {
           // Generate a unique ID for the variant
           const variantId = `variant-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
 
+          // Create a readable variant name
+          const variantName = createVariantName(allAttributes, primary);
+
           append({
-            id: variantId, // Add a unique ID for each variant
-            name: `${primary.charAt(0).toUpperCase() + primary.slice(1)}: ${primaryValue}`,
+            id: variantId,
+            name: variantName,
             sku: finalSku,
             price: productPrice,
             discountPrice: 0,
@@ -281,12 +400,11 @@ export default function ProductVariant() {
     });
 
     for (const [index, combo] of newCombinations.entries()) {
-      const attrValues = Object.values(combo).join(' / ');
+      // Create a readable variant name
+      const variantName = createVariantName(combo, null);
 
       const attributeCodes = Object.entries(combo)
-        .map(([key, value]) =>
-          `${key.substring(0, 2)}${value.substring(0, 2)}`.toUpperCase()
-        )
+        .map(([key, value]) => createAttributeCode(key, value))
         .join('-');
 
       // Generate SKU with index offset to ensure uniqueness
@@ -302,8 +420,8 @@ export default function ProductVariant() {
       const variantId = `variant-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
 
       append({
-        id: variantId, // Add a unique ID for each variant
-        name: attrValues, // Default name based on attributes, but can be modified by user later
+        id: variantId,
+        name: variantName,
         sku: finalSku,
         price: productPrice,
         discountPrice: 0,
@@ -317,36 +435,6 @@ export default function ProductVariant() {
   const hasAttributes = Object.keys(attributeOptions).length > 0;
   const hasProductSku = productSku.trim() !== '';
   const canGenerateVariants = hasAttributes && hasProductSku;
-
-  // Also update attributeHierarchy when attributes change
-  useEffect(() => {
-    if (
-      attributeHierarchy.primary &&
-      !attributeOptions[attributeHierarchy.primary]
-    ) {
-      // If the primary attribute was deleted, reset the hierarchy
-      setAttributeHierarchy({
-        primary: null,
-        secondary: attributeHierarchy.secondary.filter(
-          (attr) => attributeOptions[attr]
-        ),
-      });
-    }
-
-    // Filter out any secondary attributes that no longer exist
-    if (attributeHierarchy.secondary.length > 0) {
-      const validSecondary = attributeHierarchy.secondary.filter(
-        (attr) => attributeOptions[attr]
-      );
-
-      if (validSecondary.length !== attributeHierarchy.secondary.length) {
-        setAttributeHierarchy({
-          ...attributeHierarchy,
-          secondary: validSecondary,
-        });
-      }
-    }
-  }, [attributeOptions, attributeHierarchy]);
 
   return (
     <Card className="mb-6">
@@ -369,12 +457,12 @@ export default function ProductVariant() {
                   : !hasAttributes
                     ? 'Product attributes must be defined first'
                     : attributeHierarchy.primary
-                      ? `Generate variants using ${attributeHierarchy.primary} as primary attribute`
+                      ? `Generate variants using ${formatAttributeName(attributeHierarchy.primary)} as primary attribute`
                       : 'Generate all possible variants'
               }
             >
               {attributeHierarchy.primary
-                ? `Generate Variants by ${attributeHierarchy.primary}`
+                ? `Generate Variants by ${formatAttributeName(attributeHierarchy.primary)}`
                 : 'Generate All Variants'}
             </Button>
           </div>

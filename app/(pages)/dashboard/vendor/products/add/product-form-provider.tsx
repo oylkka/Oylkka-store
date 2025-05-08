@@ -117,8 +117,8 @@ export function ProductFormProvider({ children }: ProductFormProviderProps) {
         mutate(formData, {
           onSuccess: (response) => {
             toast.success('Product submitted successfully!');
-            // setProductImages([]);
-            // methods.reset();
+            setProductImages([]);
+            methods.reset();
             resolve(response);
           },
           onError: (err) => {
