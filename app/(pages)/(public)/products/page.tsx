@@ -1,6 +1,7 @@
 'use client';
 
-import { useSearchParams } from 'next/navigation';
+import { Package } from 'lucide-react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { Suspense } from 'react';
 
 import { Button } from '@/components/ui/button';
@@ -44,10 +45,12 @@ function ShopContent() {
   const searchParams = useSearchParams();
   const page = Number.parseInt(searchParams.get('page') || '1', 10);
   const { isPending, data, isError } = useProductList({ currentPage: page });
+  const router = useRouter();
 
   if (isPending) {
     return <LoadingState />;
   }
+
   if (isError) {
     return <ErrorState />;
   }
@@ -64,11 +67,38 @@ function ShopContent() {
     >
       <div className="container mx-auto my-4 space-y-12">
         <ProductHeader totalProducts={data.pagination.total} />
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-3 lg:grid-cols-4">
-          {data.products.map((product: ProductCardType) => (
-            <ProductCard key={product.id} product={product} />
-          ))}
-        </div>
+
+        {data.products.length === 0 ? (
+          <div className="container mx-auto py-12">
+            <div className="flex flex-col items-center justify-center rounded-lg border border-dashed p-12 text-center">
+              <div className="bg-muted rounded-full p-3">
+                <Package className="text-muted-foreground h-10 w-10" />
+              </div>
+              <h3 className="mt-4 text-lg font-semibold">
+                No products available
+              </h3>
+              <p className="text-muted-foreground mt-2 max-w-md text-sm">
+                We couldn&apos;t find any products matching your criteria. Try
+                adjusting your filters or check back later for new arrivals.
+              </p>
+              <div className="mt-6 flex gap-4">
+                <Button variant="outline" onClick={() => router.push('/')}>
+                  Back to Home
+                </Button>
+                <Button variant="secondary" onClick={() => router.refresh()}>
+                  Clear Filters
+                </Button>
+              </div>
+            </div>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-3 lg:grid-cols-4">
+            {data.products.map((product: ProductCardType) => (
+              <ProductCard key={product.id} product={product} />
+            ))}
+          </div>
+        )}
+
         {data.pagination.totalPages > 1 && (
           <ProductListPagination
             totalPages={data.pagination.totalPages}
@@ -79,10 +109,11 @@ function ShopContent() {
     </Suspense>
   );
 }
+
 export default function Shop() {
   return (
     <Suspense fallback={<LoadingState />}>
-      <ShopContent />;
+      <ShopContent />
     </Suspense>
   );
 }

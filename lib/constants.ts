@@ -1,3 +1,6 @@
+/* This code snippet is defining a constant object named `QUERY_KEYS` using TypeScript. Each key in the
+object represents a specific query key related to different functionalities in an application. The
+values assigned to each key are string literals describing the purpose of each query key. */
 export const QEUERY_KEYS = {
   VENDOR_SHOP: 'vendor shop',
   ADMIN_PRODUCT_CATEGORIES: 'admin product categories',

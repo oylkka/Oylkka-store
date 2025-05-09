@@ -14,6 +14,7 @@ import {
   Truck,
   Users,
 } from 'lucide-react';
+import Link from 'next/link';
 
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
@@ -361,16 +362,17 @@ function ManagerDashboard({ user }: UserType) {
 }
 
 // Vendor Dashboard Component
-function VendorDashboard({ user }: UserType) {
+function VendorDashboard() {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <h2 className="text-3xl font-bold tracking-tight">Vendor Portal</h2>
-        <p>{user.name}</p>
-        <Button variant="secondary">
-          <Package className="mr-2 h-4 w-4" />
-          Add New Product
-        </Button>
+        <Link href="/dashboard/vendor/products/add">
+          <Button variant="secondary">
+            <Package className="mr-2 h-4 w-4" />
+            Add New Product
+          </Button>
+        </Link>
       </div>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
@@ -433,9 +435,11 @@ function VendorDashboard({ user }: UserType) {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="bg-muted/20 flex h-[300px] items-center justify-center rounded-md">
-              <BarChart3 className="text-muted h-16 w-16" />
-              <span className="text-muted ml-2">Sales performance chart</span>
+            <div className="flex h-[300px] items-center justify-center rounded-md">
+              <BarChart3 className="text-muted-foreground h-16 w-16" />
+              <span className="text-muted-foreground ml-2">
+                Sales performance chart
+              </span>
             </div>
           </CardContent>
         </Card>
@@ -848,7 +852,7 @@ export default async function Dashboard() {
       ) : session?.user.role === 'MANAGER' ? (
         <ManagerDashboard user={session.user} />
       ) : session?.user.role === 'VENDOR' ? (
-        <VendorDashboard user={session.user} />
+        <VendorDashboard />
       ) : session?.user.role === 'CUSTOMER_SERVICE' ? (
         <CustomerServiceDashboard user={session.user} />
       ) : (

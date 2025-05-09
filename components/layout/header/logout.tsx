@@ -31,7 +31,7 @@ export function SignOut() {
           <AlertDialogCancel>Cancel</AlertDialogCancel>
           <form action={signOutAction}>
             <AlertDialogAction asChild>
-              <Button variant="destructive" type="submit">
+              <Button variant="destructive" className="w-full" type="submit">
                 Sign Out
               </Button>
             </AlertDialogAction>
