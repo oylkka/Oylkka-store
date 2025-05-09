@@ -277,7 +277,7 @@ export async function NavMain() {
       items: [
         {
           title: 'Customer List',
-          url: '/admin/customers/list',
+          url: '/dashboard/admin/customers/list',
         },
         {
           title: 'Customer Reports',

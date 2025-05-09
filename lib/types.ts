@@ -165,3 +165,17 @@ export interface PaymentDetails {
   email: string;
   phone: string;
 }
+
+export interface CustomerListType {
+  id: string;
+  name: string;
+  email: string;
+  role: string;
+  createdAt: string;
+  username: string | null;
+  phone: string | null;
+  image: string | null;
+  isActive: boolean;
+  phoneVerified: boolean;
+  emailVerified: boolean | null;
+}

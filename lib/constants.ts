@@ -13,4 +13,5 @@ export const QEUERY_KEYS = {
   ORDER_CONFIRMATION: 'order confirmation',
   SINGLE_ORDER_INFO: 'single order info',
   ADMIN_ORDER_LIST: 'admin order list',
+  CUSTOMERS_LIST: 'customers list',
 };
