@@ -17,11 +17,14 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: 18
+          node-version: 20.18.1
           cache: 'pnpm'
 
-      - name: Install pnpm
-        run: npm install -g pnpm
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 8
+          run_install: false
 
       - name: Install dependencies
         run: pnpm install
@@ -41,17 +44,15 @@ jobs:
           NODE_ENV: test
           NEXT_PUBLIC_SITE_URL: ${{ secrets.NEXT_PUBLIC_SITE_URL }}
           NEXTAUTH_URL: ${{ secrets.NEXTAUTH_URL }}
-          MONGO_URI: ${{ secrets.MONGO_URI }}
+          MONGO_URI: ${{ secrets.MONGODB_URI }}
           AUTH_SECRET: ${{ secrets.AUTH_SECRET }}
           AUTH_GOOGLE_ID: ${{ secrets.AUTH_GOOGLE_ID }}
           AUTH_GOOGLE_SECRET: ${{ secrets.AUTH_GOOGLE_SECRET }}
           AUTH_GITHUB_ID: ${{ secrets.AUTH_GITHUB_ID }}
           AUTH_GITHUB_SECRET: ${{ secrets.AUTH_GITHUB_SECRET }}
-
           CLOUDINARY_CLOUD_NAME: ${{ secrets.CLOUDINARY_CLOUD_NAME }}
           CLOUDINARY_API_KEY: ${{ secrets.CLOUDINARY_API_KEY }}
           CLOUDINARY_API_SECRET: ${{ secrets.CLOUDINARY_API_SECRET }}
-
           BKASH_BASE_URL: ${{ secrets.BKASH_BASE_URL }}
           BKASH_CHECKOUT_URL_USER_NAME: ${{ secrets.BKASH_CHECKOUT_URL_USER_NAME }}
           BKASH_CHECKOUT_URL_PASSWORD: ${{ secrets.BKASH_CHECKOUT_URL_PASSWORD }}
@@ -64,17 +65,15 @@ jobs:
           NODE_ENV: production
           NEXT_PUBLIC_SITE_URL: ${{ secrets.NEXT_PUBLIC_SITE_URL }}
           NEXTAUTH_URL: ${{ secrets.NEXTAUTH_URL }}
-          MONGO_URI: ${{ secrets.MONGO_URI }}
+          MONGO_URI: ${{ secrets.MONGODB_URI }}
           AUTH_SECRET: ${{ secrets.AUTH_SECRET }}
           AUTH_GOOGLE_ID: ${{ secrets.AUTH_GOOGLE_ID }}
           AUTH_GOOGLE_SECRET: ${{ secrets.AUTH_GOOGLE_SECRET }}
           AUTH_GITHUB_ID: ${{ secrets.AUTH_GITHUB_ID }}
           AUTH_GITHUB_SECRET: ${{ secrets.AUTH_GITHUB_SECRET }}
-
           CLOUDINARY_CLOUD_NAME: ${{ secrets.CLOUDINARY_CLOUD_NAME }}
           CLOUDINARY_API_KEY: ${{ secrets.CLOUDINARY_API_KEY }}
           CLOUDINARY_API_SECRET: ${{ secrets.CLOUDINARY_API_SECRET }}
-
           BKASH_BASE_URL: ${{ secrets.BKASH_BASE_URL }}
           BKASH_CHECKOUT_URL_USER_NAME: ${{ secrets.BKASH_CHECKOUT_URL_USER_NAME }}
           BKASH_CHECKOUT_URL_PASSWORD: ${{ secrets.BKASH_CHECKOUT_URL_PASSWORD }}
