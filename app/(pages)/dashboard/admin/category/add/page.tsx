@@ -2,8 +2,8 @@
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { AlertCircle, Loader2, PlusCircle, RefreshCw } from 'lucide-react';
-import { useEffect, useRef, useState } from 'react';
-import { useForm } from 'react-hook-form';
+import { JSX, useEffect, useRef, useState } from 'react';
+import { useForm, useWatch } from 'react-hook-form';
 import slugify from 'slugify';
 import { toast } from 'sonner';
 import { z } from 'zod';
@@ -42,6 +42,7 @@ import { useAdminProductCategories } from '@/services';
 
 import { ImageUpload } from './image-upload';
 
+// Define types for our form
 const FormSchema = z.object({
   name: z.string().min(2, {
     message: 'Name must be at least 2 characters.',
@@ -54,23 +55,41 @@ const FormSchema = z.object({
         'Slug can only contain lowercase letters, numbers, and hyphens. No spaces or special characters allowed.',
     }),
   parentId: z.string(),
-  featured: z.boolean().default(false).optional(),
-  description: z.string().optional(),
+  featured: z.boolean(),
+  description: z.string().max(200).optional(),
   image: z.any().optional(),
-  order: z.number().default(0).optional(),
 });
 
-export default function AddCategory() {
+// Type for form values
+type FormValues = z.infer<typeof FormSchema>;
+
+// Type for category data
+interface Category {
+  id: string;
+  name: string;
+}
+
+// Type for slug check response
+interface SlugCheckResponse {
+  isUnique: boolean;
+  suggestions: string[];
+}
+
+export default function AddCategory(): JSX.Element {
   const { isPending, data, isError, refetch } = useAdminProductCategories();
-  const [isCheckingSlug, setIsCheckingSlug] = useState(false);
+  const [isCheckingSlug, setIsCheckingSlug] = useState<boolean>(false);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [slugSuggestions, setSlugSuggestions] = useState<string[]>([]);
   const [slugError, setSlugError] = useState<string | null>(null);
-  const [slugDebounceTimeout, setSlugDebounceTimeout] =
-    useState<NodeJS.Timeout | null>(null);
+  const [isSlugManuallyEdited, setIsSlugManuallyEdited] =
+    useState<boolean>(false);
+
+  // Ref for slug check debounce
+  const slugDebounceTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const imageUploadRef = useRef<{ resetUpload: () => void } | null>(null);
 
-  const form = useForm<z.infer<typeof FormSchema>>({
+  // Create form
+  const form = useForm<FormValues>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
       name: '',
@@ -79,28 +98,15 @@ export default function AddCategory() {
       featured: false,
       description: '',
       image: undefined,
-      order: 0,
     },
   });
 
-  // Watch the name field to auto-generate slug
-  const watchName = form.watch('name');
-  const watchSlug = form.watch('slug');
+  // Watch form values using useWatch
+  const name = useWatch({ control: form.control, name: 'name' });
+  const slug = useWatch({ control: form.control, name: 'slug' });
 
-  // Generate slug from name
-  useEffect(() => {
-    if (watchName) {
-      const slug = slugify(watchName, {
-        lower: true,
-        strict: true,
-        trim: true,
-      });
-      form.setValue('slug', slug, { shouldValidate: true });
-    }
-  }, [watchName, form]);
-
-  // Format slug input to enforce valid slug format
-  const formatSlugInput = (value: string) => {
+  // Format slug to enforce valid slug format
+  const formatSlugInput = (value: string): string => {
     return slugify(value, {
       lower: true, // Convert to lowercase
       strict: true, // Strip special characters
@@ -108,37 +114,52 @@ export default function AddCategory() {
     });
   };
 
-  // Check slug uniqueness with debounce
+  // Auto-generate slug from name when name changes
   useEffect(() => {
-    if (watchSlug && watchSlug.length >= 2) {
+    if (name && !isSlugManuallyEdited) {
+      const generatedSlug = formatSlugInput(name);
+      if (generatedSlug !== slug) {
+        form.setValue('slug', generatedSlug, { shouldValidate: true });
+      }
+    }
+  }, [name, form, isSlugManuallyEdited, slug]);
+
+  // Check slug when it changes (with debounce)
+  useEffect(() => {
+    // Only run checks if slug is valid and not empty
+    if (slug && slug.length >= 2) {
       // Clear previous timeout
-      if (slugDebounceTimeout) {
-        clearTimeout(slugDebounceTimeout);
+      if (slugDebounceTimeoutRef.current) {
+        clearTimeout(slugDebounceTimeoutRef.current);
       }
 
       // Set new timeout for debounce
-      const timeout = setTimeout(async () => {
-        await checkSlugAvailability(watchSlug);
+      slugDebounceTimeoutRef.current = setTimeout(() => {
+        checkSlugAvailability(slug);
       }, 500); // 500ms debounce
-
-      setSlugDebounceTimeout(timeout);
     }
 
     return () => {
-      if (slugDebounceTimeout) {
-        clearTimeout(slugDebounceTimeout);
+      if (slugDebounceTimeoutRef.current) {
+        clearTimeout(slugDebounceTimeoutRef.current);
       }
     };
-  }, [watchSlug, slugDebounceTimeout]);
+  }, [slug]);
 
-  // Function to check slug availability
-  const checkSlugAvailability = async (slug: string) => {
+  // Check slug availability
+  const checkSlugAvailability = async (slugValue: string): Promise<void> => {
+    if (!slugValue || slugValue.length < 2) {
+      return;
+    }
+
     try {
       setIsCheckingSlug(true);
       setSlugError(null);
       setSlugSuggestions([]);
 
-      const result = await checkCategorySlugUniqueness(slug);
+      const result = (await checkCategorySlugUniqueness(
+        slugValue
+      )) as SlugCheckResponse;
 
       if (!result.isUnique) {
         setSlugSuggestions(result.suggestions);
@@ -152,14 +173,23 @@ export default function AddCategory() {
   };
 
   // Apply slug suggestion
-  const applySlugSuggestion = (suggestion: string) => {
+  const applySlugSuggestion = (suggestion: string): void => {
     form.setValue('slug', suggestion, { shouldValidate: true });
     setSlugSuggestions([]);
     setSlugError(null);
   };
 
+  // Handle slug field change - mark as manually edited
+  const handleSlugChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
+    const value = e.target.value;
+    const formattedValue = formatSlugInput(value);
+
+    setIsSlugManuallyEdited(true);
+    form.setValue('slug', formattedValue, { shouldValidate: true });
+  };
+
   // Reset the form completely, including the image
-  const resetForm = () => {
+  const resetForm = (): void => {
     form.reset({
       name: '',
       slug: '',
@@ -167,10 +197,10 @@ export default function AddCategory() {
       featured: false,
       description: '',
       image: undefined,
-      order: 0,
     });
     setSlugSuggestions([]);
     setSlugError(null);
+    setIsSlugManuallyEdited(false);
 
     // Reset the image upload component
     if (imageUploadRef.current) {
@@ -179,7 +209,7 @@ export default function AddCategory() {
   };
 
   // Form submission handler
-  async function onSubmit(values: z.infer<typeof FormSchema>) {
+  const onSubmit = async (values: FormValues): Promise<void> => {
     // Prepare form data for server action
     const formData = new FormData();
     formData.append('name', values.name);
@@ -191,10 +221,6 @@ export default function AddCategory() {
       formData.append('description', values.description);
     }
 
-    if (values.order !== undefined) {
-      formData.append('order', values.order.toString());
-    }
-
     if (values.image) {
       formData.append('image', values.image);
     }
@@ -202,7 +228,9 @@ export default function AddCategory() {
     // Use Sonner's promise toast
     toast.promise(createCategory(formData), {
       loading: 'Creating category...',
-      success: (result) => {
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      success: (result: any) => {
         if (result.success) {
           // Reset the form including the image
           resetForm();
@@ -217,18 +245,18 @@ export default function AddCategory() {
           throw new Error(result.message || 'Failed to create category');
         }
       },
-      error: (error) => {
+      error: (error: unknown) => {
         console.error('Error creating category:', error);
         return error instanceof Error ? error.message : 'Something went wrong';
       },
     });
-  }
+  };
 
   // Manual slug check button handler
-  const handleManualSlugCheck = async () => {
-    const slug = form.getValues('slug');
-    if (slug) {
-      await checkSlugAvailability(slug);
+  const handleManualSlugCheck = (): void => {
+    const currentSlug = form.getValues('slug');
+    if (currentSlug) {
+      checkSlugAvailability(currentSlug);
     }
   };
 
@@ -276,33 +304,25 @@ export default function AddCategory() {
                               placeholder="category-slug"
                               {...field}
                               className={
-                                !slugError
+                                field.value && !slugError
                                   ? 'border-green-600'
-                                  : 'border-red-500'
+                                  : slugError
+                                    ? 'border-red-500'
+                                    : ''
                               }
                               onChange={(e) => {
-                                // Auto-format the slug as the user types
-                                const formattedValue = formatSlugInput(
-                                  e.target.value
-                                );
-                                field.onChange(formattedValue);
+                                handleSlugChange(e);
                               }}
                               onPaste={(e) => {
-                                // Format pasted content
                                 e.preventDefault();
                                 const pastedText =
                                   e.clipboardData.getData('text');
                                 const formattedValue =
                                   formatSlugInput(pastedText);
-                                field.onChange(formattedValue);
-                              }}
-                              onBlur={(e) => {
-                                // Ensure slug is formatted on blur
-                                const formattedValue = formatSlugInput(
-                                  e.target.value
-                                );
-                                field.onChange(formattedValue);
-                                field.onBlur();
+                                form.setValue('slug', formattedValue, {
+                                  shouldValidate: true,
+                                });
+                                setIsSlugManuallyEdited(true);
                               }}
                             />
                           </FormControl>
@@ -366,32 +386,6 @@ export default function AddCategory() {
                     )}
                   />
 
-                  {/* Order */}
-                  <FormField
-                    control={form.control}
-                    name="order"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Display Order</FormLabel>
-                        <FormControl>
-                          <Input
-                            type="number"
-                            placeholder="0"
-                            {...field}
-                            onChange={(e) =>
-                              field.onChange(parseInt(e.target.value) || 0)
-                            }
-                          />
-                        </FormControl>
-                        <FormDescription>
-                          Lower numbers display first
-                        </FormDescription>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  {/* Parent Category */}
                   {/* Parent Category */}
                   <FormField
                     control={form.control}
@@ -402,7 +396,6 @@ export default function AddCategory() {
                         <Select
                           onValueChange={field.onChange}
                           value={field.value}
-                          defaultValue="none"
                           disabled={isPending || isError}
                         >
                           <FormControl>
@@ -434,7 +427,7 @@ export default function AddCategory() {
                             {/* No data state */}
                             {!isPending &&
                               !isError &&
-                              data?.json?.length === 0 && (
+                              (!data || data.length === 0) && (
                                 <div className="text-muted-foreground p-2 text-sm">
                                   No categories found
                                 </div>
@@ -443,17 +436,16 @@ export default function AddCategory() {
                             {/* Category options */}
                             {!isPending &&
                               !isError &&
-                              data?.length > 0 &&
-                              data.map(
-                                (category: { id: string; name: string }) => (
-                                  <SelectItem
-                                    key={category.id}
-                                    value={category.id}
-                                  >
-                                    {category.name}
-                                  </SelectItem>
-                                )
-                              )}
+                              data &&
+                              data.length > 0 &&
+                              data.map((category: Category) => (
+                                <SelectItem
+                                  key={category.id}
+                                  value={category.id}
+                                >
+                                  {category.name}
+                                </SelectItem>
+                              ))}
                           </SelectContent>
                         </Select>
                         <FormMessage />

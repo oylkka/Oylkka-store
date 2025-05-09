@@ -29,19 +29,16 @@ export const ImageUpload = forwardRef<
 
   // Use the provided preview if available, otherwise use internal state
   const preview = previewUrl !== undefined ? previewUrl : internalPreview;
-  const setPreview = (url: string | null) => {
-    if (onPreviewChange) {
-      onPreviewChange(url);
-    } else {
-      setInternalPreview(url);
-    }
-  };
 
   // Expose resetUpload method to parent component
   useImperativeHandle(ref, () => ({
     resetUpload: () => {
       onChange(undefined);
-      setPreview(null);
+      if (onPreviewChange) {
+        onPreviewChange(null);
+      } else {
+        setInternalPreview(null);
+      }
       setError(null);
       if (fileInputRef.current) {
         fileInputRef.current.value = '';
@@ -71,17 +68,22 @@ export const ImageUpload = forwardRef<
     // Reset error if exists
     setError(null);
 
-    // Create and set preview URL
+    // Create preview URL
     const objectUrl = URL.createObjectURL(file);
-    setPreview(objectUrl);
+
+    // Update preview based on whether parent is managing it or not
+    if (onPreviewChange) {
+      onPreviewChange(objectUrl);
+    } else {
+      // Cleanup old preview URL if internal state is used
+      if (internalPreview) {
+        URL.revokeObjectURL(internalPreview);
+      }
+      setInternalPreview(objectUrl);
+    }
 
     // Pass file to parent
     onChange(file);
-
-    // Cleanup old preview URL if internal state is used
-    if (!onPreviewChange && internalPreview) {
-      URL.revokeObjectURL(internalPreview);
-    }
   };
 
   const handleRemove = () => {
@@ -90,9 +92,19 @@ export const ImageUpload = forwardRef<
       URL.revokeObjectURL(internalPreview);
     }
 
+    // Update state in parent or internally
     onChange(undefined);
-    setPreview(null);
+    if (onPreviewChange) {
+      onPreviewChange(null);
+    } else {
+      setInternalPreview(null);
+    }
     setError(null);
+
+    // Reset file input
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
   };
 
   return (
@@ -116,7 +128,12 @@ export const ImageUpload = forwardRef<
 
       {preview ? (
         <div className="relative h-40 w-40 overflow-hidden rounded-md border">
-          <Image src={preview} alt="Preview" fill className="object-cover" />
+          <Image
+            src={preview || '/placeholder.svg'}
+            alt="Preview"
+            fill
+            className="object-cover"
+          />
           <Button
             type="button"
             onClick={handleRemove}

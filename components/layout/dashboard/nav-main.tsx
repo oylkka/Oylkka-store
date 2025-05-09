@@ -113,6 +113,20 @@ export async function NavMain() {
       ],
       items: [
         {
+          title: 'All Categories',
+          url: '/dashboard/admin/category/all',
+          roles: ['ADMIN', 'MANAGER', 'CUSTOMER_SERVICE'],
+        },
+        {
+          title: 'Add Category',
+          url: '/dashboard/admin/category/add',
+          roles: ['ADMIN', 'MANAGER', 'CUSTOMER_SERVICE'],
+        },
+        {
+          title: 'Electronics',
+          url: '/categories/electronics',
+        },
+        {
           title: 'Clothing',
           url: '/categories/clothing',
         },
