@@ -45,11 +45,14 @@ type CheckoutStep = 'information' | 'shipping' | 'payment' | 'review';
 
 interface CartItem {
   id: string;
-  productName: string;
+  name: string;
   price: number;
   discountPrice?: number;
   quantity: number;
-  imageUrl?: string;
+  image: {
+    url: string;
+    alt: string;
+  };
 }
 
 interface ShippingOption {
@@ -759,17 +762,15 @@ export default function CheckoutPage() {
                         >
                           <div className="h-16 w-16 flex-shrink-0 overflow-hidden rounded-md border">
                             <Image
-                              src={item.imageUrl || '/api/placeholder/100/100'}
-                              alt={item.productName}
+                              src={item.image.url}
+                              alt={item.name}
                               className="h-full w-full object-cover"
                               width={100}
                               height={100}
                             />
                           </div>
                           <div className="flex-1">
-                            <h4 className="text-sm font-medium">
-                              {item.productName}
-                            </h4>
+                            <h4 className="text-sm font-medium">{item.name}</h4>
                             <p className="text-muted-foreground text-sm">
                               Qty: {item.quantity}
                             </p>

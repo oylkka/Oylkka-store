@@ -23,11 +23,15 @@ import { useUserCart } from '@/services';
 interface CartItem {
   id: string;
   productId?: string;
-  productName: string;
+  name: string;
   price: number;
   discountPrice?: number | null;
   quantity: number;
-  imageUrl?: string;
+  variantName: string;
+  image: {
+    url: string;
+    alt: string;
+  };
 }
 
 interface OrderSummaryProps {
@@ -211,31 +215,36 @@ export default function OrderSummary({
         <CardContent>
           <div className="space-y-4">
             {data.map((item: CartItem) => (
-              <div key={item.id} className="flex items-center justify-between">
-                <div className="flex items-center space-x-3">
-                  {item.imageUrl && (
-                    <div className="h-10 w-10 overflow-hidden rounded-md">
-                      <Image
-                        src={item.imageUrl}
-                        alt={item.productName}
-                        width={40}
-                        height={40}
-                        className="h-full w-full object-cover"
-                      />
-                    </div>
-                  )}
-                  <div>
-                    <div className="text-sm font-medium">
-                      {item.productName}
-                    </div>
-                    <div className="text-muted-foreground text-xs">
-                      Qty: {item.quantity}
+              <div key={item.id}>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-3">
+                    {item.image.url && (
+                      <div className="h-10 w-10 overflow-hidden rounded-md">
+                        <Image
+                          src={item.image.url}
+                          alt={item.name}
+                          width={40}
+                          height={40}
+                          className="h-full w-full object-cover"
+                        />
+                      </div>
+                    )}
+                    <div>
+                      <div className="text-sm font-medium">{item.name}</div>
+                      <div className="text-muted-foreground text-xs">
+                        Qty: {item.quantity}
+                      </div>
                     </div>
                   </div>
+                  <div className="text-sm font-medium">
+                    ৳{(item.discountPrice ?? item.price) * item.quantity}
+                  </div>
                 </div>
-                <div className="text-sm font-medium">
-                  ৳{(item.discountPrice ?? item.price) * item.quantity}
-                </div>
+                {item.variantName && (
+                  <div className="text-muted-foreground text-xs">
+                    {item.variantName}
+                  </div>
+                )}
               </div>
             ))}
 

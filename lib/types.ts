@@ -142,10 +142,13 @@ export interface CartItem {
   id: string;
   productId: string;
   quantity: number;
-  productName: string;
+  name: string;
   price: number;
   discountPrice: number | null;
-  imageUrl: string;
+  image: {
+    url: string;
+    alt: string;
+  };
 }
 
 export interface BkashConfig {

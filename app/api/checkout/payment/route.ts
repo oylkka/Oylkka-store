@@ -89,7 +89,7 @@ export async function POST(req: NextRequest) {
         items: {
           create: data.cart.map((item) => ({
             productSku: item.productId,
-            productName: item.productName,
+            productName: item.name,
             quantity: item.quantity,
             price: item.price,
             discount: item.discountPrice ? item.price - item.discountPrice : 0,
@@ -162,6 +162,7 @@ export async function POST(req: NextRequest) {
     );
   }
 }
+
 async function validateCartData(cart: CartItem[]) {
   try {
     // Check if cart is empty
@@ -210,8 +211,8 @@ async function validateCartData(cart: CartItem[]) {
         return { valid: false, error: `Product ${item.productId} not found` };
       }
 
-      // Check product name
-      if (item.productName !== dbProduct.productName) {
+      // Check product name - FIXED: comparing item.name with dbProduct.productName
+      if (item.name !== dbProduct.productName) {
         return {
           valid: false,
           error: `Product name mismatch for ${item.productId}`,
@@ -225,8 +226,12 @@ async function validateCartData(cart: CartItem[]) {
 
       // Check discount price if applicable
       if (
-        (item.discountPrice !== null && dbProduct.discountPrice === null) ||
-        item.discountPrice !== dbProduct.discountPrice
+        (item.discountPrice !== null &&
+          item.discountPrice !== undefined &&
+          dbProduct.discountPrice === null) ||
+        (item.discountPrice !== null &&
+          item.discountPrice !== undefined &&
+          item.discountPrice !== dbProduct.discountPrice)
       ) {
         return {
           valid: false,
@@ -234,8 +239,8 @@ async function validateCartData(cart: CartItem[]) {
         };
       }
 
-      // Check image URL
-      if (item.imageUrl !== dbProduct.images[0].url) {
+      // FIXED: Check image URL - item.image.url vs dbProduct.images[0].url
+      if (item.image?.url !== dbProduct.images[0]?.url) {
         return {
           valid: false,
           error: `Image URL mismatch for ${item.productId}`,
@@ -246,14 +251,14 @@ async function validateCartData(cart: CartItem[]) {
       if (dbProduct.stock < item.quantity) {
         return {
           valid: false,
-          error: `Insufficient stock for ${item.productName}`,
+          error: `Insufficient stock for ${item.name}`,
         };
       }
     }
 
     return { valid: true };
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
   } catch (error) {
+    console.error('Cart validation error:', error);
     return { valid: false, error: 'Database error during cart validation' };
   }
 }
@@ -262,7 +267,9 @@ function validateTotalCalculation(data: PaymentData) {
   // Calculate subtotal based on cart items
   const calculatedSubtotal = data.cart.reduce((total, item) => {
     const itemPrice =
-      item.discountPrice !== null ? item.discountPrice : item.price;
+      item.discountPrice !== null && item.discountPrice !== undefined
+        ? item.discountPrice
+        : item.price;
     return total + itemPrice * item.quantity;
   }, 0);
 
