@@ -1,4 +1,3 @@
-// app/api/checkout/callback/route.ts
 import { NextRequest, NextResponse } from 'next/server';
 
 import { bkashConfig } from '@/lib/bkash';
@@ -121,6 +120,10 @@ export async function GET(req: NextRequest) {
               executionFailedButQuerySucceeded: true,
             },
           },
+        });
+
+        await db.cartItem.deleteMany({
+          where: { userId: order.userId },
         });
 
         // Update product stock
