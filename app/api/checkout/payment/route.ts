@@ -239,14 +239,6 @@ async function validateCartData(cart: CartItem[]) {
         };
       }
 
-      // FIXED: Check image URL - item.image.url vs dbProduct.images[0].url
-      if (item.image?.url !== dbProduct.images[0]?.url) {
-        return {
-          valid: false,
-          error: `Image URL mismatch for ${item.productId}`,
-        };
-      }
-
       // Check stock availability
       if (dbProduct.stock < item.quantity) {
         return {
