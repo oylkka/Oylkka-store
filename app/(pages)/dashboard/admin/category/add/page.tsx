@@ -57,7 +57,9 @@ const FormSchema = z.object({
   parentId: z.string(),
   featured: z.boolean(),
   description: z.string().max(200).optional(),
-  image: z.any().optional(),
+  image: z.any().refine((val) => !!val, {
+    message: 'Image is required',
+  }),
 });
 
 // Type for form values
@@ -99,6 +101,7 @@ export default function AddCategory(): JSX.Element {
       description: '',
       image: undefined,
     },
+    mode: 'onChange', // Enable validation on change
   });
 
   // Watch form values using useWatch
@@ -461,7 +464,10 @@ export default function AddCategory(): JSX.Element {
                     name="image"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Category Image</FormLabel>
+                        <FormLabel className="flex items-center">
+                          Category Image
+                          <span className="ml-1 text-red-500">*</span>
+                        </FormLabel>
                         <FormControl>
                           <ImageUpload
                             value={field.value}
@@ -472,7 +478,8 @@ export default function AddCategory(): JSX.Element {
                           />
                         </FormControl>
                         <FormDescription>
-                          Recommended: 512×512px square image
+                          Required. Recommended: 512×512px square image (max
+                          500KB)
                         </FormDescription>
                         <FormMessage />
                       </FormItem>
