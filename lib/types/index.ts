@@ -1,3 +1,6 @@
+import { CartItem } from './order';
+
+export * from './order';
 export interface CategoriesType {
   name: string;
   slug: string;
@@ -135,19 +138,6 @@ export interface PaymentData {
       amount: number;
     };
     total: number;
-  };
-}
-
-export interface CartItem {
-  id: string;
-  productId: string;
-  quantity: number;
-  name: string;
-  price: number;
-  discountPrice: number | null;
-  image: {
-    url: string;
-    alt: string;
   };
 }
 

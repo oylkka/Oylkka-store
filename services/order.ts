@@ -6,7 +6,7 @@ export function useOrderConfirmation({ id }: { id: string }) {
   return useQuery({
     queryKey: [QEUERY_KEYS.ORDER_CONFIRMATION, id],
     queryFn: async () => {
-      const response = await axios.get(`/api/dashboard/customer/order/single`, {
+      const response = await axios.get(`/api/dashboard/customer/order/single-order`, {
         params: { orderId: id },
       });
       return response.data;

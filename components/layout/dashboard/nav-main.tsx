@@ -312,13 +312,13 @@ export async function NavMain() {
     },
     {
       title: 'Order Management',
-      url: '/admin/orders',
+      url: '/dashboard/admin/orders',
       icon: ShoppingCart,
       roles: ['ADMIN', 'MANAGER', 'CUSTOMER_SERVICE'],
       items: [
         {
           title: 'All Orders',
-          url: '/admin/orders/all',
+          url: '/dashboard/admin/orders',
         },
         {
           title: 'Pending Orders',

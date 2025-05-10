@@ -238,7 +238,7 @@ function OrdersContent() {
                         key={order.id}
                         onClick={() =>
                           router.push(
-                            `/dashboard/admin/orders/single-order?orderId=${order.id}`
+                            `/dashboard/admin/orders/single-order?orderId=${order.orderNumber}`
                           )
                         }
                         className="cursor-pointer hover:bg-gray-50"
