@@ -170,14 +170,24 @@ async function validateCartData(cart: CartItem[]) {
       return { valid: false, error: 'Cart is empty' };
     }
 
-    // Extract product IDs to query the database in bulk
-    const productIds = cart.map((item) => item.productId);
+    // Extract product and variant IDs from cart
+    const productIds = new Set<string>();
+    const variantIds = new Set<string>();
 
-    // Fetch products from database in a single query
-    const dbProducts = await db.product.findMany({
+    // Separate product IDs and variant IDs
+    cart.forEach((item) => {
+      if (item.variantId) {
+        variantIds.add(item.variantId);
+      } else {
+        productIds.add(item.productId);
+      }
+    });
+
+    // Fetch base products
+    const baseProducts = await db.product.findMany({
       where: {
         id: {
-          in: productIds,
+          in: Array.from(productIds),
         },
       },
       select: {
@@ -185,66 +195,133 @@ async function validateCartData(cart: CartItem[]) {
         productName: true,
         price: true,
         discountPrice: true,
-        images: true,
-        stock: true, // Include stock to check availability
+        stock: true,
       },
     });
 
-    // Check if all products exist in DB
-    if (dbProducts.length !== productIds.length) {
-      return {
-        valid: false,
-        error: 'Some products do not exist in the database',
-      };
-    }
+    // Fetch product variants
+    const productVariants =
+      variantIds.size > 0
+        ? await db.productVariant.findMany({
+            where: {
+              id: {
+                in: Array.from(variantIds),
+              },
+            },
+            include: {
+              product: {
+                select: {
+                  productName: true,
+                },
+              },
+            },
+          })
+        : [];
 
-    // Create a map for easier lookup
-    const productMap = new Map(
-      dbProducts.map((product) => [product.id, product])
+    // Create maps for easy lookup
+    const baseProductMap = new Map(
+      baseProducts.map((product) => [product.id, product])
+    );
+
+    const variantMap = new Map(
+      productVariants.map((variant) => [variant.id, variant])
     );
 
     // Validate each cart item
     for (const item of cart) {
-      const dbProduct = productMap.get(item.productId);
+      if (item.variantId) {
+        // This is a variant product
+        const variant = variantMap.get(item.variantId);
 
-      if (!dbProduct) {
-        return { valid: false, error: `Product ${item.productId} not found` };
-      }
+        if (!variant) {
+          return {
+            valid: false,
+            error: `Product variant ${item.variantId} not found`,
+          };
+        }
 
-      // Check product name - FIXED: comparing item.name with dbProduct.productName
-      if (item.name !== dbProduct.productName) {
-        return {
-          valid: false,
-          error: `Product name mismatch for ${item.productId}`,
-        };
-      }
+        // Check variant price
+        if (item.price !== variant.price) {
+          return {
+            valid: false,
+            error: `Price mismatch for variant ${item.variantId}`,
+          };
+        }
 
-      // Check prices
-      if (item.price !== dbProduct.price) {
-        return { valid: false, error: `Price mismatch for ${item.productId}` };
-      }
+        // Check variant discount price if applicable
+        if (
+          (item.discountPrice !== null &&
+            item.discountPrice !== undefined &&
+            variant.discountPrice === null) ||
+          (item.discountPrice !== null &&
+            item.discountPrice !== undefined &&
+            item.discountPrice !== variant.discountPrice)
+        ) {
+          return {
+            valid: false,
+            error: `Discount price mismatch for variant ${item.variantId}`,
+          };
+        }
 
-      // Check discount price if applicable
-      if (
-        (item.discountPrice !== null &&
-          item.discountPrice !== undefined &&
-          dbProduct.discountPrice === null) ||
-        (item.discountPrice !== null &&
-          item.discountPrice !== undefined &&
-          item.discountPrice !== dbProduct.discountPrice)
-      ) {
-        return {
-          valid: false,
-          error: `Discount price mismatch for ${item.productId}`,
-        };
-      }
+        // Check variant stock availability
+        if (variant.stock < item.quantity) {
+          return {
+            valid: false,
+            error: `Insufficient stock for variant ${item.name || variant.product.productName}`,
+          };
+        }
 
-      // Check stock availability
-      if (dbProduct.stock < item.quantity) {
-        return {
-          valid: false,
-          error: `Insufficient stock for ${item.name}`,
-        };
+        // For variants, the name might be combined (product name + variant name)
+        // We're more lenient with name validation for variants as formatting may vary
+      } else {
+        // This is a base product
+        const product = baseProductMap.get(item.productId);
+
+        if (!product) {
+          return {
+            valid: false,
+            error: `Product ${item.productId} not found`,
+          };
+        }
+
+        // Check product name
+        if (item.name !== product.productName) {
+          return {
+            valid: false,
+            error: `Product name mismatch for ${item.productId}`,
+          };
+        }
+
+        // Check product price
+        if (item.price !== product.price) {
+          return {
+            valid: false,
+            error: `Price mismatch for ${item.productId}`,
+          };
+        }
+
+        // Check product discount price if applicable
+        if (
+          (item.discountPrice !== null &&
+            item.discountPrice !== undefined &&
+            product.discountPrice === null) ||
+          (item.discountPrice !== null &&
+            item.discountPrice !== undefined &&
+            item.discountPrice !== product.discountPrice)
+        ) {
+          return {
+            valid: false,
+            error: `Discount price mismatch for ${item.productId}`,
+          };
+        }
+
+        // Check product stock availability
+        if (product.stock < item.quantity) {
+          return {
+            valid: false,
+            error: `Insufficient stock for ${item.name}`,
+          };
+        }
       }
     }
 

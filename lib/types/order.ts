@@ -42,6 +42,10 @@ export interface OrderMetadata {
 }
 
 export interface Order {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  items: any;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  user: any;
   shippingAddress: Address;
   billingAddress: Address | null;
   id: string;

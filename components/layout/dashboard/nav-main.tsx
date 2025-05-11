@@ -418,13 +418,13 @@ export async function NavMain() {
     },
     {
       title: 'Orders',
-      url: '/vendor/orders',
+      url: 'dashboard/vendor/orders/all',
       icon: ClipboardList,
       roles: ['VENDOR'],
       items: [
         {
-          title: 'New Orders',
-          url: '/vendor/orders/new',
+          title: 'All Orders',
+          url: '/dashboard/vendor/orders/all',
         },
         {
           title: 'Processing',
