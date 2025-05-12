@@ -12,11 +12,11 @@ type NavItem = {
 };
 
 const navItems: NavItem[] = [
-  { label: 'Overview', href: '/' },
+  { label: 'Home', href: '/' },
   { label: 'Products', href: '/products' },
-  { label: 'Shop', href: '/shop' },
-  { label: 'Activity', href: '/activity' },
-  { label: 'Domains', href: '/domains' },
+  { label: 'New Arrivals', href: '/new-arrivals' },
+  { label: 'Sale', href: '/sale' },
+  { label: 'About', href: '/about' },
 ];
 
 export default function Navigation() {
@@ -29,8 +29,8 @@ export default function Navigation() {
   const isFirstRender = useRef(true);
 
   // Determine active index based on current path
-  const activeIndex = navItems.findIndex(
-    (item) => item.href === (pathname === '/' ? '/' : pathname)
+  const activeIndex = navItems.findIndex((item) =>
+    item.href === '/' ? pathname === '/' : pathname.startsWith(item.href)
   );
 
   useEffect(() => {
@@ -94,55 +94,59 @@ export default function Navigation() {
   }, [activeIndex, prevActiveIndex]);
 
   return (
-    <nav className="relative hidden w-full items-center justify-center border-none shadow-none md:flex">
-      <div className="p-0">
-        <div className="relative">
-          {/* Hover Highlight */}
-          <div
-            className="absolute flex items-center rounded-[6px] bg-[#0e0f1114] transition-all duration-300 ease-out dark:bg-[#ffffff11]"
-            style={{
-              ...hoverStyle,
-              opacity: hoveredIndex !== null ? 1 : 0,
-            }}
-          />
+    <nav className="relative flex items-center justify-center">
+      <div className="relative">
+        {/* Hover Highlight */}
+        <div
+          className="bg-primary/10 dark:bg-primary/20 absolute flex items-center rounded-full transition-all duration-300 ease-out"
+          style={{
+            ...hoverStyle,
+            opacity: hoveredIndex !== null ? 1 : 0,
+            height: '95%',
+          }}
+        />
 
-          {/* Active Indicator */}
-          <div
-            className="bg-primary absolute bottom-[-6px] h-[2px] dark:bg-white"
-            style={activeStyle}
-          />
+        {/* Active Indicator */}
+        <div
+          className="bg-primary absolute bottom-[-4px] h-[3px] rounded-full transition-all duration-300 ease-out"
+          style={activeStyle}
+        />
 
-          {/* Tabs */}
-          <div className="relative flex items-center space-x-[6px]">
-            {navItems.map((item, index) => (
-              <Link
-                key={index}
-                href={item.href}
+        {/* Tabs */}
+        <div className="relative flex items-center space-x-1 md:space-x-2">
+          {navItems.map((item, index) => (
+            <Link
+              key={index}
+              href={item.href}
+              className={cn(
+                'focus-visible:ring-primary rounded-full outline-none focus-visible:ring-2',
+                'transition-colors duration-300'
+              )}
+            >
+              <div
+                ref={(el) => {
+                  tabRefs.current[index] = el;
+                }}
                 className={cn(
-                  'focus-visible:ring-primary rounded-md outline-none focus-visible:ring-2',
-                  'transition-colors duration-300'
+                  'cursor-pointer rounded-full px-3 py-2 transition-all duration-300',
+                  index === activeIndex
+                    ? 'text-primary font-medium'
+                    : 'text-foreground/70 hover:text-foreground'
                 )}
+                onMouseEnter={() => setHoveredIndex(index)}
+                onMouseLeave={() => setHoveredIndex(null)}
               >
-                <div
-                  ref={(el) => {
-                    tabRefs.current[index] = el;
-                  }}
-                  className={cn(
-                    'cursor-pointer px-3 py-2',
-                    index === activeIndex
-                      ? 'text-[#0e0e10] dark:text-white'
-                      : 'text-[#0e0f1199] hover:text-[#0e0e10]/80 dark:text-[#ffffff99] dark:hover:text-white/80'
+                <div className="flex h-full items-center justify-center text-sm font-medium whitespace-nowrap">
+                  {item.label}
+                  {item.label === 'Sale' && (
+                    <span className="ml-1 inline-flex items-center justify-center rounded-full bg-red-500 px-1.5 py-0.5 text-[10px] font-medium text-white">
+                      20%
+                    </span>
                   )}
-                  onMouseEnter={() => setHoveredIndex(index)}
-                  onMouseLeave={() => setHoveredIndex(null)}
-                >
-                  <div className="flex h-full items-center justify-center text-sm leading-5 whitespace-nowrap">
-                    {item.label}
-                  </div>
                 </div>
-              </Link>
-            ))}
-          </div>
+              </div>
+            </Link>
+          ))}
         </div>
       </div>
     </nav>

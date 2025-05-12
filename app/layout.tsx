@@ -4,6 +4,7 @@ import { Geist, Geist_Mono } from 'next/font/google';
 
 import { Toaster } from '@/components/ui/sonner';
 import TanstackProvider from '@/context/tanstack-provider';
+import { ThemeProvider } from '@/context/theme-provider';
 import './globals.css';
 
 const geistSans = Geist({
@@ -29,11 +30,18 @@ export default function RootLayout({
 }>) {
   return (
     <TanstackProvider>
-      <html lang="en">
+      <html lang="en" suppressHydrationWarning>
         <body
           className={`${geistSans.variable} ${geistMono.variable} antialiased [&::-webkit-scrollbar]:w-0`}
         >
-          {children}
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="light"
+            enableSystem
+            disableTransitionOnChange
+          >
+            {children}
+          </ThemeProvider>
           <ReactQueryDevtools initialIsOpen={false} />
           <Toaster position="top-right" richColors />
         </body>

@@ -2,6 +2,7 @@ import Cart from './cart';
 import HeaderClient from './header-client';
 import Navigation from './navigation';
 import SearchBar from './search-bar';
+import { ThemeSwitcher } from './theme-switcher';
 import UserDropDown from './user';
 
 type HeaderProps = {
@@ -10,20 +11,27 @@ type HeaderProps = {
 
 export default function Header({ navigation = true }: HeaderProps) {
   return (
-    <header className="bg-background sticky top-0 z-50 w-full border-b">
-      <div
-        className={`container mx-auto flex h-12 items-center justify-between pr-2 md:h-16 ${
-          !navigation ? 'md:px-2' : 'md:px-0'
-        }`}
-      >
-        <HeaderClient />
-        {navigation && <Navigation />}
-        <div className="flex flex-1 items-center justify-end gap-4 md:justify-end md:gap-6">
-          <div className="hidden md:w-[280px] lg:block lg:w-[320px] xl:w-[380px]">
-            <SearchBar />
+    <header className="bg-background/80 border-border/40 sticky top-0 z-50 w-full border-b shadow-sm backdrop-blur-md">
+      <div className="container mx-auto py-3 md:py-4">
+        <div className="flex items-center justify-between gap-4">
+          <HeaderClient />
+
+          {navigation && (
+            <div className="hidden flex-1 justify-center md:flex">
+              <Navigation />
+            </div>
+          )}
+
+          <div className="flex items-center justify-end gap-3 md:gap-5">
+            <div className="hidden md:block md:w-[280px] lg:w-[320px] xl:w-[380px]">
+              <SearchBar />
+            </div>
+            <div className="flex items-center gap-1 md:gap-3">
+              <ThemeSwitcher />
+              <Cart />
+              <UserDropDown />
+            </div>
           </div>
-          <Cart />
-          <UserDropDown />
         </div>
       </div>
     </header>

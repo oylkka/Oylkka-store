@@ -29,14 +29,22 @@ export default async function UserDropDown() {
         <div>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Avatar className="cursor-pointer">
-                <AvatarImage src={session.user.image!} alt="@shadcn" />
-                <AvatarFallback>
+              <Avatar className="border-primary/20 hover:border-primary/40 h-9 w-9 cursor-pointer border-2 transition-all">
+                <AvatarImage
+                  src={session.user.image! || '/placeholder.svg'}
+                  alt={session.user.name || 'User avatar'}
+                />
+                <AvatarFallback className="bg-primary/10 text-primary">
                   {getInitials(session.user.name)}
                 </AvatarFallback>
               </Avatar>
             </DropdownMenuTrigger>
-            <DropdownMenuContent className="w-56" forceMount sideOffset={8}>
+            <DropdownMenuContent
+              className="w-56"
+              align="end"
+              forceMount
+              sideOffset={8}
+            >
               <DropdownMenuLabel className="font-normal">
                 <div className="flex flex-col space-y-1">
                   <p className="text-sm leading-none font-medium">
@@ -53,7 +61,7 @@ export default async function UserDropDown() {
                   href="/dashboard"
                   className="flex w-full cursor-pointer items-center"
                 >
-                  <LayoutDashboard className="mr-2 h-4 w-4" />
+                  <LayoutDashboard className="text-primary/70 mr-2 h-4 w-4" />
                   Dashboard
                 </Link>
               </DropdownMenuItem>
@@ -63,7 +71,7 @@ export default async function UserDropDown() {
                   className="flex w-full cursor-pointer items-center justify-between"
                 >
                   <div className="flex items-center">
-                    <MessageSquare className="mr-2 h-4 w-4" />
+                    <MessageSquare className="text-primary/70 mr-2 h-4 w-4" />
                     Messages
                   </div>
                 </Link>
@@ -73,7 +81,7 @@ export default async function UserDropDown() {
                   href="/edit-profile"
                   className="flex w-full cursor-pointer items-center"
                 >
-                  <Settings className="mr-2 h-4 w-4" />
+                  <Settings className="text-primary/70 mr-2 h-4 w-4" />
                   Edit Account
                 </Link>
               </DropdownMenuItem>
@@ -82,7 +90,7 @@ export default async function UserDropDown() {
                   href={`/profile?id=${session.user.id}`}
                   className="flex w-full cursor-pointer items-center"
                 >
-                  <UserIcon className="mr-2 h-4 w-4" />
+                  <UserIcon className="text-primary/70 mr-2 h-4 w-4" />
                   Account Details
                 </Link>
               </DropdownMenuItem>
@@ -93,7 +101,9 @@ export default async function UserDropDown() {
         </div>
       ) : (
         <Link href="/sign-in">
-          <Button>Sign In</Button>
+          <Button size="sm" className="rounded-full px-4 shadow-sm">
+            Sign In
+          </Button>
         </Link>
       )}
     </div>
