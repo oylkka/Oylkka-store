@@ -11,8 +11,8 @@ type HeaderProps = {
 
 export default function Header({ navigation = true }: HeaderProps) {
   return (
-    <header className="bg-background/80 border-border/40 sticky top-0 z-50 w-full border-b shadow-sm backdrop-blur-md">
-      <div className="container mx-auto py-3 md:py-4">
+    <header className="bg-background sticky top-0 z-50 w-full border-b shadow-sm">
+      <div className="container py-3 md:py-4">
         <div className="flex items-center justify-between gap-4">
           <HeaderClient />
 

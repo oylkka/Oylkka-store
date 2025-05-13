@@ -24,7 +24,7 @@ export default async function Cart() {
         <CartBadge />
       </SheetTrigger>
 
-      <SheetContent className="flex w-full flex-col sm:max-w-md">
+      <SheetContent className="flex w-[300px] flex-col sm:w-[400px]">
         <SheetHeader className="border-b px-4 py-4">
           <SheetTitle>Your Shopping Cart</SheetTitle>
         </SheetHeader>

@@ -92,7 +92,7 @@ function ShopContent() {
             </div>
           </div>
         ) : (
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-3 lg:grid-cols-4">
+          <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
             {data.products.map((product: ProductCardType) => (
               <ProductCard key={product.id} product={product} />
             ))}

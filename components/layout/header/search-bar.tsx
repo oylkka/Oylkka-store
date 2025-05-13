@@ -57,7 +57,7 @@ export default function SearchBar({ isMobile = false }: SearchBarProps) {
                     <Input
                       {...field}
                       placeholder="Search products..."
-                      className={`border-border/50 bg-background focus-visible:border-primary/50 focus-visible:ring-primary/30 h-10 md:min-w-max rounded-full pr-10 pl-10 shadow-sm transition-all focus-visible:ring-1 focus-visible:ring-offset-0 ${isMobile ? 'h-9 w-full' : ''}`}
+                      className={`border-border/50 bg-background focus-visible:border-primary/50 focus-visible:ring-primary/30 h-10 rounded-full pr-10 pl-10 shadow-sm transition-all focus-visible:ring-1 focus-visible:ring-offset-0 md:min-w-max ${isMobile ? 'h-9 w-full' : ''}`}
                       autoComplete="off"
                     />
                     <Search

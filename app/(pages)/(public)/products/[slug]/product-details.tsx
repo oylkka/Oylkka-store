@@ -315,10 +315,10 @@ export default function ProductDetails({ slug }: { slug: string }) {
             <div className="flex items-center gap-3">
               {currentDiscountPrice ? (
                 <>
-                  <span className="text-3xl font-bold text-gray-900">
+                  <span className="text-3xl font-bold">
                     ${currentDiscountPrice.toFixed(2)}
                   </span>
-                  <span className="text-lg text-gray-500 line-through">
+                  <span className="text-muted-foreground text-lg line-through">
                     ${currentPrice.toFixed(2)}
                   </span>
                   <Badge className="bg-red-500 hover:bg-red-600">
@@ -326,18 +326,18 @@ export default function ProductDetails({ slug }: { slug: string }) {
                   </Badge>
                 </>
               ) : (
-                <span className="text-3xl font-bold text-gray-900">
+                <span className="text-3xl font-bold">
                   ${currentPrice.toFixed(2)}
                 </span>
               )}
             </div>
-            <p className="text-sm text-gray-500">
+            <p className="text-muted-foreground text-sm">
               Price includes taxes & duties for US
             </p>
           </div>
 
           <div className="prose prose-sm max-w-none">
-            <p className="leading-relaxed text-gray-700">
+            <p className="text-secondary-foreground leading-relaxed">
               {product.description.split('\n\n')[0]}
             </p>
           </div>
@@ -419,7 +419,7 @@ export default function ProductDetails({ slug }: { slug: string }) {
           </div>
 
           {/* Shipping & Returns Info */}
-          <div className="mt-6 grid grid-cols-2 gap-4 rounded-xl border bg-gray-50/50 p-4">
+          <div className="bg-card mt-6 grid grid-cols-2 gap-4 rounded-xl border p-4">
             <div className="flex items-start gap-2">
               <div className="bg-primary/10 rounded-full p-2">
                 <svg
@@ -516,14 +516,22 @@ export default function ProductDetails({ slug }: { slug: string }) {
 
       {/* Product Information Tabs */}
       <div className="mt-16">
-        <Tabs defaultValue="details" className="w-full">
-          <TabsList className="grid w-full grid-cols-4">
+        <Tabs defaultValue="details">
+          <TabsList className="mb-4 hidden w-full grid-cols-4 md:grid">
             <TabsTrigger value="details">Details</TabsTrigger>
             <TabsTrigger value="specifications">Specifications</TabsTrigger>
             <TabsTrigger value="reviews">Reviews</TabsTrigger>
             <TabsTrigger value="shipping">Shipping & Returns</TabsTrigger>
           </TabsList>
-          <TabsContent value="details" className="rounded-b-lg border p-6">
+          <TabsList className="mb-4 max-w-full md:hidden">
+            <div className="flex items-center overflow-x-auto">
+              <TabsTrigger value="details">Details</TabsTrigger>
+              <TabsTrigger value="specifications">Specifications</TabsTrigger>
+              <TabsTrigger value="reviews">Reviews</TabsTrigger>
+              <TabsTrigger value="shipping">Shipping & Returns</TabsTrigger>
+            </div>
+          </TabsList>
+          <TabsContent value="details">
             <div className="prose max-w-none">
               <h3>Product Description</h3>
               {product.description
@@ -541,10 +549,7 @@ export default function ProductDetails({ slug }: { slug: string }) {
               </ul>
             </div>
           </TabsContent>
-          <TabsContent
-            value="specifications"
-            className="rounded-b-lg border p-6"
-          >
+          <TabsContent value="specifications">
             <div className="grid grid-cols-1 gap-y-4 md:grid-cols-2 md:gap-x-8">
               <div>
                 <h3 className="text-lg font-medium">
@@ -619,10 +624,10 @@ export default function ProductDetails({ slug }: { slug: string }) {
               </div>
             </div>
           </TabsContent>
-          <TabsContent value="reviews" className="rounded-b-lg border p-6">
+          <TabsContent value="reviews">
             <div className="flex flex-col md:flex-row md:gap-8">
               <div className="mb-8 md:mb-0 md:w-1/3">
-                <div className="rounded-lg bg-gray-50 p-6">
+                <div className="bg-secondary rounded-lg p-6">
                   <h3 className="mb-4 text-xl font-bold">Customer Reviews</h3>
                   <div className="mb-6 text-center">
                     <div className="text-5xl font-bold">
@@ -672,11 +677,11 @@ export default function ProductDetails({ slug }: { slug: string }) {
               </div>
             </div>
           </TabsContent>
-          <TabsContent value="shipping" className="rounded-b-lg border p-6">
+          <TabsContent value="shipping">
             <div className="space-y-6">
               <div>
                 <h3 className="text-lg font-medium">Shipping Information</h3>
-                <p className="mt-2 text-gray-600">
+                <p className="text-muted-foreground mt-2">
                   We offer the following shipping options for your convenience:
                 </p>
                 <ul className="mt-4 list-disc space-y-2 pl-5">
