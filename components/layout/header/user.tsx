@@ -24,7 +24,7 @@ import { SignOut } from './logout';
 export default async function UserDropDown() {
   const session = await auth();
   return (
-    <div>
+    <div className="pl-2">
       {session?.user ? (
         <div>
           <DropdownMenu>

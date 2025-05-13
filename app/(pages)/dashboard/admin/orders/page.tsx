@@ -241,7 +241,7 @@ function OrdersContent() {
                             `/dashboard/admin/orders/single-order?orderId=${order.orderNumber}`
                           )
                         }
-                        className="cursor-pointer hover:bg-gray-50"
+                        className="cursor-pointer"
                       >
                         <TableCell className="font-medium">
                           {order.orderNumber}

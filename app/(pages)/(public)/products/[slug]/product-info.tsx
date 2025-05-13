@@ -1,12 +1,12 @@
 'use client';
 
 import { Heart, Star } from 'lucide-react';
-import Image from 'next/image';
 
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import type { Product } from '@/lib/types';
-import { cn } from '@/lib/utils';
+import { cn, getInitials } from '@/lib/utils';
 
 import ShareProduct from './share-product';
 import { StockStatus } from './stock-status';
@@ -91,13 +91,14 @@ export default function ProductInfo({
         <div className="mt-3 flex items-center gap-2">
           <span className="text-muted-foreground text-sm">Sold by:</span>
           <div className="flex items-center gap-2">
-            <Image
-              width={20}
-              height={20}
-              src={product.shop.logo?.url}
-              alt={product.shop.name}
-              className="h-5 w-5 rounded-full object-cover"
-            />
+            <Avatar>
+              <AvatarImage
+                src={product.shop.logo?.url}
+                alt={product.shop.name}
+              />
+              <AvatarFallback>{getInitials(product.shop.name)}</AvatarFallback>
+            </Avatar>
+
             <span className="text-sm font-medium">{product.shop.name}</span>
           </div>
         </div>
