@@ -24,9 +24,9 @@ export default async function Cart() {
         <CartBadge />
       </SheetTrigger>
 
-      <SheetContent className="flex w-full flex-col sm:max-w-md">
-        <SheetHeader className="px-4 py-2 md:py-4">
-          <SheetTitle>Shopping Cart</SheetTitle>
+      <SheetContent className="flex w-[300px] flex-col sm:w-[400px]">
+        <SheetHeader className="border-b px-4 py-4">
+          <SheetTitle>Your Shopping Cart</SheetTitle>
         </SheetHeader>
 
         <div className="mx-4 flex-1 overflow-auto">
@@ -36,7 +36,7 @@ export default async function Cart() {
             <div className="flex h-[50vh] flex-col items-center justify-center space-y-4 p-8 text-center">
               <p className="text-muted-foreground">Sign in to see your cart</p>
               <Link href="/auth/signin">
-                <Button variant="outline" size="sm">
+                <Button variant="outline" size="sm" className="rounded-full">
                   Sign In
                 </Button>
               </Link>
@@ -45,10 +45,12 @@ export default async function Cart() {
         </div>
 
         {session && (
-          <SheetFooter className="mt-auto px-4 py-4">
+          <SheetFooter className="mt-auto border-t px-4 py-4">
             <SheetClose asChild>
               <Link href="/cart/checkout" className="w-full">
-                <Button className="w-full font-medium">CHECKOUT</Button>
+                <Button className="w-full rounded-full font-medium shadow-sm">
+                  CHECKOUT
+                </Button>
               </Link>
             </SheetClose>
           </SheetFooter>

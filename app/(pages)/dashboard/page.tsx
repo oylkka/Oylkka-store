@@ -14,7 +14,6 @@ import {
   Truck,
   Users,
 } from 'lucide-react';
-import Link from 'next/link';
 
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
@@ -39,17 +38,10 @@ interface UserType {
 }
 
 // Admin Dashboard Component
-function AdminDashboard({ user }: UserType) {
+function AdminDashboard() {
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <h2 className="text-3xl font-bold tracking-tight">Admin Dashboard</h2>
-        <p>{user.role}</p>
-        <Button>
-          <ArrowUpRight className="mr-2 h-4 w-4" />
-          Export Reports
-        </Button>
-      </div>
+      <h2 className="text-2xl font-bold tracking-tight">Admin Dashboard</h2>
 
       <Tabs defaultValue="overview" className="space-y-4">
         <TabsList>
@@ -60,7 +52,7 @@ function AdminDashboard({ user }: UserType) {
         </TabsList>
 
         <TabsContent value="overview" className="space-y-4">
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+          <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">
@@ -365,17 +357,9 @@ function ManagerDashboard({ user }: UserType) {
 function VendorDashboard() {
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <h2 className="text-3xl font-bold tracking-tight">Vendor Portal</h2>
-        <Link href="/dashboard/vendor/products/add">
-          <Button variant="secondary">
-            <Package className="mr-2 h-4 w-4" />
-            Add New Product
-          </Button>
-        </Link>
-      </div>
+      <h2 className="text-2xl font-bold tracking-tight">Vendor Portal</h2>
 
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+      <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
@@ -848,7 +832,7 @@ export default async function Dashboard() {
   return (
     <div>
       {session?.user.role === 'ADMIN' ? (
-        <AdminDashboard user={session.user} />
+        <AdminDashboard />
       ) : session?.user.role === 'MANAGER' ? (
         <ManagerDashboard user={session.user} />
       ) : session?.user.role === 'VENDOR' ? (

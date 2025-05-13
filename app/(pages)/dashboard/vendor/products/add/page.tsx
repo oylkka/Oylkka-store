@@ -37,14 +37,14 @@ function NewProductForm() {
   return (
     <form onSubmit={methods.handleSubmit(onSubmit)}>
       {/* Header */}
-      <div className="mb-6 flex items-center justify-between">
+      <div className="mb-6 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div className="flex items-center gap-3">
           <Button variant="outline">
             <ArrowBigLeft />
           </Button>
           <h1 className="text-2xl font-bold">New Product</h1>
         </div>
-        <div className="flex items-center gap-5">
+        <div className="flex items-center gap-5 justify-end">
           <Button variant="outline" type="button">
             Discard
           </Button>

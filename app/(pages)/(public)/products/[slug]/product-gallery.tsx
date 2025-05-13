@@ -1,5 +1,6 @@
 'use client';
 
+import { DialogTitle } from '@radix-ui/react-dialog';
 import { Maximize2 } from 'lucide-react';
 import Image from 'next/image';
 import { useRef, useState } from 'react';
@@ -13,7 +14,12 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from '@/components/ui/carousel';
-import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTrigger,
+} from '@/components/ui/dialog';
 import { cn } from '@/lib/utils';
 
 interface ProductImage {
@@ -72,16 +78,13 @@ export default function ProductGallery({
       <Dialog>
         <div
           ref={imageContainerRef}
-          className="relative h-[500px] w-full cursor-zoom-in overflow-hidden rounded-lg bg-gray-50"
+          className="bg-secondary relative h-80 w-full cursor-zoom-in overflow-hidden rounded-lg md:h-[500px]"
           onMouseMove={handleMouseMove}
           onMouseEnter={() => setMagnify(true)}
           onMouseLeave={() => setMagnify(false)}
         >
           <Image
-            src={
-              images[selectedImage]?.url ||
-              '/placeholder.svg?height=600&width=600'
-            }
+            src={images[selectedImage]?.url}
             alt={`${productName} - ${images[selectedImage]?.alt || `view ${selectedImage + 1}`}`}
             className="object-contain transition-opacity duration-300"
             fill
@@ -111,16 +114,18 @@ export default function ProductGallery({
 
           <DialogTrigger asChild>
             <Button
-              variant="outline"
+              variant="secondary"
               size="icon"
-              className="absolute right-4 bottom-4 z-20 bg-white/70 hover:bg-white"
+              className="absolute right-4 bottom-4 z-20"
             >
               <Maximize2 className="h-5 w-5" />
             </Button>
           </DialogTrigger>
         </div>
-
         <DialogContent className="max-w-4xl">
+          <DialogHeader className="hidden">
+            <DialogTitle>{productName}</DialogTitle>
+          </DialogHeader>
           <div className="h-full w-full">
             <Image
               src={

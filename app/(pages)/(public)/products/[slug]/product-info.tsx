@@ -1,12 +1,12 @@
 'use client';
 
 import { Heart, Star } from 'lucide-react';
-import Image from 'next/image';
 
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import type { Product } from '@/lib/types';
-import { cn } from '@/lib/utils';
+import { cn, getInitials } from '@/lib/utils';
 
 import ShareProduct from './share-product';
 import { StockStatus } from './stock-status';
@@ -53,7 +53,7 @@ export default function ProductInfo({
         </div>
       </div>
 
-      <h1 className="text-3xl font-bold tracking-tight text-gray-900">
+      <h1 className="text-3xl font-bold tracking-tight">
         {product.productName}
       </h1>
 
@@ -67,12 +67,12 @@ export default function ProductInfo({
                   'h-5 w-5',
                   star <= Math.round(product.rating ?? 0)
                     ? 'fill-yellow-400 text-yellow-400'
-                    : 'fill-gray-200 text-gray-200'
+                    : 'fill-gray-200 text-gray-200 dark:fill-gray-600'
                 )}
               />
             ))}
           </div>
-          <span className="ml-2 text-sm text-gray-600">
+          <span className="text-muted-foreground ml-2 text-sm">
             {product.rating
               ? `${product.rating.toFixed(1)} (${product.reviewCount || 0} reviews)`
               : 'No ratings yet'}
@@ -89,17 +89,16 @@ export default function ProductInfo({
       {/* Shop info */}
       {product.shop && (
         <div className="mt-3 flex items-center gap-2">
-          <span className="text-sm text-gray-500">Sold by:</span>
+          <span className="text-muted-foreground text-sm">Sold by:</span>
           <div className="flex items-center gap-2">
-            <Image
-              width={20}
-              height={20}
-              src={
-                product.shop.logo?.url || '/placeholder.svg?height=20&width=20'
-              }
-              alt={product.shop.name}
-              className="h-5 w-5 rounded-full object-cover"
-            />
+            <Avatar>
+              <AvatarImage
+                src={product.shop.logo?.url}
+                alt={product.shop.name}
+              />
+              <AvatarFallback>{getInitials(product.shop.name)}</AvatarFallback>
+            </Avatar>
+
             <span className="text-sm font-medium">{product.shop.name}</span>
           </div>
         </div>

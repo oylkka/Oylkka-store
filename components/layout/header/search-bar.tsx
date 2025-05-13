@@ -57,21 +57,22 @@ export default function SearchBar({ isMobile = false }: SearchBarProps) {
                     <Input
                       {...field}
                       placeholder="Search products..."
-                      className={`bg-muted focus-visible:ring-primary h-10 min-w-max rounded-full border-none pr-10 pl-10 ring-offset-0 focus-visible:ring-1 focus-visible:ring-offset-0 ${
-                        isMobile ? 'h-9' : ''
-                      }`}
+                      className={`border-border/50 bg-background focus-visible:border-primary/50 focus-visible:ring-primary/30 h-10 rounded-full pr-10 pl-10 shadow-sm transition-all focus-visible:ring-1 focus-visible:ring-offset-0 md:min-w-max ${isMobile ? 'h-9 w-full' : ''}`}
                       autoComplete="off"
                     />
                     <Search
-                      className="text-muted-foreground absolute top-1/2 left-3 -translate-y-1/2"
+                      className="text-muted-foreground group-focus-within:text-primary absolute top-1/2 left-3 -translate-y-1/2 transition-colors"
                       size={18}
                     />
                     {field.value?.length > 0 && (
-                      <X
-                        className="text-muted-foreground hover:text-foreground absolute top-1/2 right-3 -translate-y-1/2 cursor-pointer"
-                        size={18}
+                      <button
+                        type="button"
+                        className="text-muted-foreground hover:bg-muted hover:text-foreground absolute top-1/2 right-3 -translate-y-1/2 rounded-full p-0.5 transition-colors"
                         onClick={clearInput}
-                      />
+                      >
+                        <X size={16} />
+                        <span className="sr-only">Clear search</span>
+                      </button>
                     )}
                   </div>
                 </FormControl>

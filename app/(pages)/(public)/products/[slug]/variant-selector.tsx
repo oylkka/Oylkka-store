@@ -160,9 +160,9 @@ export default function VariantSelector({
                   <Label
                     htmlFor={`size-${size}`}
                     className={cn(
-                      'relative flex h-10 w-14 cursor-pointer items-center justify-center rounded-md border bg-white text-center transition-colors',
+                      'relative flex h-10 w-14 cursor-pointer items-center justify-center rounded-md border text-center transition-colors',
                       selectedSize === size
-                        ? 'border-primary bg-primary/5 text-primary'
+                        ? 'border-primary bg-primary/10 text-primary'
                         : 'border-gray-200',
                       !isAvailable && 'cursor-not-allowed opacity-50'
                     )}
