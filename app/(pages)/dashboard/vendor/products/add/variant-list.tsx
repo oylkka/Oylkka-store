@@ -221,7 +221,7 @@ export default function VariantList({
 
       {primaryAttribute && (
         <div className="mb-4">
-          <p className="text-sm text-gray-500">
+          <p className="text-muted-foreground text-sm">
             Variants grouped by {formatAttributeName(primaryAttribute)}
           </p>
         </div>
@@ -291,11 +291,15 @@ export default function VariantList({
 
                   <div className="mb-4 grid grid-cols-2 gap-4 md:grid-cols-4">
                     <div>
-                      <span className="text-sm text-gray-500">SKU:</span>
+                      <span className="text-muted-foreground text-sm">
+                        SKU:
+                      </span>
                       <Input value={variant.sku} className="mt-1" disabled />
                     </div>
                     <div>
-                      <span className="text-sm text-gray-500">Price:</span>
+                      <span className="text-muted-foreground text-sm">
+                        Price:
+                      </span>
                       <Input
                         type="number"
                         value={variant.price || ''}
@@ -344,7 +348,7 @@ export default function VariantList({
                   {variant.attributes &&
                     Object.keys(variant.attributes).length > 0 && (
                       <div className="mb-4">
-                        <span className="mb-2 block text-sm text-gray-500">
+                        <span className="text-muted-foreground mb-2 block text-sm">
                           Attributes:
                         </span>
                         <div className="flex flex-wrap gap-2">
@@ -377,7 +381,7 @@ export default function VariantList({
                     )}
 
                   <div>
-                    <span className="mb-2 block text-sm text-gray-500">
+                    <span className="text-muted-foreground mb-2 block text-sm">
                       Image:
                     </span>
                     <div className="flex items-center gap-4">

@@ -532,7 +532,7 @@ export function ProductAttributes() {
           {attributeTypes.map((attrType) => (
             <div
               key={attrType}
-              className="rounded-lg border bg-gray-50/50 p-5 transition-all hover:shadow-sm"
+              className="rounded-lg border p-5 transition-all hover:shadow-sm"
             >
               <div className="flex items-start justify-between gap-4">
                 <FormItem className="flex-1">

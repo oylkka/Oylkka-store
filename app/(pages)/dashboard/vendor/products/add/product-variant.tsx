@@ -61,13 +61,16 @@ export default function ProductVariant() {
   const attributeOptions = useMemo(() => {
     const options: Record<string, string[]> = {};
 
-    Object.entries(attributes).forEach(([key, value]) => {
-      if (Array.isArray(value)) {
-        options[key] = value;
-      } else if (typeof value === 'string') {
-        options[key] = [value];
-      }
-    });
+    // Add a check to make sure attributes is defined before calling Object.entries
+    if (attributes && typeof attributes === 'object') {
+      Object.entries(attributes).forEach(([key, value]) => {
+        if (Array.isArray(value)) {
+          options[key] = value;
+        } else if (typeof value === 'string') {
+          options[key] = [value];
+        }
+      });
+    }
 
     return options;
   }, [attributes]);

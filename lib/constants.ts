@@ -17,4 +17,5 @@ export const QEUERY_KEYS = {
   SHOP_LIST: 'shop list',
   SHOP_DETAILS: 'shop details',
   VENDOR_ORDERS: 'vendor orders',
+  FEATURED_PRODUCTS: 'featured products',
 };
