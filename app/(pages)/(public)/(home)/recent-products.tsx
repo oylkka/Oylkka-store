@@ -1,14 +1,16 @@
 'use client';
+import Link from 'next/link';
 
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { ProductCardType } from '@/lib/types';
-import { useFeaturedProducts } from '@/services/public/featured-products';
+import { useProductList } from '@/services';
 
 import { ProductCard, ProductCardSkeleton } from '../products/product-card';
 
-export default function FeaturedProducts() {
-  const { isPending, data, isError } = useFeaturedProducts();
+export default function RecentProducts() {
+  const { isPending, data, isError } = useProductList({ currentPage: 1 });
+
   if (isPending) {
     return (
       <div className="container mx-auto py-8">
@@ -40,13 +42,18 @@ export default function FeaturedProducts() {
     );
   }
   return (
-    <div className="container mx-auto my-4 space-y-12">
-      <h2 className="text-2xl font-bold">Featured Products</h2>
+    <div className="container mx-auto my-4 space-y-12 md:my-10">
+      <h2 className="text-2xl font-bold">Recent Products</h2>
       <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
         {data.products.map((product: ProductCardType) => (
           <ProductCard key={product.id} product={product} />
         ))}
       </div>
+      {data.products.length > 15 && (
+        <Link href="/products" className="flex items-center justify-center">
+          <Button size="lg">View All Products</Button>
+        </Link>
+      )}
     </div>
   );
 }

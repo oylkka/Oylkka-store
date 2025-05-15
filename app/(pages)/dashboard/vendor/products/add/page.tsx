@@ -44,7 +44,7 @@ function NewProductForm() {
           </Button>
           <h1 className="text-2xl font-bold">New Product</h1>
         </div>
-        <div className="flex items-center gap-5 justify-end">
+        <div className="flex items-center justify-end gap-5">
           <Button variant="outline" type="button">
             Discard
           </Button>

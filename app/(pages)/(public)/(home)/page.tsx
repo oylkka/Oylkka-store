@@ -4,6 +4,7 @@ import Header from '@/components/layout/header';
 import Categories from './categories';
 import FeaturedProducts from './featured-products';
 import HeroSection from './hero';
+import RecentProducts from './recent-products';
 
 export default function page() {
   return (
@@ -13,6 +14,7 @@ export default function page() {
         <HeroSection />
         <Categories />
         <FeaturedProducts />
+        <RecentProducts />
       </main>
       <Footer />
     </>
