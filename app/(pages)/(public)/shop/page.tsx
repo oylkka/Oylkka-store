@@ -75,10 +75,10 @@ export default function ShopListPage() {
     <div className="container mx-auto py-6">
       {/* Header Section */}
       <div className="mb-12 text-center">
-        <h1 className="text-primary text-5xl font-extrabold tracking-tight">
+        <h1 className="text-primary text-4xl font-extrabold tracking-tight">
           Explore Our Shops
         </h1>
-        <p className="text-muted-foreground mx-auto mt-4 max-w-2xl text-xl">
+        <p className="text-muted-foreground mx-auto mt-4 max-w-2xl">
           Discover a curated selection of unique stores offering the best
           products and experiences.
         </p>
@@ -97,7 +97,7 @@ export default function ShopListPage() {
               whileHover={{ scale: 1.03, transition: { duration: 0.2 } }}
               className="group"
             >
-              <Card className="relative flex h-full flex-col overflow-hidden rounded-3xl border-none bg-white p-0 shadow-xl transition-all hover:shadow-2xl">
+              <Card className="bg-card relative flex h-full flex-col overflow-hidden rounded-3xl border-none p-0 shadow-xl transition-all hover:shadow-2xl">
                 {/* Banner Image */}
                 <div className="relative h-56 w-full">
                   {shop.bannerImage?.url ? (
@@ -110,7 +110,7 @@ export default function ShopListPage() {
                       priority={false}
                     />
                   ) : (
-                    <div className="h-full w-full bg-gradient-to-br from-indigo-200 to-purple-200" />
+                    <div className="h-full w-full bg-gradient-to-br from-indigo-200 to-purple-200 dark:from-orange-900 dark:to-purple-900" />
                   )}
                   {/* Status Badge */}
                   <Badge
@@ -131,17 +131,17 @@ export default function ShopListPage() {
                       alt={shop.logo.alt ?? shop.name}
                       width={90}
                       height={90}
-                      className="h-[90px] w-[90px] rounded-full border-4 border-white bg-white object-cover shadow-lg"
+                      className="h-[90px] w-[90px] rounded-full border-4 object-cover shadow-lg"
                     />
                   ) : (
-                    <div className="bg-muted text-muted-foreground flex h-[90px] w-[90px] items-center justify-center rounded-full border-4 border-white text-2xl font-bold shadow-lg">
+                    <div className="bg-muted text-muted-foreground flex h-[90px] w-[90px] items-center justify-center rounded-full border-4 text-2xl font-bold shadow-lg">
                       {shop.name.charAt(0)}
                     </div>
                   )}
                 </div>
 
                 <CardHeader className="mt-12 flex-1">
-                  <CardTitle className="truncate text-2xl font-bold text-gray-900">
+                  <CardTitle className="truncate text-2xl font-bold">
                     {shop.name}
                   </CardTitle>
                   <div className="mt-2 flex items-center gap-1">
@@ -153,9 +153,7 @@ export default function ShopListPage() {
                 </CardHeader>
 
                 <CardContent className="space-y-4">
-                  <p className="text-base font-medium text-gray-800">
-                    {shop.address}
-                  </p>
+                  <p className="text-base font-medium">{shop.address}</p>
                   {shop.description ? (
                     <p className="text-muted-foreground line-clamp-3 text-sm">
                       {shop.description}

@@ -186,3 +186,33 @@ export interface AdminOrderListType {
     name: string;
   };
 }
+
+export interface ShopType {
+  id: string;
+  name: string;
+  slug: string;
+  description?: string | null;
+  address: string;
+  shopEmail: string;
+  shopPhone: string;
+  status: 'PENDING' | 'ACTIVE';
+  rating: number;
+  totalSales: number;
+  logo?: ProductImage | null;
+  bannerImage?: ProductImage | null;
+  socialLinks?: SocialLinks | null;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  policies?: any | null;
+  isVerified: boolean;
+  createdAt: string;
+  views: number;
+  products?: ProductCardType[];
+}
+
+export interface SocialLinks {
+  website?: string | null;
+  facebook?: string | null;
+  instagram?: string | null;
+  twitter?: string | null;
+  linkedin?: string | null;
+}
