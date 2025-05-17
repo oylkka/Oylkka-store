@@ -5,6 +5,7 @@ import {
   ClipboardList,
   FileText,
   HelpCircle,
+  Image,
   MessageSquare,
   Package,
   Settings,
@@ -346,7 +347,32 @@ export async function NavMain() {
       items: [
         {
           title: 'Vendor List',
-          url: '/admin/vendors/list',
+          url: '/dashboard/admin/vendors/list',
+        },
+        {
+          title: 'Vendor Applications',
+          url: '/admin/vendors/applications',
+        },
+        {
+          title: 'Performance Metrics',
+          url: '/admin/vendors/performance',
+        },
+        {
+          title: 'Payouts',
+          url: '/admin/vendors/payouts',
+          roles: ['ADMIN'],
+        },
+      ],
+    },
+    {
+      title: 'Banner Management',
+      url: '/dashboard/admin/banner',
+      icon: Image,
+      roles: ['ADMIN', 'MANAGER'],
+      items: [
+        {
+          title: 'Add Banner',
+          url: '/dashboard/admin/banner/add',
         },
         {
           title: 'Vendor Applications',

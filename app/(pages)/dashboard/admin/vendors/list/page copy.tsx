@@ -4,12 +4,12 @@ import { useState } from 'react';
 
 import { useCustomersList } from '@/services';
 
-import { CustomerList } from './customer-list';
 import { CustomerListEmpty } from './customer-list-empty';
 import { CustomerListError } from './customer-list-error';
 import { CustomerListSkeleton } from './customer-list-skeleton';
+import { VendorList } from './vendor-list';
 
-export default function CustomersPage() {
+export default function VendorsListPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [roleFilter, setRoleFilter] = useState('ALL');
   const [statusFilter, setStatusFilter] = useState('ALL');
@@ -32,7 +32,7 @@ export default function CustomersPage() {
   }
 
   return (
-    <CustomerList
+    <VendorList
       customers={customers}
       searchQuery={searchQuery}
       onSearchChange={setSearchQuery}

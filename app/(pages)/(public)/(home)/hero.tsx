@@ -1,126 +1,60 @@
 'use client';
-import Image, { StaticImageData } from 'next/image';
+
+import Image from 'next/image';
 import Link from 'next/link';
 import React, { useEffect, useRef, useState } from 'react';
 
-import image1 from '@/assets/hero-slider-1.jpg';
-import image2 from '@/assets/hero-slider-2.jpg';
-import image3 from '@/assets/hero-slider-3.jpg';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
+import { useHeroBanner } from '@/services/public/hero-banner';
 
-interface Slide {
-  id: number;
+type HeroBanner = {
+  id: string;
   title: string;
-  subtitle: string;
+  subTitle: string;
   description: string;
-  image: StaticImageData;
-  primaryCta: {
-    text: string;
-    link: string;
-  };
-  secondaryCta?: {
-    text: string;
-    link: string;
-  };
-  badge?: string;
-  theme: 'light' | 'dark';
-}
+  image: { url: string };
+  bannerTag?: string;
+  primaryActionText?: string;
+  primaryActionLink?: string;
+  secondaryActionText?: string;
+  secondaryActionLink?: string;
+  alignment?: 'left' | 'center' | 'right';
+};
 
 export default function HeroSection() {
+  const { isPending, data = [], isError } = useHeroBanner();
   const [currentSlide, setCurrentSlide] = useState(0);
   const [autoplay, setAutoplay] = useState(true);
   const [touchStart, setTouchStart] = useState<number | null>(null);
   const [touchEnd, setTouchEnd] = useState<number | null>(null);
   const autoplayTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  const slides: Slide[] = [
-    {
-      id: 1,
-      title: 'Summer Collection',
-      subtitle: '2024',
-      description:
-        'Discover the latest trends for the season with up to 30% off on selected items.',
-      image: image1,
-      primaryCta: {
-        text: 'Shop Now',
-        link: '/collections/summer',
-      },
-      secondaryCta: {
-        text: 'Learn More',
-        link: '/about-collection',
-      },
-      badge: 'New Arrivals',
-      theme: 'light',
-    },
-    {
-      id: 2,
-      title: 'Premium Accessories',
-      subtitle: 'Exclusive Collection',
-      description:
-        'Elevate your style with our handcrafted accessories made from premium materials.',
-      image: image2,
-      primaryCta: {
-        text: 'Explore',
-        link: '/collections/accessories',
-      },
-      theme: 'dark',
-    },
-    {
-      id: 3,
-      title: 'Limited Edition',
-      subtitle: 'Designer Collaboration',
-      description:
-        'Our exclusive designer collaboration is now available. Limited quantities only.',
-      image: image3,
-      primaryCta: {
-        text: 'Shop Collection',
-        link: '/collections/limited-edition',
-      },
-      secondaryCta: {
-        text: 'View Lookbook',
-        link: '/lookbook',
-      },
-      badge: 'Limited Stock',
-      theme: 'light',
-    },
-  ];
-
-  // Handle autoplay
+  // Autoplay effect
   useEffect(() => {
-    let interval: NodeJS.Timeout;
+    if (!autoplay || data.length === 0) {return;}
 
-    if (autoplay) {
-      interval = setInterval(() => {
-        setCurrentSlide((prev) => (prev === slides.length - 1 ? 0 : prev + 1));
-      }, 5000);
-    }
+    const interval = setInterval(() => {
+      setCurrentSlide((prev) => (prev === data.length - 1 ? 0 : prev + 1));
+    }, 8000);
 
-    return () => {
-      if (interval) {
-        clearInterval(interval);
-      }
-    };
-  }, [autoplay, slides.length]);
+    return () => clearInterval(interval);
+  }, [autoplay, data.length]);
 
   const resetAutoplayWithDelay = () => {
     setAutoplay(false);
-    if (autoplayTimeoutRef.current) {
-      clearTimeout(autoplayTimeoutRef.current);
-    }
-    autoplayTimeoutRef.current = setTimeout(() => {
-      setAutoplay(true);
-    }, 8000); // resume after 5s
+    if (autoplayTimeoutRef.current) {clearTimeout(autoplayTimeoutRef.current);}
+    autoplayTimeoutRef.current = setTimeout(() => setAutoplay(true), 8000); // 8s
   };
 
   const nextSlide = () => {
-    setCurrentSlide((prev) => (prev === slides.length - 1 ? 0 : prev + 1));
+    setCurrentSlide((prev) => (prev === data.length - 1 ? 0 : prev + 1));
     resetAutoplayWithDelay();
   };
 
   const prevSlide = () => {
-    setCurrentSlide((prev) => (prev === 0 ? slides.length - 1 : prev - 1));
+    setCurrentSlide((prev) => (prev === 0 ? data.length - 1 : prev - 1));
     resetAutoplayWithDelay();
   };
 
@@ -138,19 +72,15 @@ export default function HeroSection() {
   };
 
   const handleTouchEnd = () => {
-    if (!touchStart || !touchEnd) {
-      return;
-    }
+    if (touchStart === null || touchEnd === null) {return;}
     const distance = touchStart - touchEnd;
-    if (distance > 50) {
-      nextSlide();
-    }
-    if (distance < -50) {
-      prevSlide();
-    }
+    if (distance > 50) {nextSlide();}
+    if (distance < -50) {prevSlide();}
     setTouchStart(null);
     setTouchEnd(null);
   };
+
+  if (isPending || isError || data.length === 0) {return null;}
 
   return (
     <section
@@ -160,7 +90,7 @@ export default function HeroSection() {
       onTouchEnd={handleTouchEnd}
     >
       <div className="relative h-[40vh] w-full md:h-[70vh] lg:h-[91vh]">
-        {slides.map((slide, index) => (
+        {data.map((slide: HeroBanner, index: number) => (
           <div
             key={slide.id}
             className={cn(
@@ -172,59 +102,56 @@ export default function HeroSection() {
           >
             <div className="absolute inset-0 overflow-hidden">
               <Image
-                src={slide.image}
+                src={slide.image.url}
                 alt={slide.title}
                 fill
                 priority={index === 0}
                 className="object-cover object-center"
               />
-              <div
-                className={cn(
-                  'absolute inset-0',
-                  slide.theme === 'light'
-                    ? 'bg-black/30'
-                    : 'bg-gradient-to-r from-black/70 via-black/50 to-black/30'
-                )}
-              />
+              <div className="absolute inset-0 bg-black/30 dark:bg-gradient-to-r dark:from-black/70 dark:via-black/40 dark:to-black/20" />
             </div>
 
             <div className="relative z-10 flex h-full items-center">
               <div
                 className={cn(
                   'container mx-auto flex px-2 md:px-0',
-                  index === 2 ? 'justify-end text-end' : 'justify-start'
+                  slide.alignment === 'left'
+                    ? 'justify-start'
+                    : slide.alignment === 'center'
+                      ? 'justify-center'
+                      : 'justify-end'
                 )}
               >
                 <div className="max-w-md space-y-2 md:max-w-lg md:space-y-4 lg:max-w-xl">
-                  {slide.badge && (
+                  {slide.bannerTag && (
                     <Badge
                       className="md:mb-2 md:rounded-md md:px-3 md:py-1 md:text-sm md:font-medium"
-                      variant={
-                        slide.theme === 'light' ? 'secondary' : 'default'
-                      }
+                      variant="secondary"
                     >
-                      {slide.badge}
+                      {slide.bannerTag}
                     </Badge>
                   )}
                   <h2 className="font-heading text-xl font-bold tracking-tight text-white sm:text-4xl md:text-5xl lg:text-6xl">
                     {slide.title}
                   </h2>
                   <p className="text-lg font-medium text-white md:text-2xl">
-                    {slide.subtitle}
+                    {slide.subTitle}
                   </p>
                   <p className="text-sm text-white/90 md:text-lg">
                     {slide.description}
                   </p>
                   <div className="flex flex-wrap gap-3 pt-2">
-                    <Button asChild>
-                      <Link href={slide.primaryCta.link}>
-                        {slide.primaryCta.text}
-                      </Link>
-                    </Button>
-                    {slide.secondaryCta && (
+                    {slide.primaryActionText && slide.primaryActionLink && (
+                      <Button asChild>
+                        <Link href={slide.primaryActionLink}>
+                          {slide.primaryActionText}
+                        </Link>
+                      </Button>
+                    )}
+                    {slide.secondaryActionText && slide.secondaryActionLink && (
                       <Button asChild variant="outline">
-                        <Link href={slide.secondaryCta.link}>
-                          {slide.secondaryCta.text}
+                        <Link href={slide.secondaryActionLink}>
+                          {slide.secondaryActionText}
                         </Link>
                       </Button>
                     )}
@@ -236,7 +163,7 @@ export default function HeroSection() {
         ))}
 
         <div className="absolute right-0 bottom-4 left-0 z-20 flex justify-center gap-2">
-          {slides.map((_, index) => (
+          {data.map((index: number) => (
             <button
               key={index}
               className={cn(

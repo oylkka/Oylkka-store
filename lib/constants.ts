@@ -18,4 +18,6 @@ export const QEUERY_KEYS = {
   SHOP_DETAILS: 'shop details',
   VENDOR_ORDERS: 'vendor orders',
   FEATURED_PRODUCTS: 'featured products',
+  VENDORS_LIST: 'vendors list',
+  HERO_BANNER: 'hero banner',
 };

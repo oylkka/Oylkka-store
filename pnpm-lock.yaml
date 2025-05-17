@@ -151,6 +151,9 @@ importers:
       tailwind-merge:
         specifier: ^3.2.0
         version: 3.2.0
+      timescape:
+        specifier: ^0.7.1
+        version: 0.7.1(preact@10.24.3)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
       use-debounce:
         specifier: ^10.0.4
         version: 10.0.4(react@19.1.0)
@@ -6388,6 +6391,35 @@ packages:
       }
     engines: { node: '>=8' }
 
+  timescape@0.7.1:
+    resolution:
+      {
+        integrity: sha512-v80kXaQ7a1QpgZoR1Sh81qmkGweR4gS80VZiOpRc0sYROOUbT2DDdd5PxynJs2v8NXtgyPCXQNjigf6je5hqgQ==,
+      }
+    peerDependencies:
+      '@preact/signals': 1.x
+      preact: 10.x
+      react: '>=17'
+      react-dom: '>=17'
+      solid-js: '>=1'
+      svelte: 3.x
+      vue: 3.x
+    peerDependenciesMeta:
+      '@preact/signals':
+        optional: true
+      preact:
+        optional: true
+      react:
+        optional: true
+      react-dom:
+        optional: true
+      solid-js:
+        optional: true
+      svelte:
+        optional: true
+      vue:
+        optional: true
+
   tinyglobby@0.2.13:
     resolution:
       {
@@ -11012,6 +11044,12 @@ snapshots:
       '@istanbuljs/schema': 0.1.3
       glob: 7.2.3
       minimatch: 3.1.2
+
+  timescape@0.7.1(preact@10.24.3)(react-dom@19.1.0(react@19.1.0))(react@19.1.0):
+    optionalDependencies:
+      preact: 10.24.3
+      react: 19.1.0
+      react-dom: 19.1.0(react@19.1.0)
 
   tinyglobby@0.2.13:
     dependencies:

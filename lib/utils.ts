@@ -55,10 +55,16 @@ export function cleanFormData<T extends Record<string, any>>(
     } else if (Array.isArray(value)) {
       cleanedData[key] = value;
     } else if (typeof value === 'object' && value !== null) {
-      // Narrow the type before checking instanceof
-      if ((value as File) instanceof File) {
+      // Check for Date objects first
+      if ((value as object) instanceof Date) {
         cleanedData[key] = value;
-      } else {
+      }
+      // Then check for File objects
+      else if ((value as File) instanceof File) {
+        cleanedData[key] = value;
+      }
+      // Handle other objects recursively
+      else {
         const nested = cleanFormData(value);
         if (Object.keys(nested).length > 0) {
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
