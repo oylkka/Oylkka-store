@@ -27,4 +27,14 @@ describe('getInitials', () => {
   it('handles names with extra spaces correctly', () => {
     expect(getInitials('  Elon   Reeve   Musk  ')).toBe('EM');
   });
+
+  it('handles names with numbers or symbols', () => {
+    expect(getInitials('123 456')).toBe('14');
+    expect(getInitials('@John #Doe')).toBe('@#');
+  });
+
+  it('returns correct initials for long names', () => {
+    expect(getInitials('Firstname Middlename Lastname')).toBe('FL');
+    expect(getInitials('Very Long Complex Name Example')).toBe('VE');
+  });
 });

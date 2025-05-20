@@ -1,5 +1,3 @@
-/* This TypeScript code snippet is setting up a database connection using PrismaClient. Here's a
-breakdown of what each part of the code is doing: */
 import { PrismaClient } from '../prisma/output';
 
 /* eslint-disable no-var */

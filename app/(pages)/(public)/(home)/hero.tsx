@@ -1,9 +1,11 @@
 'use client';
 
+import { AlertCircle } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import React, { useEffect, useRef, useState } from 'react';
 
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -33,7 +35,9 @@ export default function HeroSection() {
 
   // Autoplay effect
   useEffect(() => {
-    if (!autoplay || data.length === 0) {return;}
+    if (!autoplay || data.length === 0) {
+      return;
+    }
 
     const interval = setInterval(() => {
       setCurrentSlide((prev) => (prev === data.length - 1 ? 0 : prev + 1));
@@ -44,7 +48,9 @@ export default function HeroSection() {
 
   const resetAutoplayWithDelay = () => {
     setAutoplay(false);
-    if (autoplayTimeoutRef.current) {clearTimeout(autoplayTimeoutRef.current);}
+    if (autoplayTimeoutRef.current) {
+      clearTimeout(autoplayTimeoutRef.current);
+    }
     autoplayTimeoutRef.current = setTimeout(() => setAutoplay(true), 8000); // 8s
   };
 
@@ -72,15 +78,29 @@ export default function HeroSection() {
   };
 
   const handleTouchEnd = () => {
-    if (touchStart === null || touchEnd === null) {return;}
+    if (touchStart === null || touchEnd === null) {
+      return;
+    }
     const distance = touchStart - touchEnd;
-    if (distance > 50) {nextSlide();}
-    if (distance < -50) {prevSlide();}
+    if (distance > 50) {
+      nextSlide();
+    }
+    if (distance < -50) {
+      prevSlide();
+    }
     setTouchStart(null);
     setTouchEnd(null);
   };
 
-  if (isPending || isError || data.length === 0) {return null;}
+  if (isPending) {
+    return <HeroSkeleton />;
+  }
+  if (isError) {
+    return <HeroError />;
+  }
+  if (data.length === 0) {
+    return null;
+  }
 
   return (
     <section
@@ -179,5 +199,33 @@ export default function HeroSection() {
         </div>
       </div>
     </section>
+  );
+}
+
+function HeroSkeleton() {
+  return (
+    <div className="bg-muted relative h-[40vh] w-full animate-pulse md:h-[70vh] lg:h-[91vh]">
+      <div className="absolute inset-0 flex items-center justify-center">
+        <div className="space-y-2 text-center">
+          <div className="h-4 w-32 rounded bg-gray-300" />
+          <div className="h-6 w-48 rounded bg-gray-400" />
+          <div className="h-3 w-64 rounded bg-gray-300" />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function HeroError() {
+  return (
+    <div className="w-full p-6">
+      <Alert variant="destructive">
+        <AlertCircle className="h-4 w-4" />
+        <AlertTitle>Failed to load</AlertTitle>
+        <AlertDescription>
+          We couldn’t load the hero banner. Please try again later.
+        </AlertDescription>
+      </Alert>
+    </div>
   );
 }
