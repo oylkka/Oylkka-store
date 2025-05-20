@@ -26,7 +26,7 @@ type HeroBanner = {
 };
 
 export default function HeroSection() {
-  const { isPending, data, isError } = useHeroBanner();
+  const { isPending, data = [], isError } = useHeroBanner();
   const [currentSlide, setCurrentSlide] = useState(0);
   const [autoplay, setAutoplay] = useState(true);
   const [touchStart, setTouchStart] = useState<number | null>(null);

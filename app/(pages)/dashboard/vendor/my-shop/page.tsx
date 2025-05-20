@@ -40,8 +40,8 @@ export default function VendorShop() {
     return (
       <div className="flex h-96 w-full items-center justify-center">
         <div className="text-center">
-          <h2 className="text-2xl font-bold text-gray-800">Oops!</h2>
-          <p className="mt-2 text-gray-600">
+          <h2 className="text-2xl font-bold">Oops!</h2>
+          <p className="text-muted-foreground mt-2">
             We couldn&apos;t load the shop information.
           </p>
           <Button className="mt-4" variant="outline">
@@ -53,7 +53,7 @@ export default function VendorShop() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-12">
+    <div className="min-h-screen pb-12">
       {/* Banner Section */}
       <div className="relative h-64 w-full sm:h-80 md:h-96">
         <Image
@@ -69,7 +69,7 @@ export default function VendorShop() {
       {/* Shop Info Section */}
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="relative -mt-24 flex flex-col sm:flex-row sm:items-end sm:space-x-5">
-          <div className="relative h-32 w-32 overflow-hidden rounded-xl border-4 border-white bg-white sm:h-40 sm:w-40">
+          <div className="relative h-32 w-32 overflow-hidden rounded-xl border-4 sm:h-40 sm:w-40">
             <Image
               src={shop.logo.url}
               alt={shop.logo.alt || shop.name}
