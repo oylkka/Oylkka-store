@@ -37,7 +37,7 @@ jobs:
         run: pnpm install
 
       - name: Generate Prisma client
-        run: pnpm exec prisma generate
+        run: pnpm exec prisma generate --schema ./prisma/schema
 
       - name: Lint
         run: pnpm lint
@@ -51,7 +51,7 @@ jobs:
           NODE_ENV: test
           NEXT_PUBLIC_SITE_URL: ${{ secrets.NEXT_PUBLIC_SITE_URL }}
           NEXTAUTH_URL: ${{ secrets.NEXTAUTH_URL }}
-          MONGO_URI: ${{ secrets.MONGO_URI }}
+          MONGO_URI: ${{ secrets.MONGODB_URI }}
           AUTH_SECRET: ${{ secrets.AUTH_SECRET }}
           AUTH_GOOGLE_ID: ${{ secrets.AUTH_GOOGLE_ID }}
           AUTH_GOOGLE_SECRET: ${{ secrets.AUTH_GOOGLE_SECRET }}
@@ -72,7 +72,7 @@ jobs:
           NODE_ENV: production
           NEXT_PUBLIC_SITE_URL: ${{ secrets.NEXT_PUBLIC_SITE_URL }}
           NEXTAUTH_URL: ${{ secrets.NEXTAUTH_URL }}
-          MONGO_URI: ${{ secrets.MONGO_URI }}
+          MONGO_URI: ${{ secrets.MONGODB_URI }}
           AUTH_SECRET: ${{ secrets.AUTH_SECRET }}
           AUTH_GOOGLE_ID: ${{ secrets.AUTH_GOOGLE_ID }}
           AUTH_GOOGLE_SECRET: ${{ secrets.AUTH_GOOGLE_SECRET }}
