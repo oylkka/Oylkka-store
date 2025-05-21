@@ -3,7 +3,7 @@
 import { AlertCircle } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
-import React, { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
@@ -122,7 +122,7 @@ export default function HeroSection() {
           >
             <div className="absolute inset-0 overflow-hidden">
               <Image
-                src={slide.image.url}
+                src={slide.image.url || '/placeholder.svg'}
                 alt={slide.title}
                 fill
                 priority={index === 0}
@@ -183,7 +183,7 @@ export default function HeroSection() {
         ))}
 
         <div className="absolute right-0 bottom-4 left-0 z-20 flex justify-center gap-2">
-          {data.map((index: number) => (
+          {data.map((_: HeroBanner, index: number) => (
             <button
               key={index}
               className={cn(
@@ -204,13 +204,40 @@ export default function HeroSection() {
 
 function HeroSkeleton() {
   return (
-    <div className="bg-muted relative h-[40vh] w-full animate-pulse md:h-[70vh] lg:h-[91vh]">
-      <div className="absolute inset-0 flex items-center justify-center">
-        <div className="space-y-2 text-center">
-          <div className="h-4 w-32 rounded bg-gray-300" />
-          <div className="h-6 w-48 rounded bg-gray-400" />
-          <div className="h-3 w-64 rounded bg-gray-300" />
+    <div className="relative h-[40vh] w-full md:h-[70vh] lg:h-[91vh]">
+      <div className="bg-muted absolute inset-0 animate-pulse" />
+      <div className="relative z-10 flex h-full items-center">
+        <div className="container mx-auto px-2 md:px-0">
+          <div className="max-w-md space-y-2 md:max-w-lg md:space-y-4 lg:max-w-xl">
+            <div className="bg-muted-foreground/20 h-6 w-24 rounded" />{' '}
+            {/* Badge placeholder */}
+            <div className="bg-muted-foreground/30 h-10 w-3/4 rounded" />{' '}
+            {/* Title placeholder */}
+            <div className="bg-muted-foreground/30 h-8 w-2/3 rounded" />{' '}
+            {/* Subtitle placeholder */}
+            <div className="space-y-2">
+              {' '}
+              {/* Description placeholder */}
+              <div className="bg-muted-foreground/20 h-4 w-full rounded" />
+              <div className="bg-muted-foreground/20 h-4 w-5/6 rounded" />
+              <div className="bg-muted-foreground/20 h-4 w-4/6 rounded" />
+            </div>
+            <div className="flex gap-3 pt-2">
+              {' '}
+              {/* Buttons placeholder */}
+              <div className="bg-muted-foreground/30 h-10 w-32 rounded" />
+              <div className="bg-muted-foreground/20 h-10 w-32 rounded" />
+            </div>
+          </div>
         </div>
+      </div>
+      <div className="absolute right-0 bottom-4 left-0 z-20 flex justify-center gap-2">
+        {[0, 1, 2].map((index) => (
+          <div
+            key={index}
+            className="bg-muted-foreground/30 h-2 w-2 rounded-full"
+          />
+        ))}
       </div>
     </div>
   );

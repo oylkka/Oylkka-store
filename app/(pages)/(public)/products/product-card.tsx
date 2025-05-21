@@ -1,9 +1,12 @@
 'use client';
 
-import { Heart, ShoppingBag, Star, Truck } from 'lucide-react';
+import { Heart, ShoppingBag, ShoppingCart, Star, Truck } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { useSession } from 'next-auth/react';
 import { useState } from 'react';
+import { toast } from 'sonner';
 
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -12,16 +15,40 @@ import { Skeleton } from '@/components/ui/skeleton';
 import type { ProductCardType } from '@/lib/types';
 import { cn } from '@/lib/utils';
 import { useAddToCart } from '@/services';
-// import { useHandleAddToCartBySlug } from './quick-view';
 
 export function ProductCard({ product }: { product: ProductCardType }) {
   const [isWishlisted, setIsWishlisted] = useState(false);
   const { mutate: addToCart, isPending: isCartPending } = useAddToCart();
+  const router = useRouter();
+  const { data: session, status } = useSession();
 
   const handleAddToCart = () => {
+    if (!session) {
+      router.push('/sign-in');
+      return;
+    }
+
     addToCart({
       productId: product.id,
     });
+  };
+
+  const handleBuyNow = () => {
+    if (!session) {
+      router.push('/sign-in');
+      return;
+    }
+
+    addToCart(
+      {
+        productId: product.id,
+      },
+      {
+        onSuccess: () => {
+          toast.success('Product added to cart');
+        },
+      }
+    );
   };
 
   return (
@@ -31,7 +58,17 @@ export function ProductCard({ product }: { product: ProductCardType }) {
         <Button
           variant="ghost"
           size="icon"
-          onClick={() => setIsWishlisted(!isWishlisted)}
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+
+            if (!session) {
+              router.push('/sign-in');
+              return;
+            }
+
+            setIsWishlisted(!isWishlisted);
+          }}
           className="bg-background/80 hover:bg-background absolute top-2 right-2 z-20 h-7 w-7 rounded-full p-0 shadow-sm backdrop-blur-sm transition-all sm:top-3 sm:right-3 sm:h-8 sm:w-8"
           aria-label={isWishlisted ? 'Remove from wishlist' : 'Add to wishlist'}
         >
@@ -137,88 +174,111 @@ export function ProductCard({ product }: { product: ProductCardType }) {
             </div>
           )}
 
-          {/* Cart and wishlist actions */}
+          {/* Cart and Buy Now actions */}
           <div className="mt-1 flex items-center gap-1.5 sm:gap-2">
-            {/* Wishlist button (alternative position) - hidden on mobile as we have the top-right one */}
-            <Button
-              variant={isWishlisted ? 'destructive' : 'outline'}
-              size="icon"
-              onClick={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                setIsWishlisted(!isWishlisted);
-              }}
-              className={cn(
-                'hidden h-8 w-8 rounded-full p-0 sm:flex sm:h-9 sm:w-9',
-                isWishlisted ? 'bg-destructive/10' : ''
-              )}
-              aria-label={
-                isWishlisted ? 'Remove from wishlist' : 'Add to wishlist'
-              }
-            >
-              <Heart
+            <div className="flex w-full gap-1.5">
+              {/* Add to cart button */}
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleAddToCart}
+                disabled={
+                  product.stock <= 0 || isCartPending || status === 'loading'
+                }
                 className={cn(
-                  'h-3.5 w-3.5 sm:h-4 sm:w-4',
-                  isWishlisted ? 'fill-current' : ''
+                  'border-primary/30 bg-primary/5 text-primary hover:bg-primary/10 h-8 flex-1 text-[10px] font-medium sm:h-9 sm:text-xs',
+                  isCartPending && 'opacity-70'
                 )}
-              />
-            </Button>
+              >
+                {isCartPending ? (
+                  <span className="flex items-center">
+                    <svg
+                      className="mr-2 h-3 w-3 animate-spin"
+                      viewBox="0 0 24 24"
+                    >
+                      <circle
+                        className="opacity-25"
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        strokeWidth="4"
+                        fill="none"
+                      />
+                      <path
+                        className="opacity-75"
+                        fill="currentColor"
+                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                      />
+                    </svg>
+                    Adding...
+                  </span>
+                ) : (
+                  <>
+                    <ShoppingBag className="mr-1 h-3 w-3" />
+                    {product.stock <= 0 ? 'Out of Stock' : 'Add to Cart'}
+                  </>
+                )}
+              </Button>
 
-            {/* Add to cart button */}
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handleAddToCart}
-              disabled={product.stock <= 0 || isCartPending}
-              className={cn(
-                'border-primary/30 bg-primary/5 text-primary hover:bg-primary/10 h-8 flex-1 text-[10px] font-medium sm:h-9 sm:text-xs',
-                isCartPending && 'opacity-70'
-              )}
-            >
-              {isCartPending ? (
-                <span className="flex items-center">
-                  <svg
-                    className="mr-2 h-3 w-3 animate-spin"
-                    viewBox="0 0 24 24"
-                  >
-                    <circle
-                      className="opacity-25"
-                      cx="12"
-                      cy="12"
-                      r="10"
-                      stroke="currentColor"
-                      strokeWidth="4"
-                      fill="none"
-                    />
-                    <path
-                      className="opacity-75"
-                      fill="currentColor"
-                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                    />
-                  </svg>
-                  Adding...
-                </span>
-              ) : (
-                <>
-                  <ShoppingBag className="mr-1 h-3 w-3" />
-                  {product.stock <= 0 ? 'Out of Stock' : 'Add to Cart'}
-                </>
-              )}
-            </Button>
+              {/* Buy Now button */}
+              <Button
+                variant="default"
+                size="sm"
+                onClick={handleBuyNow}
+                disabled={
+                  product.stock <= 0 || isCartPending || status === 'loading'
+                }
+                className={cn(
+                  'h-8 flex-1 text-[10px] font-medium sm:h-9 sm:text-xs',
+                  isCartPending && 'opacity-70'
+                )}
+              >
+                {isCartPending ? (
+                  <span className="flex items-center">
+                    <svg
+                      className="mr-2 h-3 w-3 animate-spin"
+                      viewBox="0 0 24 24"
+                    >
+                      <circle
+                        className="opacity-25"
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        strokeWidth="4"
+                        fill="none"
+                      />
+                      <path
+                        className="opacity-75"
+                        fill="currentColor"
+                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                      />
+                    </svg>
+                    Processing...
+                  </span>
+                ) : (
+                  <span className="flex items-center justify-center">
+                    <ShoppingCart className="mr-1 h-3 w-3 sm:h-3.5 sm:w-3.5" />
+                    <span>Buy Now</span>
+                  </span>
+                )}
+              </Button>
+            </div>
           </div>
+
+          {/* Stock indicator */}
+          {product.stock <= 0 && (
+            <div className="bg-background/10 absolute inset-0 flex items-center justify-center backdrop-blur-[1px]">
+              <Badge
+                variant="secondary"
+                className="bg-background/80 px-3 py-1.5 text-xs font-medium"
+              >
+                Out of Stock
+              </Badge>
+            </div>
+          )}
         </CardContent>
-
-        {/* Stock indicator */}
-        {product.stock <= 0 && (
-          <div className="bg-background/10 absolute inset-0 flex items-center justify-center backdrop-blur-[1px]">
-            <Badge
-              variant="secondary"
-              className="bg-background/80 px-3 py-1.5 text-xs font-medium"
-            >
-              Out of Stock
-            </Badge>
-          </div>
-        )}
       </Card>
     </>
   );
@@ -255,8 +315,10 @@ export function ProductCardSkeleton() {
         </div>
 
         <div className="flex gap-1.5 sm:gap-2">
-          <Skeleton className="hidden h-8 w-8 rounded-full sm:block sm:h-9 sm:w-9" />
-          <Skeleton className="h-8 w-full rounded-md sm:h-9" />
+          <div className="flex w-full gap-1.5">
+            <Skeleton className="h-8 w-full rounded-md sm:h-9" />
+            <Skeleton className="h-8 w-full rounded-md sm:h-9" />
+          </div>
         </div>
       </CardContent>
     </Card>
