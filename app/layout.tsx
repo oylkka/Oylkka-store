@@ -43,7 +43,12 @@ export default function RootLayout({
             {children}
           </ThemeProvider>
           <ReactQueryDevtools initialIsOpen={false} />
-          <Toaster position="top-right" richColors />
+          <Toaster
+            position="top-right"
+            richColors
+            closeButton
+            toastOptions={{ duration: 3000 }}
+          />
         </body>
       </html>
     </TanstackProvider>
