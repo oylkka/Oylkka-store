@@ -48,7 +48,7 @@ export default function Footer() {
               </div>
               <div>
                 <p className="text-sm font-medium">Free Shipping</p>
-                <p className="text-xs text-zinc-400">On orders over $50</p>
+                <p className="text-xs text-zinc-400">On orders over ৳2000</p>
               </div>
             </div>
 

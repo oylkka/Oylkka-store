@@ -123,12 +123,12 @@ export default function ProductHeader({
                       <Slider max={1000} step={10} />
                       <div className="mt-4 flex gap-4">
                         <Input
-                          placeholder="$ Min"
+                          placeholder="৳ Min"
                           className="w-full"
                           type="number"
                         />
                         <Input
-                          placeholder="$ Max"
+                          placeholder="৳ Max"
                           className="w-full"
                           type="number"
                         />

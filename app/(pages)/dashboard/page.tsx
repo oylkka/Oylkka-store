@@ -737,7 +737,7 @@ function CustomerDashboard({ user }: UserType) {
           <CardContent>
             <div className="text-2xl font-bold">2,840</div>
             <p className="text-muted-foreground text-xs">
-              $28.40 redeemable value
+            ৳28.40 redeemable value
             </p>
           </CardContent>
         </Card>
