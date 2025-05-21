@@ -316,10 +316,10 @@ export default function ProductDetails({ slug }: { slug: string }) {
               {currentDiscountPrice ? (
                 <>
                   <span className="text-3xl font-bold">
-                    ${currentDiscountPrice.toFixed(2)}
+                    ৳{currentDiscountPrice.toFixed(2)}
                   </span>
                   <span className="text-muted-foreground text-lg line-through">
-                    ${currentPrice.toFixed(2)}
+                    ৳{currentPrice.toFixed(2)}
                   </span>
                   <Badge className="bg-red-500 hover:bg-red-600">
                     Save {currentDiscountPercent}%
@@ -327,7 +327,7 @@ export default function ProductDetails({ slug }: { slug: string }) {
                 </>
               ) : (
                 <span className="text-3xl font-bold">
-                  ${currentPrice.toFixed(2)}
+                  ৳{currentPrice.toFixed(2)}
                 </span>
               )}
             </div>
@@ -611,7 +611,7 @@ export default function ProductDetails({ slug }: { slug: string }) {
                             {variant.name}
                           </td>
                           <td className="px-3 py-2 text-sm whitespace-nowrap">
-                            ${variant.discountPrice || variant.price}
+                            ৳{variant.discountPrice || variant.price}
                           </td>
                           <td className="px-3 py-2 text-sm whitespace-nowrap">
                             {variant.stock > 0 ? variant.stock : 'Out of stock'}
@@ -687,9 +687,9 @@ export default function ProductDetails({ slug }: { slug: string }) {
                 <ul className="mt-4 list-disc space-y-2 pl-5">
                   <li>
                     Standard Shipping (3-5 business days): Free on orders over
-                    $50
+                    ৳120
                   </li>
-                  <li>Express Shipping (1-2 business days): $12.99</li>
+                  <li>Express Shipping (1-2 business days): ৳240</li>
                   <li>
                     International Shipping (7-14 business days): Rates
                     calculated at checkout

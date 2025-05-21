@@ -61,8 +61,8 @@ export default function CartClient() {
     updateQuantity.mutate({ itemId, quantity: newQuantity });
   };
 
-  const shippingCost = 10;
-  const shippingThreshold = 1000;
+  const shippingCost = 120;
+  const shippingThreshold = 2000;
 
   const subtotal = data.reduce((acc: number, item: CartItem) => {
     const price = item.discountPrice ?? item.price;
@@ -120,7 +120,7 @@ export default function CartClient() {
                         onClick={() =>
                           handleUpdateQuantity(item.id, item.quantity + 1)
                         }
-                        className="flex w-full items-center justify-center border-b p-0.5 hover:bg-gray-100 md:p-1"
+                        className="flex w-full items-center justify-center border-b p-0.5 hover:bg-gray-100 md:p-1 dark:hover:bg-gray-800"
                         aria-label="Increase quantity"
                       >
                         <Plus size={14} />
@@ -133,7 +133,7 @@ export default function CartClient() {
                             Math.max(1, item.quantity - 1)
                           )
                         }
-                        className="flex w-full items-center justify-center p-0.5 hover:bg-gray-100 md:p-1"
+                        className="flex w-full items-center justify-center p-0.5 hover:bg-gray-100 md:p-1 dark:hover:bg-gray-800"
                         aria-label="Decrease quantity"
                       >
                         <Minus size={14} />
@@ -143,12 +143,12 @@ export default function CartClient() {
 
                   <X size={14} className="text-gray-400" />
                   <p className="text-gray-500">
-                    ${item.discountPrice?.toFixed(2) ?? item.price.toFixed(2)}
+                    ৳{item.discountPrice?.toFixed(2) ?? item.price.toFixed(2)}
                   </p>
                 </div>
 
                 <p className="font-semibold">
-                  $
+                  ৳
                   {((item.discountPrice ?? item.price) * item.quantity).toFixed(
                     2
                   )}
@@ -157,7 +157,7 @@ export default function CartClient() {
             </div>
           </div>
         ))}
-        <div className="pointer-events-none absolute right-0 bottom-0 left-0 h-8 bg-gradient-to-t from-white via-white to-transparent" />
+        <div className="from-background pointer-events-none absolute right-0 bottom-0 left-0 h-8 bg-gradient-to-t to-transparent" />
       </ScrollArea>
 
       <div className="mt-4 space-y-2">
@@ -177,7 +177,7 @@ export default function CartClient() {
           <p className="space-x-1 text-sm">
             <span>Spend</span>
             <span className="text-primary">
-              ${(shippingThreshold - subtotal).toFixed(0)}
+              ৳{(shippingThreshold - subtotal).toFixed(0)}
             </span>
             <span>more to get</span>
             <span className="text-lg font-medium uppercase">free shipping</span>
@@ -189,14 +189,14 @@ export default function CartClient() {
         <div>
           <div className="flex justify-between text-lg">
             <p>Subtotal:</p>
-            <p className="font-bold">${subtotal.toFixed(0)}</p>
+            <p className="font-bold">৳{subtotal.toFixed(0)}</p>
           </div>
           <div className="flex justify-between">
             <p>Shipping:</p>
             {subtotal >= shippingThreshold ? (
-              <p className="line-through">${shippingCost}</p>
+              <p className="line-through">৳{shippingCost}</p>
             ) : (
-              <p>${shippingCost}</p>
+              <p>৳{shippingCost}</p>
             )}
           </div>
         </div>
@@ -206,7 +206,7 @@ export default function CartClient() {
         <div className="flex justify-between text-lg">
           <p>Total:</p>
           <p className="font-bold">
-            $
+            ৳
             {subtotal >= shippingThreshold
               ? subtotal.toFixed(0)
               : (subtotal + shippingCost).toFixed(0)}
