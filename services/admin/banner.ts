@@ -173,3 +173,37 @@ export function prepareFormData(
 
   return formData;
 }
+
+export const useDeleteBanner = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({ id }: { id: string }) => {
+      const deletePromise = axios
+        .delete<{
+          message: string;
+        }>(`/api/dashboard/admin/banners/single-banner?id=${id}`)
+        .then((res) => res.data); // Unwrap response before passing to toast
+
+      return toast.promise(deletePromise, {
+        loading: 'Deleting design...',
+        success: (data) => {
+          queryClient.invalidateQueries({
+            queryKey: [QEUERY_KEYS.ADMIN_BANNER_LIST],
+          });
+          queryClient.invalidateQueries({
+            queryKey: [QEUERY_KEYS.HERO_BANNER],
+          });
+          queryClient.invalidateQueries({
+            queryKey: [QEUERY_KEYS.SINGLE_BANNER],
+          });
+          return data.message || 'Design deleted successfully ✅';
+        },
+        error: (error) =>
+          axios.isAxiosError(error)
+            ? error.response?.data?.message || 'Failed to delete design ❌'
+            : 'Something went wrong. Please try again.',
+      });
+    },
+  });
+};

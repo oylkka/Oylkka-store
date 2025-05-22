@@ -15,6 +15,16 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useState } from 'react';
 
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
@@ -34,7 +44,7 @@ import {
 import { Skeleton } from '@/components/ui/skeleton';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import type { BannerType } from '@/lib/types';
-import { useAdminBannerList } from '@/services';
+import { useAdminBannerList, useDeleteBanner } from '@/services';
 
 import { BannerPreview } from './banner-preview';
 
@@ -43,6 +53,9 @@ export default function AdminBannerListPage() {
   const [view, setView] = useState<'grid' | 'list'>('grid');
   const [previewBanner, setPreviewBanner] = useState<BannerType | null>(null);
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
+  const [isAlertOpen, setIsAlertOpen] = useState(false);
+  const [bannerToDelete, setBannerToDelete] = useState<string | null>(null);
+  const { mutate: deleteBanner, isPending: isDeleting } = useDeleteBanner();
 
   const handleOpenPreview = (banner: BannerType) => {
     setPreviewBanner(banner);
@@ -51,6 +64,29 @@ export default function AdminBannerListPage() {
 
   const handleClosePreview = () => {
     setIsPreviewOpen(false);
+  };
+
+  const handleOpenDeleteDialog = (bannerId: string) => {
+    setBannerToDelete(bannerId);
+    setIsAlertOpen(true);
+  };
+
+  const handleCloseDeleteDialog = () => {
+    setIsAlertOpen(false);
+    setBannerToDelete(null);
+  };
+
+  const handleConfirmDelete = () => {
+    if (bannerToDelete) {
+      deleteBanner(
+        { id: bannerToDelete },
+        {
+          onSettled: () => {
+            handleCloseDeleteDialog(); // Close dialog after deletion (success or failure)
+          },
+        }
+      );
+    }
   };
 
   // Handle loading state
@@ -179,10 +215,12 @@ export default function AdminBannerListPage() {
             You haven&#39;t created any banners yet. Get started by creating a
             new banner.
           </p>
-          <Button className="mt-4">
-            <Plus className="mr-2 h-4 w-4" />
-            Create Banner
-          </Button>
+          <Link href="/dashboard/admin/banner/add">
+            <Button className="mt-4">
+              <Plus className="mr-2 h-4 w-4" />
+              Create Banner
+            </Button>
+          </Link>
         </div>
       ) : (
         <Tabs defaultValue={positions[0]} className="w-full">
@@ -210,6 +248,7 @@ export default function AdminBannerListPage() {
                       key={banner.id}
                       banner={banner}
                       onPreview={handleOpenPreview}
+                      onDelete={() => handleOpenDeleteDialog(banner.id)}
                     />
                   ))}
                 </div>
@@ -228,6 +267,7 @@ export default function AdminBannerListPage() {
                         key={banner.id}
                         banner={banner}
                         onPreview={handleOpenPreview}
+                        onDelete={() => handleOpenDeleteDialog(banner.id)}
                       />
                     ))}
                   </div>
@@ -244,6 +284,31 @@ export default function AdminBannerListPage() {
         onClose={handleClosePreview}
         banner={previewBanner}
       />
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={isAlertOpen} onOpenChange={setIsAlertOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Banner</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete this banner? This action cannot be
+              undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={handleCloseDeleteDialog}>
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleConfirmDelete}
+              disabled={isDeleting}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {isDeleting ? 'Deleting...' : 'Delete'}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
@@ -251,9 +316,10 @@ export default function AdminBannerListPage() {
 interface BannerCardProps {
   banner: BannerType;
   onPreview: (banner: BannerType) => void;
+  onDelete: (bannerId: string) => void;
 }
 
-function BannerCard({ banner, onPreview }: BannerCardProps) {
+function BannerCard({ banner, onPreview, onDelete }: BannerCardProps) {
   return (
     <Card className="overflow-hidden pt-0">
       <div className="bg-muted aspect-video w-full overflow-hidden">
@@ -294,7 +360,10 @@ function BannerCard({ banner, onPreview }: BannerCardProps) {
                   Edit
                 </Link>
               </DropdownMenuItem>
-              <DropdownMenuItem className="text-red-600">
+              <DropdownMenuItem
+                className="text-red-600"
+                onClick={() => onDelete(banner.id)}
+              >
                 <Trash2 className="mr-2 h-4 w-4" />
                 Delete
               </DropdownMenuItem>
@@ -338,9 +407,10 @@ function BannerCard({ banner, onPreview }: BannerCardProps) {
 interface BannerRowProps {
   banner: BannerType;
   onPreview: (banner: BannerType) => void;
+  onDelete: (bannerId: string) => void;
 }
 
-function BannerRow({ banner, onPreview }: BannerRowProps) {
+function BannerRow({ banner, onPreview, onDelete }: BannerRowProps) {
   return (
     <div className="grid grid-cols-12 items-center gap-4 p-4">
       <div className="col-span-4 flex items-center gap-3">
@@ -387,10 +457,18 @@ function BannerRow({ banner, onPreview }: BannerRowProps) {
               Preview
             </DropdownMenuItem>
             <DropdownMenuItem>
-              <Edit className="mr-2 h-4 w-4" />
-              Edit
+              <Link
+                className="flex w-full items-center gap-2"
+                href={`/dashboard/admin/banner/edit?bannerId=${banner.id}`}
+              >
+                <Edit className="mr-2 h-4 w-4" />
+                Edit
+              </Link>
             </DropdownMenuItem>
-            <DropdownMenuItem className="text-red-600">
+            <DropdownMenuItem
+              className="text-red-600"
+              onClick={() => onDelete(banner.id)}
+            >
               <Trash2 className="mr-2 h-4 w-4" />
               Delete
             </DropdownMenuItem>
