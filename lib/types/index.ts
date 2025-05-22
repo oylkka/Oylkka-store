@@ -1,5 +1,5 @@
 import { CartItem } from './order';
-
+export * from './banners';
 export * from './order';
 export interface CategoriesType {
   name: string;
