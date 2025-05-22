@@ -53,7 +53,7 @@ export function ProductCard({ product }: { product: ProductCardType }) {
 
   return (
     <>
-      <Card className="group border-border bg-card hover:border-primary/20 relative h-full overflow-hidden p-0 transition-all duration-300 hover:shadow-md">
+      <Card className="group relative h-full overflow-hidden rounded pt-0 pb-2 transition-all duration-300 hover:shadow-md md:rounded-lg md:pb-4">
         {/* Wishlist button (positioned absolutely) */}
         <Button
           variant="ghost"
@@ -100,10 +100,7 @@ export function ProductCard({ product }: { product: ProductCardType }) {
           {/* Discount badge */}
           {product.discountPercent > 0 && (
             <div className="absolute top-2 left-2 z-10 sm:top-3 sm:left-3">
-              <Badge
-                variant="destructive"
-                className="px-1.5 py-0.5 text-[10px] font-medium sm:px-2 sm:py-1 sm:text-xs"
-              >
+              <Badge className="px-1.5 py-0.5 text-[10px] font-medium sm:px-2 sm:py-1 sm:text-xs">
                 {product.discountPercent}% OFF
               </Badge>
             </div>
@@ -111,7 +108,7 @@ export function ProductCard({ product }: { product: ProductCardType }) {
         </div>
 
         {/* Product content section */}
-        <CardContent className="flex flex-col gap-2 p-3 sm:gap-3 sm:p-4">
+        <CardContent className="flex flex-col gap-2 px-2 sm:gap-3 sm:px-4">
           {/* Category and rating */}
           <div className="flex items-center justify-between">
             <Badge
@@ -136,7 +133,7 @@ export function ProductCard({ product }: { product: ProductCardType }) {
             href={`/products/${product.slug}`}
             className="group-hover:text-primary"
           >
-            <h3 className="text-card-foreground line-clamp-2 min-h-[2.5rem] text-xs font-medium transition-colors sm:text-sm">
+            <h3 className="text-card-foreground line-clamp-2 text-xs font-medium transition-colors sm:text-sm">
               {product.productName}
             </h3>
           </Link>
@@ -260,7 +257,7 @@ export function ProductCard({ product }: { product: ProductCardType }) {
                 ) : (
                   <span className="flex items-center justify-center">
                     <ShoppingCart className="mr-1 h-3 w-3 sm:h-3.5 sm:w-3.5" />
-                    <span>Buy Now</span>
+                    <span className="hidden sm:inline">Buy Now</span>
                   </span>
                 )}
               </Button>

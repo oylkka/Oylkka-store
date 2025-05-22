@@ -49,13 +49,13 @@ export default function Categories() {
           {categories.map((category: CategoriesType) => (
             <CarouselItem
               key={category.slug}
-              className="basis-1/2 pl-2 md:basis-1/3 md:pl-4 lg:basis-1/4"
+              className="basis-1/3 pl-2 md:basis-1/3 md:pl-4 lg:basis-1/4"
             >
               <Link
                 href={`/products/category/${category.slug}`}
                 className="group relative block overflow-hidden rounded-lg"
               >
-                <div className="bg-muted aspect-square w-full overflow-hidden rounded-lg md:aspect-[3/4]">
+                <div className="bg-muted aspect-[3/4] w-full overflow-hidden rounded-lg md:aspect-[3/4]">
                   <Image
                     src={category.image.url}
                     alt={category.image.alt}
