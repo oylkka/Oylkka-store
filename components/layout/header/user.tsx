@@ -101,9 +101,7 @@ export default async function UserDropDown() {
         </div>
       ) : (
         <Link href="/sign-in">
-          <Button size="sm" className="rounded-full px-4 shadow-sm">
-            Sign In
-          </Button>
+          <Button size="sm">Sign In</Button>
         </Link>
       )}
     </div>
