@@ -28,8 +28,12 @@ export function BannerPreview({ isOpen, onClose, banner }: BannerPreviewProps) {
     setIsMounted(true);
   }, []);
 
-  if (!isMounted) {return null;}
-  if (!banner) {return null;}
+  if (!isMounted) {
+    return null;
+  }
+  if (!banner) {
+    return null;
+  }
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>

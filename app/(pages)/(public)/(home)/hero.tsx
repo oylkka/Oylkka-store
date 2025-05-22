@@ -128,7 +128,17 @@ export default function HeroSection() {
                 priority={index === 0}
                 className="object-cover object-center"
               />
-              <div className="absolute inset-0 bg-black/30 dark:bg-gradient-to-r dark:from-black/70 dark:via-black/40 dark:to-black/20" />
+              <div
+                className={cn(
+                  'absolute inset-0 bg-black/40', // Base overlay for better contrast
+                  slide.alignment === 'left'
+                    ? 'bg-gradient-to-r from-black/80 via-black/50 to-black/20'
+                    : slide.alignment === 'center'
+                      ? 'bg-gradient-to-r from-black/60 via-black/20 to-black/60'
+                      : 'bg-gradient-to-l from-black/80 via-black/50 to-black/20'
+                )}
+                aria-hidden="true" // Accessibility: Hide decorative overlay
+              />
             </div>
 
             <div className="relative z-10 flex h-full items-center">
@@ -138,14 +148,14 @@ export default function HeroSection() {
                   slide.alignment === 'left'
                     ? 'justify-start'
                     : slide.alignment === 'center'
-                      ? 'justify-center'
+                      ? 'justify-center text-center'
                       : 'justify-end'
                 )}
               >
                 <div className="max-w-md space-y-2 md:max-w-lg md:space-y-4 lg:max-w-xl">
                   {slide.bannerTag && (
                     <Badge
-                      className="md:mb-2 md:rounded-md md:px-3 md:py-1 md:text-sm md:font-medium"
+                      className="bg-white/90 text-black md:mb-2 md:rounded-md md:px-3 md:py-1 md:text-sm md:font-medium"
                       variant="secondary"
                     >
                       {slide.bannerTag}
@@ -160,7 +170,12 @@ export default function HeroSection() {
                   <p className="text-sm text-white/90 md:text-lg">
                     {slide.description}
                   </p>
-                  <div className="flex flex-wrap gap-3 pt-2">
+                  <div
+                    className={cn(
+                      'flex flex-wrap gap-3 pt-2',
+                      slide.alignment === 'center' && 'justify-center'
+                    )}
+                  >
                     {slide.primaryActionText && slide.primaryActionLink && (
                       <Button asChild>
                         <Link href={slide.primaryActionLink}>
@@ -169,7 +184,11 @@ export default function HeroSection() {
                       </Button>
                     )}
                     {slide.secondaryActionText && slide.secondaryActionLink && (
-                      <Button asChild variant="outline">
+                      <Button
+                        asChild
+                        variant="outline"
+                        className="border-white/20 bg-white/10 text-white hover:bg-white/20"
+                      >
                         <Link href={slide.secondaryActionLink}>
                           {slide.secondaryActionText}
                         </Link>
@@ -209,22 +228,15 @@ function HeroSkeleton() {
       <div className="relative z-10 flex h-full items-center">
         <div className="container mx-auto px-2 md:px-0">
           <div className="max-w-md space-y-2 md:max-w-lg md:space-y-4 lg:max-w-xl">
-            <div className="bg-muted-foreground/20 h-6 w-24 rounded" />{' '}
-            {/* Badge placeholder */}
-            <div className="bg-muted-foreground/30 h-10 w-3/4 rounded" />{' '}
-            {/* Title placeholder */}
-            <div className="bg-muted-foreground/30 h-8 w-2/3 rounded" />{' '}
-            {/* Subtitle placeholder */}
+            <div className="bg-muted-foreground/20 h-6 w-24 rounded" />
+            <div className="bg-muted-foreground/30 h-10 w-3/4 rounded" />
+            <div className="bg-muted-foreground/30 h-8 w-2/3 rounded" />
             <div className="space-y-2">
-              {' '}
-              {/* Description placeholder */}
               <div className="bg-muted-foreground/20 h-4 w-full rounded" />
               <div className="bg-muted-foreground/20 h-4 w-5/6 rounded" />
               <div className="bg-muted-foreground/20 h-4 w-4/6 rounded" />
             </div>
             <div className="flex gap-3 pt-2">
-              {' '}
-              {/* Buttons placeholder */}
               <div className="bg-muted-foreground/30 h-10 w-32 rounded" />
               <div className="bg-muted-foreground/20 h-10 w-32 rounded" />
             </div>

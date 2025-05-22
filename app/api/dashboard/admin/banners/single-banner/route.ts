@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 
+import { auth } from '@/features/auth/auth';
 import { DeleteImage, UploadImage } from '@/features/cloudinary';
 import { db } from '@/lib/db';
 import { Prisma } from '@/prisma/output';
@@ -205,5 +206,96 @@ export async function PUT(req: NextRequest) {
       errorMessage = error.message;
     }
     return NextResponse.json({ error: errorMessage }, { status: 500 });
+  }
+}
+
+export async function DELETE(request: Request) {
+  try {
+    // 1. Authentication check
+    const session = await auth();
+    if (
+      !session ||
+      !session.user ||
+      !session.user.role ||
+      session.user.role !== 'ADMIN'
+    ) {
+      return NextResponse.json(
+        {
+          message: 'Unauthorized',
+          error: 'You are not authorized to delete banners',
+        },
+        { status: 401 }
+      );
+    }
+
+    // 2. Parse and validate query parameters
+    const url = new URL(request.url);
+    const id = url.searchParams.get('id');
+
+    if (!id) {
+      return NextResponse.json(
+        { message: 'Not Found', error: 'Banner not found' },
+        { status: 404 }
+      );
+    }
+
+    // 3. Fetch the banner
+    const banner = await db.banner.findUnique({
+      where: { id },
+      select: {
+        id: true,
+        title: true, // Include for logging
+        image: {
+          select: {
+            publicId: true,
+          },
+        },
+      },
+    });
+
+    if (!banner) {
+      return NextResponse.json(
+        { message: 'Not Found', error: 'Banner not found' },
+        { status: 404 }
+      );
+    }
+
+    // 4. Perform deletion in a transaction
+    await db.$transaction(async (tx) => {
+      // Delete the image if publicId exists
+      if (banner.image?.publicId) {
+        try {
+          await DeleteImage(banner.image.publicId);
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        } catch (imageError) {
+          throw new Error('Failed to delete associated image');
+        }
+      }
+
+      // Delete the banner
+      await tx.banner.delete({
+        where: { id },
+      });
+    });
+
+    return NextResponse.json(
+      { message: 'Banner deleted successfully', data: { id } },
+      { status: 200 }
+    );
+  } catch (error) {
+    // 6. Handle and log errors
+    const errorMessage =
+      error instanceof Error ? error.message : 'Internal Server Error';
+
+    return NextResponse.json(
+      {
+        message: 'Internal Server Error',
+        error:
+          errorMessage === 'Failed to delete associated image'
+            ? 'Failed to delete associated image'
+            : 'An unexpected error occurred',
+      },
+      { status: 500 }
+    );
   }
 }
