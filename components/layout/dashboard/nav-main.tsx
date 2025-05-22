@@ -375,17 +375,8 @@ export async function NavMain() {
           url: '/dashboard/admin/banner/add',
         },
         {
-          title: 'Vendor Applications',
-          url: '/admin/vendors/applications',
-        },
-        {
-          title: 'Performance Metrics',
-          url: '/admin/vendors/performance',
-        },
-        {
-          title: 'Payouts',
-          url: '/admin/vendors/payouts',
-          roles: ['ADMIN'],
+          title: 'Banner List',
+          url: '/dashboard/admin/banner/list',
         },
       ],
     },

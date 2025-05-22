@@ -6,7 +6,7 @@ export function useHeroBanner() {
   return useQuery({
     queryKey: [QEUERY_KEYS.HERO_BANNER],
     queryFn: async () => {
-      const response = await axios.get(`/api/dashboard/admin/banners`);
+      const response = await axios.get(`/api/public/banners`);
       return response.data;
     },
   });
