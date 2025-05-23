@@ -2,6 +2,10 @@ import { CartItem } from './order';
 export * from './banners';
 export * from './order';
 export interface CategoriesType {
+  id: string;
+  featured: boolean;
+  createdAt: string;
+  updatedAt: string;
   name: string;
   slug: string;
   description: string;

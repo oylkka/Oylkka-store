@@ -22,4 +22,6 @@ export const QEUERY_KEYS = {
   HERO_BANNER: 'hero banner',
   ADMIN_BANNER_LIST: 'admin banner list',
   SINGLE_BANNER: 'single banner',
+  ADMIN_CATEGORY_LIST: 'admin category list',
+  SINGLE_CATEGORY: 'single category',
 };
