@@ -101,20 +101,13 @@ export async function NavMain() {
       ],
     },
     {
-      title: 'Categories',
+      title: 'Categories Management',
       url: '/categories',
       icon: Tag,
-      roles: [
-        'ADMIN',
-        'MANAGER',
-        'VENDOR',
-        'CUSTOMER_SERVICE',
-        'USER',
-        'CUSTOMER',
-      ],
+      roles: ['ADMIN', 'MANAGER', 'CUSTOMER_SERVICE'],
       items: [
         {
-          title: 'All Categories',
+          title: 'Category list',
           url: '/dashboard/admin/category/all',
           roles: ['ADMIN', 'MANAGER', 'CUSTOMER_SERVICE'],
         },
@@ -122,26 +115,6 @@ export async function NavMain() {
           title: 'Add Category',
           url: '/dashboard/admin/category/add',
           roles: ['ADMIN', 'MANAGER', 'CUSTOMER_SERVICE'],
-        },
-        {
-          title: 'Electronics',
-          url: '/categories/electronics',
-        },
-        {
-          title: 'Clothing',
-          url: '/categories/clothing',
-        },
-        {
-          title: 'Accessories',
-          url: '/categories/accessories',
-        },
-        {
-          title: 'Footwear',
-          url: '/categories/footwear',
-        },
-        {
-          title: 'Home & Living',
-          url: '/categories/home',
         },
       ],
     },
