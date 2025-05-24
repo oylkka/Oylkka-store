@@ -28,6 +28,7 @@ export async function GET(req: NextRequest) {
         price: true,
         condition: true,
         attributes: true,
+        slug: true,
       },
     });
 
@@ -45,6 +46,7 @@ export async function GET(req: NextRequest) {
       take: limit * 3, // Fetch more than needed to allow for scoring
       select: {
         id: true,
+        slug: true,
         productName: true,
         description: true,
         category: true,
@@ -177,6 +179,7 @@ export async function GET(req: NextRequest) {
           createdAt: 'desc',
         },
         select: {
+          slug: true,
           id: true,
           productName: true,
           description: true,

@@ -6,15 +6,13 @@ import { cn } from '@/lib/utils';
 interface RatingDisplayProps {
   rating: number;
   size?: 'sm' | 'md' | 'lg';
-  showValue?: boolean;
-  reviewCount?: number;
+  className?: string;
 }
 
 export const RatingDisplay: React.FC<RatingDisplayProps> = ({
   rating,
   size = 'md',
-  showValue = false,
-  reviewCount,
+  className,
 }) => {
   const starSize = {
     sm: 'h-3 w-3',
@@ -23,39 +21,30 @@ export const RatingDisplay: React.FC<RatingDisplayProps> = ({
   };
 
   return (
-    <div className="flex items-center gap-2">
-      <div className="flex items-center">
-        {[1, 2, 3, 4, 5].map((star) => {
-          const fillPercentage = Math.min(
-            Math.max((rating - (star - 1)) * 100, 0),
-            100
-          );
+    <div className={cn('flex items-center', className)}>
+      {[1, 2, 3, 4, 5].map((star) => {
+        const fillPercentage = Math.min(
+          Math.max((rating - (star - 1)) * 100, 0),
+          100
+        );
 
-          return (
-            <div key={star} className="relative">
-              <Star className={cn(starSize[size], 'text-gray-300')} />
-              <div
-                className="absolute inset-0 overflow-hidden"
-                style={{ width: `${fillPercentage}%` }}
-              >
-                <Star
-                  className={cn(
-                    starSize[size],
-                    'fill-yellow-400 text-yellow-400'
-                  )}
-                />
-              </div>
+        return (
+          <div key={star} className="relative">
+            <Star className={cn(starSize[size], 'text-gray-300')} />
+            <div
+              className="absolute inset-0 overflow-hidden"
+              style={{ width: `${fillPercentage}%` }}
+            >
+              <Star
+                className={cn(
+                  starSize[size],
+                  'fill-yellow-400 text-yellow-400'
+                )}
+              />
             </div>
-          );
-        })}
-      </div>
-
-      {showValue && (
-        <span className="text-sm text-gray-600">
-          {rating.toFixed(1)}
-          {reviewCount !== undefined && ` (${reviewCount})`}
-        </span>
-      )}
+          </div>
+        );
+      })}
     </div>
   );
 };
