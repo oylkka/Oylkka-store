@@ -30,6 +30,7 @@ import LoadingSkeleton from './loading-skeleton';
 import ProductGallery from './product-gallery';
 import ProductInfo from './product-info';
 import RelatedProducts from './related-products';
+import ProductReviews from './review';
 import { StockStatus } from './stock-status';
 import VariantSelector from './variant-selector';
 
@@ -583,16 +584,16 @@ export default function ProductDetails({ slug }: { slug: string }) {
               <div>
                 <h3 className="text-lg font-medium">Available Variants</h3>
                 <div className="mt-3 overflow-x-auto">
-                  <table className="min-w-full divide-y divide-gray-200">
+                  <table className="min-w-full divide-y">
                     <thead>
                       <tr>
-                        <th className="px-3 py-2 text-left text-xs font-medium tracking-wider text-gray-500 uppercase">
+                        <th className="text-muted-foreground px-3 py-2 text-left text-xs font-medium tracking-wider uppercase">
                           Variant
                         </th>
-                        <th className="px-3 py-2 text-left text-xs font-medium tracking-wider text-gray-500 uppercase">
+                        <th className="text-muted-foreground px-3 py-2 text-left text-xs font-medium tracking-wider uppercase">
                           Price
                         </th>
-                        <th className="px-3 py-2 text-left text-xs font-medium tracking-wider text-gray-500 uppercase">
+                        <th className="text-muted-foreground px-3 py-2 text-left text-xs font-medium tracking-wider uppercase">
                           Stock
                         </th>
                       </tr>
@@ -625,57 +626,7 @@ export default function ProductDetails({ slug }: { slug: string }) {
             </div>
           </TabsContent>
           <TabsContent value="reviews">
-            <div className="flex flex-col md:flex-row md:gap-8">
-              <div className="mb-8 md:mb-0 md:w-1/3">
-                <div className="bg-secondary rounded-lg p-6">
-                  <h3 className="mb-4 text-xl font-bold">Customer Reviews</h3>
-                  <div className="mb-6 text-center">
-                    <div className="text-5xl font-bold">
-                      {(product.rating || 0).toFixed(1)}
-                    </div>
-                    <div className="mt-2 flex justify-center">
-                      {[1, 2, 3, 4, 5].map((star) => (
-                        <svg
-                          key={star}
-                          className={`h-5 w-5 ${star <= Math.round(product.rating || 0) ? 'fill-yellow-400 text-yellow-400' : 'fill-gray-200 text-gray-200'}`}
-                          xmlns="http://www.w3.org/2000/svg"
-                          viewBox="0 0 24 24"
-                          stroke="currentColor"
-                          strokeWidth="2"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        >
-                          <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
-                        </svg>
-                      ))}
-                    </div>
-                    <p className="mt-1 text-sm text-gray-500">
-                      Based on {product.reviewCount || 0} reviews
-                    </p>
-                  </div>
-                  <Button className="w-full">Write a Review</Button>
-                </div>
-              </div>
-              <div className="md:w-2/3">
-                <div className="mb-6 flex items-center justify-between">
-                  <h3 className="text-xl font-bold">Recent Reviews</h3>
-                  <div className="flex gap-2">
-                    <Button variant="outline" size="sm">
-                      Most Recent
-                    </Button>
-                    <Button variant="ghost" size="sm">
-                      Highest Rated
-                    </Button>
-                  </div>
-                </div>
-                <div className="rounded-lg border border-dashed p-8 text-center">
-                  <p className="text-gray-500">
-                    No reviews yet. Be the first to review this product!
-                  </p>
-                  <Button className="mt-4">Write a Review</Button>
-                </div>
-              </div>
-            </div>
+            <ProductReviews productId={product.id} />
           </TabsContent>
           <TabsContent value="shipping">
             <div className="space-y-6">

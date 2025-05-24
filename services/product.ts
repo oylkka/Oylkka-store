@@ -1,5 +1,5 @@
 import { QEUERY_KEYS } from '@/lib/constants';
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
 
 export class SkuService {
@@ -112,6 +112,80 @@ export function useRelatedProduct({ slug }: { slug: string }) {
       const response = await axios.get(`/api/public/related-products`, {
         params: { slug: slug },
       });
+      return response.data;
+    },
+  });
+}
+export function useCreateReview() {
+  return useMutation({
+    mutationFn: async (formData: FormData) => {
+      const res = await axios.post(
+        '/api/public/single-product/review',
+        formData,
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        }
+      );
+      return res.data;
+    },
+  });
+}
+
+
+export function useDeleteReview() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (reviewId: string) => {
+      const res = await axios.delete(
+        `/api/public/single-product/review?reviewId=${reviewId}`
+      );
+      return res.data;
+    },
+    onSuccess: (data, reviewId) => {
+      // Invalidate product reviews queries to refetch data
+      queryClient.invalidateQueries({
+        queryKey: [QEUERY_KEYS.PRODUCT_REVIEWS],
+      });
+    },
+  });
+}
+
+export function useProductReview({ 
+  productId, 
+  userId, 
+  page = 1, 
+  limit = 10, 
+  sortBy = 'createdAt', 
+  sortOrder = 'desc' 
+}: { 
+  productId: string;
+  userId?: string;
+  page?: number;
+  limit?: number;
+  sortBy?: string;
+  sortOrder?: string;
+}) {
+  return useQuery({
+    queryKey: [QEUERY_KEYS.PRODUCT_REVIEWS, productId, userId, page, limit, sortBy, sortOrder],
+    queryFn: async () => {
+      const params = new URLSearchParams({
+        productId,
+        page: page.toString(),
+        limit: limit.toString(),
+        sortBy,
+        sortOrder,
+      });
+      
+      if (userId) {
+        params.append('userId', userId);
+      }
+
+      const response = await axios.get(
+        `/api/public/single-product/review?${params.toString()}`
+      );
       return response.data;
     },
   });

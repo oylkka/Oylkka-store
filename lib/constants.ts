@@ -24,4 +24,5 @@ export const QEUERY_KEYS = {
   SINGLE_BANNER: 'single banner',
   ADMIN_CATEGORY_LIST: 'admin category list',
   SINGLE_CATEGORY: 'single category',
+  PRODUCT_REVIEWS: 'product reviews',
 };
