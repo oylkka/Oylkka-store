@@ -14,6 +14,7 @@ export async function GET(req: NextRequest) {
           select: {
             name: true,
             slug: true,
+            ownerId: true,
             logo: {
               select: {
                 url: true,

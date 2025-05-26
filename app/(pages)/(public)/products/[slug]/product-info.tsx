@@ -28,7 +28,7 @@ export default function ProductInfo({
     <div>
       <div className="mb-2 flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <Badge variant="outline">{product.brand}</Badge>
+          <Badge variant="outline">{product.brand || 'Not specified'}</Badge>
           {product.shop?.isVerified && (
             <Badge
               variant="secondary"

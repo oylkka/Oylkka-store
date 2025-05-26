@@ -75,7 +75,7 @@ const ProductReviews: React.FC<ProductReviewsProps> = ({ productId }) => {
   const handleSignIn = () => {
     toast.info('Redirecting to sign-in...');
   };
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const handleSubmitReview = async (data: any) => {
     if (sessionStatus !== 'authenticated' || !session?.user?.id) {
       toast.error('Please log in to submit a review.');
@@ -115,7 +115,7 @@ const ProductReviews: React.FC<ProductReviewsProps> = ({ productId }) => {
       console.error('Review submission error:', err);
       const errorMessage =
         err instanceof Error ? err.message : 'Failed to submit review.';
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       if (err instanceof Error && (err as any).response?.status === 409) {
         toast.error("You've already reviewed this product.", {
           id: submissionToastId,

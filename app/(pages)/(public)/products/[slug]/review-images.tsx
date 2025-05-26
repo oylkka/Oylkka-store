@@ -8,7 +8,9 @@ interface ReviewImagesProps {
 }
 
 export const ReviewImages: React.FC<ReviewImagesProps> = ({ images }) => {
-  if (!images || images.length === 0) {return null;}
+  if (!images || images.length === 0) {
+    return null;
+  }
 
   return (
     <div className="mt-3 flex flex-wrap gap-2">
