@@ -1,6 +1,5 @@
 'use client';
 
-
 import { X } from 'lucide-react';
 import Image from 'next/image';
 import { useEffect, useState } from 'react';
@@ -17,7 +16,9 @@ export const ImagePreview: React.FC<ImagePreviewProps> = ({
   const [imageUrl, setImageUrl] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!file) {return;}
+    if (!file) {
+      return;
+    }
 
     const newImageUrl = URL.createObjectURL(file);
     setImageUrl(newImageUrl);
@@ -25,7 +26,9 @@ export const ImagePreview: React.FC<ImagePreviewProps> = ({
     return () => URL.revokeObjectURL(newImageUrl);
   }, [file]);
 
-  if (!imageUrl) {return null;}
+  if (!imageUrl) {
+    return null;
+  }
 
   return (
     <div className="group relative h-20 w-20 overflow-hidden rounded-lg border">

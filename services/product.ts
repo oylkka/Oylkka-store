@@ -133,7 +133,6 @@ export function useCreateReview() {
   });
 }
 
-
 export function useDeleteReview() {
   const queryClient = useQueryClient();
 
@@ -153,14 +152,14 @@ export function useDeleteReview() {
   });
 }
 
-export function useProductReview({ 
-  productId, 
-  userId, 
-  page = 1, 
-  limit = 10, 
-  sortBy = 'createdAt', 
-  sortOrder = 'desc' 
-}: { 
+export function useProductReview({
+  productId,
+  userId,
+  page = 1,
+  limit = 10,
+  sortBy = 'createdAt',
+  sortOrder = 'desc',
+}: {
   productId: string;
   userId?: string;
   page?: number;
@@ -169,7 +168,15 @@ export function useProductReview({
   sortOrder?: string;
 }) {
   return useQuery({
-    queryKey: [QEUERY_KEYS.PRODUCT_REVIEWS, productId, userId, page, limit, sortBy, sortOrder],
+    queryKey: [
+      QEUERY_KEYS.PRODUCT_REVIEWS,
+      productId,
+      userId,
+      page,
+      limit,
+      sortBy,
+      sortOrder,
+    ],
     queryFn: async () => {
       const params = new URLSearchParams({
         productId,
@@ -178,7 +185,7 @@ export function useProductReview({
         sortBy,
         sortOrder,
       });
-      
+
       if (userId) {
         params.append('userId', userId);
       }

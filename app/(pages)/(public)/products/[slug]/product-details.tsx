@@ -25,6 +25,7 @@ import { Separator } from '@/components/ui/separator';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import type { ProductImage, ProductVariant } from '@/lib/types';
 import { useAddToCart, useSingleProduct } from '@/services';
+import MessageVendorButton from '@/utils/chat-button';
 
 import LoadingSkeleton from './loading-skeleton';
 import ProductGallery from './product-gallery';
@@ -337,12 +338,6 @@ export default function ProductDetails({ slug }: { slug: string }) {
             </p>
           </div>
 
-          <div className="prose prose-sm max-w-none">
-            <p className="text-secondary-foreground leading-relaxed">
-              {product.description.split('\n\n')[0]}
-            </p>
-          </div>
-
           <Separator />
 
           <div className="space-y-6">
@@ -403,6 +398,12 @@ export default function ProductDetails({ slug }: { slug: string }) {
                 <ShoppingCart className="mr-2 h-5 w-5" />
                 {currentStock <= 0 ? 'Out of Stock' : 'Add to Cart'}
               </Button>
+              <MessageVendorButton
+                className="hidden md:flex"
+                vendorId={product.shop.ownerId}
+                vendorName={product.shop.name}
+                productId={product.id}
+              />
               <Button
                 variant={inWishlist ? 'destructive' : 'outline'}
                 size="lg"
@@ -417,6 +418,12 @@ export default function ProductDetails({ slug }: { slug: string }) {
                 </span>
               </Button>
             </div>
+            <MessageVendorButton
+              className="md:hidden"
+              vendorId={product.shop.ownerId}
+              vendorName={product.shop.name}
+              productId={product.id}
+            />
           </div>
 
           {/* Shipping & Returns Info */}
@@ -441,7 +448,7 @@ export default function ProductDetails({ slug }: { slug: string }) {
               </div>
               <div>
                 <p className="font-medium">Free Shipping</p>
-                <p className="text-xs text-gray-500">On orders over $50</p>
+                <p className="text-xs text-gray-500">On orders over 2000 BDT</p>
               </div>
             </div>
             <div className="flex items-start gap-2">
@@ -559,7 +566,7 @@ export default function ProductDetails({ slug }: { slug: string }) {
                 <div className="mt-3 space-y-2">
                   <div className="flex justify-between border-b pb-2">
                     <span className="font-medium">Brand</span>
-                    <span>{product.brand}</span>
+                    <span>{product.brand || 'Not specified'}</span>
                   </div>
                   <div className="flex justify-between border-b pb-2">
                     <span className="font-medium">Model</span>
