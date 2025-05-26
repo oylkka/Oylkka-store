@@ -67,7 +67,7 @@ export default async function UserDropDown() {
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
                 <Link
-                  href="/messages"
+                  href="/chat"
                   className="flex w-full cursor-pointer items-center justify-between"
                 >
                   <div className="flex items-center">
