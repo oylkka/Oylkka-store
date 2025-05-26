@@ -65,6 +65,7 @@ jobs:
           BKASH_CHECKOUT_URL_PASSWORD: ${{ secrets.BKASH_CHECKOUT_URL_PASSWORD }}
           BKASH_CHECKOUT_URL_APP_KEY: ${{ secrets.BKASH_CHECKOUT_URL_APP_KEY }}
           BKASH_CHECKOUT_URL_APP_SECRET: ${{ secrets.BKASH_CHECKOUT_URL_APP_SECRET }}
+          ABLY_API_KEY: ${{ secrets.ABLY_API_KEY }}
 
       - name: Build
         run: pnpm build
@@ -86,3 +87,4 @@ jobs:
           BKASH_CHECKOUT_URL_PASSWORD: ${{ secrets.BKASH_CHECKOUT_URL_PASSWORD }}
           BKASH_CHECKOUT_URL_APP_KEY: ${{ secrets.BKASH_CHECKOUT_URL_APP_KEY }}
           BKASH_CHECKOUT_URL_APP_SECRET: ${{ secrets.BKASH_CHECKOUT_URL_APP_SECRET }}
+          ABLY_API_KEY: ${{ secrets.ABLY_API_KEY }}
