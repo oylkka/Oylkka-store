@@ -7,6 +7,8 @@ import { db } from '@/lib/db';
 import { CartItem, PaymentData } from '@/lib/types';
 import { createPayment } from '@/services/bkash';
 
+const myUrl = process.env.NEXT_PUBLIC_SITE_URL;
+
 export async function POST(req: NextRequest) {
   try {
     // Get user session
@@ -19,6 +21,15 @@ export async function POST(req: NextRequest) {
 
     const data: PaymentData = await req.json();
     const myUrl = process.env.NEXT_PUBLIC_SITE_URL;
+
+    // Validate required environment variable
+    if (!myUrl) {
+      console.error('NEXT_PUBLIC_SITE_URL environment variable is not set');
+      return NextResponse.json(
+        { error: 'Server configuration error' },
+        { status: 500 }
+      );
+    }
 
     // Validate cart items against database
     const validationResult = await validateCartData(data.cart);
@@ -53,9 +64,119 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    // Check payment method and handle accordingly
+    const paymentMethod = data.payment.method.toLowerCase();
+
+    if (paymentMethod === 'nagad') {
+      return NextResponse.json(
+        { error: 'Nagad payment is not implemented yet' },
+        { status: 501 }
+      );
+    }
+
     const orderNumber = uuidv4().substring(0, 10);
 
-    // Create order with PENDING status
+    // Handle Cash on Delivery (COD)
+    if (paymentMethod === 'cod') {
+      return await handleCODOrder(data, userId, orderNumber);
+    }
+
+    // Handle bKash payment
+    if (paymentMethod === 'bkash') {
+      return await handleBkashPayment(data, userId, orderNumber, myUrl);
+    }
+
+    // This should never happen due to validation, but just in case
+    return NextResponse.json(
+      { error: 'Unsupported payment method' },
+      { status: 400 }
+    );
+  } catch (error) {
+    console.error('Payment processing error:', error);
+    return NextResponse.json(
+      { error: 'Internal Server Error' },
+      { status: 500 }
+    );
+  }
+}
+
+async function handleCODOrder(
+  data: PaymentData,
+  userId: string,
+  orderNumber: string
+) {
+  try {
+    // Create order with PROCESSING status for COD (ready to be processed)
+    const order = await db.order.create({
+      data: {
+        orderNumber,
+        user: {
+          connect: { id: userId },
+        },
+        status: 'PROCESSING', // COD orders can be processed immediately
+        paymentStatus: 'PENDING', // Payment will be collected on delivery
+        paymentMethod: 'CASH_ON_DELIVERY',
+        subtotal: data.pricing.subtotal,
+        tax: 0, // Adjust as needed
+        shipping: data.pricing.shippingCost,
+        discount: data.pricing.discount.amount || 0,
+        total: data.pricing.total,
+        currency: 'BDT', // Bangladesh Taka
+        shippingAddress: {
+          name: data.shipping.address.name,
+          address1:
+            `${data.shipping.address.address}, ${data.shipping.address.apartment || ''}`.trim(),
+          city: data.shipping.address.city,
+          district: data.shipping.address.district,
+          postalCode: data.shipping.address.postalCode,
+          phone: data.shipping.address.phone,
+          email: data.shipping.address.email,
+          isDefault: false,
+        },
+        metadata: {
+          paymentMethod: 'CASH_ON_DELIVERY',
+          orderProcessing: true,
+          confirmedAt: new Date().toISOString(),
+          cartData: JSON.parse(JSON.stringify(data.cart)),
+        },
+        items: {
+          create: data.cart.map((item) => ({
+            productSku: item.productId,
+            productName: item.name,
+            quantity: item.quantity,
+            price: item.price,
+            discount: item.discountPrice ? item.price - item.discountPrice : 0,
+            variantInfo: {},
+          })),
+        },
+      },
+    });
+
+    // TODO: You might want to reduce stock quantities here for COD orders
+    // await reduceStockQuantities(data.cart);
+
+    return NextResponse.json({
+      message: 'Order placed successfully',
+      url: `${myUrl}/dashboard/order/order-confirmation?orderId=${order.orderNumber}`,
+      orderId: orderNumber,
+      paymentMethod: 'CASH_ON_DELIVERY',
+      status: 'PROCESSING',
+      paymentStatus: 'PENDING',
+    });
+  } catch (error) {
+    console.error('COD order creation error:', error);
+    throw error;
+  }
+}
+
+async function handleBkashPayment(
+  data: PaymentData,
+  userId: string,
+  orderNumber: string,
+  myUrl: string
+) {
+  try {
+    // Create order with PENDING status for bKash payment
     const order = await db.order.create({
       data: {
         orderNumber,
@@ -131,6 +252,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({
         message: 'Payment Failed',
         error: createPaymentResponse.statusMessage,
+        paymentMethod: 'BKASH',
       });
     }
 
@@ -150,16 +272,14 @@ export async function POST(req: NextRequest) {
     });
 
     return NextResponse.json({
-      message: 'Payment Success',
+      message: 'Payment initiated successfully',
       url: createPaymentResponse.bkashURL,
       orderId: orderNumber,
+      paymentMethod: 'BKASH',
     });
   } catch (error) {
-    console.error('Payment processing error:', error);
-    return NextResponse.json(
-      { error: 'Internal Server Error' },
-      { status: 500 }
-    );
+    console.error('bKash payment error:', error);
+    throw error;
   }
 }
 
@@ -397,6 +517,6 @@ function validateShipping(shipping: PaymentData['shipping']) {
 }
 
 function validatePaymentMethod(method: string) {
-  const validMethods = ['bkash', 'card', 'cod', 'nagad', 'rocket'];
-  return validMethods.includes(method);
+  const validMethods = ['bkash', 'cod', 'nagad'];
+  return validMethods.includes(method.toLowerCase());
 }

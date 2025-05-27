@@ -244,7 +244,9 @@ export default function CheckoutPage() {
 
       // Call API with axios
       const response = await axios.post('/api/checkout/payment', orderData);
-
+      if (response.status === 501) {
+        toast.error('Payment gatway is not configured');
+      }
       if (response.data.url) {
         router.push(response.data.url);
       } else {
@@ -784,7 +786,7 @@ export default function CheckoutPage() {
                   </div>
 
                   {/* Order summary in review step */}
-                  <div className="mt-4 rounded-lg bg-gray-50 p-4">
+                  <div className="mt-4 rounded-lg  p-4">
                     <h3 className="text-md mb-2 font-medium">Order Summary</h3>
                     <div className="space-y-2 text-sm">
                       <div className="flex justify-between">
