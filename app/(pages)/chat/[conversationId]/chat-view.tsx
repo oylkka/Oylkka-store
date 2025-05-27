@@ -1,3 +1,6 @@
+/* eslint-disable no-console */
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 'use client';
 
 import { format, isToday, isYesterday } from 'date-fns';
@@ -77,7 +80,7 @@ interface Conversation {
   createdAt: string;
   lastMessageAt: string;
 }
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+
 type MessageListener = (message: any) => void;
 
 export function ImprovedChatView() {
@@ -105,7 +108,7 @@ export function ImprovedChatView() {
   const [onlineUserDetails, setOnlineUserDetails] = useState<User[]>([]); // New state for user details
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
   const channelRef = useRef<any>(null);
   const messageListenersRef = useRef<Set<MessageListener>>(new Set());
 
@@ -116,7 +119,9 @@ export function ImprovedChatView() {
   const fetchUserDetails = useCallback(async (userIds: string[]) => {
     try {
       const userPromises = userIds.map(async (userId) => {
-        const response = await fetch(`/api/user/${userId}`);
+        const response = await fetch(
+          `/api/dashboard/admin/users/single-user?id=${userId}`
+        );
         if (response.ok) {
           return response.json() as Promise<User>;
         }
@@ -146,7 +151,6 @@ export function ImprovedChatView() {
       }
       const data: Conversation = await response.json();
       setConversation(data);
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
       setError(err.message);
       toast.error('Failed to load conversation details');
@@ -176,7 +180,6 @@ export function ImprovedChatView() {
         status: 'read' as const,
       }));
       setMessages(processedMessages);
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
       setError(err.message);
       toast.error('Failed to load messages');
@@ -193,21 +196,39 @@ export function ImprovedChatView() {
   }, [onlineUsers, isConnected, fetchUserDetails]);
 
   // Setup Ably channel and listeners
+  // Step 1: Let's add comprehensive debugging to your useEffect that sets up Ably
+  // Replace your existing Ably setup useEffect with this debug version:
+
   useEffect(() => {
+    console.log('🔧 Ably setup useEffect triggered', {
+      ably: !!ably,
+      isConnected,
+      conversationId,
+      userId: session?.user?.id,
+    });
+
     if (!ably || !isConnected || !conversationId || !session?.user?.id) {
+      console.log('❌ Ably setup conditions not met');
       return;
     }
 
-    const channelName = `chat:${conversationId}`; // Aligned with useAbly and auth endpoint
+    const currentMessageListeners = messageListenersRef.current;
+    const channelName = `chat:${conversationId}`;
+    console.log('📺 Getting channel:', channelName);
+
     const channel = getChannel(channelName);
 
     if (!channel) {
-      console.warn('Failed to get channel:', channelName);
+      console.warn('❌ Failed to get channel:', channelName);
       return;
     }
 
+    console.log('✅ Channel obtained successfully');
+    console.log('📊 Channel state:', channel.state);
+
     // Clean up previous channel
     if (channelRef.current && channelRef.current !== channel) {
+      console.log('🧹 Cleaning up previous channel');
       const previousListeners = new Set(messageListenersRef.current);
       previousListeners.forEach((listener) => {
         channelRef.current!.unsubscribe('message', listener);
@@ -220,53 +241,117 @@ export function ImprovedChatView() {
 
     channelRef.current = channel;
 
-    // Message listener
+    // Enhanced message listener with detailed logging
     const messageListener: MessageListener = (ablyMessage) => {
-      const receivedMessage = ablyMessage.data as ClientMessage;
-      if (receivedMessage.senderId === session.user?.id) {
-        if (pendingMessagesRef.current.has(receivedMessage.id)) {
-          setMessages((prevMessages) =>
-            prevMessages.map((msg) => {
-              if (
-                msg.id.startsWith('temp-') &&
-                msg.content === receivedMessage.content &&
-                msg.senderId === receivedMessage.senderId
-              ) {
-                pendingMessagesRef.current.delete(receivedMessage.id);
-                return {
-                  ...receivedMessage,
-                  createdAt: new Date(receivedMessage.createdAt),
-                  status: 'delivered' as const,
-                };
-              }
-              return msg;
-            })
-          );
-        }
+      console.log('📨 RAW Ably message received:', {
+        name: ablyMessage.name,
+        data: ablyMessage.data,
+        timestamp: new Date().toISOString(),
+      });
+
+      if (ablyMessage.name !== 'message') {
+        console.log('⚠️ Ignoring non-message event:', ablyMessage.name);
         return;
       }
 
+      const receivedMessage = ablyMessage.data as ClientMessage;
+
+      console.log('📩 Processing message:', {
+        id: receivedMessage.id,
+        senderId: receivedMessage.senderId,
+        content: receivedMessage.content?.substring(0, 50) + '...',
+        currentUserId: session.user?.id,
+        isFromCurrentUser: receivedMessage.senderId === session.user?.id,
+      });
+
       setMessages((prevMessages) => {
-        const exists = prevMessages.some(
+        console.log('📝 Current messages count:', prevMessages.length);
+
+        // Check if message already exists
+        const existingMessage = prevMessages.find(
           (msg) => msg.id === receivedMessage.id
         );
-        if (!exists) {
-          return [
-            ...prevMessages,
-            {
-              ...receivedMessage,
-              createdAt: new Date(receivedMessage.createdAt),
-              status: 'delivered',
-            },
-          ];
+
+        if (existingMessage) {
+          console.log('🔄 Message already exists, updating status');
+          return prevMessages.map((msg) =>
+            msg.id === receivedMessage.id
+              ? {
+                  ...receivedMessage,
+                  createdAt: new Date(receivedMessage.createdAt),
+                  status: 'delivered' as const,
+                }
+              : msg
+          );
         }
-        return prevMessages;
+
+        // For messages from current user - try to replace temp message
+        if (receivedMessage.senderId === session.user?.id) {
+          console.log(
+            '👤 Message from current user, looking for temp message to replace'
+          );
+
+          const tempMessageIndex = prevMessages.findIndex(
+            (msg) =>
+              msg.id.startsWith('temp-') &&
+              msg.content === receivedMessage.content &&
+              msg.senderId === receivedMessage.senderId
+          );
+
+          if (tempMessageIndex !== -1) {
+            console.log(
+              '🔄 Found temp message to replace at index:',
+              tempMessageIndex
+            );
+            return prevMessages.map((msg, index) =>
+              index === tempMessageIndex
+                ? {
+                    ...receivedMessage,
+                    createdAt: new Date(receivedMessage.createdAt),
+                    status: 'delivered' as const,
+                  }
+                : msg
+            );
+          } else {
+            console.log('⚠️ No temp message found, adding as new message');
+          }
+        }
+
+        // Add as new message
+        console.log('➕ Adding as new message');
+        const newMessages = [
+          ...prevMessages,
+          {
+            ...receivedMessage,
+            createdAt: new Date(receivedMessage.createdAt),
+            status: 'delivered' as const,
+          },
+        ];
+
+        console.log('📊 New messages count:', newMessages.length);
+        return newMessages;
       });
     };
 
-    // Read receipt listener
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    // Enhanced typing listener
+    const typingListener = (ablyMessage: any) => {
+      console.log('⌨️ Typing event received:', ablyMessage.data);
+      const { userId, isTyping: typing } = ablyMessage.data;
+      if (userId !== session.user?.id) {
+        console.log('👥 Setting typing state for other user:', typing);
+        setIsTyping(typing);
+        if (typing) {
+          setTimeout(() => {
+            console.log('⏰ Typing timeout reached');
+            setIsTyping(false);
+          }, 3000);
+        }
+      }
+    };
+
+    // Enhanced read receipt listener
     const readReceiptListener = (ablyMessage: any) => {
+      console.log('✅ Read receipt received:', ablyMessage.data);
       const {
         readerId,
         messageIds,
@@ -291,35 +376,34 @@ export function ImprovedChatView() {
       }
     };
 
-    // Typing indicator listener
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const typingListener = (ablyMessage: any) => {
-      const { userId, isTyping: typing } = ablyMessage.data;
-      if (userId !== session.user?.id) {
-        setIsTyping(typing);
-        if (typing) {
-          setTimeout(() => setIsTyping(false), 3000);
-        }
-      }
-    };
-
     // Subscribe to events
+    console.log('🔔 Subscribing to channel events');
     channel.subscribe('message', messageListener);
     channel.subscribe('read_receipt', readReceiptListener);
     channel.subscribe('typing', typingListener);
 
+    // Test channel connection
+    channel
+      .publish('test', {
+        userId: session.user.id,
+        timestamp: new Date().toISOString(),
+        message: 'Connection test',
+      })
+      .then(() => {
+        console.log('✅ Test message published successfully');
+      })
+      .catch((error: any) => {
+        console.error('❌ Failed to publish test message:', error);
+      });
+
     messageListenersRef.current.add(messageListener);
 
-    // Store current refs in variables for cleanup
-    const currentChannel = channelRef.current;
-    const currentMessageListeners = messageListenersRef.current;
-
     return () => {
-      if (currentChannel) {
-        currentChannel.unsubscribe('message', messageListener);
-        currentChannel.unsubscribe('read_receipt', readReceiptListener);
-        currentChannel.unsubscribe('typing', typingListener);
-        currentChannel.presence.unsubscribe();
+      console.log('🧹 Cleaning up Ably subscriptions');
+      if (channelRef.current) {
+        channelRef.current.unsubscribe('message', messageListener);
+        channelRef.current.unsubscribe('read_receipt', readReceiptListener);
+        channelRef.current.unsubscribe('typing', typingListener);
       }
       currentMessageListeners.delete(messageListener);
     };
@@ -331,6 +415,115 @@ export function ImprovedChatView() {
     getChannel,
     session,
   ]);
+
+  // Step 2: Enhanced handleSendMessage with debugging
+  const handleSendMessage = async (e: FormEvent) => {
+    e.preventDefault();
+    console.log('📤 handleSendMessage called');
+
+    if (!newMessageContent.trim() || !session?.user?.id || !conversationId) {
+      console.log('❌ Message send conditions not met:', {
+        hasContent: !!newMessageContent.trim(),
+        hasUserId: !!session?.user?.id,
+        hasConversationId: !!conversationId,
+      });
+      return;
+    }
+
+    const content = newMessageContent.trim();
+    setNewMessageContent('');
+
+    console.log('📝 Sending message:', {
+      content: content.substring(0, 50) + '...',
+      conversationId,
+      userId: session.user.id,
+    });
+
+    // Stop typing indicator
+    if (channelRef.current && isConnected) {
+      console.log('⌨️ Publishing typing stop event');
+      channelRef.current.publish('typing', {
+        userId: session.user.id,
+        isTyping: false,
+      });
+    }
+
+    const tempId = `temp-${Date.now()}-${Math.random()}`;
+    const tempMessage: ClientMessage = {
+      id: tempId,
+      conversationId: conversationId,
+      senderId: session.user.id,
+      content: content,
+      createdAt: new Date(),
+      sender: {
+        id: session.user.id,
+        name: session.user.name,
+        username: session.user.username,
+        image: session.user.image,
+      },
+      status: 'sending',
+    };
+
+    console.log('🔄 Adding optimistic message:', tempId);
+    setMessages((prev) => {
+      console.log('📊 Adding temp message, prev count:', prev.length);
+      return [...prev, tempMessage];
+    });
+
+    try {
+      console.log('🌐 Calling sendMessage API...');
+      const savedMessage = await sendMessage(conversationId, content);
+      console.log('✅ Message saved to server:', {
+        id: savedMessage.id,
+        tempId,
+        content: savedMessage.content?.substring(0, 50) + '...',
+      });
+
+      // Update temp message with real message data
+      setMessages((prev) => {
+        console.log('🔄 Replacing temp message with real message');
+        const updated = prev.map((msg) =>
+          msg.id === tempId
+            ? {
+                ...savedMessage,
+                createdAt: new Date(savedMessage.createdAt),
+                status: 'sent' as const,
+              }
+            : msg
+        );
+        console.log('📊 Updated messages count:', updated.length);
+        return updated;
+      });
+
+      // Publish to Ably channel for real-time updates
+      if (channelRef.current && isConnected) {
+        console.log('📡 Publishing message to Ably channel');
+        try {
+          await channelRef.current.publish('message', {
+            ...savedMessage,
+            createdAt: savedMessage.createdAt, // Keep as string for Ably
+          });
+          console.log('✅ Message published to Ably successfully');
+        } catch (ablyError) {
+          console.error('❌ Failed to publish to Ably:', ablyError);
+        }
+      } else {
+        console.warn('⚠️ Cannot publish to Ably - channel not ready:', {
+          hasChannel: !!channelRef.current,
+          isConnected,
+        });
+      }
+    } catch (err: any) {
+      console.error('❌ Error sending message:', err);
+      toast.error('Failed to send message');
+
+      setMessages((prev) =>
+        prev.map((msg) =>
+          msg.id === tempId ? { ...msg, status: 'failed' as const } : msg
+        )
+      );
+    }
+  };
 
   // Initial data fetch
   useEffect(() => {
@@ -345,7 +538,6 @@ export function ImprovedChatView() {
 
       try {
         await Promise.all([fetchConversation(), fetchMessages()]);
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } catch (err: any) {
         console.error('Error loading chat data:', err);
         setError('Failed to load chat data');
@@ -387,70 +579,11 @@ export function ImprovedChatView() {
   };
 
   // Improved message sending logic
-  const handleSendMessage = async (e: FormEvent) => {
-    e.preventDefault();
-    if (!newMessageContent.trim() || !session?.user?.id || !conversationId) {
-      return;
-    }
+  // PART 1: Replace your existing messageListener with this improved version:
 
-    const content = newMessageContent.trim();
-    setNewMessageContent('');
+  // PART 2: Also update your handleSendMessage function with this improved version:
 
-    if (channelRef.current && isConnected) {
-      channelRef.current.publish('typing', {
-        userId: session.user.id,
-        isTyping: false,
-      });
-    }
-
-    const tempId = `temp-${Date.now()}-${Math.random()}`;
-    const tempMessage: ClientMessage = {
-      id: tempId,
-      conversationId: conversationId,
-      senderId: session.user.id,
-      content: content,
-      createdAt: new Date(),
-      sender: {
-        id: session.user.id,
-        name: session.user.name,
-        username: session.user.username,
-        image: session.user.image,
-      },
-      status: 'sending',
-    };
-
-    setMessages((prev) => [...prev, tempMessage]);
-
-    try {
-      const savedMessage = await sendMessage(conversationId, content);
-      pendingMessagesRef.current.add(savedMessage.id);
-
-      setMessages((prev) =>
-        prev.map((msg) =>
-          msg.id === tempId
-            ? {
-                ...savedMessage,
-                createdAt: new Date(savedMessage.createdAt),
-                status: 'sent' as const,
-              }
-            : msg
-        )
-      );
-
-      setTimeout(() => {
-        pendingMessagesRef.current.delete(savedMessage.id);
-      }, 5000);
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } catch (err: any) {
-      console.error('Error sending message:', err);
-      toast.error('Failed to send message');
-      setMessages((prev) =>
-        prev.map((msg) =>
-          msg.id === tempId ? { ...msg, status: 'failed' as const } : msg
-        )
-      );
-    }
-  };
+  // PART 2: Improved handleSendMessage function:
 
   const retryFailedMessage = async (messageId: string) => {
     const message = messages.find((msg) => msg.id === messageId);
@@ -483,7 +616,6 @@ export function ImprovedChatView() {
       setTimeout(() => {
         pendingMessagesRef.current.delete(savedMessage.id);
       }, 5000);
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
       console.error('Error retrying message:', err);
       toast.error('Failed to retry message');

@@ -34,8 +34,6 @@ export async function GET(req: NextRequest) {
     }
 
     // Optional: Verify user has access to this conversation
-    // You might want to add this check based on your database
-
     const hasAccess = await db.conversation.findFirst({
       where: {
         id: conversationId,
@@ -54,22 +52,19 @@ export async function GET(req: NextRequest) {
       );
     }
 
-    // Define Ably token capabilities for the specific private channel
+    // Define Ably token capabilities for the specific channel
+    // FIXED: Removed 'private:' prefix to match client channel name
     const tokenRequest = await ably.auth.createTokenRequest({
       clientId: userId,
       capability: {
-        [`private:chat:${conversationId}`]: [
-          'publish',
-          'subscribe',
-          'presence',
-        ],
+        [`chat:${conversationId}`]: ['publish', 'subscribe', 'presence'],
       },
       ttl: 60 * 60 * 1000, // 1 hour TTL
     });
 
     return NextResponse.json(tokenRequest);
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
   } catch (error) {
+    console.error('Ably auth error:', error);
     return NextResponse.json(
       { message: 'Internal Server Error' },
       { status: 500 }
