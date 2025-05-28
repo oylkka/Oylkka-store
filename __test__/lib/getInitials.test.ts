@@ -1,4 +1,4 @@
-import { getInitials } from '@/lib/utils';
+import { formatDisplayName, getInitials } from '@/lib/utils';
 
 describe('getInitials', () => {
   it('returns empty string for null input', () => {
@@ -36,5 +36,33 @@ describe('getInitials', () => {
   it('returns correct initials for long names', () => {
     expect(getInitials('Firstname Middlename Lastname')).toBe('FL');
     expect(getInitials('Very Long Complex Name Example')).toBe('VE');
+  });
+});
+it('returns correct initials for name with multiple middle names', () => {
+  expect(getInitials('Ada Lovelace Byron King')).toBe('AK');
+});
+
+describe('formatDisplayName', () => {
+  it('returns name if name is provided', () => {
+    const user = { name: 'John Doe', username: 'johnd' };
+    expect(formatDisplayName(user)).toBe('John Doe');
+  });
+
+  it('returns username if name is not provided', () => {
+    const user = { name: null, username: 'johnd' };
+    expect(formatDisplayName(user)).toBe('johnd');
+  });
+
+  it('returns "Unknown User" if name and username are not provided', () => {
+    const user = { name: null, username: null };
+    expect(formatDisplayName(user)).toBe('Unknown User');
+  });
+
+  it('returns "Unknown User" if user is undefined', () => {
+    expect(formatDisplayName(undefined)).toBe('Unknown User');
+  });
+
+  it('returns "Unknown User" if user is null', () => {
+    expect(formatDisplayName(null)).toBe('Unknown User');
   });
 });

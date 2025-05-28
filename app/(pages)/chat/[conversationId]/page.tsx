@@ -1,5 +1,5 @@
-import { ImprovedChatView } from './chat-view';
+import { ChatConversation } from './chat-conversation';
 
 export default function ChatConversationPage() {
-  return <ImprovedChatView />;
+  return <ChatConversation />;
 }

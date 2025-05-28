@@ -78,3 +78,8 @@ export function cleanFormData<T extends Record<string, any>>(
 
   return cleanedData;
 }
+export function formatDisplayName(
+  user?: { name?: string | null; username?: string | null } | null
+): string {
+  return user?.name || user?.username || 'Unknown User';
+}

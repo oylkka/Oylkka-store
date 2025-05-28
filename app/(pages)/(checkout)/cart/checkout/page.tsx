@@ -786,7 +786,7 @@ export default function CheckoutPage() {
                   </div>
 
                   {/* Order summary in review step */}
-                  <div className="mt-4 rounded-lg  p-4">
+                  <div className="mt-4 rounded-lg p-4">
                     <h3 className="text-md mb-2 font-medium">Order Summary</h3>
                     <div className="space-y-2 text-sm">
                       <div className="flex justify-between">

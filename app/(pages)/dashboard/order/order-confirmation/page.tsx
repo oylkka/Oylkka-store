@@ -56,13 +56,16 @@ function OrderConfirmationContent(): JSX.Element {
   const orderId = searchParams.get('orderId') || '1';
   const { isPending, data, isError } = useOrderConfirmation({ id: orderId });
 
-  if (isPending) {return <OrderSkeleton />;}
-  if (isError || !data)
-    {return (
+  if (isPending) {
+    return <OrderSkeleton />;
+  }
+  if (isError || !data) {
+    return (
       <div className="flex h-[50vh] items-center justify-center text-red-500">
         <XCircle className="mr-2 h-6 w-6" /> Something went wrong.
       </div>
-    );}
+    );
+  }
 
   const order: Order = data.order;
   const { cartData: products } = order.metadata;

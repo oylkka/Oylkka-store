@@ -14,6 +14,8 @@
   },
   "dependencies": {
     "@auth/prisma-adapter": "^2.9.0",
+    "@emoji-mart/data": "^1.2.1",
+    "@emoji-mart/react": "^1.1.1",
     "@hookform/resolvers": "^5.0.1",
     "@keyv/mongo": "^3.0.1",
     "@prisma/client": "^6.6.0",

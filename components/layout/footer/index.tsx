@@ -319,16 +319,16 @@ export default function Footer() {
             </p>
 
             <form className="mb-6">
-              <div className="relative mb-3 overflow-hidden rounded-lg">
+              <div className="relative mb-3 overflow-hidden">
                 <Input
                   type="email"
                   placeholder="Your email address"
-                  className="focus:border-primary focus:ring-primary border-zinc-700 bg-zinc-800/50 pr-12 text-zinc-100 placeholder:text-zinc-500"
+                  className="h-12 pr-12"
                 />
                 <Button
                   type="submit"
                   size="icon"
-                  className="bg-primary hover:bg-primary/90 absolute top-1 right-1 h-8 w-8 rounded-md"
+                  className="absolute top-2 right-1"
                 >
                   <Send className="h-4 w-4" />
                   <span className="sr-only">Subscribe</span>
