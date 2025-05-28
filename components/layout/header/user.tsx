@@ -70,7 +70,7 @@ export default async function UserDropDown() {
                   href="/chat"
                   className="flex w-full cursor-pointer items-center justify-between"
                 >
-                  <div className="flex items-center">
+                  <div className="flex items-center gap-2">
                     <MessageSquare className="text-primary/70 mr-2 h-4 w-4" />
                     Messages
                   </div>
@@ -78,7 +78,7 @@ export default async function UserDropDown() {
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
                 <Link
-                  href="/edit-profile"
+                  href="/dashboard/edit-profile"
                   className="flex w-full cursor-pointer items-center"
                 >
                   <Settings className="text-primary/70 mr-2 h-4 w-4" />
@@ -87,7 +87,7 @@ export default async function UserDropDown() {
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
                 <Link
-                  href={`/profile?id=${session.user.id}`}
+                  href="/dashboard/profile"
                   className="flex w-full cursor-pointer items-center"
                 >
                   <UserIcon className="text-primary/70 mr-2 h-4 w-4" />

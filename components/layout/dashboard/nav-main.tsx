@@ -548,7 +548,7 @@ export async function NavMain() {
   // Account settings for all users with role-specific options
   const accountSettingsItem: NavItem = {
     title: 'Account',
-    url: '/account',
+    url: '/dashboard/profile',
     icon: Settings,
     roles: [
       'ADMIN',
@@ -561,7 +561,7 @@ export async function NavMain() {
     items: [
       {
         title: 'Profile',
-        url: '/account/profile',
+        url: '/dashboard/profile',
       },
       {
         title: 'Addresses',
