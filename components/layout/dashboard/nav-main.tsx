@@ -414,7 +414,7 @@ export async function NavMain() {
       items: [
         {
           title: 'All Orders',
-          url: '/dashboard/vendor/orders/all',
+          url: '/dashboard/vendor/orders',
         },
         {
           title: 'Processing',

@@ -81,18 +81,90 @@ export function useAdminProductCategories() {
   });
 }
 
-export function useProductList({ currentPage = 1 }: { currentPage?: number }) {
+import { useDebounce } from 'use-debounce';
+
+// Updated useProductList hook with filter support
+export interface ProductFilters {
+  currentPage?: number;
+  search?: string;
+  category?: string;
+  sortBy?: string;
+  minPrice?: number;
+  maxPrice?: number;
+  sizes?: string[];
+  colors?: string[];
+}
+
+export function useProductList({
+  currentPage = 1,
+  search = '',
+  category = '',
+  sortBy = '',
+  minPrice,
+  maxPrice,
+  sizes = [],
+  colors = [],
+}: ProductFilters) {
+  // Debounce the search query for the API call
+  const [debouncedSearch] = useDebounce(search, 400);
+
   return useQuery({
-    queryKey: [QEUERY_KEYS.PRODUCT_LIST, currentPage],
+    queryKey: [
+      QEUERY_KEYS.PRODUCT_LIST,
+      currentPage,
+      debouncedSearch,
+      category,
+      sortBy,
+      minPrice,
+      maxPrice,
+      sizes,
+      colors,
+    ],
     queryFn: async () => {
+      const params: Record<string, any> = { currentPage };
+
+      // Only add search param if it's not empty
+      if (debouncedSearch && debouncedSearch.trim()) {
+        params.search = debouncedSearch.trim();
+      }
+
+      // Add category filter
+      if (category && category !== 'All') {
+        params.category = category;
+      }
+
+      // Add sort parameter
+      if (sortBy) {
+        params.sortBy = sortBy;
+      }
+
+      // Add price range filters
+      if (minPrice !== undefined && minPrice > 0) {
+        params.minPrice = minPrice;
+      }
+
+      if (maxPrice !== undefined && maxPrice > 0) {
+        params.maxPrice = maxPrice;
+      }
+
+      // Add size filters
+      if (sizes.length > 0) {
+        params.sizes = sizes.join(',');
+      }
+
+      // Add color filters
+      if (colors.length > 0) {
+        params.colors = colors.join(',');
+      }
+
       const response = await axios.get('/api/public/product-list', {
-        params: { currentPage },
+        params,
       });
+
       return response.data;
     },
   });
 }
-
 export function useSingleProduct({ slug }: { slug: string }) {
   return useQuery({
     queryKey: [QEUERY_KEYS.SINGLE_PRODUCT, slug],

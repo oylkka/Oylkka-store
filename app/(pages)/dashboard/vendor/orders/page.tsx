@@ -280,7 +280,7 @@ function OrdersContent() {
               role="search"
             >
               <Search
-                className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-gray-400"
+                className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2"
                 aria-hidden="true"
               />
               <Input
@@ -390,10 +390,10 @@ function OrdersContent() {
                       key={order.id}
                       onClick={() =>
                         router.push(
-                          `/dashboard/vendor/orders/${order.orderNumber}`
+                          `/dashboard/vendor/orders/single-order?orderId=${order.orderNumber}`
                         )
                       }
-                      className="cursor-pointer hover:bg-gray-50"
+                      className="cursor-pointer"
                       role="link"
                       tabIndex={0}
                       onKeyDown={(e) =>
