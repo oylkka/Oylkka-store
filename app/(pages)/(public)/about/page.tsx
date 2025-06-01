@@ -4,9 +4,7 @@ import {
   Clock,
   Globe,
   Heart,
-  Mail,
   MapPin,
-  Phone,
   Shield,
   Star,
   Truck,
@@ -30,6 +28,8 @@ import {
   CarouselPrevious,
 } from '@/components/ui/carousel';
 
+import Contact from './contact';
+
 export default function AboutPage() {
   return (
     <div className="bg-background min-h-screen">
@@ -39,7 +39,7 @@ export default function AboutPage() {
         <div className="bg-primary/10 absolute -top-24 -right-24 -z-10 h-64 w-64 rounded-full blur-3xl" />
         <div className="bg-secondary/10 absolute -bottom-32 -left-32 -z-10 h-96 w-96 rounded-full blur-3xl" />
 
-        <div className="mx-auto max-w-6xl">
+        <div className="mx-auto max-w-6xl px-2">
           <div className="grid items-center gap-16 lg:grid-cols-2">
             <div className="space-y-8">
               <div className="inline-flex">
@@ -62,7 +62,7 @@ export default function AboutPage() {
                 exceptional quality and service. Our journey began with a simple
                 mission: to make premium shopping accessible to everyone.
               </p>
-              <div className="flex flex-col gap-4 sm:flex-row">
+              <div className="flex gap-4">
                 <Button size="lg" className="group">
                   Shop Our Collection
                   <ChevronRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
@@ -106,7 +106,7 @@ export default function AboutPage() {
 
       {/* Values Section */}
       <section className="py-12">
-        <div className="mx-auto max-w-6xl">
+        <div className="mx-auto max-w-6xl px-2">
           <div className="mx-auto mb-16 max-w-3xl text-center">
             <Badge
               variant="outline"
@@ -190,7 +190,7 @@ export default function AboutPage() {
         <div className="bg-primary/5 absolute top-0 right-0 -z-10 h-1/3 w-1/3 rounded-full blur-3xl" />
         <div className="bg-secondary/5 absolute bottom-0 left-0 -z-10 h-1/3 w-1/3 rounded-full blur-3xl" />
 
-        <div className="mx-auto max-w-6xl">
+        <div className="mx-auto max-w-6xl px-2">
           <div className="grid items-center gap-16 lg:grid-cols-2">
             <div className="order-2 space-y-8 lg:order-1">
               <Badge
@@ -225,15 +225,15 @@ export default function AboutPage() {
                 </p>
               </div>
               <div className="grid grid-cols-3 gap-8 pt-4">
-                <div className="bg-card border-border/40 rounded-xl border p-6 text-center shadow-sm">
-                  <p className="text-primary text-3xl font-bold">2019</p>
+                <div className="bg-card border-border/40 rounded-xl border p-2 text-center shadow-sm md:p-6">
+                  <p className="text-primary text-3xl font-bold">2025</p>
                   <p className="text-muted-foreground text-sm">Founded</p>
                 </div>
-                <div className="bg-card border-border/40 rounded-xl border p-6 text-center shadow-sm">
+                <div className="bg-card border-border/40 rounded-xl border p-2 text-center shadow-sm md:p-6">
                   <p className="text-primary text-3xl font-bold">10K+</p>
                   <p className="text-muted-foreground text-sm">Customers</p>
                 </div>
-                <div className="bg-card border-border/40 rounded-xl border p-6 text-center shadow-sm">
+                <div className="bg-card border-border/40 rounded-xl border p-2 text-center shadow-sm md:p-6">
                   <p className="text-primary text-3xl font-bold">500+</p>
                   <p className="text-muted-foreground text-sm">Products</p>
                 </div>
@@ -263,7 +263,8 @@ export default function AboutPage() {
 
       {/* Team Section */}
       <section className="py-12">
-        <div className="mx-auto max-w-6xl">
+        z
+        <div className="mx-auto max-w-6xl px-2">
           <div className="mx-auto mb-16 max-w-3xl text-center">
             <Badge
               variant="outline"
@@ -337,7 +338,7 @@ export default function AboutPage() {
       </section>
 
       {/* Testimonials Section */}
-      <section className="bg-muted/30 relative overflow-hidden py-12">
+      <section className="bg-muted/30 relative overflow-hidden px-2 py-12">
         <div className="bg-grid-secondary/5 absolute inset-0 -z-10" />
         <div className="bg-secondary/5 absolute top-0 left-0 -z-10 h-1/3 w-1/3 rounded-full blur-3xl" />
         <div className="bg-primary/5 absolute right-0 bottom-0 -z-10 h-1/3 w-1/3 rounded-full blur-3xl" />
@@ -515,134 +516,7 @@ export default function AboutPage() {
       </section>
 
       {/* Contact Section */}
-      <section className="py-12">
-        <div className="mx-auto max-w-6xl">
-          <div className="grid items-center gap-16 lg:grid-cols-2">
-            <div className="space-y-8">
-              <Badge
-                variant="outline"
-                className="px-4 py-1 text-sm font-medium"
-              >
-                Get In Touch
-              </Badge>
-              <h2 className="text-foreground text-3xl font-bold lg:text-5xl">
-                Contact Us
-              </h2>
-              <p className="text-muted-foreground text-xl">
-                Have questions or feedback? We&#39;d love to hear from you. Our team
-                is ready to assist you with any inquiries.
-              </p>
-
-              <div className="space-y-6">
-                <div className="flex items-center gap-4">
-                  <div className="bg-primary/10 flex h-12 w-12 items-center justify-center rounded-full">
-                    <Mail className="text-primary h-6 w-6" />
-                  </div>
-                  <div>
-                    <p className="text-muted-foreground text-sm">Email</p>
-                    <p className="text-foreground font-medium">
-                      contact@oylkka.com
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-4">
-                  <div className="bg-primary/10 flex h-12 w-12 items-center justify-center rounded-full">
-                    <Phone className="text-primary h-6 w-6" />
-                  </div>
-                  <div>
-                    <p className="text-muted-foreground text-sm">Phone</p>
-                    <p className="text-foreground font-medium">
-                      +1 (555) 123-4567
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-4">
-                  <div className="bg-primary/10 flex h-12 w-12 items-center justify-center rounded-full">
-                    <MapPin className="text-primary h-6 w-6" />
-                  </div>
-                  <div>
-                    <p className="text-muted-foreground text-sm">Location</p>
-                    <p className="text-foreground font-medium">
-                      123 Commerce St, New York, NY 10001
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div className="relative">
-              <div className="bg-primary/5 absolute inset-0 -z-10 -translate-x-1/4 -translate-y-1/4 transform rounded-full blur-3xl" />
-              <Card className="border-border/40 overflow-hidden shadow-lg">
-                <CardContent className="p-8">
-                  <form className="space-y-6">
-                    <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-                      <div className="space-y-2">
-                        <label
-                          htmlFor="name"
-                          className="text-foreground text-sm font-medium"
-                        >
-                          Name
-                        </label>
-                        <input
-                          id="name"
-                          type="text"
-                          className="border-border bg-background text-foreground focus:ring-primary/20 w-full rounded-md border px-4 py-3 focus:ring-2 focus:outline-none"
-                          placeholder="Your name"
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <label
-                          htmlFor="email"
-                          className="text-foreground text-sm font-medium"
-                        >
-                          Email
-                        </label>
-                        <input
-                          id="email"
-                          type="email"
-                          className="border-border bg-background text-foreground focus:ring-primary/20 w-full rounded-md border px-4 py-3 focus:ring-2 focus:outline-none"
-                          placeholder="Your email"
-                        />
-                      </div>
-                    </div>
-                    <div className="space-y-2">
-                      <label
-                        htmlFor="subject"
-                        className="text-foreground text-sm font-medium"
-                      >
-                        Subject
-                      </label>
-                      <input
-                        id="subject"
-                        type="text"
-                        className="border-border bg-background text-foreground focus:ring-primary/20 w-full rounded-md border px-4 py-3 focus:ring-2 focus:outline-none"
-                        placeholder="Subject"
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <label
-                        htmlFor="message"
-                        className="text-foreground text-sm font-medium"
-                      >
-                        Message
-                      </label>
-                      <textarea
-                        id="message"
-                        rows={5}
-                        className="border-border bg-background text-foreground focus:ring-primary/20 w-full rounded-md border px-4 py-3 focus:ring-2 focus:outline-none"
-                        placeholder="Your message"
-                      />
-                    </div>
-                    <Button className="w-full">Send Message</Button>
-                  </form>
-                </CardContent>
-              </Card>
-            </div>
-          </div>
-        </div>
-      </section>
+      <Contact />
 
       {/* CTA Section */}
       <section className="bg-primary relative overflow-hidden py-12">
@@ -650,7 +524,7 @@ export default function AboutPage() {
         <div className="absolute -top-24 -right-24 -z-10 h-64 w-64 rounded-full bg-white/10 blur-3xl" />
         <div className="absolute -bottom-32 -left-32 -z-10 h-96 w-96 rounded-full bg-white/10 blur-3xl" />
 
-        <div className="mx-auto max-w-4xl text-center">
+        <div className="mx-auto max-w-4xl px-2 text-center">
           <h2 className="text-foreground mb-6 text-3xl font-bold lg:text-5xl">
             Ready to Start Shopping?
           </h2>
@@ -658,7 +532,7 @@ export default function AboutPage() {
             Join thousands of satisfied customers and discover our amazing
             collection of premium products.
           </p>
-          <div className="flex flex-col justify-center gap-4 sm:flex-row">
+          <div className="flex justify-center gap-4">
             <Button size="lg" variant="default" className="group bg-black">
               Browse Products
               <ChevronRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
