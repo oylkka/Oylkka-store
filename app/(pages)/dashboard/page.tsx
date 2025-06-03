@@ -2,7 +2,6 @@ import {
   ArrowUpRight,
   BadgePercent,
   BarChart3,
-  Box,
   CircleDollarSign,
   ClipboardList,
   Heart,
@@ -27,168 +26,15 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { auth } from '@/features/auth/auth';
+
+import AdminDashboard from './admin-dashboard';
 
 interface UserType {
   user: {
     name: string;
     role: string;
   };
-}
-
-// Admin Dashboard Component
-function AdminDashboard() {
-  return (
-    <div className="space-y-4">
-      <h2 className="text-2xl font-bold tracking-tight">Admin Dashboard</h2>
-
-      <Tabs defaultValue="overview" className="space-y-4">
-        <TabsList>
-          <TabsTrigger value="overview">Overview</TabsTrigger>
-          <TabsTrigger value="analytics">Analytics</TabsTrigger>
-          <TabsTrigger value="reports">Reports</TabsTrigger>
-          <TabsTrigger value="settings">Settings</TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="overview" className="space-y-4">
-          <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">
-                  Total Revenue
-                </CardTitle>
-                <CircleDollarSign className="text-muted-foreground h-4 w-4" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">$45,231.89</div>
-                <p className="text-muted-foreground text-xs">
-                  +20.1% from last month
-                </p>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">
-                  New Customers
-                </CardTitle>
-                <Users className="text-muted-foreground h-4 w-4" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">+2,350</div>
-                <p className="text-muted-foreground text-xs">
-                  +18.2% from last month
-                </p>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">
-                  Active Orders
-                </CardTitle>
-                <ShoppingBag className="text-muted-foreground h-4 w-4" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">+573</div>
-                <p className="text-muted-foreground text-xs">
-                  +201 pending fulfillment
-                </p>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">
-                  Inventory Status
-                </CardTitle>
-                <Package className="text-muted-foreground h-4 w-4" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">12,234</div>
-                <p className="text-muted-foreground text-xs">
-                  54 products low in stock
-                </p>
-              </CardContent>
-            </Card>
-          </div>
-
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
-            <Card className="col-span-4">
-              <CardHeader>
-                <CardTitle>Sales Overview</CardTitle>
-                <CardDescription>
-                  Monthly revenue breakdown for the current quarter
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="pl-2">
-                <div className="bg-muted/20 flex h-[300px] items-center justify-center rounded-md">
-                  <BarChart3 className="text-muted h-16 w-16" />
-                  <span className="text-muted ml-2">
-                    Sales chart visualization
-                  </span>
-                </div>
-              </CardContent>
-            </Card>
-            <Card className="col-span-3">
-              <CardHeader>
-                <CardTitle>Recent Activities</CardTitle>
-                <CardDescription>
-                  Latest system activities and updates
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-5">
-                  {[
-                    {
-                      action: 'New product added',
-                      user: 'Anna K.',
-                      time: '2 hours ago',
-                      icon: Package,
-                    },
-                    {
-                      action: 'Order #35782 shipped',
-                      user: 'System',
-                      time: '5 hours ago',
-                      icon: Truck,
-                    },
-                    {
-                      action: 'New user registered',
-                      user: 'James B.',
-                      time: '6 hours ago',
-                      icon: Users,
-                    },
-                    {
-                      action: 'Inventory updated',
-                      user: 'Sarah M.',
-                      time: 'Yesterday',
-                      icon: Box,
-                    },
-                    {
-                      action: 'Monthly report generated',
-                      user: 'System',
-                      time: 'Yesterday',
-                      icon: ClipboardList,
-                    },
-                  ].map((item, i) => (
-                    <div key={i} className="flex items-center">
-                      <div className="bg-primary/10 mr-3 flex h-9 w-9 items-center justify-center rounded-full">
-                        <item.icon className="text-primary h-5 w-5" />
-                      </div>
-                      <div className="flex-1">
-                        <p className="text-sm font-medium">{item.action}</p>
-                        <p className="text-muted-foreground text-xs">
-                          {item.user} • {item.time}
-                        </p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        </TabsContent>
-      </Tabs>
-    </div>
-  );
 }
 
 // Manager Dashboard Component

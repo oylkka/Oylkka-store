@@ -201,7 +201,7 @@ export function ChatSidebar({
                                       'User'
                                     }
                                   />
-                                  <AvatarFallback className="bg-gradient-to-br from-blue-500 to-purple-600 text-sm font-medium text-white">
+                                  <AvatarFallback>
                                     {getInitials(
                                       recipient.name ||
                                         recipient.username ||
@@ -209,7 +209,6 @@ export function ChatSidebar({
                                     )}
                                   </AvatarFallback>
                                 </Avatar>
-                                <div className="border-background absolute -right-0.5 -bottom-0.5 h-3 w-3 rounded-full border-2 bg-emerald-500" />
                               </div>
 
                               {state === 'expanded' && (

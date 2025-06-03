@@ -34,7 +34,7 @@ export function MessageBubble({
       case 'delivered':
         return <CheckCheck className="h-3 w-3" />;
       case 'read':
-        return <CheckCheck className="h-3 w-3 text-blue-500" />;
+        return <CheckCheck className="h-3 w-3 text-green-500" />;
       case 'failed':
         return <AlertCircle className="text-destructive h-3 w-3" />;
       default:
@@ -58,7 +58,7 @@ export function MessageBubble({
               src={message.sender.image || undefined}
               alt={formatDisplayName(message.sender)}
             />
-            <AvatarFallback className="bg-gradient-to-br from-blue-500 to-purple-600 text-xs font-medium text-white">
+            <AvatarFallback>
               {getInitials(formatDisplayName(message.sender))}
             </AvatarFallback>
           </Avatar>
@@ -68,19 +68,14 @@ export function MessageBubble({
           className={cn(
             'relative max-w-full rounded-2xl px-4 py-3 shadow-lg backdrop-blur-sm transition-all duration-200 hover:shadow-xl',
             isCurrentUser
-              ? 'rounded-br-md bg-gradient-to-r from-blue-500 to-purple-600 text-white'
-              : 'bg-background/80 border-border/50 text-foreground rounded-bl-md border'
+              ? 'rounded-br-none bg-black text-white'
+              : 'bg-background/80 dark:bg-secondary text-foreground rounded-bl-none border'
           )}
         >
           <p className="text-sm leading-relaxed break-words">
             {message.content}
           </p>
-          <div
-            className={cn(
-              'mt-2 flex items-center justify-end gap-2',
-              isCurrentUser ? 'text-white/70' : 'text-muted-foreground'
-            )}
-          >
+          <div className="text-muted-foreground mt-2 flex items-center justify-end gap-2">
             <span className="text-xs">
               {formatMessageTime(message.createdAt)}
             </span>

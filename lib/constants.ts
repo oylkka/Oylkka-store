@@ -26,4 +26,5 @@ export const QEUERY_KEYS = {
   SINGLE_CATEGORY: 'single category',
   PRODUCT_REVIEWS: 'product reviews',
   USER_PROFILE: 'user profile',
+  ADMIN_STATS: 'admin stats',
 };

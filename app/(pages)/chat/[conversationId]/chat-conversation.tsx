@@ -3,7 +3,7 @@
 import { RefreshCw } from 'lucide-react';
 import { useParams, useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -16,7 +16,6 @@ import { ChatInput } from './chat-input';
 import { ChatMessages } from './chat-messages';
 import { ChatLoadingSkeleton } from './chat-skeleton';
 import { ConnectionStatus } from './connection-status';
-import { OnlineUsers } from './online-users';
 
 export function ChatConversation() {
   const router = useRouter();
@@ -48,39 +47,10 @@ export function ChatConversation() {
     isLoading: isMessagesLoading,
     error: messagesError,
   } = useChatMessages(conversationId, session, ably, isConnected, getChannel);
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const [onlineUserDetails, setOnlineUserDetails] = useState<any[]>([]);
-
-  // Fetch user details for online users
-  useEffect(() => {
-    const fetchUserDetails = async (userIds: string[]) => {
-      try {
-        const userPromises = userIds.map(async (userId) => {
-          const response = await fetch(
-            `/api/dashboard/admin/users/single-user?id=${userId}`
-          );
-          if (response.ok) {
-            return response.json();
-          }
-          return { id: userId, username: userId };
-        });
-        const users = await Promise.all(userPromises);
-        setOnlineUserDetails(users);
-      } catch (err) {
-        console.error('Error fetching user details:', err);
-      }
-    };
-
-    if (isConnected && onlineUsers.length > 0) {
-      fetchUserDetails(onlineUsers);
-    } else {
-      setOnlineUserDetails([]);
-    }
-  }, [onlineUsers, isConnected]);
 
   useEffect(() => {
     if (status === 'unauthenticated') {
-      router.push('/api/auth/signin');
+      router.push('/signin');
     }
   }, [status, router]);
 
@@ -141,8 +111,6 @@ export function ChatConversation() {
         connectionError={connectionError}
         connectionState={connectionState}
       />
-
-      <OnlineUsers userDetails={onlineUserDetails} />
 
       <ChatMessages
         messages={messages}
