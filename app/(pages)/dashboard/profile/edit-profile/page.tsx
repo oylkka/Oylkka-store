@@ -45,7 +45,7 @@ import { Input } from '@/components/ui/input';
 import { Separator } from '@/components/ui/separator';
 import { Skeleton } from '@/components/ui/skeleton';
 import { getInitials } from '@/lib/utils';
-import { useProfile, useUpdateProfile } from '@/services/customar/useProfile';
+import { useProfile, useUpdateProfile } from '@/services/customer/useProfile';
 
 import { UsernameField } from './username';
 

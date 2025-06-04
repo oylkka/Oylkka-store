@@ -351,7 +351,7 @@ export default function Footer() {
               <p className="mb-4 text-xs text-zinc-400">
                 Shop on the go with our mobile app
               </p>
-              <div className="flex gap-3">
+              <div className="flex flex-wrap gap-3">
                 <Button
                   variant="outline"
                   size="sm"

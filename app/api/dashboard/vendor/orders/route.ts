@@ -51,7 +51,11 @@ export async function GET(req: NextRequest) {
         status: true,
         updatedAt: true,
         total: true,
-        items: true,
+        items: {
+          where: {
+            
+          }
+        },
 
         user: {
           select: {

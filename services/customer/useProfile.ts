@@ -10,7 +10,7 @@ export function useProfile() {
   return useQuery({
     queryKey: [QEUERY_KEYS.USER_PROFILE],
     queryFn: async () => {
-      const { data } = await axios.get('/api/dashboard/customar/profile');
+      const { data } = await axios.get('/api/dashboard/customer/profile');
       return data;
     },
   });
@@ -66,7 +66,7 @@ async function updateProfileAPI({
   }
 
   const { data } = await axios.put(
-    '/api/dashboard/customar/profile',
+    '/api/dashboard/customer/profile',
     formDataToSend,
     {
       headers: {

@@ -15,6 +15,7 @@ export interface Address {
 }
 
 export interface CartItem {
+  shopId: string;
   id: string;
   productId: string;
   variantId: string;
@@ -89,6 +90,14 @@ export type OrderStatus =
   | 'DELIVERED'
   | 'CANCELLED';
 export type PaymentStatus = 'PENDING' | 'PAID' | 'FAILED' | 'REFUNDED';
+export type PaymentMathod =
+  | 'CREDIT_CARD'
+  | 'PAYPAL'
+  | 'STRIPE'
+  | 'WALLET'
+  | 'BKASH'
+  | 'CASH_ON_DELIVERY'
+  | 'BANK_TRANSFER';
 
 export interface OrderStatusConfig {
   variant: string;

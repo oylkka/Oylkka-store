@@ -5,6 +5,7 @@ import Categories from './categories';
 import FeaturedProducts from './featured-products';
 import HeroSection from './hero';
 import RecentProducts from './recent-products';
+import TypingApp from './typing-app';
 
 export default function page() {
   return (
@@ -15,6 +16,7 @@ export default function page() {
         <Categories />
         <FeaturedProducts />
         <RecentProducts />
+        <TypingApp />
       </main>
       <Footer />
     </>

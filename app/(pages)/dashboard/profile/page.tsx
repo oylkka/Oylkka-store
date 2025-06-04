@@ -21,7 +21,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { Skeleton } from '@/components/ui/skeleton';
 import { getInitials } from '@/lib/utils';
-import { useProfile } from '@/services/customar/useProfile';
+import { useProfile } from '@/services/customer/useProfile';
 
 export default function Profile() {
   const { isPending, data, isError } = useProfile();
