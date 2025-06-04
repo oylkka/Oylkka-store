@@ -304,7 +304,7 @@ export default function AboutPage() {
             ].map((member, index) => (
               <Card
                 key={index}
-                className="group border-border/40 overflow-hidden transition-all duration-300 hover:shadow-xl"
+                className="group border-border/40 overflow-hidden p-0 transition-all duration-300 hover:shadow-xl"
               >
                 <CardContent className="p-0">
                   <div className="relative overflow-hidden">

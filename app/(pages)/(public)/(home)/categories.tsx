@@ -52,7 +52,7 @@ export default function Categories() {
               className="basis-1/3 pl-2 md:basis-1/3 md:pl-4 lg:basis-1/4"
             >
               <Link
-                href={`/products/category/${category.slug}`}
+                href={`/products?category=${category.slug}`}
                 className="group relative block overflow-hidden rounded-lg"
               >
                 <div className="bg-muted aspect-[3/4] w-full overflow-hidden rounded-lg md:aspect-[3/4]">

@@ -23,9 +23,13 @@ const FormSchema = z.object({
 
 interface SearchBarProps {
   isMobile?: boolean;
+  isHidden?: boolean;
 }
 
-export default function SearchBar({ isMobile = false }: SearchBarProps) {
+export default function SearchBar({
+  isMobile = false,
+  isHidden = false,
+}: SearchBarProps) {
   const router = useRouter();
 
   const form = useForm<z.infer<typeof FormSchema>>({
@@ -36,7 +40,7 @@ export default function SearchBar({ isMobile = false }: SearchBarProps) {
   });
 
   const onSubmit = (data: z.infer<typeof FormSchema>) => {
-    router.push(`/search?q=${encodeURIComponent(data.search)}`);
+    router.push(`/products?search=${encodeURIComponent(data.search)}`);
   };
 
   const clearInput = () => {
@@ -44,7 +48,7 @@ export default function SearchBar({ isMobile = false }: SearchBarProps) {
   };
 
   return (
-    <div className="relative w-full">
+    <div className={isHidden ? 'hidden' : 'relative w-full'}>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="w-full">
           <FormField
