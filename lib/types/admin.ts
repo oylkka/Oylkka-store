@@ -1,6 +1,7 @@
 export interface User {
   name?: string;
   username?: string;
+  image?: string;
   email?: string;
   role?: 'CUSTOMER' | 'VENDOR' | 'ADMIN';
 }
@@ -33,6 +34,7 @@ export interface OrderActivity extends BaseActivity {
   status: 'PROCESSING' | 'COMPLETED' | 'CANCELLED';
   paymentStatus: 'PAID' | 'PENDING' | 'FAILED';
   total: number;
+  orderNumber: string;
 }
 
 export interface ProductActivity extends BaseActivity {

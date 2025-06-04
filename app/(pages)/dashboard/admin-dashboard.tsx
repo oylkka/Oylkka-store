@@ -10,9 +10,10 @@ import {
   Store,
   Users,
 } from 'lucide-react';
+import Link from 'next/link';
 import type React from 'react';
 
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import type {
@@ -107,10 +108,6 @@ export default function AdminDashboard() {
     return activity.type === 'ORDER';
   };
 
-  const isReviewActivity = (activity: Activity): activity is ReviewActivity => {
-    return activity.type === 'REVIEW';
-  };
-
   const isUserActivity = (activity: Activity): activity is UserActivity => {
     return activity.type === 'USER';
   };
@@ -162,8 +159,20 @@ export default function AdminDashboard() {
     );
   }
 
-  const orderActivities = data.recentActivity.filter(isOrderActivity);
-  const reviewActivities = data.recentActivity.filter(isReviewActivity);
+  const activityUrl = (activity: Activity): string => {
+    switch (activity.type) {
+      case 'ORDER':
+        return `/dashboard/admin/orders/single-order?orderId=${(activity as OrderActivity).orderNumber}`;
+      case 'PRODUCT':
+        return `/products/${(activity as ProductActivity).slug}`;
+      case 'USER':
+        return `/dashboard/admin/users/${(activity as UserActivity).username}`;
+      case 'REVIEW':
+        return `/dashboard/admin/reviews/${(activity as ReviewActivity).product.slug}`;
+      default:
+        return '#';
+    }
+  };
 
   return (
     <main className="flex flex-1 flex-col gap-8">
@@ -225,7 +234,11 @@ export default function AdminDashboard() {
           <CardContent>
             <div className="space-y-8">
               {data.recentActivity.map((activity: Activity) => (
-                <div key={activity.id} className="flex items-center">
+                <Link
+                  href={activityUrl(activity)}
+                  key={activity.id}
+                  className="flex items-center"
+                >
                   <Avatar className="h-9 w-9 border">
                     <AvatarFallback
                       className={getActivityColor(
@@ -251,7 +264,7 @@ export default function AdminDashboard() {
                   <div className="text-muted-foreground ml-auto text-xs">
                     {formatRelativeDate(activity.createdAt)}
                   </div>
-                </div>
+                </Link>
               ))}
             </div>
           </CardContent>
@@ -263,32 +276,40 @@ export default function AdminDashboard() {
           </CardHeader>
           <CardContent>
             <div className="space-y-8">
-              {reviewActivities.map((review: ReviewActivity) => (
-                <div key={review.id} className="flex items-start space-x-4">
-                  <Avatar>
-                    <AvatarFallback className="bg-pink-100 text-pink-700">
-                      {getInitials(review.user?.name || 'User')}
-                    </AvatarFallback>
-                  </Avatar>
-                  <div className="space-y-2">
-                    <div className="flex items-center gap-2">
-                      <h4 className="font-semibold">{review.user?.name}</h4>
-                      <div className="flex">
-                        {renderStarRating(review.rating)}
+              {data &&
+                data.recentReviews &&
+                data.recentReviews.length > 0 &&
+                data.recentReviews.map((review: ReviewActivity) => (
+                  <Link
+                    href={`/products/${review.product?.slug}`}
+                    key={review.id}
+                    className="flex items-start space-x-4"
+                  >
+                    <Avatar>
+                      <AvatarImage src={review.user?.image || ''} />
+                      <AvatarFallback className="bg-pink-100 text-pink-700">
+                        {getInitials(review.user?.name || 'User')}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div className="space-y-2">
+                      <div className="flex items-center gap-2">
+                        <h4 className="font-semibold">{review.user?.name}</h4>
+                        <div className="flex">
+                          {renderStarRating(review.rating)}
+                        </div>
+                      </div>
+                      <p className="text-muted-foreground text-sm">
+                        {review.content}
+                      </p>
+                      <div className="text-muted-foreground flex items-center gap-2 text-xs">
+                        <span>{formatRelativeDate(review.createdAt)}</span>
+                        <span>•</span>
+                        <span>{review.product?.productName}</span>
                       </div>
                     </div>
-                    <p className="text-muted-foreground text-sm">
-                      {review.content}
-                    </p>
-                    <div className="text-muted-foreground flex items-center gap-2 text-xs">
-                      <span>{formatRelativeDate(review.createdAt)}</span>
-                      <span>•</span>
-                      <span>{review.product?.productName}</span>
-                    </div>
-                  </div>
-                </div>
-              ))}
-              {reviewActivities.length === 0 && (
+                  </Link>
+                ))}
+              {data.recentReviews.length === 0 && (
                 <div className="flex h-[200px] items-center justify-center rounded-md border border-dashed">
                   <div className="text-center">
                     <Star className="text-muted-foreground/50 mx-auto h-6 w-6" />
@@ -314,39 +335,45 @@ export default function AdminDashboard() {
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              {orderActivities.slice(0, 5).map((order: OrderActivity) => (
-                <div
-                  key={order.id}
-                  className="flex items-center justify-between rounded-lg border p-3"
-                >
-                  <div className="flex items-center space-x-4">
-                    <div className="rounded-full bg-violet-100 p-2">
-                      <ShoppingCart className="h-4 w-4 text-violet-700" />
+              {data &&
+                data.recentOrders &&
+                data.recentOrders.length > 0 &&
+                data.recentOrders.map((order: OrderActivity) => (
+                  <Link
+                    href={`/dashboard/admin/orders/single-order?orderId=${order.orderNumber}`}
+                    key={order.id}
+                    className="flex items-center justify-between rounded-lg border p-3"
+                  >
+                    <div className="flex items-center space-x-4">
+                      <div className="rounded-full bg-violet-100 p-2">
+                        <ShoppingCart className="h-4 w-4 text-violet-700" />
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium">
+                          {order.user?.name}
+                        </p>
+                        <p className="text-muted-foreground text-xs">
+                          Order #{order.id.substring(0, 8)}
+                        </p>
+                      </div>
                     </div>
-                    <div>
-                      <p className="text-sm font-medium">{order.user?.name}</p>
-                      <p className="text-muted-foreground text-xs">
-                        Order #{order.id.substring(0, 8)}
-                      </p>
+                    <div className="flex items-center space-x-4">
+                      <div className="text-right">
+                        <p className="text-sm font-medium">${order.total}</p>
+                        <p className="text-muted-foreground text-xs">
+                          {formatRelativeDate(order.createdAt)}
+                        </p>
+                      </div>
+                      <Badge
+                        variant={
+                          order.paymentStatus === 'PAID' ? 'default' : 'outline'
+                        }
+                      >
+                        {order.paymentStatus}
+                      </Badge>
                     </div>
-                  </div>
-                  <div className="flex items-center space-x-4">
-                    <div className="text-right">
-                      <p className="text-sm font-medium">${order.total}</p>
-                      <p className="text-muted-foreground text-xs">
-                        {formatRelativeDate(order.createdAt)}
-                      </p>
-                    </div>
-                    <Badge
-                      variant={
-                        order.paymentStatus === 'PAID' ? 'default' : 'outline'
-                      }
-                    >
-                      {order.paymentStatus}
-                    </Badge>
-                  </div>
-                </div>
-              ))}
+                  </Link>
+                ))}
             </div>
           </CardContent>
         </Card>

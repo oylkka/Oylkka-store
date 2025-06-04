@@ -6,7 +6,12 @@ import { db } from '@/lib/db';
 export async function GET() {
   try {
     const session = await auth();
-    if(!session || !session.user || !session.user.role || session.user.role !== 'ADMIN') {
+    if (
+      !session ||
+      !session.user ||
+      !session.user.role ||
+      session.user.role !== 'ADMIN'
+    ) {
       return NextResponse.json('Unauthorized', { status: 401 });
     }
     const [
@@ -34,7 +39,7 @@ export async function GET() {
         select: {
           id: true,
           createdAt: true,
-
+          orderNumber: true,
           status: true,
           paymentStatus: true,
           total: true,
@@ -60,8 +65,8 @@ export async function GET() {
           createdAt: true,
           rating: true,
           content: true,
-          user: { select: { name: true } },
-          product: { select: { productName: true } },
+          user: { select: { name: true, image: true } },
+          product: { select: { productName: true, slug: true } },
         },
       }),
       db.user.findMany({
@@ -104,7 +109,7 @@ export async function GET() {
         (a, b) =>
           new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
       )
-      .slice(0, 10);
+      .slice(0, 5);
 
     return NextResponse.json({
       stats: {
@@ -117,7 +122,9 @@ export async function GET() {
           averageRating: Number((reviewStats._avg.rating || 0).toFixed(1)),
         },
       },
+      recentOrders,
       recentActivity,
+      recentReviews,
     });
   } catch (error) {
     console.error(error);
