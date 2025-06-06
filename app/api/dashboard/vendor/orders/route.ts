@@ -52,9 +52,7 @@ export async function GET(req: NextRequest) {
         updatedAt: true,
         total: true,
         items: {
-          where: {
-            
-          }
+          where: {},
         },
 
         user: {

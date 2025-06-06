@@ -57,7 +57,7 @@ model OrderItem {
   order       Order           @relation(fields: [orderId], references: [id], onDelete: Cascade)
   productSku  String
   productName String
-  shopId      String?         @db.ObjectId // To track which shop fulfills this item
+  shopId      String?         @db.ObjectId
   variantInfo Json?
   quantity    Int
   price       Float
@@ -65,6 +65,7 @@ model OrderItem {
   weight      Float?
   status      OrderItemStatus @default(PROCESSING)
   isReviewed  Boolean         @default(false)
+  image       String
 
   @@index([orderId])
   @@index([productSku])

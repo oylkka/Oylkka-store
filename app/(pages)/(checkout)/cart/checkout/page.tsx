@@ -119,7 +119,7 @@ export default function CheckoutPage() {
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [promoCode, setPromoCode] = useState<string>('');
   const [discount, setDiscount] = useState<number>(0);
-  const { isPending, data: cartData, isError } = useUserCart();
+  const { isPending, data: cartData, isError, refetch } = useUserCart();
 
   const addressForm = useForm<z.infer<typeof addressSchema>>({
     resolver: zodResolver(addressSchema),
@@ -248,6 +248,7 @@ export default function CheckoutPage() {
         toast.error('Payment gatway is not configured');
       }
       if (response.data.url) {
+        refetch();
         router.push(response.data.url);
       } else {
         throw new Error('Failed to place order');

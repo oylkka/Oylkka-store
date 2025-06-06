@@ -31,6 +31,7 @@ export interface CartItem {
     alt: string | null;
   } | null;
   variantName: string;
+  variantSku: string;
 }
 
 export interface OrderMetadata {
