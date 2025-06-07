@@ -27,4 +27,5 @@ export const QEUERY_KEYS = {
   PRODUCT_REVIEWS: 'product reviews',
   USER_PROFILE: 'user profile',
   ADMIN_STATS: 'admin stats',
+  SINGLE_VENDOR_ORDER: 'single vendor order',
 };

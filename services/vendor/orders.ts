@@ -73,3 +73,17 @@ export function useShopDetails({ slug }: { slug: string }) {
     },
   });
 }
+export function useSingleVendorOrder({ orderId }: { orderId: string }) {
+  return useQuery({
+    queryKey: [QEUERY_KEYS.SINGLE_VENDOR_ORDER, orderId],
+    queryFn: async () => {
+      const response = await axios.get(
+        `/api/dashboard/vendor/orders/single-order`,
+        {
+          params: { orderId: orderId },
+        }
+      );
+      return response.data;
+    },
+  });
+}

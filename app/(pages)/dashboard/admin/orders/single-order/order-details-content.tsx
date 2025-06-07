@@ -51,7 +51,7 @@ export default function OrderDetailsContent(): JSX.Element {
     return <OrderErrorState message="Order data is missing or invalid" />;
   }
 
-  const cartItems: CartItem[] = order.metadata?.cartData || [];
+  const cartItems: CartItem[] = order.items || [];
   const shippingAddress = order.shippingAddress;
 
   // Calculate order progress based on status
@@ -140,7 +140,7 @@ export default function OrderDetailsContent(): JSX.Element {
 
       <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
         {/* Order Details */}
-        <Card className="overflow-hidden border-none shadow-md md:col-span-2">
+        <Card className="overflow-hidden border-none pt-0 shadow-md md:col-span-2">
           <div className="bg-gradient-to-r from-violet-50 to-purple-50 px-6 py-4 dark:from-violet-950/20 dark:to-purple-950/20">
             <CardTitle className="flex items-center gap-2 text-lg">
               <Package className="h-5 w-5" />
@@ -224,7 +224,7 @@ export default function OrderDetailsContent(): JSX.Element {
         </Card>
 
         {/* Order Summary */}
-        <Card className="overflow-hidden border-none shadow-md">
+        <Card className="overflow-hidden border-none pt-0 shadow-md">
           <div className="bg-gradient-to-r from-violet-50 to-purple-50 px-6 py-4 dark:from-violet-950/20 dark:to-purple-950/20">
             <CardTitle className="flex items-center gap-2 text-lg">
               <CreditCard className="h-5 w-5" />
@@ -272,7 +272,7 @@ export default function OrderDetailsContent(): JSX.Element {
       </div>
 
       {/* Items */}
-      <Card className="overflow-hidden border-none shadow-md">
+      <Card className="overflow-hidden border-none pt-0 shadow-md">
         <div className="bg-gradient-to-r from-violet-50 to-purple-50 px-6 py-4 dark:from-violet-950/20 dark:to-purple-950/20">
           <div className="flex items-center justify-between">
             <CardTitle className="flex items-center gap-2 text-lg">
@@ -292,10 +292,10 @@ export default function OrderDetailsContent(): JSX.Element {
                 className="group hover:bg-muted/50 flex flex-col items-start gap-6 rounded-lg p-4 transition-colors sm:flex-row"
               >
                 <div className="bg-muted relative h-24 w-24 overflow-hidden rounded-lg">
-                  {item.image?.url ? (
+                  {item.image ? (
                     <Image
-                      src={item.image.url || '/placeholder.svg'}
-                      alt={item.name}
+                      src={item.image}
+                      alt={item.productName}
                       fill
                       className="object-cover transition-transform group-hover:scale-105"
                       sizes="96px"
@@ -308,7 +308,7 @@ export default function OrderDetailsContent(): JSX.Element {
                 </div>
                 <div className="flex flex-1 flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                   <div className="space-y-1">
-                    <h3 className="text-lg font-medium">{item.name}</h3>
+                    <h3 className="text-lg font-medium">{item.productName}</h3>
                     {item.variantName && (
                       <p className="text-muted-foreground text-sm">
                         {item.variantName}
@@ -329,7 +329,7 @@ export default function OrderDetailsContent(): JSX.Element {
       </Card>
 
       {/* Shipping Address */}
-      <Card className="overflow-hidden border-none shadow-md">
+      <Card className="overflow-hidden border-none pt-0 shadow-md">
         <div className="bg-gradient-to-r from-violet-50 to-purple-50 px-6 py-4 dark:from-violet-950/20 dark:to-purple-950/20">
           <CardTitle className="flex items-center gap-2 text-lg">
             <MapPin className="h-5 w-5" />
@@ -390,7 +390,7 @@ export default function OrderDetailsContent(): JSX.Element {
       </Card>
 
       {order.notes && (
-        <Card className="overflow-hidden border-none shadow-md">
+        <Card className="overflow-hidden border-none pt-0 shadow-md">
           <div className="bg-gradient-to-r from-violet-50 to-purple-50 px-6 py-4 dark:from-violet-950/20 dark:to-purple-950/20">
             <CardTitle className="text-lg">Order Notes</CardTitle>
           </div>

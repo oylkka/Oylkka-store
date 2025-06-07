@@ -15,21 +15,22 @@ export interface Address {
 }
 
 export interface CartItem {
+  name: string;
   shopId: string;
   id: string;
   productId: string;
   variantId: string;
   quantity: number;
-  name: string;
+  productName: string;
+  variantInfo: {
+    variantName: string;
+    sku: string;
+  };
   slug: string;
   price: number;
   discountPrice: number | null;
   discountPercent: number | null;
-  image: {
-    url: string;
-    publicId: string;
-    alt: string | null;
-  } | null;
+  image: string;
   variantName: string;
   variantSku: string;
 }
