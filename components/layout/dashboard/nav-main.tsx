@@ -234,8 +234,8 @@ export async function NavMain() {
       roles: ['ADMIN', 'MANAGER', 'VENDOR'],
       items: [
         {
-          title: 'Add Product',
-          url: '/admin/products/add',
+          title: 'Product List',
+          url: '/dashboard/admin/products/list',
         },
         {
           title: 'Edit Products',
