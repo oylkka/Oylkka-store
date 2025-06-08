@@ -25,7 +25,7 @@ export default function AdminProductsPage() {
 
   if (isError) {
     return (
-      <div className="container mx-auto py-8">
+      <div className="container mx-auto">
         <Card className="p-8 text-center">
           <h2 className="text-destructive mb-2 text-2xl font-semibold">
             Error Loading Products
@@ -39,7 +39,7 @@ export default function AdminProductsPage() {
   }
 
   return (
-    <div className="container mx-auto space-y-6 py-8">
+    <div className="container mx-auto space-y-6">
       <ProductsHeader
         totalProducts={data?.pagination?.total || 0}
         resultsCount={data?.filterInfo?.resultsCount || 0}

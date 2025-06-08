@@ -177,6 +177,29 @@ export function useSingleProduct({ slug }: { slug: string }) {
   });
 }
 
+export function useDeleteProduct({ id }: { id: string }) {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const res = await axios.delete(`/api/dashboard/admin/product?id=${id}`);
+      return res.data;
+    },
+    onSuccess: (data, reviewId) => {
+      // Invalidate product reviews queries to refetch data
+      queryClient.invalidateQueries({
+        queryKey: [
+          QEUERY_KEYS.PRODUCT_LIST,
+          QEUERY_KEYS.FEATURED_PRODUCTS,
+          QEUERY_KEYS.SINGLE_PRODUCT,
+          QEUERY_KEYS.USER_CART,
+          QEUERY_KEYS.USER_WISHLIST,
+        ],
+      });
+    },
+  });
+}
+
 export function useRelatedProduct({ slug }: { slug: string }) {
   return useQuery({
     queryKey: [QEUERY_KEYS.RELATED_PRODUCT, slug],

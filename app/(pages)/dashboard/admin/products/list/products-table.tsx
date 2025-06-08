@@ -8,8 +8,19 @@ import {
   Trash2,
   Truck,
 } from 'lucide-react';
-import Link from 'next/link';
+import { useState } from 'react';
+import { toast } from 'sonner';
 
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -38,6 +49,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import { useDeleteProduct } from '@/services';
 
 interface Product {
   id: string;
@@ -81,6 +93,11 @@ export function ProductsTable({
   currentPage,
   onPageChange,
 }: ProductsTableProps) {
+  const [deleteProductId, setDeleteProductId] = useState<string | null>(null);
+  const [productToDelete, setProductToDelete] = useState<Product | null>(null);
+
+  const deleteProductMutation = useDeleteProduct({ id: deleteProductId || '' });
+
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
@@ -97,10 +114,38 @@ export function ProductsTable({
   };
 
   const getStockStatus = (stock: number) => {
-    if (stock === 0)
-      {return { label: 'Out of Stock', variant: 'destructive' as const };}
-    if (stock <= 5) {return { label: 'Low Stock', variant: 'default' as const };}
-    return { label: 'In Stock', variant: 'secondary' as const };
+    if (stock === 0) {
+      return { label: 'Out of Stock', variant: 'destructive' as const };
+    }
+    if (stock <= 5) {
+      return { label: 'Low Stock', variant: 'secondary' as const };
+    }
+    return { label: 'In Stock', variant: 'default' as const };
+  };
+
+  const handleDeleteProduct = async (product: Product) => {
+    const deletePromise = deleteProductMutation.mutateAsync(product.id);
+
+    toast.promise(deletePromise, {
+      loading: `Deleting ${product.productName}...`,
+      success: `${product.productName} has been deleted successfully`,
+      error: (error) =>
+        `Failed to delete ${product.productName}: ${error.message}`,
+    });
+
+    await deletePromise;
+    setDeleteProductId(null);
+    setProductToDelete(null);
+  };
+
+  const openDeleteDialog = (product: Product) => {
+    setDeleteProductId(product.id);
+    setProductToDelete(product);
+  };
+
+  const closeDeleteDialog = () => {
+    setDeleteProductId(null);
+    setProductToDelete(null);
   };
 
   return (
@@ -220,20 +265,18 @@ export function ProductsTable({
                         <DropdownMenuContent align="end">
                           <DropdownMenuLabel>Actions</DropdownMenuLabel>
                           <DropdownMenuItem>
-                            <Link
-                              className="flex items-center gap-1"
-                              href={`/products/${product.slug}`}
-                            >
-                              <Eye className="mr-2 h-4 w-4" />
-                              View Details
-                            </Link>
+                            <Eye className="mr-2 h-4 w-4" />
+                            View Details
                           </DropdownMenuItem>
                           <DropdownMenuItem>
                             <Edit className="mr-2 h-4 w-4" />
                             Edit Product
                           </DropdownMenuItem>
                           <DropdownMenuSeparator />
-                          <DropdownMenuItem className="text-destructive">
+                          <DropdownMenuItem
+                            className="text-destructive"
+                            onClick={() => openDeleteDialog(product)}
+                          >
                             <Trash2 className="mr-2 h-4 w-4" />
                             Delete Product
                           </DropdownMenuItem>
@@ -288,6 +331,39 @@ export function ProductsTable({
           </Pagination>
         </div>
       )}
+
+      <AlertDialog open={!!deleteProductId} onOpenChange={closeDeleteDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>
+              Are you sure you want to delete this product?
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. This will permanently delete{' '}
+              <span className="font-semibold">
+                {productToDelete?.productName}
+              </span>{' '}
+              from your inventory.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={deleteProductMutation.isPending}>
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() =>
+                productToDelete && handleDeleteProduct(productToDelete)
+              }
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              disabled={deleteProductMutation.isPending}
+            >
+              {deleteProductMutation.isPending
+                ? 'Deleting...'
+                : 'Delete Product'}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
