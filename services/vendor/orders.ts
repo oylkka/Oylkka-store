@@ -87,3 +87,50 @@ export function useSingleVendorOrder({ orderId }: { orderId: string }) {
     },
   });
 }
+
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+
+interface UpdateOrderStatusData {
+  orderId: string;
+  vendorId: string;
+  orderStatus?: string;
+  paymentStatus?: string;
+}
+
+export async function updateOrderStatus(data: UpdateOrderStatusData) {
+  try {
+    const response = await axios.patch(
+      '/api/dashboard/vendor/orders/single-order',
+      data
+    );
+    return response.data;
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      const message =
+        error.response?.data?.message || 'Failed to update order status';
+      throw new Error(message);
+    }
+    throw error;
+  }
+}
+
+export function useUpdateOrderStatus() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: updateOrderStatus,
+    onSuccess: () => {
+      // Invalidate and refetch orders queries
+      queryClient.invalidateQueries({
+        queryKey: [
+          QEUERY_KEYS.VENDOR_ORDERS,
+          QEUERY_KEYS.ADMIN_ORDER_LIST,
+          QEUERY_KEYS.SINGLE_VENDOR_ORDER,
+        ],
+      });
+    },
+    onError: (error) => {
+      console.error('Failed to update order status:', error);
+    },
+  });
+}
