@@ -11,12 +11,29 @@ export async function GET(req: NextRequest) {
       return new Response('Unauthorized', { status: 401 });
     }
 
+    // Get vendor's shop
+    const shop = await db.shop.findUnique({
+      where: {
+        ownerId: session.user.id,
+      },
+      select: {
+        id: true,
+      },
+    });
+
+    if (!shop) {
+      return new Response('Shop not found', { status: 404 });
+    }
+
+    const shopId = shop.id;
+
     const { searchParams } = new URL(req.url);
     const page = parseInt(searchParams.get('currentPage') || '1');
     const status = searchParams.get('status');
     const search = searchParams.get('search');
     const pageSize = 16;
 
+    // Delete stale pending orders
     await db.order.deleteMany({
       where: {
         status: { in: ['PENDING'] },
@@ -25,8 +42,15 @@ export async function GET(req: NextRequest) {
       },
     });
 
+    // Build dynamic filter
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const whereClause: any = {};
+    const whereClause: any = {
+      items: {
+        some: {
+          shopId: shopId,
+        },
+      },
+    };
 
     if (status && status !== 'ALL') {
       whereClause.status = status;
@@ -40,6 +64,7 @@ export async function GET(req: NextRequest) {
       ];
     }
 
+    // Fetch vendor-related orders
     const orders = await db.order.findMany({
       where: whereClause,
       select: {
@@ -53,10 +78,9 @@ export async function GET(req: NextRequest) {
         total: true,
         items: {
           where: {
-            shopId: session.user.shopId,
+            shopId: shopId,
           },
         },
-
         user: {
           select: {
             email: true,
@@ -83,7 +107,7 @@ export async function GET(req: NextRequest) {
       { status: 200 }
     );
   } catch (error) {
-    console.error('[ORDER_FETCH_ERROR]', error);
+    console.error(error);
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
