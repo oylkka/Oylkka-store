@@ -241,7 +241,7 @@ export default function ProductDetails({ slug }: { slug: string }) {
 
   if (isPending) {
     return (
-      <div className="flex h-screen items-center justify-center">
+      <div className="flex items-center justify-center">
         <LoadingSkeleton />
       </div>
     );
