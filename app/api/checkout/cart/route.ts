@@ -1,22 +1,19 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-import { auth } from '@/features/auth/auth';
+import { getAuthenticatedUser } from '@/features/auth/get-user';
 import { db } from '@/lib/db';
 
-// GET: Fetch user cart items with product and variant data
-
-export async function GET() {
+export async function GET(req: NextRequest) {
   try {
-    // Authenticate user
-    const session = await auth();
-    if (!session || !session.user) {
+    const user = await getAuthenticatedUser(req);
+    if (!user) {
       return new NextResponse('Unauthorized', { status: 401 });
     }
 
     // Fetch cart items with product and variant data
     const cartItems = await db.cartItem.findMany({
       where: {
-        userId: session.user.id,
+        userId: user.id,
       },
       select: {
         id: true,
@@ -105,8 +102,8 @@ export async function GET() {
 }
 export async function POST(req: NextRequest) {
   try {
-    const session = await auth();
-    if (!session || !session.user) {
+    const user = await getAuthenticatedUser(req);
+    if (!user) {
       return new NextResponse('Unauthorized', { status: 401 });
     }
 
@@ -160,7 +157,7 @@ export async function POST(req: NextRequest) {
     // Check if item already in cart
     const existingCartItem = await db.cartItem.findFirst({
       where: {
-        userId: session.user.id,
+        userId: user.id,
         productId,
         variantId: selectedVariantId ?? null,
       },
@@ -174,7 +171,7 @@ export async function POST(req: NextRequest) {
     } else {
       await db.cartItem.create({
         data: {
-          userId: session.user.id,
+          userId: user.id,
           productId,
           variantId: selectedVariantId ?? null,
           quantity,
@@ -192,8 +189,8 @@ export async function POST(req: NextRequest) {
 // DELETE: Remove from cart
 export async function DELETE(req: NextRequest) {
   try {
-    const session = await auth();
-    if (!session || !session.user) {
+    const user = await getAuthenticatedUser(req);
+    if (!user) {
       return new NextResponse('Unauthorized', { status: 401 });
     }
 
@@ -209,7 +206,7 @@ export async function DELETE(req: NextRequest) {
       where: { id: cartItemId },
     });
 
-    if (!cartItem || cartItem.userId !== session.user.id) {
+    if (!cartItem || cartItem.userId !== user.id) {
       return new NextResponse('Item not found or unauthorized', {
         status: 404,
       });
@@ -229,8 +226,8 @@ export async function DELETE(req: NextRequest) {
 // PATCH: Update cart item quantity
 export async function PATCH(req: NextRequest) {
   try {
-    const session = await auth();
-    if (!session || !session.user) {
+    const user = await getAuthenticatedUser(req);
+    if (!user) {
       return new NextResponse('Unauthorized', { status: 401 });
     }
 
@@ -245,7 +242,7 @@ export async function PATCH(req: NextRequest) {
       where: { id: itemId },
     });
 
-    if (!cartItem || cartItem.userId !== session.user.id) {
+    if (!cartItem || cartItem.userId !== user.id) {
       return new NextResponse('Item not found or unauthorized', {
         status: 404,
       });
