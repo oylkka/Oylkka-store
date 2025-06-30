@@ -49,7 +49,7 @@ export async function handleCODOrder(
         currency: 'BDT',
         shippingAddress: {
           name: data.shipping.address.name,
-          address1:
+          address:
             `${data.shipping.address.address}, ${data.shipping.address.apartment || ''}`.trim(),
           city: data.shipping.address.city,
           district: data.shipping.address.district,
