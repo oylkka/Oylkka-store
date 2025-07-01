@@ -29,4 +29,5 @@ export const QEUERY_KEYS = {
   ADMIN_STATS: 'admin stats',
   SINGLE_VENDOR_ORDER: 'single vendor order',
   USER_ADDRESSES: 'user addresses',
+  SINGLE_ADDRESS: 'single address',
 };

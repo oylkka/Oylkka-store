@@ -12,6 +12,7 @@ import {
   Trash2,
 } from 'lucide-react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { toast } from 'sonner';
 
@@ -49,6 +50,7 @@ export default function UserAddresses() {
   const deleteAddressMutation = useDeleteAddress();
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [addressToDelete, setAddressToDelete] = useState<Address | null>(null);
+  const router = useRouter();
 
   const handleDeleteAddress = async () => {
     if (!addressToDelete) {
@@ -233,7 +235,11 @@ export default function UserAddresses() {
                     variant="outline"
                     size="sm"
                     className="flex-1 bg-transparent"
-                    onClick={() => toast.info('Feature coming soon!')}
+                    onClick={() =>
+                      router.push(
+                        `/dashboard/profile/addresses/edit?addressesId=${address.id}`
+                      )
+                    }
                   >
                     <Edit className="mr-2 h-3 w-3" />
                     Edit
@@ -247,11 +253,6 @@ export default function UserAddresses() {
                         variant="outline"
                         size="sm"
                         className="bg-transparent text-red-600 hover:bg-red-50 hover:text-red-700"
-                        title={
-                          address.isDefault
-                            ? "Default address can't be deleted"
-                            : undefined
-                        }
                         onClick={() => openDeleteDialog(address)}
                       >
                         <Trash2 className="mr-2 h-3 w-3" />

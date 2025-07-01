@@ -1,5 +1,8 @@
 import { QEUERY_KEYS } from '@/lib/constants';
-import { AddressFormValues } from '@/schemas/addressesSchema';
+import {
+  AddressFormValues,
+  EditAddressFormValues,
+} from '@/schemas/addressesSchema';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
 
@@ -49,3 +52,40 @@ export function useAddress() {
     },
   });
 }
+
+export function useSingleAddress({ id }: { id: string }) {
+  return useQuery({
+    queryKey: [QEUERY_KEYS.SINGLE_ADDRESS],
+    queryFn: async () => {
+      const { data } = await axios.get(
+        `/api/dashboard/customer/profile/addresses/single-address?id=${id}`
+      );
+      return data;
+    },
+  });
+}
+
+export const useUpdateAddress = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({
+      id,
+      data,
+    }: {
+      id: string;
+      data: EditAddressFormValues;
+    }) => {
+      const response = await axios.put(
+        `/api/dashboard/customer/profile/addresses/single-address?id=${id}`,
+        data
+      );
+      return response.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: [QEUERY_KEYS.USER_ADDRESSES],
+      });
+    },
+  });
+};

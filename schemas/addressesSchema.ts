@@ -26,3 +26,9 @@ export const addressSchema = z.object({
 });
 
 export type AddressFormValues = z.infer<typeof addressSchema>;
+
+export const editAddressSchema = addressSchema.extend({
+  id: z.string().min(1, { message: 'Address ID is required.' }),
+});
+
+export type EditAddressFormValues = z.infer<typeof editAddressSchema>;
