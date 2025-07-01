@@ -565,7 +565,7 @@ export async function NavMain() {
       },
       {
         title: 'Addresses',
-        url: '/account/addresses',
+        url: '/dashboard/profile/addresses',
         roles: ['USER', 'CUSTOMER', 'VENDOR'],
       },
       {

@@ -2,6 +2,7 @@
 
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
+import { useSession } from 'next-auth/react';
 import { useState } from 'react';
 import { toast } from 'sonner';
 
@@ -25,6 +26,7 @@ import { ShippingForm } from './shipping-form';
 // Import your existing OrderSummary component
 
 export default function CheckoutPage() {
+  const { data: session } = useSession();
   const router = useRouter();
   const [step, setStep] = useState<CheckoutStep>('information');
   const [addressData, setAddressData] = useState<AddressData | null>(null);
@@ -161,7 +163,10 @@ export default function CheckoutPage() {
       <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
         <div className="lg:col-span-2">
           {step === 'information' && (
-            <AddressForm onSubmit={handleAddressSubmit} />
+            <AddressForm
+              onSubmit={handleAddressSubmit}
+              email={session?.user?.email ?? ''}
+            />
           )}
 
           {step === 'shipping' && addressData && (
@@ -214,3 +219,4 @@ export default function CheckoutPage() {
     </div>
   );
 }
+
