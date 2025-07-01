@@ -1,6 +1,6 @@
 'use client';
 
-import { motion } from 'framer-motion';
+import { easeOut, motion } from 'framer-motion';
 import Link from 'next/link';
 
 import { Button } from '@/components/ui/button';
@@ -20,7 +20,7 @@ const itemVariants = {
   visible: {
     opacity: 1,
     y: 0,
-    transition: { duration: 0.4, ease: 'easeOut' },
+    transition: { duration: 0.4, easeOut },
   },
 };
 

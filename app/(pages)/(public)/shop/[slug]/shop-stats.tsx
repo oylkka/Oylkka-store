@@ -1,7 +1,7 @@
 'use client';
 
 import { format } from 'date-fns';
-import { motion } from 'framer-motion';
+import { easeOut, motion } from 'framer-motion';
 import { Star } from 'lucide-react';
 
 import { Card, CardContent } from '@/components/ui/card';
@@ -12,7 +12,7 @@ const itemVariants = {
   visible: {
     opacity: 1,
     y: 0,
-    transition: { duration: 0.4, ease: 'easeOut' },
+    transition: { duration: 0.4, easeOut },
   },
 };
 
