@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-import { auth } from '@/features/auth/auth';
+import { getAuthenticatedUser } from '@/features/auth/get-user';
 import { db } from '@/lib/db';
 
 export async function GET(req: NextRequest) {
@@ -24,9 +24,9 @@ export async function GET(req: NextRequest) {
 
 export async function PUT(req: NextRequest) {
   try {
-    const session = await auth();
-    if (!session || !session.user?.id) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    const user = await getAuthenticatedUser(req);
+    if (!user) {
+      return new NextResponse('Unauthorized', { status: 401 });
     }
 
     const { searchParams } = new URL(req.url);
@@ -59,7 +59,7 @@ export async function PUT(req: NextRequest) {
       return NextResponse.json({ error: 'Address not found' }, { status: 404 });
     }
 
-    if (existingAddress.userId !== session.user.id) {
+    if (existingAddress.userId !== user.id) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
@@ -67,7 +67,7 @@ export async function PUT(req: NextRequest) {
     if (isDefault) {
       await db.savedAddress.updateMany({
         where: {
-          userId: session.user.id,
+          userId: user.id,
           isDefault: true,
         },
         data: {

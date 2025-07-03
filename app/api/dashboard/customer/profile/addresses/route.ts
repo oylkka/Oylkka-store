@@ -1,17 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-import { auth } from '@/features/auth/auth';
+import { getAuthenticatedUser } from '@/features/auth/get-user';
 import { db } from '@/lib/db';
 
 export async function POST(req: NextRequest) {
   try {
-    const session = await auth();
-
-    if (!session || !session.user?.id) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    const user = await getAuthenticatedUser(req);
+    if (!user) {
+      return new NextResponse('Unauthorized', { status: 401 });
     }
 
-    const userId = session.user.id;
+    const userId = user.id;
     const body = await req.json();
 
     const {
@@ -65,16 +64,16 @@ export async function POST(req: NextRequest) {
     );
   }
 }
-export async function GET() {
+export async function GET(req: NextRequest) {
   try {
-    const session = await auth();
+    const user = await getAuthenticatedUser(req);
 
-    if (!session || !session.user?.id) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    if (!user) {
+      return new NextResponse('Unauthorized', { status: 401 });
     }
 
     const addresses = await db.savedAddress.findMany({
-      where: { userId: session.user.id },
+      where: { userId: user.id },
       orderBy: { createdAt: 'desc' },
     });
 
@@ -90,10 +89,9 @@ export async function GET() {
 
 export async function DELETE(req: NextRequest) {
   try {
-    const session = await auth();
-
-    if (!session || !session.user?.id) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    const user = await getAuthenticatedUser(req);
+    if (!user) {
+      return new NextResponse('Unauthorized', { status: 401 });
     }
 
     const { searchParams } = new URL(req.url);
@@ -108,7 +106,7 @@ export async function DELETE(req: NextRequest) {
       return NextResponse.json({ error: 'Address not found' }, { status: 404 });
     }
 
-    if (address.userId !== session.user.id) {
+    if (address.userId !== user.id) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
@@ -121,7 +119,7 @@ export async function DELETE(req: NextRequest) {
     if (address.isDefault) {
       // Find another address for the user, ordered by createdAt descending
       const anotherAddress = await db.savedAddress.findFirst({
-        where: { userId: session.user.id },
+        where: { userId: user.id },
         orderBy: { createdAt: 'desc' },
       });
 
