@@ -18,6 +18,7 @@ import {
   MapPin,
   RotateCcw,
 } from 'lucide-react';
+import Link from 'next/link';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { Suspense } from 'react';
 
@@ -574,19 +575,23 @@ function CustomerOrdersPage() {
                               </h4>
 
                               {/* Primary Actions */}
-                              <div className="space-y-2">
-                                <Button
-                                  variant="default"
-                                  size="sm"
-                                  className="group/btn bg-primary hover:bg-primary/90 text-primary-foreground w-full justify-start shadow-sm"
-                                >
-                                  <Eye className="mr-3 h-4 w-4" />
-                                  <span className="flex-1 text-left font-medium">
-                                    View Order Details
-                                  </span>
-                                  <ArrowRight className="h-4 w-4 opacity-70 transition-all group-hover/btn:translate-x-1 group-hover/btn:opacity-100" />
-                                </Button>
-                              </div>
+                              <Link
+                                href={`/dashboard/customer/orders/single-order?orderId=${order.orderNumber}`}
+                              >
+                                <div className="mb-2 space-y-2">
+                                  <Button
+                                    variant="default"
+                                    size="sm"
+                                    className="group/btn bg-primary hover:bg-primary/90 text-primary-foreground w-full justify-start shadow-sm"
+                                  >
+                                    <Eye className="mr-3 h-4 w-4" />
+                                    <span className="flex-1 text-left font-medium">
+                                      View Order Details
+                                    </span>
+                                    <ArrowRight className="h-4 w-4 opacity-70 transition-all group-hover/btn:translate-x-1 group-hover/btn:opacity-100" />
+                                  </Button>
+                                </div>
+                              </Link>
 
                               {/* Secondary Actions */}
                               <div className="space-y-2">
