@@ -13,6 +13,7 @@ import {
   Truck,
   Users,
 } from 'lucide-react';
+import Link from 'next/link';
 
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
@@ -558,10 +559,12 @@ function CustomerDashboard({ user }: UserType) {
             Here&#39;s what&#39;s happening with your account
           </p>
         </div>
-        <Button>
-          <ShoppingBag className="mr-2 h-4 w-4" />
-          Continue Shopping
-        </Button>
+        <Link href="/products">
+          <Button>
+            <ShoppingBag className="mr-2 h-4 w-4" />
+            Continue Shopping
+          </Button>
+        </Link>
       </div>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">

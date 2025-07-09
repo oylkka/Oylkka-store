@@ -24,45 +24,43 @@ export default {
     Google({
       clientId: process.env.AUTH_GOOGLE_ID!,
       clientSecret: process.env.AUTH_GOOGLE_SECRET!,
+
+      authorization: {
+        params: {
+          prompt: 'select_account consent',
+        },
+      },
       // Add a profile function to provide a username
       profile: async (profile) => {
-        // Create a base username from email
         let baseUsername = profile.email?.split('@')[0] || 'user';
-
-        // Remove non-alphanumeric characters
         baseUsername = baseUsername.toLowerCase().replace(/[^a-z0-9]/g, '');
-
-        // Ensure minimum length
         if (baseUsername.length < 3) {
           baseUsername = `user${generateRandomSuffix()}`;
         }
 
-        // Check if the username exists and generate a unique one if needed
         let username = baseUsername;
         let usernameIsUnique = false;
         let attempts = 0;
 
         while (!usernameIsUnique && attempts < 5) {
-          // Check if username exists
           const exists = await usernameExists(username);
-
           if (!exists) {
             usernameIsUnique = true;
           } else {
-            // If exists, add a random suffix
             username = `${baseUsername}${generateRandomSuffix()}`;
             attempts++;
           }
         }
 
-        // Return the profile with the unique username
-        return {
+        const user = {
           id: profile.sub,
           name: profile.name,
           email: profile.email,
           image: profile.picture,
-          username: username,
+          username,
         };
+
+        return user;
       },
     }),
     Github({

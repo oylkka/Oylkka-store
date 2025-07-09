@@ -68,14 +68,7 @@ export async function NavMain() {
       url: '/shop',
       icon: ShoppingCart,
       isActive: userRole === 'CUSTOMER' || userRole === 'USER',
-      roles: [
-        'ADMIN',
-        'MANAGER',
-        'VENDOR',
-        'CUSTOMER_SERVICE',
-        'USER',
-        'CUSTOMER',
-      ],
+      roles: ['ADMIN', 'MANAGER', 'VENDOR', 'CUSTOMER_SERVICE'],
       items: [
         {
           title: 'My Shop',
@@ -146,14 +139,7 @@ export async function NavMain() {
       title: 'Promotions',
       url: '/promotions',
       icon: BadgePercent,
-      roles: [
-        'ADMIN',
-        'MANAGER',
-        'VENDOR',
-        'CUSTOMER_SERVICE',
-        'USER',
-        'CUSTOMER',
-      ],
+      roles: ['ADMIN', 'MANAGER', 'VENDOR', 'CUSTOMER_SERVICE'],
       items: [
         {
           title: 'Current Deals',
@@ -568,11 +554,7 @@ export async function NavMain() {
         url: '/dashboard/profile/addresses',
         roles: ['USER', 'CUSTOMER', 'VENDOR'],
       },
-      {
-        title: 'Payment Methods',
-        url: '/account/payment',
-        roles: ['USER', 'CUSTOMER'],
-      },
+
       {
         title: 'Wishlist',
         url: '/account/wishlist',
@@ -583,23 +565,16 @@ export async function NavMain() {
         url: '/account/notifications',
       },
       {
-        title: 'Security',
-        url: '/account/security',
+        title: 'Message',
+        url: '/message',
       },
       {
-        title: 'Store Settings',
-        url: '/admin/settings/store',
-        roles: ['ADMIN', 'MANAGER'],
+        title: 'Vouchers',
+        url: '/account/vouchers',
       },
       {
-        title: 'System Settings',
-        url: '/admin/settings/system',
-        roles: ['ADMIN'],
-      },
-      {
-        title: 'User Management',
-        url: '/admin/settings/users',
-        roles: ['ADMIN'],
+        title: 'My Review',
+        url: '/account/review',
       },
     ],
   };
