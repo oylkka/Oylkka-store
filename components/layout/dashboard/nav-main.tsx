@@ -119,20 +119,20 @@ export async function NavMain() {
       roles: ['USER', 'CUSTOMER'],
       items: [
         {
-          title: 'Active Orders',
-          url: '/dashboard/customer/orders?status=active',
+          title: 'Pending Orders',
+          url: '/dashboard/customer/orders?status=PENDING',
+        },
+        {
+          title: 'Processing Orders',
+          url: '/dashboard/customer/orders?status=PROCESSING',
+        },
+        {
+          title: 'Shipped Orders',
+          url: '/dashboard/customer/orders?status=SHIPPED',
         },
         {
           title: 'Order History',
-          url: '/dashboard/customer/orders?status=all',
-        },
-        {
-          title: 'Returns',
-          url: '/dashboard/customer/orders?status=returns',
-        },
-        {
-          title: 'Track Order',
-          url: '/dashboard/customer/orders?status=active',
+          url: '/dashboard/customer/orders',
         },
       ],
     },

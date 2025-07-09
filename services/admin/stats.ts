@@ -1,9 +1,9 @@
-import { QEUERY_KEYS } from '@/lib/constants';
+import { QUERY_KEYS } from '@/lib/constants';
 import { useQuery } from '@tanstack/react-query';
 
 export function useAdminStats() {
   return useQuery({
-    queryKey: [QEUERY_KEYS.ADMIN_STATS],
+    queryKey: [QUERY_KEYS.ADMIN_STATS],
     queryFn: async () => {
       const response = await fetch('/api/dashboard/admin/stats');
       return response.json();

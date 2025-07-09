@@ -1,4 +1,4 @@
-import { QEUERY_KEYS } from '@/lib/constants';
+import { QUERY_KEYS } from '@/lib/constants';
 import {
   AddressFormValues,
   EditAddressFormValues,
@@ -18,7 +18,7 @@ export const useCreateAddress = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: [QEUERY_KEYS.USER_ADDRESSES],
+        queryKey: [QUERY_KEYS.USER_ADDRESSES],
       });
     },
   });
@@ -35,7 +35,7 @@ export const useDeleteAddress = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: [QEUERY_KEYS.USER_ADDRESSES],
+        queryKey: [QUERY_KEYS.USER_ADDRESSES],
       });
     },
   });
@@ -43,7 +43,7 @@ export const useDeleteAddress = () => {
 
 export function useAddress() {
   return useQuery({
-    queryKey: [QEUERY_KEYS.USER_ADDRESSES],
+    queryKey: [QUERY_KEYS.USER_ADDRESSES],
     queryFn: async () => {
       const { data } = await axios.get(
         '/api/dashboard/customer/profile/addresses'
@@ -55,7 +55,7 @@ export function useAddress() {
 
 export function useSingleAddress({ id }: { id: string }) {
   return useQuery({
-    queryKey: [QEUERY_KEYS.SINGLE_ADDRESS],
+    queryKey: [QUERY_KEYS.SINGLE_ADDRESS],
     queryFn: async () => {
       const { data } = await axios.get(
         `/api/dashboard/customer/profile/addresses/single-address?id=${id}`
@@ -84,7 +84,7 @@ export const useUpdateAddress = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: [QEUERY_KEYS.USER_ADDRESSES],
+        queryKey: [QUERY_KEYS.USER_ADDRESSES],
       });
     },
   });

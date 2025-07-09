@@ -1,4 +1,4 @@
-import { QEUERY_KEYS } from '@/lib/constants';
+import { QUERY_KEYS } from '@/lib/constants';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
 
@@ -73,7 +73,7 @@ export function useCreateProduct() {
 
 export function useAdminProductCategories() {
   return useQuery({
-    queryKey: [QEUERY_KEYS.ADMIN_PRODUCT_CATEGORIES],
+    queryKey: [QUERY_KEYS.ADMIN_PRODUCT_CATEGORIES],
     queryFn: async () => {
       const response = await axios.get(`/api/dashboard/admin/product-category`);
       return response.data;
@@ -110,7 +110,7 @@ export function useProductList({
 
   return useQuery({
     queryKey: [
-      QEUERY_KEYS.PRODUCT_LIST,
+      QUERY_KEYS.PRODUCT_LIST,
       currentPage,
       debouncedSearch,
       category,
@@ -167,7 +167,7 @@ export function useProductList({
 }
 export function useSingleProduct({ slug }: { slug: string }) {
   return useQuery({
-    queryKey: [QEUERY_KEYS.SINGLE_PRODUCT, slug],
+    queryKey: [QUERY_KEYS.SINGLE_PRODUCT, slug],
     queryFn: async () => {
       const response = await axios.get(`/api/public/single-product`, {
         params: { slug: slug },
@@ -189,11 +189,11 @@ export function useDeleteProduct({ id }: { id: string }) {
       // Invalidate product reviews queries to refetch data
       queryClient.invalidateQueries({
         queryKey: [
-          QEUERY_KEYS.PRODUCT_LIST,
-          QEUERY_KEYS.FEATURED_PRODUCTS,
-          QEUERY_KEYS.SINGLE_PRODUCT,
-          QEUERY_KEYS.USER_CART,
-          QEUERY_KEYS.USER_WISHLIST,
+          QUERY_KEYS.PRODUCT_LIST,
+          QUERY_KEYS.FEATURED_PRODUCTS,
+          QUERY_KEYS.SINGLE_PRODUCT,
+          QUERY_KEYS.USER_CART,
+          QUERY_KEYS.USER_WISHLIST,
         ],
       });
     },
@@ -202,7 +202,7 @@ export function useDeleteProduct({ id }: { id: string }) {
 
 export function useRelatedProduct({ slug }: { slug: string }) {
   return useQuery({
-    queryKey: [QEUERY_KEYS.RELATED_PRODUCT, slug],
+    queryKey: [QUERY_KEYS.RELATED_PRODUCT, slug],
     queryFn: async () => {
       const response = await axios.get(`/api/public/related-products`, {
         params: { slug: slug },
@@ -241,7 +241,7 @@ export function useDeleteReview() {
     onSuccess: (data, reviewId) => {
       // Invalidate product reviews queries to refetch data
       queryClient.invalidateQueries({
-        queryKey: [QEUERY_KEYS.PRODUCT_REVIEWS],
+        queryKey: [QUERY_KEYS.PRODUCT_REVIEWS],
       });
     },
   });
@@ -264,7 +264,7 @@ export function useProductReview({
 }) {
   return useQuery({
     queryKey: [
-      QEUERY_KEYS.PRODUCT_REVIEWS,
+      QUERY_KEYS.PRODUCT_REVIEWS,
       productId,
       userId,
       page,

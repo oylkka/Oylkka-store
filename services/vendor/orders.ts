@@ -1,4 +1,4 @@
-import { QEUERY_KEYS } from '@/lib/constants';
+import { QUERY_KEYS } from '@/lib/constants';
 import { Order } from '@/lib/types';
 import { useQuery } from '@tanstack/react-query';
 
@@ -21,7 +21,7 @@ export function useVendorOrders({
   search?: string;
 }) {
   return useQuery<VendorOrdersResponse, Error>({
-    queryKey: [QEUERY_KEYS.VENDOR_ORDERS, page, status, search],
+    queryKey: [QUERY_KEYS.VENDOR_ORDERS, page, status, search],
     queryFn: async () => {
       const params = new URLSearchParams({
         currentPage: page.toString(),
@@ -45,7 +45,7 @@ import axios from 'axios';
 
 export function useVendorShop() {
   return useQuery({
-    queryKey: [QEUERY_KEYS.VENDOR_SHOP],
+    queryKey: [QUERY_KEYS.VENDOR_SHOP],
     queryFn: async () => {
       const response = await axios.get(`/api/dashboard/vendor/my-shop`);
       return response.data;
@@ -55,7 +55,7 @@ export function useVendorShop() {
 
 export function useShopList() {
   return useQuery({
-    queryKey: [QEUERY_KEYS.SHOP_LIST],
+    queryKey: [QUERY_KEYS.SHOP_LIST],
     queryFn: async () => {
       const response = await axios.get(`/api/public/shop-list`);
       return response.data;
@@ -64,7 +64,7 @@ export function useShopList() {
 }
 export function useShopDetails({ slug }: { slug: string }) {
   return useQuery({
-    queryKey: [QEUERY_KEYS.SHOP_DETAILS, slug],
+    queryKey: [QUERY_KEYS.SHOP_DETAILS, slug],
     queryFn: async () => {
       const response = await axios.get(`/api/public/shop-list/single-shop`, {
         params: { slug: slug },
@@ -75,7 +75,7 @@ export function useShopDetails({ slug }: { slug: string }) {
 }
 export function useSingleVendorOrder({ orderId }: { orderId: string }) {
   return useQuery({
-    queryKey: [QEUERY_KEYS.SINGLE_VENDOR_ORDER, orderId],
+    queryKey: [QUERY_KEYS.SINGLE_VENDOR_ORDER, orderId],
     queryFn: async () => {
       const response = await axios.get(
         `/api/dashboard/vendor/orders/single-order`,
@@ -123,9 +123,9 @@ export function useUpdateOrderStatus() {
       // Invalidate and refetch orders queries
       queryClient.invalidateQueries({
         queryKey: [
-          QEUERY_KEYS.VENDOR_ORDERS,
-          QEUERY_KEYS.ADMIN_ORDER_LIST,
-          QEUERY_KEYS.SINGLE_VENDOR_ORDER,
+          QUERY_KEYS.VENDOR_ORDERS,
+          QUERY_KEYS.ADMIN_ORDER_LIST,
+          QUERY_KEYS.SINGLE_VENDOR_ORDER,
         ],
       });
     },

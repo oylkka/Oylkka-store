@@ -1,4 +1,4 @@
-import { QEUERY_KEYS } from '@/lib/constants';
+import { QUERY_KEYS } from '@/lib/constants';
 import { cleanFormData } from '@/lib/utils';
 import { BannerFormSchema, EditBannerFormType } from '@/schemas';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
@@ -40,7 +40,7 @@ export function useBannerMutation() {
 
     onSuccess: () => {
       toast.success('Banner created successfully!');
-      queryClient.invalidateQueries({ queryKey: [QEUERY_KEYS.HERO_BANNER] });
+      queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.HERO_BANNER] });
     },
 
     onError: (error: any) => {
@@ -55,7 +55,7 @@ export function useBannerMutation() {
 
 export function useAdminBannerList() {
   return useQuery({
-    queryKey: [QEUERY_KEYS.ADMIN_BANNER_LIST],
+    queryKey: [QUERY_KEYS.ADMIN_BANNER_LIST],
     queryFn: async () => {
       const response = await fetch('/api/dashboard/admin/banners');
       return response.json();
@@ -65,7 +65,7 @@ export function useAdminBannerList() {
 
 export function useSingleBanner({ id }: { id: string }) {
   return useQuery({
-    queryKey: [QEUERY_KEYS.SINGLE_BANNER, id],
+    queryKey: [QUERY_KEYS.SINGLE_BANNER, id],
     queryFn: async () => {
       const response = await fetch(
         `/api/dashboard/admin/banners/single-banner?id=${id}`
@@ -105,7 +105,7 @@ export function useUpdateBanner() {
     },
     onSuccess: (variables) => {
       queryClient.invalidateQueries({
-        queryKey: [QEUERY_KEYS.SINGLE_BANNER, variables.id],
+        queryKey: [QUERY_KEYS.SINGLE_BANNER, variables.id],
       });
       toast.success('Banner updated successfully');
     },
@@ -189,13 +189,13 @@ export const useDeleteBanner = () => {
         loading: 'Deleting design...',
         success: (data) => {
           queryClient.invalidateQueries({
-            queryKey: [QEUERY_KEYS.ADMIN_BANNER_LIST],
+            queryKey: [QUERY_KEYS.ADMIN_BANNER_LIST],
           });
           queryClient.invalidateQueries({
-            queryKey: [QEUERY_KEYS.HERO_BANNER],
+            queryKey: [QUERY_KEYS.HERO_BANNER],
           });
           queryClient.invalidateQueries({
-            queryKey: [QEUERY_KEYS.SINGLE_BANNER],
+            queryKey: [QUERY_KEYS.SINGLE_BANNER],
           });
           return data.message || 'Design deleted successfully ✅';
         },

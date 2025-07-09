@@ -1,4 +1,4 @@
-import { QEUERY_KEYS } from '@/lib/constants';
+import { QUERY_KEYS } from '@/lib/constants';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
 import { toast } from 'sonner';
@@ -7,7 +7,7 @@ import { useDebouncedCallback } from 'use-debounce';
 // Get user cart
 export function useUserCart() {
   return useQuery({
-    queryKey: [QEUERY_KEYS.USER_CART],
+    queryKey: [QUERY_KEYS.USER_CART],
     queryFn: async () => {
       const response = await axios.get(`/api/checkout/cart`);
       return response.data;
@@ -43,7 +43,7 @@ export function useAddToCart() {
           loading: `Adding product to cart...`,
           success: () => {
             queryClient.invalidateQueries({
-              queryKey: [QEUERY_KEYS.USER_CART],
+              queryKey: [QUERY_KEYS.USER_CART],
             });
             return `Product added to cart!`;
           },
@@ -73,7 +73,7 @@ export function useRemoveFromCart() {
           loading: 'Removing item...',
           success: () => {
             queryClient.invalidateQueries({
-              queryKey: [QEUERY_KEYS.USER_CART],
+              queryKey: [QUERY_KEYS.USER_CART],
             });
             return 'Item removed from cart';
           },
@@ -109,7 +109,7 @@ export function useUpdateCartQuantity() {
           loading: 'Updating quantity...',
           success: () => {
             queryClient.invalidateQueries({
-              queryKey: [QEUERY_KEYS.USER_CART],
+              queryKey: [QUERY_KEYS.USER_CART],
             });
             return 'Quantity updated';
           },

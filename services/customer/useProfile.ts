@@ -1,5 +1,5 @@
 'use client';
-import { QEUERY_KEYS } from '@/lib/constants';
+import { QUERY_KEYS } from '@/lib/constants';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
 import { useSession } from 'next-auth/react';
@@ -8,7 +8,7 @@ import { toast } from 'sonner';
 
 export function useProfile() {
   return useQuery({
-    queryKey: [QEUERY_KEYS.USER_PROFILE],
+    queryKey: [QUERY_KEYS.USER_PROFILE],
     queryFn: async () => {
       const { data } = await axios.get('/api/dashboard/customer/profile');
       return data;
@@ -120,7 +120,7 @@ export function useUpdateProfile(options: UseUpdateProfileOptions = {}) {
       }
     },
     onSuccess: async (data) => {
-      queryClient.invalidateQueries({ queryKey: [QEUERY_KEYS.USER_PROFILE] });
+      queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.USER_PROFILE] });
 
       await update({
         name: data.user.name,

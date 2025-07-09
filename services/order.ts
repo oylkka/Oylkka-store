@@ -1,10 +1,10 @@
-import { QEUERY_KEYS } from '@/lib/constants';
+import { QUERY_KEYS } from '@/lib/constants';
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
 
 export function useOrderConfirmation({ id }: { id: string }) {
   return useQuery({
-    queryKey: [QEUERY_KEYS.ORDER_CONFIRMATION, id],
+    queryKey: [QUERY_KEYS.ORDER_CONFIRMATION, id],
     queryFn: async () => {
       const response = await axios.get(
         `/api/dashboard/customer/order/single-order`,
@@ -29,7 +29,7 @@ export function useAdminOrderList({
   search,
 }: UseAdminOrderListParams) {
   return useQuery({
-    queryKey: [QEUERY_KEYS.ADMIN_ORDER_LIST, currentPage, status, search],
+    queryKey: [QUERY_KEYS.ADMIN_ORDER_LIST, currentPage, status, search],
     queryFn: async () => {
       const response = await axios.get(
         '/api/dashboard/admin/order/order-list',
@@ -44,7 +44,7 @@ export function useAdminOrderList({
 
 export function useSignleOrderInfo({ orderId }: { orderId: string }) {
   return useQuery({
-    queryKey: [QEUERY_KEYS.SINGLE_ORDER_INFO, orderId],
+    queryKey: [QUERY_KEYS.SINGLE_ORDER_INFO, orderId],
     queryFn: async () => {
       const response = await axios.get(
         '/api/dashboard/admin/order/single-order',

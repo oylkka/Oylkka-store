@@ -1,7 +1,7 @@
 /* This code snippet is defining a constant object named `QUERY_KEYS` using TypeScript. Each key in the
 object represents a specific query key related to different functionalities in an application. The
 values assigned to each key are string literals describing the purpose of each query key. */
-export const QEUERY_KEYS = {
+export const QUERY_KEYS = {
   VENDOR_SHOP: 'vendor shop',
   ADMIN_PRODUCT_CATEGORIES: 'admin product categories',
   PRODUCT_CATEGORIES: 'product categories',
@@ -30,4 +30,5 @@ export const QEUERY_KEYS = {
   SINGLE_VENDOR_ORDER: 'single vendor order',
   USER_ADDRESSES: 'user addresses',
   SINGLE_ADDRESS: 'single address',
+  USER_ORDERS: 'user orders',
 };
