@@ -23,6 +23,8 @@ export function ProductCard({ product }: { product: ProductCardType }) {
   const { data: session, status } = useSession();
 
   const handleAddToCart = () => {
+    if (status === 'loading') {return;}
+
     if (!session) {
       router.push('/sign-in');
       return;
@@ -34,6 +36,8 @@ export function ProductCard({ product }: { product: ProductCardType }) {
   };
 
   const handleBuyNow = () => {
+    if (status === 'loading') {return;}
+
     if (!session) {
       router.push('/sign-in');
       return;
@@ -61,6 +65,8 @@ export function ProductCard({ product }: { product: ProductCardType }) {
           onClick={(e) => {
             e.preventDefault();
             e.stopPropagation();
+
+            if (status === 'loading') {return;}
 
             if (!session) {
               router.push('/sign-in');

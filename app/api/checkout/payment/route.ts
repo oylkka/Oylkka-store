@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { v4 as uuidv4 } from 'uuid';
 
-import { auth } from '@/features/auth/auth'; // Import your auth module
+import { getAuthenticatedUser } from '@/features/auth/get-user';
 import { PaymentData } from '@/lib/types';
 
 import { handleBkashPayment } from './bkash-payment';
@@ -16,13 +16,12 @@ import {
 export async function POST(req: NextRequest) {
   try {
     // Get user session
-    const session = await auth();
-    if (!session || !session.user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    const user = await getAuthenticatedUser(req);
+    if (!user) {
+      return new NextResponse('Unauthorized', { status: 401 });
     }
 
-    const userId = session.user.id;
-
+    const userId = user.id;
     const data: PaymentData = await req.json();
     const myUrl = process.env.NEXT_PUBLIC_SITE_URL;
 
