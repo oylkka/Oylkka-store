@@ -67,7 +67,7 @@ export async function NavMain() {
       title: 'Shop',
       url: '/shop',
       icon: ShoppingCart,
-      isActive: userRole === 'CUSTOMER' || userRole === 'USER',
+
       roles: ['ADMIN', 'MANAGER', 'VENDOR', 'CUSTOMER_SERVICE'],
       items: [
         {
@@ -115,23 +115,24 @@ export async function NavMain() {
       title: 'My Orders',
       url: '/orders',
       icon: Package,
+      isActive: userRole === 'CUSTOMER' || userRole === 'USER',
       roles: ['USER', 'CUSTOMER'],
       items: [
         {
           title: 'Active Orders',
-          url: '/orders/active',
+          url: '/dashboard/customer/orders?status=active',
         },
         {
           title: 'Order History',
-          url: '/orders/history',
+          url: '/dashboard/customer/orders?status=all',
         },
         {
           title: 'Returns',
-          url: '/orders/returns',
+          url: '/dashboard/customer/orders?status=returns',
         },
         {
           title: 'Track Order',
-          url: '/orders/track',
+          url: '/dashboard/customer/orders?status=active',
         },
       ],
     },
