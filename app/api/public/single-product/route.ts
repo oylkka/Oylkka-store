@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 
+import { getAuthenticatedUser } from '@/features/auth/get-user';
 import { db } from '@/lib/db';
 
 export async function GET(req: NextRequest) {
@@ -37,6 +38,21 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: 'Product not found' }, { status: 404 });
     }
 
+    const user = await getAuthenticatedUser(req);
+    let isWishlisted = false;
+
+    if (user) {
+      const wishlistItem = await db.wishlistItem.findUnique({
+        where: {
+          userId_productId: {
+            userId: user.id,
+            productId: product.id,
+          },
+        },
+      });
+      isWishlisted = !!wishlistItem;
+    }
+
     const reviewCount = product.reviews.length;
     const averageRating =
       reviewCount > 0
@@ -48,8 +64,9 @@ export async function GET(req: NextRequest) {
       {
         product: {
           ...product,
-          rating: Number(averageRating.toFixed(1)), // Optional: round to 1 decimal
+          rating: Number(averageRating.toFixed(1)),
           reviewCount,
+          isWishlisted,
         },
       },
       { status: 200 }

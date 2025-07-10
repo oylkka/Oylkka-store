@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 
+import { getAuthenticatedUser } from '@/features/auth/get-user';
 import { db } from '@/lib/db';
 
 export async function GET(req: NextRequest) {
@@ -33,7 +34,7 @@ export async function GET(req: NextRequest) {
         {
           productName: {
             contains: searchTerm,
-            mode: 'insensitive', // Case-insensitive search
+            mode: 'insensitive',
           },
         },
         {
@@ -60,33 +61,28 @@ export async function GET(req: NextRequest) {
     // Price range filter
     if (minPrice !== null || maxPrice !== null) {
       whereClause.price = {};
-
       if (minPrice !== null && minPrice > 0) {
         whereClause.price.gte = minPrice;
       }
-
       if (maxPrice !== null && maxPrice > 0) {
         whereClause.price.lte = maxPrice;
       }
     }
 
-    // Build the orderBy clause based on sortBy parameter
+    // Build the orderBy clause
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    let orderBy: any = { createdAt: 'desc' }; // default
+    let orderBy: any = { createdAt: 'desc' };
 
     switch (sortBy) {
       case 'popular':
-        // Sort by review count or total sales (you might need to add this logic)
-        orderBy = [
-          { reviews: { _count: 'desc' } }, // More reviews = more popular
-          { createdAt: 'desc' },
-        ];
+        orderBy = [{ reviews: { _count: 'desc' } }, { createdAt: 'desc' }];
         break;
       case 'new':
         orderBy = { createdAt: 'desc' };
         break;
       case 'old':
         orderBy = { createdAt: 'asc' };
+        break;
       case 'priceLow':
         orderBy = { price: 'asc' };
         break;
@@ -97,12 +93,28 @@ export async function GET(req: NextRequest) {
         orderBy = { createdAt: 'desc' };
     }
 
-    // Get the total count of products with all filters
+    // Get current authenticated user
+    const user = await getAuthenticatedUser(req);
+    const userId = user?.id || null;
+
+    // Fetch user's wishlist product IDs (if logged in)
+    let wishlistProductIds: string[] = [];
+
+    if (userId) {
+      const wishlistItems = await db.wishlistItem.findMany({
+        where: { userId },
+        select: { productId: true },
+      });
+
+      wishlistProductIds = wishlistItems.map((item) => item.productId);
+    }
+
+    // Get total count
     const totalProducts = await db.product.count({
       where: whereClause,
     });
 
-    // Get the products along with review count and average rating
+    // Get paginated products
     const products = await db.product.findMany({
       where: whereClause,
       skip: (page - 1) * limit,
@@ -114,7 +126,6 @@ export async function GET(req: NextRequest) {
         discountPrice: true,
         slug: true,
         stock: true,
-
         category: {
           select: {
             name: true,
@@ -135,16 +146,15 @@ export async function GET(req: NextRequest) {
           },
         },
       },
-      orderBy: orderBy,
+      orderBy,
     });
 
-    // Map the products to add review count and average rating
+    // Map products to include rating, review count, and isWishlisted
     const productWithRatings = products.map((product) => {
       const reviewCount = product.reviews.length;
       const averageRating =
         reviewCount > 0
-          ? product.reviews.reduce((sum, review) => sum + review.rating, 0) /
-            reviewCount
+          ? product.reviews.reduce((sum, r) => sum + r.rating, 0) / reviewCount
           : 0;
 
       return {
@@ -152,6 +162,7 @@ export async function GET(req: NextRequest) {
         imageUrl: product.images[0]?.url || null,
         reviewCount,
         rating: parseFloat(averageRating.toFixed(1)),
+        isWishlisted: wishlistProductIds.includes(product.id), // ✅ added
       };
     });
 
@@ -164,7 +175,6 @@ export async function GET(req: NextRequest) {
         hasNext: page < Math.ceil(totalProducts / limit),
         hasPrev: page > 1,
       },
-      // Include filter info in response for debugging/logging
       filterInfo: {
         search: search || null,
         category: category || null,

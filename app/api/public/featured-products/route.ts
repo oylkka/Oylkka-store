@@ -1,9 +1,24 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 
+import { getAuthenticatedUser } from '@/features/auth/get-user';
 import { db } from '@/lib/db';
 
-export async function GET() {
+export async function GET(req: NextRequest) {
   try {
+    const user = await getAuthenticatedUser(req);
+    const userId = user?.id || null;
+
+    let wishlistProductIds: string[] = [];
+
+    if (userId) {
+      const wishlistItems = await db.wishlistItem.findMany({
+        where: { userId },
+        select: { productId: true },
+      });
+
+      wishlistProductIds = wishlistItems.map((item) => item.productId);
+    }
+
     const products = await db.product.findMany({
       where: {
         featured: true,
@@ -41,7 +56,6 @@ export async function GET() {
       take: 8,
     });
 
-    // Map the products to add review count and average rating
     const productWithRatings = products.map((product) => {
       const reviewCount = product.reviews.length;
       const averageRating =
@@ -55,12 +69,14 @@ export async function GET() {
         imageUrl: product.images[0]?.url || null,
         reviewCount,
         rating: parseFloat(averageRating.toFixed(1)),
+        isWishlisted: wishlistProductIds.includes(product.id),
       };
     });
 
     if (!products) {
       return new Response('Not Found', { status: 404 });
     }
+
     return NextResponse.json({
       products: productWithRatings,
     });

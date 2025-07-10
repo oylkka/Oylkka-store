@@ -1,6 +1,7 @@
+import { NextRequest, NextResponse } from 'next/server';
+
 import { getAuthenticatedUser } from '@/features/auth/get-user';
 import { db } from '@/lib/db';
-import { NextRequest, NextResponse } from 'next/server';
 
 export async function POST(req: NextRequest) {
   try {
@@ -16,14 +17,6 @@ export async function POST(req: NextRequest) {
       return new NextResponse('Product ID is required', { status: 400 });
     }
 
-    const product = await db.product.findUnique({
-      where: { id: productId },
-    });
-
-    if (!product) {
-      return new NextResponse('Product not found', { status: 404 });
-    }
-
     const wishlistItem = await db.wishlistItem.findUnique({
       where: {
         userId_productId: {
@@ -34,24 +27,44 @@ export async function POST(req: NextRequest) {
     });
 
     if (wishlistItem) {
-      return new NextResponse('Product already in wishlist', { status: 400 });
-    }
+      // Product is in wishlist, so remove it
+      await db.wishlistItem.delete({
+        where: {
+          userId_productId: {
+            userId: user.id,
+            productId: productId,
+          },
+        },
+      });
+      return NextResponse.json(
+        { message: 'Product removed from wishlist', added: false },
+        { status: 200 }
+      );
+    } else {
+      // Product not in wishlist, so add it
+      // First, ensure product exists
+      const product = await db.product.findUnique({
+        where: { id: productId },
+      });
 
-    await db.wishlistItem.create({
-      data: {
-        productId,
-        userId: user.id,
-      },
-    });
-
-    return NextResponse.json(
-      { message: 'Product added to wishlist' },
-      {
-        status: 201,
+      if (!product) {
+        return new NextResponse('Product not found', { status: 404 });
       }
-    );
+
+      await db.wishlistItem.create({
+        data: {
+          productId,
+          userId: user.id,
+        },
+      });
+
+      return NextResponse.json(
+        { message: 'Product added to wishlist', added: true },
+        { status: 201 }
+      );
+    }
   } catch (error) {
-    console.error('[ADD_TO_WISHLIST_ERROR]', error);
+    console.error('[TOGGLE_WISHLIST_ERROR]', error);
     return NextResponse.json(
       { message: 'Internal Server Error' },
       { status: 500 }

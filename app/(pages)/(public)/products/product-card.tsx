@@ -5,7 +5,6 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
-import { useState } from 'react';
 import { toast } from 'sonner';
 
 import { Badge } from '@/components/ui/badge';
@@ -15,15 +14,19 @@ import { Skeleton } from '@/components/ui/skeleton';
 import type { ProductCardType } from '@/lib/types';
 import { cn } from '@/lib/utils';
 import { useAddToCart } from '@/services';
+import { useToggleWishlist } from '@/services/customer/wishlist';
 
 export function ProductCard({ product }: { product: ProductCardType }) {
-  const [isWishlisted, setIsWishlisted] = useState(false);
+  const { mutate: toggleWishlist, isPending: isWishlistPending } =
+    useToggleWishlist();
   const { mutate: addToCart, isPending: isCartPending } = useAddToCart();
   const router = useRouter();
   const { data: session, status } = useSession();
 
   const handleAddToCart = () => {
-    if (status === 'loading') {return;}
+    if (status === 'loading') {
+      return;
+    }
 
     if (!session) {
       router.push('/sign-in');
@@ -36,7 +39,9 @@ export function ProductCard({ product }: { product: ProductCardType }) {
   };
 
   const handleBuyNow = () => {
-    if (status === 'loading') {return;}
+    if (status === 'loading') {
+      return;
+    }
 
     if (!session) {
       router.push('/sign-in');
@@ -55,6 +60,19 @@ export function ProductCard({ product }: { product: ProductCardType }) {
     );
   };
 
+  const handleWishlistToggle = () => {
+    if (status === 'loading') {
+      return;
+    }
+
+    if (!session) {
+      router.push('/sign-in');
+      return;
+    }
+
+    toggleWishlist({ productId: product.id });
+  };
+
   return (
     <>
       <Card className="group relative h-full overflow-hidden rounded pt-0 pb-2 transition-all duration-300 hover:shadow-md md:rounded-lg md:pb-4">
@@ -65,23 +83,18 @@ export function ProductCard({ product }: { product: ProductCardType }) {
           onClick={(e) => {
             e.preventDefault();
             e.stopPropagation();
-
-            if (status === 'loading') {return;}
-
-            if (!session) {
-              router.push('/sign-in');
-              return;
-            }
-
-            setIsWishlisted(!isWishlisted);
+            handleWishlistToggle();
           }}
+          disabled={isWishlistPending}
           className="bg-background/80 hover:bg-background absolute top-2 right-2 z-20 h-7 w-7 rounded-full p-0 shadow-sm backdrop-blur-sm transition-all sm:top-3 sm:right-3 sm:h-8 sm:w-8"
-          aria-label={isWishlisted ? 'Remove from wishlist' : 'Add to wishlist'}
+          aria-label={
+            product.isWishlisted ? 'Remove from wishlist' : 'Add to wishlist'
+          }
         >
           <Heart
             className={cn(
               'h-3.5 w-3.5 transition-colors sm:h-4 sm:w-4',
-              isWishlisted
+              product.isWishlisted
                 ? 'fill-destructive text-destructive'
                 : 'text-muted-foreground'
             )}

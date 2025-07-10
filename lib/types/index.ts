@@ -31,6 +31,7 @@ export interface ProductCardType {
   rating: number;
   reviewCount: number;
   freeShipping: boolean;
+  isWishlisted: boolean;
 }
 
 export interface ProductImage {
@@ -105,6 +106,7 @@ export interface Product {
   warrantyInfo?: string;
   variants: ProductVariant[];
   shop: Shop;
+  isWishlisted?: boolean;
 }
 
 export interface ProductResponse {

@@ -8,6 +8,8 @@ import {
   Plus,
   ShoppingCart,
 } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { useSession } from 'next-auth/react';
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 
@@ -25,6 +27,7 @@ import { Separator } from '@/components/ui/separator';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import type { ProductImage, ProductVariant } from '@/lib/types';
 import { useAddToCart, useSingleProduct } from '@/services';
+import { useToggleWishlist } from '@/services/customer/wishlist';
 import MessageVendorButton from '@/utils/chat-button';
 
 import LoadingSkeleton from './loading-skeleton';
@@ -43,14 +46,18 @@ export default function ProductDetails({ slug }: { slug: string }) {
     null
   );
   const [quantity, setQuantity] = useState(1);
-  const [inWishlist, setInWishlist] = useState(false);
+
   const [availableColors, setAvailableColors] = useState<string[]>([]);
   const [availableSizes, setAvailableSizes] = useState<string[]>([]);
   const [activeImageIndex, setActiveImageIndex] = useState(0);
   const [combinedImages, setCombinedImages] = useState<ProductImage[]>([]);
   const { mutate: addToCart } = useAddToCart();
+  const { data: session, status } = useSession();
+  const { mutate: toggleWishlist, isPending: isWishlistPending } =
+    useToggleWishlist();
 
   const product = data?.product;
+  const router = useRouter();
 
   // Extract unique colors and sizes from variants
   useEffect(() => {
@@ -198,6 +205,19 @@ export default function ProductDetails({ slug }: { slug: string }) {
     setSelectedSize(size);
   };
 
+  const handleWishlistToggle = () => {
+    if (status === 'loading') {
+      return;
+    }
+
+    if (!session) {
+      router.push('/sign-in');
+      return;
+    }
+
+    toggleWishlist({ productId: product.id });
+  };
+
   const increaseQuantity = () => {
     if (selectedVariant && quantity < selectedVariant.stock) {
       setQuantity((prev) => prev + 1);
@@ -210,11 +230,6 @@ export default function ProductDetails({ slug }: { slug: string }) {
     if (quantity > 1) {
       setQuantity((prev) => prev - 1);
     }
-  };
-
-  const toggleWishlist = () => {
-    setInWishlist(!inWishlist);
-    toast.success(inWishlist ? 'Removed from wishlist' : 'Added to wishlist');
   };
 
   // Fix the add to cart logic
@@ -303,12 +318,7 @@ export default function ProductDetails({ slug }: { slug: string }) {
 
         {/* Product Details */}
         <div className="space-y-6">
-          <ProductInfo
-            product={product}
-            inWishlist={inWishlist}
-            toggleWishlist={toggleWishlist}
-            currentStock={currentStock}
-          />
+          <ProductInfo product={product} currentStock={currentStock} />
 
           <Separator />
 
@@ -404,18 +414,18 @@ export default function ProductDetails({ slug }: { slug: string }) {
                 vendorName={product.shop.name}
                 productId={product.id}
               />
+
               <Button
-                variant={inWishlist ? 'destructive' : 'outline'}
-                size="lg"
                 className="py-6"
-                onClick={toggleWishlist}
+                variant={product.isWishlisted ? 'default' : 'outline'}
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  handleWishlistToggle();
+                }}
+                disabled={isWishlistPending}
               >
-                <Heart
-                  className={`h-5 w-5 ${inWishlist ? 'fill-current' : ''}`}
-                />
-                <span className="sr-only">
-                  {inWishlist ? 'Remove from wishlist' : 'Add to wishlist'}
-                </span>
+                <Heart className="h-5 w-5" />
               </Button>
             </div>
             <MessageVendorButton

@@ -1,29 +1,45 @@
 'use client';
 
 import { Heart, Star } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { useSession } from 'next-auth/react';
 
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import type { Product } from '@/lib/types';
 import { cn, getInitials } from '@/lib/utils';
+import { useToggleWishlist } from '@/services/customer/wishlist';
 
 import ShareProduct from './share-product';
 import { StockStatus } from './stock-status';
 
 interface ProductInfoProps {
   product: Product;
-  inWishlist: boolean;
-  toggleWishlist: () => void;
   currentStock: number;
 }
 
 export default function ProductInfo({
   product,
-  inWishlist,
-  toggleWishlist,
   currentStock,
 }: ProductInfoProps) {
+  const { data: session, status } = useSession();
+  const { mutate: toggleWishlist, isPending: isWishlistPending } =
+    useToggleWishlist();
+  const router = useRouter();
+
+  const handleWishlistToggle = () => {
+    if (status === 'loading') {
+      return;
+    }
+
+    if (!session) {
+      router.push('/sign-in');
+      return;
+    }
+
+    toggleWishlist({ productId: product.id });
+  };
   return (
     <div>
       <div className="mb-2 flex items-center justify-between">
@@ -44,11 +60,17 @@ export default function ProductInfo({
           <Button
             variant="ghost"
             size="icon"
-            onClick={toggleWishlist}
-            className={inWishlist ? 'text-red-500' : ''}
-            aria-label={inWishlist ? 'Remove from wishlist' : 'Add to wishlist'}
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              handleWishlistToggle();
+            }}
+            disabled={isWishlistPending}
+            className={product.isWishlisted ? 'text-red-500' : ''}
           >
-            <Heart className={cn('h-5 w-5', inWishlist && 'fill-red-500')} />
+            <Heart
+              className={cn('h-5 w-5', product.isWishlisted && 'fill-red-500')}
+            />
           </Button>
         </div>
       </div>

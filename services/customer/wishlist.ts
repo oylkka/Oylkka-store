@@ -3,32 +3,39 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
 import { toast } from 'sonner';
 
-export function useAddToWishlist() {
+export function useToggleWishlist() {
   const queryClient = useQueryClient();
 
   const mutation = useMutation({
     mutationFn: async ({ productId }: { productId: string }) => {
-      return toast.promise(
-        axios
-          .post('/api/dashboard/customer/wishlist', {
-            productId,
-          })
-          .then((res) => res.data),
+      const response = await axios.post<{ added: boolean }>(
+        '/api/dashboard/customer/wishlist',
         {
-          loading: `Adding product to wishlist...`,
-          success: () => {
-            queryClient.invalidateQueries({
-              queryKey: [QUERY_KEYS.USER_WISHLIST],
-            });
-            return `Product added to wishlist!`;
-          },
-          error: (err) => {
-            const errorMessage =
-              err.response?.data || 'Failed to add to wishlist';
-            return `Error: ${errorMessage}`;
-          },
+          productId,
         }
       );
+      return response.data;
+    },
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({
+        queryKey: [QUERY_KEYS.FEATURED_PRODUCTS],
+      });
+      queryClient.invalidateQueries({
+        queryKey: [QUERY_KEYS.PRODUCT_LIST],
+      });
+      queryClient.invalidateQueries({
+        queryKey: [QUERY_KEYS.SINGLE_PRODUCT],
+      });
+      toast.success(
+        data.added
+          ? 'Product added to wishlist!'
+          : 'Product removed from wishlist.'
+      );
+    },
+    onError: (err: any) => {
+      const errorMessage =
+        err.response?.data?.message || 'Failed to update wishlist';
+      toast.error(`Error: ${errorMessage}`);
     },
   });
 
