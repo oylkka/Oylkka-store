@@ -575,7 +575,7 @@ export async function NavMain() {
       },
       {
         title: 'My Review',
-        url: '/account/review',
+        url: '/dashboard/customer/reviews',
       },
     ],
   };

@@ -243,6 +243,9 @@ export function useDeleteReview() {
       queryClient.invalidateQueries({
         queryKey: [QUERY_KEYS.PRODUCT_REVIEWS],
       });
+      queryClient.invalidateQueries({
+        queryKey: [QUERY_KEYS.USER_REVIEWS],
+      });
     },
   });
 }

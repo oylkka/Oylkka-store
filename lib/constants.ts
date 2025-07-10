@@ -31,4 +31,5 @@ export const QUERY_KEYS = {
   USER_ADDRESSES: 'user addresses',
   SINGLE_ADDRESS: 'single address',
   USER_ORDERS: 'user orders',
+  USER_REVIEWS: 'user reviews',
 };
