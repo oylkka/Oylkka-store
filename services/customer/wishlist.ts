@@ -1,5 +1,5 @@
 import { QUERY_KEYS } from '@/lib/constants';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
 import { toast } from 'sonner';
 
@@ -40,4 +40,14 @@ export function useToggleWishlist() {
   });
 
   return mutation;
+}
+
+export function useWishlist() {
+  return useQuery({
+    queryKey: [QUERY_KEYS.USER_WISHLIST],
+    queryFn: async () => {
+      const { data } = await axios.get('/api/dashboard/customer/wishlist');
+      return data;
+    },
+  });
 }

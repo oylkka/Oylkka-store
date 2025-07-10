@@ -558,7 +558,7 @@ export async function NavMain() {
 
       {
         title: 'Wishlist',
-        url: '/account/wishlist',
+        url: '/dashboard/customer/wishlist',
         roles: ['USER', 'CUSTOMER'],
       },
       {

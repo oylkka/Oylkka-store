@@ -3,68 +3,77 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getAuthenticatedUser } from '@/features/auth/get-user';
 import { db } from '@/lib/db';
 
-export async function POST(req: NextRequest) {
+export async function GET(req: NextRequest) {
   try {
     const user = await getAuthenticatedUser(req);
     if (!user) {
       return new NextResponse('Unauthorized', { status: 401 });
     }
 
-    const body = await req.json();
-    const { productId } = body;
-
-    if (!productId) {
-      return new NextResponse('Product ID is required', { status: 400 });
-    }
-
-    const wishlistItem = await db.wishlistItem.findUnique({
+    const wishlistItems = await db.wishlistItem.findMany({
       where: {
-        userId_productId: {
-          userId: user.id,
-          productId: productId,
+        userId: user.id,
+      },
+      select: {
+        product: {
+          select: {
+            id: true,
+            slug: true,
+            productName: true,
+            stock: true,
+            price: true,
+            discountPrice: true,
+            discountPercent: true,
+            freeShipping: true,
+            category: {
+              select: {
+                name: true,
+                slug: true,
+              },
+            },
+            images: {
+              select: {
+                url: true,
+              },
+            },
+            reviews: {
+              select: {
+                rating: true,
+              },
+            },
+          },
         },
       },
     });
 
-    if (wishlistItem) {
-      // Product is in wishlist, so remove it
-      await db.wishlistItem.delete({
-        where: {
-          userId_productId: {
-            userId: user.id,
-            productId: productId,
-          },
-        },
-      });
-      return NextResponse.json(
-        { message: 'Product removed from wishlist', added: false },
-        { status: 200 }
-      );
-    } else {
-      // Product not in wishlist, so add it
-      // First, ensure product exists
-      const product = await db.product.findUnique({
-        where: { id: productId },
-      });
+    const formatted = wishlistItems.map((item) => {
+      const product = item.product;
+      const reviewCount = product.reviews.length;
+      const rating =
+        reviewCount > 0
+          ? product.reviews.reduce((sum, r) => sum + r.rating, 0) / reviewCount
+          : 0;
 
-      if (!product) {
-        return new NextResponse('Product not found', { status: 404 });
-      }
+      return {
+        id: product.id,
+        slug: product.slug,
+        productName: product.productName,
+        stock: product.stock,
+        imageUrl: product.images[0]?.url ?? '',
+        price: product.price,
+        discountPrice: product.discountPrice ?? undefined,
+        discountPercent: product.discountPercent,
+        category: product.category,
+        freeShipping: product.freeShipping,
+        rating: parseFloat(rating.toFixed(1)),
+        reviewCount,
+        isWishlisted: true,
+      };
+    });
 
-      await db.wishlistItem.create({
-        data: {
-          productId,
-          userId: user.id,
-        },
-      });
-
-      return NextResponse.json(
-        { message: 'Product added to wishlist', added: true },
-        { status: 201 }
-      );
-    }
+    return NextResponse.json(formatted, { status: 200 });
   } catch (error) {
-    console.error('[TOGGLE_WISHLIST_ERROR]', error);
+    console.error('[GET_WISHLIST_ERROR]', error);
     return NextResponse.json(
       { message: 'Internal Server Error' },
       { status: 500 }
