@@ -1,5 +1,5 @@
-import NextAuth from 'next-auth';
 import { NextResponse } from 'next/server';
+import NextAuth from 'next-auth';
 import authConfig from './features/auth/auth.config';
 
 // Initialize NextAuth middleware
@@ -38,11 +38,11 @@ export default auth(async (req) => {
   const isApiRoute = nextUrl.pathname.startsWith(apiPrefix);
   const isPublicRoute = publicRoutes.includes(nextUrl.pathname);
   const isProtectedRoute = protectedRoutes.some((route) =>
-    nextUrl.pathname.startsWith(route)
+    nextUrl.pathname.startsWith(route),
   );
   const isOnboardingExempt =
     onboardingExemptRoutes.some((route) =>
-      nextUrl.pathname.startsWith(route)
+      nextUrl.pathname.startsWith(route),
     ) || isApiRoute;
 
   // ==============================

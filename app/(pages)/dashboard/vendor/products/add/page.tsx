@@ -21,11 +21,9 @@ import ProductVariant from './product-variant';
 
 export default function NewProductPage() {
   return (
-    <>
-      <ProductFormProvider>
-        <NewProductForm />
-      </ProductFormProvider>
-    </>
+    <ProductFormProvider>
+      <NewProductForm />
+    </ProductFormProvider>
   );
 }
 
@@ -37,23 +35,23 @@ function NewProductForm() {
   return (
     <form onSubmit={methods.handleSubmit(onSubmit)}>
       {/* Header */}
-      <div className="mb-6 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-        <div className="flex items-center gap-3">
-          <Button variant="outline">
+      <div className='mb-6 flex flex-col gap-4 md:flex-row md:items-center md:justify-between'>
+        <div className='flex items-center gap-3'>
+          <Button variant='outline'>
             <ArrowBigLeft />
           </Button>
-          <h1 className="text-2xl font-bold">New Product</h1>
+          <h1 className='text-2xl font-bold'>New Product</h1>
         </div>
-        <div className="flex items-center justify-end gap-5">
-          <Button variant="outline" type="button">
+        <div className='flex items-center justify-end gap-5'>
+          <Button variant='outline' type='button'>
             Discard
           </Button>
-          <Button type="submit" className="gap-2" disabled={isPending}>
+          <Button type='submit' className='gap-2' disabled={isPending}>
             {isPending ? (
               'Saving...'
             ) : (
               <>
-                <Plus className="h-4 w-4" />
+                <Plus className='h-4 w-4' />
                 Save Product
               </>
             )}
@@ -62,15 +60,15 @@ function NewProductForm() {
       </div>
 
       {/* Main Content */}
-      <div className="grid grid-cols-1 gap-6 md:grid-cols-12">
-        <div className="space-y-6 md:col-span-8">
+      <div className='grid grid-cols-1 gap-6 md:grid-cols-12'>
+        <div className='space-y-6 md:col-span-8'>
           {/* Left Column Cards */}
           <BasicInformationCard />
           <PricingAndInventory />
           <ProductDimensions />
           <ProductVariant />
         </div>
-        <div className="space-y-6 md:col-span-4">
+        <div className='space-y-6 md:col-span-4'>
           {/* Right Column Cards */}
           <ProductImagesCard />
           <ProductStatus />

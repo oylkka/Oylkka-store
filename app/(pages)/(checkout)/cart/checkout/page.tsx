@@ -111,8 +111,8 @@ export default function CheckoutPage() {
       } else {
         throw new Error('Failed to place order');
       }
+      // biome-ignore lint: error
     } catch (error) {
-      console.error('Error placing order:', error);
       toast.error('Failed to place order. Please try again.');
     } finally {
       setIsSubmitting(false);
@@ -121,10 +121,10 @@ export default function CheckoutPage() {
 
   if (isPending) {
     return (
-      <div className="container mx-auto flex min-h-[400px] items-center justify-center">
-        <div className="text-center">
-          <div className="border-primary mx-auto mb-4 h-8 w-8 animate-spin rounded-full border-4 border-t-transparent" />
-          <p className="text-muted-foreground">Loading your cart...</p>
+      <div className='container mx-auto flex min-h-[400px] items-center justify-center'>
+        <div className='text-center'>
+          <div className='border-primary mx-auto mb-4 h-8 w-8 animate-spin rounded-full border-4 border-t-transparent' />
+          <p className='text-muted-foreground'>Loading your cart...</p>
         </div>
       </div>
     );
@@ -132,12 +132,12 @@ export default function CheckoutPage() {
 
   if (isError || !cartData) {
     return (
-      <div className="container mx-auto flex min-h-[400px] items-center justify-center">
-        <div className="text-center">
-          <p className="text-destructive mb-2 text-lg font-medium">
+      <div className='container mx-auto flex min-h-[400px] items-center justify-center'>
+        <div className='text-center'>
+          <p className='text-destructive mb-2 text-lg font-medium'>
             Failed to load cart data
           </p>
-          <p className="text-muted-foreground">Please try again later.</p>
+          <p className='text-muted-foreground'>Please try again later.</p>
         </div>
       </div>
     );
@@ -145,10 +145,10 @@ export default function CheckoutPage() {
 
   if (cartData.length === 0) {
     return (
-      <div className="container mx-auto flex min-h-[400px] items-center justify-center">
-        <div className="text-center">
-          <p className="mb-2 text-lg font-medium">Your cart is empty</p>
-          <p className="text-muted-foreground">
+      <div className='container mx-auto flex min-h-[400px] items-center justify-center'>
+        <div className='text-center'>
+          <p className='mb-2 text-lg font-medium'>Your cart is empty</p>
+          <p className='text-muted-foreground'>
             Add some items to get started.
           </p>
         </div>
@@ -157,11 +157,11 @@ export default function CheckoutPage() {
   }
 
   return (
-    <div className="container mx-auto max-w-7xl px-4 py-8">
+    <div className='container mx-auto max-w-7xl px-4 py-8'>
       <CheckoutProgress currentStep={step} />
 
-      <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
-        <div className="lg:col-span-2">
+      <div className='grid grid-cols-1 gap-8 lg:grid-cols-3'>
+        <div className='lg:col-span-2'>
           {step === 'information' && (
             <AddressForm
               onSubmit={handleAddressSubmit}
@@ -208,7 +208,7 @@ export default function CheckoutPage() {
         </div>
 
         {/* Order Summary Sidebar */}
-        <div className="lg:sticky lg:top-8 lg:self-start">
+        <div className='lg:sticky lg:top-8 lg:self-start'>
           <OrderSummary
             cartItems={cartData}
             shippingCost={shippingCost}

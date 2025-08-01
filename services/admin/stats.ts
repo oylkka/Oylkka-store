@@ -1,5 +1,5 @@
-import { QUERY_KEYS } from '@/lib/constants';
 import { useQuery } from '@tanstack/react-query';
+import { QUERY_KEYS } from '@/lib/constants';
 
 export function useAdminStats() {
   return useQuery({
@@ -15,7 +15,7 @@ export function useAdminChartData(period = '6months') {
     queryKey: ['admin-chart-data', period],
     queryFn: async () => {
       const response = await fetch(
-        `/api/dashboard/admin/stats/charts?period=${period}`
+        `/api/dashboard/admin/stats/charts?period=${period}`,
       );
       if (!response.ok) {
         throw new Error('Failed to fetch chart data');

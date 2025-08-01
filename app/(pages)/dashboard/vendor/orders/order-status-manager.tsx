@@ -16,7 +16,7 @@ import { useUpdateOrderStatus } from '@/services';
 import { validateStatusTransition } from './order-validation';
 
 interface OrderStatusManagerProps {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  // biome-ignore lint: error
   order: any;
   onUpdate: () => void;
 }
@@ -27,7 +27,7 @@ export function OrderStatusManager({
 }: OrderStatusManagerProps) {
   const [tempOrderStatus, setTempOrderStatus] = useState(order.status);
   const [tempPaymentStatus, setTempPaymentStatus] = useState(
-    order.paymentStatus
+    order.paymentStatus,
   );
 
   const updateOrderMutation = useUpdateOrderStatus();
@@ -46,11 +46,11 @@ export function OrderStatusManager({
     // Validate status transitions
     const orderStatusValid = validateStatusTransition(
       order.status,
-      tempOrderStatus
+      tempOrderStatus,
     );
     const paymentStatusValid = validateStatusTransition(
       order.paymentStatus,
-      tempPaymentStatus
+      tempPaymentStatus,
     );
 
     if (!orderStatusValid.isValid) {
@@ -79,10 +79,8 @@ export function OrderStatusManager({
         toast.success('Order status updated successfully');
         onUpdate(); // Refresh the orders list
       },
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      // biome-ignore lint: error
       onError: (error: any) => {
-        console.error('Failed to update order status:', error);
-
         // Handle specific error cases
         if (error.status === 403) {
           toast.error('Access Denied');
@@ -100,55 +98,55 @@ export function OrderStatusManager({
   };
 
   return (
-    <div className="space-y-4">
+    <div className='space-y-4'>
       {/* Order Status Section */}
-      <div className="space-y-2">
-        <h4 className="text-sm font-medium">Order Status</h4>
+      <div className='space-y-2'>
+        <h4 className='text-sm font-medium'>Order Status</h4>
         <Select
           value={tempOrderStatus}
           onValueChange={setTempOrderStatus}
           disabled={updateOrderMutation.isPending}
         >
-          <SelectTrigger className="w-full">
+          <SelectTrigger className='w-full'>
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="PENDING">Pending</SelectItem>
-            <SelectItem value="PROCESSING">Processing</SelectItem>
-            <SelectItem value="SHIPPED">Shipped</SelectItem>
-            <SelectItem value="DELIVERED">Delivered</SelectItem>
-            <SelectItem value="CANCELLED">Cancelled</SelectItem>
+            <SelectItem value='PENDING'>Pending</SelectItem>
+            <SelectItem value='PROCESSING'>Processing</SelectItem>
+            <SelectItem value='SHIPPED'>Shipped</SelectItem>
+            <SelectItem value='DELIVERED'>Delivered</SelectItem>
+            <SelectItem value='CANCELLED'>Cancelled</SelectItem>
           </SelectContent>
         </Select>
       </div>
 
       {/* Payment Status Section */}
-      <div className="space-y-2">
-        <h4 className="text-sm font-medium">Payment Status</h4>
+      <div className='space-y-2'>
+        <h4 className='text-sm font-medium'>Payment Status</h4>
         <Select
           value={tempPaymentStatus}
           onValueChange={setTempPaymentStatus}
           disabled={updateOrderMutation.isPending}
         >
-          <SelectTrigger className="w-full">
+          <SelectTrigger className='w-full'>
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="PENDING">Pending</SelectItem>
-            <SelectItem value="PAID">Paid</SelectItem>
-            <SelectItem value="FAILED">Failed</SelectItem>
-            <SelectItem value="REFUNDED">Refunded</SelectItem>
+            <SelectItem value='PENDING'>Pending</SelectItem>
+            <SelectItem value='PAID'>Paid</SelectItem>
+            <SelectItem value='FAILED'>Failed</SelectItem>
+            <SelectItem value='REFUNDED'>Refunded</SelectItem>
           </SelectContent>
         </Select>
       </div>
 
       {/* Update Button */}
       {hasPendingChanges && (
-        <div className="pt-2">
+        <div className='pt-2'>
           <Button
-            variant="default"
-            size="sm"
-            className="w-full"
+            variant='default'
+            size='sm'
+            className='w-full'
             onClick={handleStatusUpdate}
             disabled={updateOrderMutation.isPending}
           >

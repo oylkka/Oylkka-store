@@ -69,16 +69,16 @@ export default async function ChatLayout({
         lastMessageAt: 'desc',
       },
     })) as ConversationDisplay[];
+    // biome-ignore lint: error
   } catch (err) {
-    console.error('Error fetching conversations:', err);
     error = 'Failed to fetch conversations. Please try again later.';
   }
 
   return (
     <SidebarProvider defaultOpen={true}>
-      <div className="bg-background flex h-screen w-full">
+      <div className='bg-background flex h-screen w-full'>
         {/* Desktop Sidebar - Hidden on mobile */}
-        <div className="hidden lg:block">
+        <div className='hidden lg:block'>
           <ChatSidebar
             conversations={conversations}
             currentUserId={currentUserId}
@@ -87,7 +87,7 @@ export default async function ChatLayout({
         </div>
 
         {/* Main Content Area */}
-        <SidebarInset className="flex-1 lg:flex-1">{children}</SidebarInset>
+        <SidebarInset className='flex-1 lg:flex-1'>{children}</SidebarInset>
       </div>
     </SidebarProvider>
   );

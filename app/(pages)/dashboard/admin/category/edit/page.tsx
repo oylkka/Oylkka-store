@@ -158,7 +158,7 @@ function EditCategoryPage() {
     });
   };
 
-  // Auto-generate slug from name when name changes
+  //  biome-ignore lint: error
   useEffect(() => {
     if (name && !isSlugManuallyEdited) {
       const generatedSlug = formatSlugInput(name);
@@ -168,7 +168,7 @@ function EditCategoryPage() {
     }
   }, [name, form, isSlugManuallyEdited, slug]);
 
-  // Check slug when it changes (with debounce)
+  //  biome-ignore lint: error
   useEffect(() => {
     // Only run checks if slug is valid, not empty, and different from original
     if (slug && slug.length >= 2 && slug !== originalSlug) {
@@ -206,7 +206,7 @@ function EditCategoryPage() {
       setSlugSuggestions([]);
 
       const result = (await checkCategorySlugUniqueness(
-        slugValue
+        slugValue,
       )) as SlugCheckResponse;
 
       if (!result.isUnique) {
@@ -214,6 +214,7 @@ function EditCategoryPage() {
         setSlugError('This slug is already in use.');
       }
     } catch (error) {
+      //  biome-ignore lint: error
       console.error('Error checking slug:', error);
     } finally {
       setIsCheckingSlug(false);
@@ -258,7 +259,7 @@ function EditCategoryPage() {
     // Use Sonner's promise toast
     toast.promise(updateCategory(formData), {
       loading: 'Updating category...',
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      // biome-ignore lint: error
       success: (result: any) => {
         if (result.success) {
           // Navigate back to categories list
@@ -274,7 +275,6 @@ function EditCategoryPage() {
         }
       },
       error: (error: unknown) => {
-        console.error('Error updating category:', error);
         return error instanceof Error ? error.message : 'Something went wrong';
       },
     });
@@ -291,26 +291,26 @@ function EditCategoryPage() {
   // Loading state
   if (isLoadingCategory) {
     return (
-      <div className="container mx-auto max-w-3xl py-10">
-        <Card className="w-full">
+      <div className='container mx-auto max-w-3xl py-10'>
+        <Card className='w-full'>
           <CardHeader>
-            <Skeleton className="mx-auto h-8 w-3/4" />
-            <Skeleton className="mx-auto mt-2 h-4 w-1/2" />
+            <Skeleton className='mx-auto h-8 w-3/4' />
+            <Skeleton className='mx-auto mt-2 h-4 w-1/2' />
           </CardHeader>
           <CardContent>
-            <div className="grid gap-6 md:grid-cols-2">
-              <div className="space-y-6">
-                <Skeleton className="h-10 w-full" />
-                <Skeleton className="h-10 w-full" />
-                <Skeleton className="h-10 w-full" />
+            <div className='grid gap-6 md:grid-cols-2'>
+              <div className='space-y-6'>
+                <Skeleton className='h-10 w-full' />
+                <Skeleton className='h-10 w-full' />
+                <Skeleton className='h-10 w-full' />
               </div>
-              <div className="space-y-6">
-                <Skeleton className="mx-auto h-40 w-40" />
-                <Skeleton className="h-32 w-full" />
-                <Skeleton className="h-16 w-full" />
+              <div className='space-y-6'>
+                <Skeleton className='mx-auto h-40 w-40' />
+                <Skeleton className='h-32 w-full' />
+                <Skeleton className='h-16 w-full' />
               </div>
             </div>
-            <Skeleton className="mt-8 h-10 w-full" />
+            <Skeleton className='mt-8 h-10 w-full' />
           </CardContent>
         </Card>
       </div>
@@ -320,16 +320,16 @@ function EditCategoryPage() {
   // Error state
   if (categoryError || !category) {
     return (
-      <div className="container mx-auto max-w-3xl py-10">
-        <Alert variant="destructive">
-          <AlertCircle className="h-4 w-4" />
+      <div className='container mx-auto max-w-3xl py-10'>
+        <Alert variant='destructive'>
+          <AlertCircle className='h-4 w-4' />
           <AlertTitle>Error</AlertTitle>
           <AlertDescription>
             Failed to load category. Please try again or contact support.
           </AlertDescription>
         </Alert>
         <Button
-          className="mt-4"
+          className='mt-4'
           onClick={() => router.push('/admin/categories')}
         >
           Back to Categories
@@ -339,30 +339,30 @@ function EditCategoryPage() {
   }
 
   return (
-    <div className="container mx-auto max-w-3xl py-10">
-      <Card className="w-full">
+    <div className='container mx-auto max-w-3xl py-10'>
+      <Card className='w-full'>
         <CardHeader>
-          <CardTitle className="text-center text-2xl font-semibold">
+          <CardTitle className='text-center text-2xl font-semibold'>
             Edit Category
           </CardTitle>
-          <CardDescription className="text-center">
+          <CardDescription className='text-center'>
             Update category information
           </CardDescription>
         </CardHeader>
         <CardContent>
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-              <div className="grid gap-6 md:grid-cols-2">
-                <div className="space-y-6">
+            <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-8'>
+              <div className='grid gap-6 md:grid-cols-2'>
+                <div className='space-y-6'>
                   {/* Name */}
                   <FormField
                     control={form.control}
-                    name="name"
+                    name='name'
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Name</FormLabel>
                         <FormControl>
-                          <Input placeholder="Category name" {...field} />
+                          <Input placeholder='Category name' {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -372,14 +372,14 @@ function EditCategoryPage() {
                   {/* Slug */}
                   <FormField
                     control={form.control}
-                    name="slug"
+                    name='slug'
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Slug</FormLabel>
-                        <div className="flex space-x-2">
+                        <div className='flex space-x-2'>
                           <FormControl>
                             <Input
-                              placeholder="category-slug"
+                              placeholder='category-slug'
                               {...field}
                               className={
                                 field.value && !slugError
@@ -405,9 +405,9 @@ function EditCategoryPage() {
                             />
                           </FormControl>
                           <Button
-                            type="button"
-                            variant="outline"
-                            size="icon"
+                            type='button'
+                            variant='outline'
+                            size='icon'
                             disabled={
                               isCheckingSlug ||
                               !field.value ||
@@ -416,38 +416,38 @@ function EditCategoryPage() {
                             onClick={handleManualSlugCheck}
                           >
                             {isCheckingSlug ? (
-                              <Loader2 className="h-4 w-4 animate-spin" />
+                              <Loader2 className='h-4 w-4 animate-spin' />
                             ) : (
-                              <RefreshCw className="h-4 w-4" />
+                              <RefreshCw className='h-4 w-4' />
                             )}
                           </Button>
                         </div>
 
                         {isCheckingSlug && (
-                          <div className="text-muted-foreground mt-2 text-xs">
+                          <div className='text-muted-foreground mt-2 text-xs'>
                             Checking availability...
                           </div>
                         )}
 
                         {slugError && (
-                          <Alert variant="destructive" className="mt-2">
-                            <AlertCircle className="h-4 w-4" />
+                          <Alert variant='destructive' className='mt-2'>
+                            <AlertCircle className='h-4 w-4' />
                             <AlertTitle>Error</AlertTitle>
                             <AlertDescription>{slugError}</AlertDescription>
                           </Alert>
                         )}
 
                         {slugSuggestions.length > 0 && (
-                          <div className="mt-2">
-                            <p className="text-muted-foreground mb-2 text-sm">
+                          <div className='mt-2'>
+                            <p className='text-muted-foreground mb-2 text-sm'>
                               Suggested alternatives:
                             </p>
-                            <div className="flex flex-wrap gap-2">
+                            <div className='flex flex-wrap gap-2'>
                               {slugSuggestions.map((suggestion) => (
                                 <Badge
                                   key={suggestion}
-                                  variant="outline"
-                                  className="hover:bg-primary hover:text-primary-foreground cursor-pointer transition-colors"
+                                  variant='outline'
+                                  className='hover:bg-primary hover:text-primary-foreground cursor-pointer transition-colors'
                                   onClick={() =>
                                     applySlugSuggestion(suggestion)
                                   }
@@ -471,7 +471,7 @@ function EditCategoryPage() {
                   {/* Parent Category */}
                   <FormField
                     control={form.control}
-                    name="parentId"
+                    name='parentId'
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Parent Category</FormLabel>
@@ -482,26 +482,26 @@ function EditCategoryPage() {
                         >
                           <FormControl>
                             <SelectTrigger>
-                              <SelectValue placeholder="Select parent category" />
+                              <SelectValue placeholder='Select parent category' />
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
                             {/* Default option for no parent */}
-                            <SelectItem value="none">
+                            <SelectItem value='none'>
                               None (Top-level category)
                             </SelectItem>
 
                             {/* Loading state */}
                             {isLoadingParents && (
-                              <div className="text-muted-foreground p-2 text-sm">
-                                <Loader2 className="mr-2 inline h-4 w-4 animate-spin" />
+                              <div className='text-muted-foreground p-2 text-sm'>
+                                <Loader2 className='mr-2 inline h-4 w-4 animate-spin' />
                                 Loading categories...
                               </div>
                             )}
 
                             {/* Error state */}
                             {parentsError && (
-                              <div className="p-2 text-sm text-red-500">
+                              <div className='p-2 text-sm text-red-500'>
                                 Failed to load categories
                               </div>
                             )}
@@ -511,7 +511,7 @@ function EditCategoryPage() {
                               !parentsError &&
                               (!parentCategories ||
                                 parentCategories.length === 0) && (
-                                <div className="text-muted-foreground p-2 text-sm">
+                                <div className='text-muted-foreground p-2 text-sm'>
                                   No categories found
                                 </div>
                               )}
@@ -536,14 +536,14 @@ function EditCategoryPage() {
                   />
                 </div>
 
-                <div className="space-y-6">
+                <div className='space-y-6'>
                   {/* Image */}
                   <FormField
                     control={form.control}
-                    name="image"
+                    name='image'
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="flex items-center">
+                        <FormLabel className='flex items-center'>
                           Category Image
                         </FormLabel>
                         <FormControl>
@@ -568,14 +568,14 @@ function EditCategoryPage() {
                   {/* Description */}
                   <FormField
                     control={form.control}
-                    name="description"
+                    name='description'
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Description</FormLabel>
                         <FormControl>
                           <Textarea
-                            placeholder="Brief description of the category"
-                            className="h-32 resize-none"
+                            placeholder='Brief description of the category'
+                            className='h-32 resize-none'
                             {...field}
                             value={field.value || ''}
                           />
@@ -588,10 +588,10 @@ function EditCategoryPage() {
                   {/* Featured */}
                   <FormField
                     control={form.control}
-                    name="featured"
+                    name='featured'
                     render={({ field }) => (
-                      <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm">
-                        <div className="space-y-0.5">
+                      <FormItem className='flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm'>
+                        <div className='space-y-0.5'>
                           <FormLabel>Featured Category</FormLabel>
                           <FormDescription>
                             Display prominently on the website
@@ -609,20 +609,20 @@ function EditCategoryPage() {
                 </div>
               </div>
 
-              <div className="flex gap-4">
+              <div className='flex gap-4'>
                 <Button
-                  type="button"
-                  variant="outline"
+                  type='button'
+                  variant='outline'
                   onClick={() => router.push('/admin/categories')}
                 >
                   Cancel
                 </Button>
                 <Button
-                  type="submit"
-                  className="transition-all duration-200 hover:scale-[1.02]"
+                  type='submit'
+                  className='transition-all duration-200 hover:scale-[1.02]'
                   disabled={isCheckingSlug || !!slugError}
                 >
-                  <Save className="mr-2 h-4 w-4" />
+                  <Save className='mr-2 h-4 w-4' />
                   Save Changes
                 </Button>
               </div>

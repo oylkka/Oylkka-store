@@ -22,7 +22,7 @@ import {
 } from '@/components/ui/form';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 
-import { paymentSchema, type PaymentFormData } from './checkout-schema';
+import { type PaymentFormData, paymentSchema } from './checkout-schema';
 
 interface PaymentFormProps {
   onSubmit: (data: PaymentFormData) => void;
@@ -64,43 +64,43 @@ export function PaymentForm({
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <Wallet className="h-5 w-5" />
+        <CardTitle className='flex items-center gap-2'>
+          <Wallet className='h-5 w-5' />
           Payment Method
         </CardTitle>
         <CardDescription>Choose your preferred payment method</CardDescription>
       </CardHeader>
       <CardContent>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+          <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-6'>
             <FormField
               control={form.control}
-              name="method"
+              name='method'
               render={({ field }) => (
-                <FormItem className="space-y-4">
+                <FormItem className='space-y-4'>
                   <FormLabel>Select payment method</FormLabel>
                   <FormControl>
                     <RadioGroup
                       onValueChange={field.onChange}
                       defaultValue={field.value}
-                      className="space-y-3"
+                      className='space-y-3'
                     >
                       {paymentMethods.map((method) => (
                         <div
                           key={method.value}
-                          className="flex items-center space-x-3 rounded-lg border p-4"
+                          className='flex items-center space-x-3 rounded-lg border p-4'
                         >
                           <RadioGroupItem
                             value={method.value}
                             id={method.value}
                           />
-                          <div className="flex-1">
+                          <div className='flex-1'>
                             <label
                               htmlFor={method.value}
-                              className="cursor-pointer"
+                              className='cursor-pointer'
                             >
-                              <div className="font-medium">{method.label}</div>
-                              <div className="text-muted-foreground text-sm">
+                              <div className='font-medium'>{method.label}</div>
+                              <div className='text-muted-foreground text-sm'>
                                 {method.description}
                               </div>
                             </label>
@@ -114,13 +114,13 @@ export function PaymentForm({
               )}
             />
 
-            <div className="flex justify-between">
-              <Button variant="outline" type="button" onClick={onBack}>
+            <div className='flex justify-between'>
+              <Button variant='outline' type='button' onClick={onBack}>
                 Back
               </Button>
-              <Button type="submit" className="flex items-center gap-2">
+              <Button type='submit' className='flex items-center gap-2'>
                 Review Order
-                <ChevronRight className="h-4 w-4" />
+                <ChevronRight className='h-4 w-4' />
               </Button>
             </div>
           </form>

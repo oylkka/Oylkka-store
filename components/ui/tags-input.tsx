@@ -41,7 +41,7 @@ export const TagsInput = React.forwardRef<HTMLDivElement, TagsInputProps>(
       dir,
       ...props
     },
-    ref
+    ref,
   ) => {
     const [activeIndex, setActiveIndex] = React.useState(-1);
     const [inputValue, setInputValue] = React.useState('');
@@ -59,7 +59,7 @@ export const TagsInput = React.forwardRef<HTMLDivElement, TagsInputProps>(
           onValueChange([...value, val]);
         }
       },
-      [value, onValueChange, parseMaxItems]
+      [value, onValueChange, parseMaxItems],
     );
 
     const RemoveValue = React.useCallback(
@@ -68,7 +68,7 @@ export const TagsInput = React.forwardRef<HTMLDivElement, TagsInputProps>(
           onValueChange(value.filter((item) => item !== val));
         }
       },
-      [value, onValueChange, parseMinItems]
+      [value, onValueChange, parseMinItems],
     );
 
     const handlePaste = React.useCallback(
@@ -89,7 +89,7 @@ export const TagsInput = React.forwardRef<HTMLDivElement, TagsInputProps>(
         onValueChange(newValue);
         setInputValue('');
       },
-      [value, onValueChange, parseMaxItems]
+      [value, onValueChange, parseMaxItems],
     );
 
     const handleSelect = React.useCallback(
@@ -97,12 +97,12 @@ export const TagsInput = React.forwardRef<HTMLDivElement, TagsInputProps>(
         const target = e.currentTarget;
         const selection = target.value.substring(
           target.selectionStart ?? 0,
-          target.selectionEnd ?? 0
+          target.selectionEnd ?? 0,
         );
         setSelectedValue(selection);
         setIsValueSelected(selection === inputValue);
       },
-      [inputValue]
+      [inputValue],
     );
 
     React.useEffect(() => {
@@ -199,7 +199,7 @@ export const TagsInput = React.forwardRef<HTMLDivElement, TagsInputProps>(
         isValueSelected,
         RemoveValue,
         onValueChangeHandler,
-      ]
+      ],
     );
 
     const mousePreventDefault = React.useCallback((e: React.MouseEvent) => {
@@ -211,7 +211,7 @@ export const TagsInput = React.forwardRef<HTMLDivElement, TagsInputProps>(
       (e: React.ChangeEvent<HTMLInputElement>) => {
         setInputValue(e.currentTarget.value);
       },
-      []
+      [],
     );
 
     return (
@@ -232,7 +232,7 @@ export const TagsInput = React.forwardRef<HTMLDivElement, TagsInputProps>(
           className={cn(
             'bg-background ring-muted flex flex-wrap items-center gap-1 overflow-hidden rounded-lg p-1 ring-1',
             { 'focus-within:ring-ring': activeIndex === -1 },
-            className
+            className,
           )}
         >
           {value.map((item, index) => (
@@ -242,28 +242,28 @@ export const TagsInput = React.forwardRef<HTMLDivElement, TagsInputProps>(
               aria-disabled={disableButton}
               data-active={activeIndex === index}
               className={cn(
-                "data-[active='true']:ring-muted-foreground relative flex items-center gap-1 truncate rounded px-1 aria-disabled:cursor-not-allowed aria-disabled:opacity-50 data-[active='true']:ring-2"
+                "data-[active='true']:ring-muted-foreground relative flex items-center gap-1 truncate rounded px-1 aria-disabled:cursor-not-allowed aria-disabled:opacity-50 data-[active='true']:ring-2",
               )}
-              variant="secondary"
+              variant='secondary'
             >
-              <span className="text-xs">{item}</span>
+              <span className='text-xs'>{item}</span>
               <button
-                type="button"
+                type='button'
                 aria-label={`Remove ${item} option`}
-                aria-roledescription="button to remove option"
+                aria-roledescription='button to remove option'
                 disabled={disableButton}
                 onMouseDown={mousePreventDefault}
                 onClick={() => RemoveValue(item)}
-                className="disabled:cursor-not-allowed"
+                className='disabled:cursor-not-allowed'
               >
-                <span className="sr-only">Remove {item} option</span>
-                <RemoveIcon className="hover:stroke-destructive h-4 w-4" />
+                <span className='sr-only'>Remove {item} option</span>
+                <RemoveIcon className='hover:stroke-destructive h-4 w-4' />
               </button>
             </Badge>
           ))}
           <Input
             tabIndex={0}
-            aria-label="input tag"
+            aria-label='input tag'
             disabled={disableInput}
             onKeyDown={handleKeyDown}
             onPaste={handlePaste}
@@ -274,13 +274,13 @@ export const TagsInput = React.forwardRef<HTMLDivElement, TagsInputProps>(
             onClick={() => setActiveIndex(-1)}
             className={cn(
               'placeholder:text-muted-foreground h-7 min-w-fit flex-1 border-none px-1 outline-0 focus-visible:border-0 focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:outline-0',
-              activeIndex !== -1 && 'caret-transparent'
+              activeIndex !== -1 && 'caret-transparent',
             )}
           />
         </div>
       </TagInputContext.Provider>
     );
-  }
+  },
 );
 
 TagsInput.displayName = 'TagsInput';

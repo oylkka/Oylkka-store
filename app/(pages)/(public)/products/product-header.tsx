@@ -56,7 +56,7 @@ export default function ProductHeader({
   const router = useRouter();
   const searchParams = useSearchParams();
   const [searchInput, setSearchInput] = useState(
-    searchParams.get('search') || ''
+    searchParams.get('search') || '',
   );
   const [sheetOpen, setSheetOpen] = useState(false);
 
@@ -104,7 +104,7 @@ export default function ProductHeader({
 
       router.push(`?${params.toString()}`);
     },
-    [searchParams, router]
+    [searchParams, router],
   );
 
   // Update URL when debounced search changes
@@ -193,7 +193,7 @@ export default function ProductHeader({
     ['category', 'sortBy', 'minPrice', 'maxPrice', 'sizes', 'colors'].forEach(
       (key) => {
         params.delete(key);
-      }
+      },
     );
     params.delete('page');
     router.push(`?${params.toString()}`);
@@ -201,31 +201,31 @@ export default function ProductHeader({
   };
 
   return (
-    <section className="mb-12 px-4 md:px-0">
-      <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
+    <section className='mb-12 px-4 md:px-0'>
+      <div className='flex flex-col gap-6 md:flex-row md:items-end md:justify-between'>
         {/* Heading */}
         <div>
-          <h1 className="text-foreground text-4xl font-bold tracking-tight">
+          <h1 className='text-foreground text-4xl font-bold tracking-tight'>
             Discover Products
           </h1>
-          <p className="text-muted-foreground mt-2 text-sm">
+          <p className='text-muted-foreground mt-2 text-sm'>
             Handpicked selection just for you - {totalProducts} products
           </p>
         </div>
 
         {/* Search and Filter Row */}
-        <div className="flex w-full flex-col gap-3 sm:flex-row sm:items-center sm:justify-end md:w-auto">
-          <div className="flex w-full gap-2 sm:w-auto">
+        <div className='flex w-full flex-col gap-3 sm:flex-row sm:items-center sm:justify-end md:w-auto'>
+          <div className='flex w-full gap-2 sm:w-auto'>
             {/* Search */}
             <form
-              className="relative w-full md:w-[300px] lg:w-[400px]"
+              className='relative w-full md:w-[300px] lg:w-[400px]'
               onSubmit={handleSearchSubmit}
             >
-              <Search className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
+              <Search className='text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2' />
               <Input
-                type="text"
-                placeholder="Search products..."
-                className="pl-9"
+                type='text'
+                placeholder='Search products...'
+                className='pl-9'
                 value={searchInput}
                 onChange={handleSearchChange}
               />
@@ -234,26 +234,26 @@ export default function ProductHeader({
             {/* Filter Sheet */}
             <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
               <SheetTrigger asChild>
-                <Button className="min-w-fit gap-2">
-                  <SlidersHorizontal className="h-4 w-4" />
-                  <span className="hidden sm:inline">Filter</span>
+                <Button className='min-w-fit gap-2'>
+                  <SlidersHorizontal className='h-4 w-4' />
+                  <span className='hidden sm:inline'>Filter</span>
                 </Button>
               </SheetTrigger>
 
-              <SheetContent className="w-full px-6 py-6 sm:max-w-md">
-                <SheetHeader className="mb-4">
-                  <SheetTitle className="text-xl">Filters</SheetTitle>
+              <SheetContent className='w-full px-6 py-6 sm:max-w-md'>
+                <SheetHeader className='mb-4'>
+                  <SheetTitle className='text-xl'>Filters</SheetTitle>
                   <SheetDescription>
                     Narrow down your product selection
                   </SheetDescription>
                 </SheetHeader>
 
-                <ScrollArea className="h-[calc(100vh-15rem)] pr-2">
-                  <div className="space-y-8">
+                <ScrollArea className='h-[calc(100vh-15rem)] pr-2'>
+                  <div className='space-y-8'>
                     {/* Category */}
                     <div>
-                      <h3 className="mb-3 text-base font-medium">Categories</h3>
-                      <div className="flex flex-wrap gap-2">
+                      <h3 className='mb-3 text-base font-medium'>Categories</h3>
+                      <div className='flex flex-wrap gap-2'>
                         {['All', 'Clothing', 'T-Shirt', 'Accessories'].map(
                           (cat) => (
                             <Button
@@ -261,12 +261,12 @@ export default function ProductHeader({
                               variant={
                                 filters.category === cat ? 'default' : 'outline'
                               }
-                              className="rounded-full text-sm"
+                              className='rounded-full text-sm'
                               onClick={() => handleCategoryChange(cat)}
                             >
                               {cat}
                             </Button>
-                          )
+                          ),
                         )}
                       </div>
                     </div>
@@ -275,23 +275,23 @@ export default function ProductHeader({
 
                     {/* Sort */}
                     <div>
-                      <h3 className="mb-3 text-base font-medium">Sort by</h3>
+                      <h3 className='mb-3 text-base font-medium'>Sort by</h3>
                       <Select
                         value={filters.sortBy}
                         onValueChange={handleSortChange}
                       >
-                        <SelectTrigger className="w-full">
-                          <SelectValue placeholder="Select sorting" />
+                        <SelectTrigger className='w-full'>
+                          <SelectValue placeholder='Select sorting' />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="default">Default</SelectItem>
-                          <SelectItem value="popular">Popular</SelectItem>
-                          <SelectItem value="new">Newest</SelectItem>
-                          <SelectItem value="old">Oldest</SelectItem>
-                          <SelectItem value="priceLow">
+                          <SelectItem value='default'>Default</SelectItem>
+                          <SelectItem value='popular'>Popular</SelectItem>
+                          <SelectItem value='new'>Newest</SelectItem>
+                          <SelectItem value='old'>Oldest</SelectItem>
+                          <SelectItem value='priceLow'>
                             Price: Low to High
                           </SelectItem>
-                          <SelectItem value="priceHigh">
+                          <SelectItem value='priceHigh'>
                             Price: High to Low
                           </SelectItem>
                         </SelectContent>
@@ -302,7 +302,7 @@ export default function ProductHeader({
 
                     {/* Price Range */}
                     <div>
-                      <h3 className="mb-3 text-base font-medium">
+                      <h3 className='mb-3 text-base font-medium'>
                         Price Range
                       </h3>
                       <Slider
@@ -310,20 +310,20 @@ export default function ProductHeader({
                         step={20}
                         value={[filters.minPrice, filters.maxPrice]}
                         onValueChange={handlePriceRangeChange}
-                        className="mb-4"
+                        className='mb-4'
                       />
-                      <div className="flex gap-4">
+                      <div className='flex gap-4'>
                         <Input
-                          placeholder="৳ Min"
-                          className="w-full"
-                          type="number"
+                          placeholder='৳ Min'
+                          className='w-full'
+                          type='number'
                           value={filters.minPrice || ''}
                           onChange={handleMinPriceChange}
                         />
                         <Input
-                          placeholder="৳ Max"
-                          className="w-full"
-                          type="number"
+                          placeholder='৳ Max'
+                          className='w-full'
+                          type='number'
                           value={filters.maxPrice || ''}
                           onChange={handleMaxPriceChange}
                         />
@@ -334,8 +334,8 @@ export default function ProductHeader({
 
                     {/* Sizes */}
                     <div>
-                      <h3 className="mb-3 text-base font-medium">Sizes</h3>
-                      <div className="grid grid-cols-3 gap-3">
+                      <h3 className='mb-3 text-base font-medium'>Sizes</h3>
+                      <div className='grid grid-cols-3 gap-3'>
                         {SIZE_OPTIONS.map((size) => (
                           <Button
                             key={size}
@@ -344,7 +344,7 @@ export default function ProductHeader({
                                 ? 'default'
                                 : 'outline'
                             }
-                            className="w-full"
+                            className='w-full'
                             onClick={() => handleSizeToggle(size)}
                           >
                             {size}
@@ -357,10 +357,11 @@ export default function ProductHeader({
 
                     {/* Colors */}
                     <div>
-                      <h3 className="mb-3 text-base font-medium">Colors</h3>
-                      <div className="flex flex-wrap gap-3">
+                      <h3 className='mb-3 text-base font-medium'>Colors</h3>
+                      <div className='flex flex-wrap gap-3'>
                         {COLOR_OPTIONS.map((colorOption) => (
                           <button
+                            type='button'
                             key={colorOption.value}
                             style={{ backgroundColor: colorOption.color }}
                             className={`h-8 w-8 rounded-full border-2 focus:ring-2 focus:ring-blue-500 focus:outline-none ${
@@ -378,16 +379,16 @@ export default function ProductHeader({
                   </div>
                 </ScrollArea>
 
-                <SheetFooter className="flex flex-col gap-3 sm:flex-row sm:justify-between">
+                <SheetFooter className='flex flex-col gap-3 sm:flex-row sm:justify-between'>
                   <Button
-                    variant="outline"
-                    className="w-full sm:w-auto"
+                    variant='outline'
+                    className='w-full sm:w-auto'
                     onClick={handleResetFilters}
                   >
                     Reset
                   </Button>
                   <Button
-                    className="w-full sm:w-auto"
+                    className='w-full sm:w-auto'
                     onClick={handleApplyFilters}
                   >
                     Apply Filters
@@ -404,19 +405,19 @@ export default function ProductHeader({
 
 export function ProductHeaderSkeleton() {
   return (
-    <section className="px-4 md:px-0">
-      <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
+    <section className='px-4 md:px-0'>
+      <div className='flex flex-col gap-6 md:flex-row md:items-end md:justify-between'>
         {/* Heading Skeleton */}
-        <div className="space-y-2">
-          <Skeleton className="h-10 w-48" />
-          <Skeleton className="h-4 w-64" />
+        <div className='space-y-2'>
+          <Skeleton className='h-10 w-48' />
+          <Skeleton className='h-4 w-64' />
         </div>
 
         {/* Search and Filter Skeleton */}
-        <div className="flex w-full flex-col gap-3 sm:flex-row sm:items-center sm:justify-end md:w-auto">
-          <div className="flex w-full gap-2 sm:w-auto">
-            <Skeleton className="h-10 w-full md:w-[300px] lg:w-[400px]" />
-            <Skeleton className="h-10 w-24" />
+        <div className='flex w-full flex-col gap-3 sm:flex-row sm:items-center sm:justify-end md:w-auto'>
+          <div className='flex w-full gap-2 sm:w-auto'>
+            <Skeleton className='h-10 w-full md:w-[300px] lg:w-[400px]' />
+            <Skeleton className='h-10 w-24' />
           </div>
         </div>
       </div>

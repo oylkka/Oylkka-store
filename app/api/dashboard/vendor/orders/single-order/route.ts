@@ -1,8 +1,8 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 
 import { auth } from '@/features/auth/auth';
 import { db } from '@/lib/db';
-import { OrderStatus, PaymentStatus } from '@/lib/types';
+import type { OrderStatus, PaymentStatus } from '@/lib/types';
 
 const allowedOrderStatuses = [
   'PENDING',
@@ -43,11 +43,11 @@ export async function GET(req: NextRequest) {
     });
 
     return NextResponse.json({ order }, { status: 200 });
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    // biome-ignore lint: error
   } catch (error) {
     return NextResponse.json(
       { error: 'Internal server error' },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -70,14 +70,14 @@ export async function PATCH(req: NextRequest) {
     if (orderStatus && !allowedOrderStatuses.includes(orderStatus)) {
       return NextResponse.json(
         { error: 'Invalid order status' },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
     if (paymentStatus && !allowedPaymentStatuses.includes(paymentStatus)) {
       return NextResponse.json(
         { error: 'Invalid payment status' },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -100,7 +100,7 @@ export async function PATCH(req: NextRequest) {
     if (vendorOrderItems.length === 0) {
       return NextResponse.json(
         { error: 'No order items found for this vendor' },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -148,13 +148,13 @@ export async function PATCH(req: NextRequest) {
 
     return NextResponse.json(
       { message: 'Order updated successfully' },
-      { status: 200 }
+      { status: 200 },
     );
+    // biome-ignore lint: error
   } catch (error) {
-    console.error('PATCH /api/order error:', error);
     return NextResponse.json(
       { error: 'Internal server error' },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

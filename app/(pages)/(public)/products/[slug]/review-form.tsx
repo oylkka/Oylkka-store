@@ -105,7 +105,7 @@ export const ReviewForm: React.FC<ReviewFormProps> = ({
     form.setValue(
       'images',
       currentImages.filter((_, index) => index !== indexToRemove),
-      { shouldValidate: true }
+      { shouldValidate: true },
     );
   };
 
@@ -125,7 +125,7 @@ export const ReviewForm: React.FC<ReviewFormProps> = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-[550px]">
+      <DialogContent className='max-h-[90vh] overflow-y-auto sm:max-w-[550px]'>
         <DialogHeader>
           <DialogTitle>Share Your Experience</DialogTitle>
           <DialogDescription>
@@ -136,27 +136,27 @@ export const ReviewForm: React.FC<ReviewFormProps> = ({
         <Form {...form}>
           <form
             onSubmit={form.handleSubmit(handleSubmit)}
-            className="space-y-5 pt-2"
+            className='space-y-5 pt-2'
           >
             <FormField
               control={form.control}
-              name="rating"
+              name='rating'
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Your Rating *</FormLabel>
                   <FormControl>
-                    <div className="flex items-center gap-1">
+                    <div className='flex items-center gap-1'>
                       {[1, 2, 3, 4, 5].map((r) => (
                         <Button
                           key={r}
-                          type="button"
+                          type='button'
                           variant={field.value >= r ? 'default' : 'outline'}
-                          size="icon"
+                          size='icon'
                           className={cn(
                             'h-9 w-9 transition-colors',
                             field.value >= r
                               ? 'text-yellow-foreground bg-yellow-400 hover:bg-yellow-500'
-                              : 'text-muted-foreground'
+                              : 'text-muted-foreground',
                           )}
                           onClick={() => field.onChange(r)}
                           aria-label={`Rate ${r} out of 5 stars`}
@@ -164,7 +164,7 @@ export const ReviewForm: React.FC<ReviewFormProps> = ({
                           <Star
                             className={cn(
                               'h-5 w-5',
-                              field.value >= r && 'fill-current'
+                              field.value >= r && 'fill-current',
                             )}
                           />
                         </Button>
@@ -178,12 +178,12 @@ export const ReviewForm: React.FC<ReviewFormProps> = ({
 
             <FormField
               control={form.control}
-              name="title"
+              name='title'
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Review Title (Optional)</FormLabel>
                   <FormControl>
-                    <Input placeholder="e.g., Excellent quality!" {...field} />
+                    <Input placeholder='e.g., Excellent quality!' {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -192,13 +192,13 @@ export const ReviewForm: React.FC<ReviewFormProps> = ({
 
             <FormField
               control={form.control}
-              name="content"
+              name='content'
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Your Review *</FormLabel>
                   <FormControl>
                     <Textarea
-                      placeholder="What did you like or dislike? How did you use the product?"
+                      placeholder='What did you like or dislike? How did you use the product?'
                       rows={5}
                       {...field}
                     />
@@ -210,13 +210,14 @@ export const ReviewForm: React.FC<ReviewFormProps> = ({
 
             <FormField
               control={form.control}
-              name="images"
+              name='images'
               render={() => (
                 <FormItem>
                   <FormLabel>Add Photos (Optional)</FormLabel>
-                  <div className="flex flex-wrap items-center gap-2">
+                  <div className='flex flex-wrap items-center gap-2'>
                     {(watchedImages || []).map((file, index) => (
                       <ImagePreview
+                        // biome-ignore lint: error
                         key={index}
                         file={file}
                         onRemove={() => removeImage(index)}
@@ -225,29 +226,29 @@ export const ReviewForm: React.FC<ReviewFormProps> = ({
                     {(watchedImages || []).length < 3 && (
                       <>
                         <input
-                          type="file"
+                          type='file'
                           ref={fileInputRef}
-                          className="hidden"
-                          accept="image/png, image/jpeg, image/webp"
+                          className='hidden'
+                          accept='image/png, image/jpeg, image/webp'
                           multiple
                           onChange={handleImageUpload}
                         />
                         <Button
-                          type="button"
-                          variant="outline"
+                          type='button'
+                          variant='outline'
                           onClick={() => fileInputRef.current?.click()}
-                          className="flex h-20 w-20 flex-col items-center justify-center rounded-lg border-dashed"
-                          aria-label="Upload images"
+                          className='flex h-20 w-20 flex-col items-center justify-center rounded-lg border-dashed'
+                          aria-label='Upload images'
                         >
-                          <ImagePlus className="text-muted-foreground mb-1 h-5 w-5" />
-                          <span className="text-muted-foreground text-xs">
+                          <ImagePlus className='text-muted-foreground mb-1 h-5 w-5' />
+                          <span className='text-muted-foreground text-xs'>
                             Add
                           </span>
                         </Button>
                       </>
                     )}
                   </div>
-                  <FormDescription className="text-xs">
+                  <FormDescription className='text-xs'>
                     You can upload up to 3 images (PNG, JPG, WEBP).
                   </FormDescription>
                   <FormMessage />
@@ -255,18 +256,18 @@ export const ReviewForm: React.FC<ReviewFormProps> = ({
               )}
             />
 
-            <DialogFooter className="pt-2">
+            <DialogFooter className='pt-2'>
               <Button
-                type="button"
-                variant="outline"
+                type='button'
+                variant='outline'
                 onClick={handleClose}
                 disabled={isSubmitting}
               >
                 Cancel
               </Button>
-              <Button type="submit" disabled={isSubmitting}>
+              <Button type='submit' disabled={isSubmitting}>
                 {isSubmitting && (
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  <Loader2 className='mr-2 h-4 w-4 animate-spin' />
                 )}
                 Submit Review
               </Button>

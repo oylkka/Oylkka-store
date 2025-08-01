@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 
 import { db } from '@/lib/db';
 
@@ -20,8 +20,8 @@ export async function POST(request: NextRequest) {
       available: !existingSku,
       message: existingSku ? 'SKU already exists' : 'SKU is available',
     });
+    // biome-ignore lint: error
   } catch (error) {
-    console.error('Error checking SKU:', error);
     return NextResponse.json({ error: 'Failed to check SKU' }, { status: 500 });
   }
 }

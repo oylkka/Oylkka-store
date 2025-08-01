@@ -6,7 +6,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { Suspense, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
-import * as z from 'zod';
+import type * as z from 'zod';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -85,47 +85,47 @@ const EditAddressPage = () => {
               resolve();
               router.push('/dashboard/profile/addresses');
             },
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            // biome-ignore lint: error
             onError: (err: any) => {
               reject(
-                err?.response?.data?.message || 'Failed to update address'
+                err?.response?.data?.message || 'Failed to update address',
               );
             },
-          }
+          },
         );
       }),
       {
         loading: 'Updating address...',
         success: 'Address updated successfully!',
         error: (err) => err.toString(),
-      }
+      },
     );
   }
 
   if (isPending) {
-    return <div className="p-4">Loading...</div>;
+    return <div className='p-4'>Loading...</div>;
   }
   if (isError) {
-    return <div className="p-4 text-red-500">Failed to fetch address</div>;
+    return <div className='p-4 text-red-500'>Failed to fetch address</div>;
   }
 
   return (
-    <div className="min-h-screen py-8">
-      <div className="container mx-auto max-w-2xl px-4">
-        <div className="mb-8">
-          <div className="mb-2 flex items-center gap-2">
-            <MapPin className="text-primary h-6 w-6" />
-            <h1 className="text-3xl font-bold">Edit Address</h1>
+    <div className='min-h-screen py-8'>
+      <div className='container mx-auto max-w-2xl px-4'>
+        <div className='mb-8'>
+          <div className='mb-2 flex items-center gap-2'>
+            <MapPin className='text-primary h-6 w-6' />
+            <h1 className='text-3xl font-bold'>Edit Address</h1>
           </div>
-          <p className="text-muted-foreground">
+          <p className='text-muted-foreground'>
             Update your delivery address details
           </p>
         </div>
 
         <Card>
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Pencil className="h-5 w-5" />
+            <CardTitle className='flex items-center gap-2'>
+              <Pencil className='h-5 w-5' />
               Edit Address
             </CardTitle>
             <CardDescription>
@@ -136,17 +136,17 @@ const EditAddressPage = () => {
             <Form {...form}>
               <form
                 onSubmit={form.handleSubmit(onSubmit)}
-                className="space-y-6"
+                className='space-y-6'
               >
-                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                <div className='grid grid-cols-1 gap-4 md:grid-cols-2'>
                   <FormField
                     control={form.control}
-                    name="name"
+                    name='name'
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Full Name</FormLabel>
                         <FormControl>
-                          <Input placeholder="John Doe" {...field} />
+                          <Input placeholder='John Doe' {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -154,12 +154,12 @@ const EditAddressPage = () => {
                   />
                   <FormField
                     control={form.control}
-                    name="phone"
+                    name='phone'
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Phone Number</FormLabel>
                         <FormControl>
-                          <Input placeholder="+88 01234567890" {...field} />
+                          <Input placeholder='+88 01234567890' {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -169,14 +169,14 @@ const EditAddressPage = () => {
 
                 <FormField
                   control={form.control}
-                  name="email"
+                  name='email'
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Email Address</FormLabel>
                       <FormControl>
                         <Input
-                          placeholder="john@example.com"
-                          type="email"
+                          placeholder='john@example.com'
+                          type='email'
                           {...field}
                         />
                       </FormControl>
@@ -187,14 +187,14 @@ const EditAddressPage = () => {
 
                 <FormField
                   control={form.control}
-                  name="address"
+                  name='address'
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Street Address</FormLabel>
                       <FormControl>
                         <Textarea
-                          placeholder="123 Main Street, Apartment 4B"
-                          className="min-h-[80px]"
+                          placeholder='123 Main Street, Apartment 4B'
+                          className='min-h-[80px]'
                           {...field}
                         />
                       </FormControl>
@@ -203,15 +203,15 @@ const EditAddressPage = () => {
                   )}
                 />
 
-                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                <div className='grid grid-cols-1 gap-4 md:grid-cols-2'>
                   <FormField
                     control={form.control}
-                    name="city"
+                    name='city'
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>City</FormLabel>
                         <FormControl>
-                          <Input placeholder="Dhaka" {...field} />
+                          <Input placeholder='Dhaka' {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -219,12 +219,12 @@ const EditAddressPage = () => {
                   />
                   <FormField
                     control={form.control}
-                    name="district"
+                    name='district'
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>District</FormLabel>
                         <FormControl>
-                          <Input placeholder="Dhaka" {...field} />
+                          <Input placeholder='Dhaka' {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -234,12 +234,12 @@ const EditAddressPage = () => {
 
                 <FormField
                   control={form.control}
-                  name="postalCode"
+                  name='postalCode'
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Postal Code</FormLabel>
                       <FormControl>
-                        <Input placeholder="10001" {...field} />
+                        <Input placeholder='10001' {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -248,18 +248,18 @@ const EditAddressPage = () => {
 
                 <FormField
                   control={form.control}
-                  name="isDefault"
+                  name='isDefault'
                   render={({ field }) => (
-                    <FormItem className="flex flex-row items-start space-y-0 space-x-3 rounded-md border p-4">
+                    <FormItem className='flex flex-row items-start space-y-0 space-x-3 rounded-md border p-4'>
                       <FormControl>
                         <Checkbox
                           checked={field.value}
                           onCheckedChange={field.onChange}
                         />
                       </FormControl>
-                      <div className="space-y-1 leading-none">
+                      <div className='space-y-1 leading-none'>
                         <FormLabel>Set as default address</FormLabel>
-                        <p className="text-muted-foreground text-sm">
+                        <p className='text-muted-foreground text-sm'>
                           Use this address as your default delivery address.
                         </p>
                       </div>
@@ -267,18 +267,18 @@ const EditAddressPage = () => {
                   )}
                 />
 
-                <div className="flex gap-4 pt-4">
+                <div className='flex gap-4 pt-4'>
                   <Button
-                    type="submit"
-                    className="flex-1"
+                    type='submit'
+                    className='flex-1'
                     disabled={isUpdating}
                   >
                     {isUpdating ? 'Updating...' : 'Update Address'}
                   </Button>
                   <Button
-                    type="button"
-                    variant="outline"
-                    className="flex-1 bg-transparent"
+                    type='button'
+                    variant='outline'
+                    className='flex-1 bg-transparent'
                     onClick={() => router.back()}
                   >
                     Cancel

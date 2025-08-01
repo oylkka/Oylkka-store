@@ -1,4 +1,4 @@
-import { clsx, type ClassValue } from 'clsx';
+import { type ClassValue, clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 
 export function cn(...inputs: ClassValue[]) {
@@ -39,9 +39,9 @@ export function getInitials(name?: string | null): string {
  * returned value is of type `Partial<T>`, which means it contains a subset of the properties of the
  * original data object `T`.
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+// biome-ignore lint: error
 export function cleanFormData<T extends Record<string, any>>(
-  data: T
+  data: T,
 ): Partial<T> {
   const cleanedData: Partial<T> = {};
 
@@ -67,7 +67,7 @@ export function cleanFormData<T extends Record<string, any>>(
       else {
         const nested = cleanFormData(value);
         if (Object.keys(nested).length > 0) {
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          // biome-ignore lint: error
           cleanedData[key] = nested as any;
         }
       }
@@ -79,7 +79,7 @@ export function cleanFormData<T extends Record<string, any>>(
   return cleanedData;
 }
 export function formatDisplayName(
-  user?: { name?: string | null; username?: string | null } | null
+  user?: { name?: string | null; username?: string | null } | null,
 ): string {
   return user?.name || user?.username || 'Unknown User';
 }

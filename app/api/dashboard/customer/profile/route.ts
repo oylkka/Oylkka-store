@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 
 import { auth } from '@/features/auth/auth';
 import { DeleteImage, UploadImage } from '@/features/cloudinary';
@@ -19,7 +19,7 @@ export async function GET() {
     return NextResponse.json(user, {
       status: 200,
     });
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    // biome-ignore lint: error
   } catch (error) {
     return NextResponse.json('Internal Server Error', { status: 500 });
   }
@@ -56,7 +56,7 @@ export async function PUT(req: NextRequest) {
     if (!name || !email || !username) {
       return NextResponse.json(
         { message: 'Missing required fields' },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -79,7 +79,7 @@ export async function PUT(req: NextRequest) {
     if (usernameExists) {
       return NextResponse.json(
         { message: 'Username is already taken' },
-        { status: 409 }
+        { status: 409 },
       );
     }
 
@@ -93,7 +93,7 @@ export async function PUT(req: NextRequest) {
 
       uploadedImage = await UploadImage(
         profileImage as File,
-        'user-profile-images'
+        'user-profile-images',
       );
     }
 
@@ -113,10 +113,10 @@ export async function PUT(req: NextRequest) {
 
     return NextResponse.json(
       { message: 'Profile updated successfully', user: updatedUser },
-      { status: 200 }
+      { status: 200 },
     );
+    // biome-ignore lint: error
   } catch (error) {
-    console.error(error);
     return NextResponse.json('Internal Server Error', { status: 500 });
   }
 }

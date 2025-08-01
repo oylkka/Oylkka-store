@@ -1,12 +1,15 @@
 // api/chat/conversations/[conversationId]/messages/route.ts
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 
 import { auth } from '@/features/auth/auth';
 import { db } from '@/lib/db';
 
 export async function GET(
+  // biome-ignore lint: error
   req: NextRequest,
-  context: { params: Promise<{ conversationId: string }> }
+  context: {
+    params: Promise<{ conversationId: string }>;
+  },
 ) {
   const session = await auth();
 
@@ -30,7 +33,7 @@ export async function GET(
   ) {
     return NextResponse.json(
       { message: 'Forbidden: You are not part of this conversation.' },
-      { status: 403 }
+      { status: 403 },
     );
   }
 
@@ -46,14 +49,11 @@ export async function GET(
     });
 
     return NextResponse.json(messages);
+    // biome-ignore lint: error
   } catch (error) {
-    console.error(
-      `Error fetching messages for conversation ${conversationId}:`,
-      error
-    );
     return NextResponse.json(
       { message: 'Failed to fetch messages.' },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

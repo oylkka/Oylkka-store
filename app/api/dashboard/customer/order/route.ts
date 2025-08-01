@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 
 import { getAuthenticatedUser } from '@/features/auth/get-user';
 import { db } from '@/lib/db';
@@ -30,11 +30,11 @@ export async function GET(req: NextRequest) {
     });
 
     return NextResponse.json(orders, { status: 200 });
+    // biome-ignore lint: error
   } catch (error) {
-    console.error('Error fetching orders:', error);
     return NextResponse.json(
       { error: 'Internal Server Error' },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

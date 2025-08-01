@@ -77,7 +77,7 @@ export function OrdersContent() {
       }
       router.push(`?${newParams.toString()}`);
     },
-    [router, searchParams]
+    [router, searchParams],
   );
 
   // Handle search input
@@ -115,19 +115,19 @@ export function OrdersContent() {
 
   if (isError) {
     return (
-      <div className="flex min-h-[400px] items-center justify-center">
-        <Card className="max-w-md">
+      <div className='flex min-h-[400px] items-center justify-center'>
+        <Card className='max-w-md'>
           <CardHeader>
-            <CardTitle className="text-lg">Error Loading Orders</CardTitle>
+            <CardTitle className='text-lg'>Error Loading Orders</CardTitle>
             <CardDescription>
               Unable to fetch orders. Please try again.
             </CardDescription>
           </CardHeader>
           <CardContent>
             <Button
-              variant="outline"
+              variant='outline'
               onClick={() => refetch()}
-              className="w-full"
+              className='w-full'
             >
               Retry
             </Button>
@@ -138,23 +138,23 @@ export function OrdersContent() {
   }
 
   return (
-    <div className="container mx-auto px-4 py-6">
-      <Card className="shadow-lg">
-        <CardHeader className="space-y-4">
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+    <div className='container mx-auto px-4 py-6'>
+      <Card className='shadow-lg'>
+        <CardHeader className='space-y-4'>
+          <div className='flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between'>
             <div>
-              <CardTitle className="text-2xl font-bold">
+              <CardTitle className='text-2xl font-bold'>
                 Vendor Orders
               </CardTitle>
-              <CardDescription className="mt-1">
+              <CardDescription className='mt-1'>
                 Manage and track customer orders for your shop
               </CardDescription>
             </div>
             <Button
-              variant="default"
-              size="sm"
+              variant='default'
+              size='sm'
               onClick={() => toast('Export functionality coming soon!')}
-              aria-label="Export orders"
+              aria-label='Export orders'
             >
               Export Orders
             </Button>
@@ -168,7 +168,7 @@ export function OrdersContent() {
             onClearFilters={handleClearFilters}
           />
         </CardHeader>
-        <CardContent className="p-0">
+        <CardContent className='p-0'>
           <OrdersTable
             orders={orders}
             isPending={isPending}
@@ -178,7 +178,7 @@ export function OrdersContent() {
           />
         </CardContent>
         {!isPending && data?.pagination.totalPages > 1 && (
-          <div className="border-t border-gray-100 p-4">
+          <div className='border-t border-gray-100 p-4'>
             <OrdersPagination
               totalPages={data.pagination.totalPages}
               currentPage={data.pagination.currentPage}

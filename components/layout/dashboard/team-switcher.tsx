@@ -20,20 +20,20 @@ export function TeamSwitcher() {
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <SidebarMenuButton
-              size="lg"
-              className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
+              size='lg'
+              className='data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground'
             >
-              <div className="bg-sidebar-primary text-sidebar-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg">
-                <ShoppingBag className="size-4" />
+              <div className='bg-sidebar-primary text-sidebar-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg'>
+                <ShoppingBag className='size-4' />
               </div>
-              <div className="grid flex-1 text-left text-sm leading-tight">
-                <Link href="/" className="flex items-center gap-2">
-                  <h1 className="text-2xl font-extrabold tracking-tight md:text-3xl">
-                    <span className="text-primary">Oyl</span>kka
+              <div className='grid flex-1 text-left text-sm leading-tight'>
+                <Link href='/' className='flex items-center gap-2'>
+                  <h1 className='text-2xl font-extrabold tracking-tight md:text-3xl'>
+                    <span className='text-primary'>Oyl</span>kka
                   </h1>
                 </Link>
               </div>
-              <ChevronsUpDown className="ml-auto" />
+              <ChevronsUpDown className='ml-auto' />
             </SidebarMenuButton>
           </DropdownMenuTrigger>
         </DropdownMenu>

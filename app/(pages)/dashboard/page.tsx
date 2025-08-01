@@ -14,7 +14,6 @@ import {
   Users,
 } from 'lucide-react';
 import Link from 'next/link';
-
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -41,103 +40,103 @@ interface UserType {
 // Manager Dashboard Component
 function ManagerDashboard({ user }: UserType) {
   return (
-    <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <h2 className="text-3xl font-bold tracking-tight">
+    <div className='space-y-4'>
+      <div className='flex items-center justify-between'>
+        <h2 className='text-3xl font-bold tracking-tight'>
           Management Dashboard
         </h2>
         <p>{user.role}</p>
-        <Button variant="outline">
-          <ArrowUpRight className="mr-2 h-4 w-4" />
+        <Button variant='outline'>
+          <ArrowUpRight className='mr-2 h-4 w-4' />
           View Reports
         </Button>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+      <div className='grid gap-4 md:grid-cols-2 lg:grid-cols-4'>
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Sales Today</CardTitle>
-            <CircleDollarSign className="text-muted-foreground h-4 w-4" />
+          <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
+            <CardTitle className='text-sm font-medium'>Sales Today</CardTitle>
+            <CircleDollarSign className='text-muted-foreground h-4 w-4' />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">$12,548.20</div>
-            <p className="text-muted-foreground text-xs">
+            <div className='text-2xl font-bold'>$12,548.20</div>
+            <p className='text-muted-foreground text-xs'>
               +8.5% from yesterday
             </p>
           </CardContent>
         </Card>
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
+          <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
+            <CardTitle className='text-sm font-medium'>
               Team Performance
             </CardTitle>
-            <Users className="text-muted-foreground h-4 w-4" />
+            <Users className='text-muted-foreground h-4 w-4' />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">92%</div>
-            <p className="text-muted-foreground text-xs">+3% from last week</p>
+            <div className='text-2xl font-bold'>92%</div>
+            <p className='text-muted-foreground text-xs'>+3% from last week</p>
           </CardContent>
         </Card>
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
+          <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
+            <CardTitle className='text-sm font-medium'>
               Pending Approvals
             </CardTitle>
-            <ClipboardList className="text-muted-foreground h-4 w-4" />
+            <ClipboardList className='text-muted-foreground h-4 w-4' />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">24</div>
-            <p className="text-muted-foreground text-xs">
+            <div className='text-2xl font-bold'>24</div>
+            <p className='text-muted-foreground text-xs'>
               12 vendors, 8 products, 4 returns
             </p>
           </CardContent>
         </Card>
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Staff Online</CardTitle>
-            <Users className="text-muted-foreground h-4 w-4" />
+          <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
+            <CardTitle className='text-sm font-medium'>Staff Online</CardTitle>
+            <Users className='text-muted-foreground h-4 w-4' />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">18/22</div>
-            <p className="text-muted-foreground text-xs">
+            <div className='text-2xl font-bold'>18/22</div>
+            <p className='text-muted-foreground text-xs'>
               Customer service (8), Vendors (10)
             </p>
           </CardContent>
         </Card>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2">
+      <div className='grid gap-4 md:grid-cols-2'>
         <Card>
           <CardHeader>
             <CardTitle>Department Goals</CardTitle>
             <CardDescription>Monthly targets and achievements</CardDescription>
           </CardHeader>
-          <CardContent className="space-y-5">
-            <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <div className="font-medium">Sales Department</div>
-                <div className="text-muted-foreground text-sm">86%</div>
+          <CardContent className='space-y-5'>
+            <div className='space-y-2'>
+              <div className='flex items-center justify-between'>
+                <div className='font-medium'>Sales Department</div>
+                <div className='text-muted-foreground text-sm'>86%</div>
               </div>
               <Progress value={86} />
             </div>
-            <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <div className="font-medium">Customer Service</div>
-                <div className="text-muted-foreground text-sm">93%</div>
+            <div className='space-y-2'>
+              <div className='flex items-center justify-between'>
+                <div className='font-medium'>Customer Service</div>
+                <div className='text-muted-foreground text-sm'>93%</div>
               </div>
               <Progress value={93} />
             </div>
-            <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <div className="font-medium">Inventory Management</div>
-                <div className="text-muted-foreground text-sm">78%</div>
+            <div className='space-y-2'>
+              <div className='flex items-center justify-between'>
+                <div className='font-medium'>Inventory Management</div>
+                <div className='text-muted-foreground text-sm'>78%</div>
               </div>
               <Progress value={78} />
             </div>
-            <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <div className="font-medium">Marketing</div>
-                <div className="text-muted-foreground text-sm">65%</div>
+            <div className='space-y-2'>
+              <div className='flex items-center justify-between'>
+                <div className='font-medium'>Marketing</div>
+                <div className='text-muted-foreground text-sm'>65%</div>
               </div>
               <Progress value={65} />
             </div>
@@ -149,7 +148,7 @@ function ManagerDashboard({ user }: UserType) {
             <CardDescription>Today&#39;s priority tasks</CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="space-y-5">
+            <div className='space-y-5'>
               {[
                 {
                   task: 'Weekly staff meeting',
@@ -177,11 +176,12 @@ function ManagerDashboard({ user }: UserType) {
                   priority: 'High',
                 },
               ].map((item, i) => (
-                <div key={i} className="flex items-center">
-                  <div className="bg-primary mr-3 h-14 w-1 rounded-full" />
-                  <div className="flex-1">
-                    <p className="text-sm font-medium">{item.task}</p>
-                    <p className="text-muted-foreground text-xs">{item.time}</p>
+                // biome-ignore lint: error
+                <div key={i} className='flex items-center'>
+                  <div className='bg-primary mr-3 h-14 w-1 rounded-full' />
+                  <div className='flex-1'>
+                    <p className='text-sm font-medium'>{item.task}</p>
+                    <p className='text-muted-foreground text-xs'>{item.time}</p>
                   </div>
                   <Badge
                     variant={
@@ -203,62 +203,62 @@ function ManagerDashboard({ user }: UserType) {
 // Vendor Dashboard Component
 function VendorDashboard() {
   return (
-    <div className="space-y-4">
-      <h2 className="text-2xl font-bold tracking-tight">Vendor Portal</h2>
+    <div className='space-y-4'>
+      <h2 className='text-2xl font-bold tracking-tight'>Vendor Portal</h2>
 
-      <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+      <div className='grid grid-cols-2 gap-4 lg:grid-cols-4'>
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
+          <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
+            <CardTitle className='text-sm font-medium'>
               Today&#39;s Revenue
             </CardTitle>
-            <CircleDollarSign className="text-muted-foreground h-4 w-4" />
+            <CircleDollarSign className='text-muted-foreground h-4 w-4' />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">$2,851.50</div>
-            <p className="text-muted-foreground text-xs">
+            <div className='text-2xl font-bold'>$2,851.50</div>
+            <p className='text-muted-foreground text-xs'>
               +11.2% from yesterday
             </p>
           </CardContent>
         </Card>
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Products</CardTitle>
-            <Package className="text-muted-foreground h-4 w-4" />
+          <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
+            <CardTitle className='text-sm font-medium'>Products</CardTitle>
+            <Package className='text-muted-foreground h-4 w-4' />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">128</div>
-            <p className="text-muted-foreground text-xs">8 pending approval</p>
+            <div className='text-2xl font-bold'>128</div>
+            <p className='text-muted-foreground text-xs'>8 pending approval</p>
           </CardContent>
         </Card>
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Open Orders</CardTitle>
-            <ShoppingBag className="text-muted-foreground h-4 w-4" />
+          <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
+            <CardTitle className='text-sm font-medium'>Open Orders</CardTitle>
+            <ShoppingBag className='text-muted-foreground h-4 w-4' />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">34</div>
-            <p className="text-muted-foreground text-xs">
+            <div className='text-2xl font-bold'>34</div>
+            <p className='text-muted-foreground text-xs'>
               12 need to ship today
             </p>
           </CardContent>
         </Card>
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Stock Alerts</CardTitle>
-            <Package className="text-muted-foreground h-4 w-4" />
+          <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
+            <CardTitle className='text-sm font-medium'>Stock Alerts</CardTitle>
+            <Package className='text-muted-foreground h-4 w-4' />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">7</div>
-            <p className="text-muted-foreground text-xs">
+            <div className='text-2xl font-bold'>7</div>
+            <p className='text-muted-foreground text-xs'>
               Products running low on inventory
             </p>
           </CardContent>
         </Card>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-7">
-        <Card className="col-span-4">
+      <div className='grid gap-4 md:grid-cols-7'>
+        <Card className='col-span-4'>
           <CardHeader>
             <CardTitle>Sales Performance</CardTitle>
             <CardDescription>
@@ -266,15 +266,15 @@ function VendorDashboard() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="flex h-[300px] items-center justify-center rounded-md">
-              <BarChart3 className="text-muted-foreground h-16 w-16" />
-              <span className="text-muted-foreground ml-2">
+            <div className='flex h-[300px] items-center justify-center rounded-md'>
+              <BarChart3 className='text-muted-foreground h-16 w-16' />
+              <span className='text-muted-foreground ml-2'>
                 Sales performance chart
               </span>
             </div>
           </CardContent>
         </Card>
-        <Card className="col-span-3">
+        <Card className='col-span-3'>
           <CardHeader>
             <CardTitle>Orders to Fulfill</CardTitle>
             <CardDescription>
@@ -282,7 +282,7 @@ function VendorDashboard() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="space-y-4">
+            <div className='space-y-4'>
               {[
                 {
                   order: '#38562',
@@ -309,19 +309,20 @@ function VendorDashboard() {
                   time: '1 day ago',
                 },
               ].map((item, i) => (
-                <div key={i} className="flex items-center">
-                  <div className="bg-primary/10 mr-3 flex h-10 w-10 items-center justify-center rounded">
-                    <ShoppingBag className="text-primary h-5 w-5" />
+                // biome-ignore lint: error
+                <div key={i} className='flex items-center'>
+                  <div className='bg-primary/10 mr-3 flex h-10 w-10 items-center justify-center rounded'>
+                    <ShoppingBag className='text-primary h-5 w-5' />
                   </div>
-                  <div className="flex-1">
-                    <p className="text-sm font-medium">
+                  <div className='flex-1'>
+                    <p className='text-sm font-medium'>
                       Order {item.order}: {item.product}
                     </p>
-                    <p className="text-muted-foreground text-xs">
+                    <p className='text-muted-foreground text-xs'>
                       {item.status} • {item.time}
                     </p>
                   </div>
-                  <Button variant="ghost" size="sm">
+                  <Button variant='ghost' size='sm'>
                     Process
                   </Button>
                 </div>
@@ -329,7 +330,7 @@ function VendorDashboard() {
             </div>
           </CardContent>
           <CardFooter>
-            <Button variant="outline" className="w-full">
+            <Button variant='outline' className='w-full'>
               View All Orders
             </Button>
           </CardFooter>
@@ -342,74 +343,74 @@ function VendorDashboard() {
 // Customer Service Dashboard Component
 function CustomerServiceDashboard({ user }: UserType) {
   return (
-    <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <h2 className="text-3xl font-bold tracking-tight">
+    <div className='space-y-4'>
+      <div className='flex items-center justify-between'>
+        <h2 className='text-3xl font-bold tracking-tight'>
           Customer Service Dashboard
         </h2>
         <p>{user.name}</p>
-        <Button variant="outline">
-          <Ticket className="mr-2 h-4 w-4" />
+        <Button variant='outline'>
+          <Ticket className='mr-2 h-4 w-4' />
           Create New Ticket
         </Button>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+      <div className='grid gap-4 md:grid-cols-2 lg:grid-cols-4'>
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Open Tickets</CardTitle>
-            <Ticket className="text-muted-foreground h-4 w-4" />
+          <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
+            <CardTitle className='text-sm font-medium'>Open Tickets</CardTitle>
+            <Ticket className='text-muted-foreground h-4 w-4' />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">37</div>
-            <p className="text-muted-foreground text-xs">12 high priority</p>
+            <div className='text-2xl font-bold'>37</div>
+            <p className='text-muted-foreground text-xs'>12 high priority</p>
           </CardContent>
         </Card>
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
+          <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
+            <CardTitle className='text-sm font-medium'>
               Today&#39;s Resolved
             </CardTitle>
-            <ClipboardList className="text-muted-foreground h-4 w-4" />
+            <ClipboardList className='text-muted-foreground h-4 w-4' />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">24</div>
-            <p className="text-muted-foreground text-xs">
+            <div className='text-2xl font-bold'>24</div>
+            <p className='text-muted-foreground text-xs'>
               +8 compared to yesterday
             </p>
           </CardContent>
         </Card>
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
+          <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
+            <CardTitle className='text-sm font-medium'>
               Avg. Response Time
             </CardTitle>
-            <MessageSquare className="text-muted-foreground h-4 w-4" />
+            <MessageSquare className='text-muted-foreground h-4 w-4' />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">42 min</div>
-            <p className="text-muted-foreground text-xs">
+            <div className='text-2xl font-bold'>42 min</div>
+            <p className='text-muted-foreground text-xs'>
               -10 min from last week
             </p>
           </CardContent>
         </Card>
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
+          <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
+            <CardTitle className='text-sm font-medium'>
               Customer Satisfaction
             </CardTitle>
-            <Users className="text-muted-foreground h-4 w-4" />
+            <Users className='text-muted-foreground h-4 w-4' />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">94%</div>
-            <p className="text-muted-foreground text-xs">
+            <div className='text-2xl font-bold'>94%</div>
+            <p className='text-muted-foreground text-xs'>
               Based on 120 ratings today
             </p>
           </CardContent>
         </Card>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2">
+      <div className='grid gap-4 md:grid-cols-2'>
         <Card>
           <CardHeader>
             <CardTitle>Active Support Tickets</CardTitle>
@@ -418,7 +419,7 @@ function CustomerServiceDashboard({ user }: UserType) {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="space-y-4">
+            <div className='space-y-4'>
               {[
                 {
                   id: '#T-2453',
@@ -451,8 +452,9 @@ function CustomerServiceDashboard({ user }: UserType) {
                   time: '2 hours ago',
                 },
               ].map((ticket, i) => (
-                <div key={i} className="flex items-center">
-                  <div className="mr-3">
+                // biome-ignore lint: error
+                <div key={i} className='flex items-center'>
+                  <div className='mr-3'>
                     <Badge
                       variant={
                         ticket.priority === 'High'
@@ -465,15 +467,15 @@ function CustomerServiceDashboard({ user }: UserType) {
                       {ticket.priority}
                     </Badge>
                   </div>
-                  <div className="flex-1">
-                    <p className="text-sm font-medium">
+                  <div className='flex-1'>
+                    <p className='text-sm font-medium'>
                       {ticket.id}: {ticket.issue}
                     </p>
-                    <p className="text-muted-foreground text-xs">
+                    <p className='text-muted-foreground text-xs'>
                       Opened {ticket.time}
                     </p>
                   </div>
-                  <Button variant="ghost" size="sm">
+                  <Button variant='ghost' size='sm'>
                     Respond
                   </Button>
                 </div>
@@ -481,7 +483,7 @@ function CustomerServiceDashboard({ user }: UserType) {
             </div>
           </CardContent>
           <CardFooter>
-            <Button variant="outline" className="w-full">
+            <Button variant='outline' className='w-full'>
               View All Tickets
             </Button>
           </CardFooter>
@@ -492,51 +494,51 @@ function CustomerServiceDashboard({ user }: UserType) {
             <CardDescription>Support metrics for today</CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="space-y-4">
-              <div className="space-y-2">
-                <div className="flex items-center">
-                  <Avatar className="mr-2 h-9 w-9">
-                    <AvatarImage src="/placeholder-avatar-1.jpg" />
+            <div className='space-y-4'>
+              <div className='space-y-2'>
+                <div className='flex items-center'>
+                  <Avatar className='mr-2 h-9 w-9'>
+                    <AvatarImage src='/placeholder-avatar-1.jpg' />
                     <AvatarFallback>JD</AvatarFallback>
                   </Avatar>
                   <div>
-                    <p className="text-sm font-medium">Jane Davis</p>
-                    <p className="text-muted-foreground text-xs">
+                    <p className='text-sm font-medium'>Jane Davis</p>
+                    <p className='text-muted-foreground text-xs'>
                       14 tickets resolved
                     </p>
                   </div>
                 </div>
-                <Progress value={87} className="h-2" />
+                <Progress value={87} className='h-2' />
               </div>
-              <div className="space-y-2">
-                <div className="flex items-center">
-                  <Avatar className="mr-2 h-9 w-9">
-                    <AvatarImage src="/placeholder-avatar-2.jpg" />
+              <div className='space-y-2'>
+                <div className='flex items-center'>
+                  <Avatar className='mr-2 h-9 w-9'>
+                    <AvatarImage src='/placeholder-avatar-2.jpg' />
                     <AvatarFallback>MS</AvatarFallback>
                   </Avatar>
                   <div>
-                    <p className="text-sm font-medium">Michael Smith</p>
-                    <p className="text-muted-foreground text-xs">
+                    <p className='text-sm font-medium'>Michael Smith</p>
+                    <p className='text-muted-foreground text-xs'>
                       10 tickets resolved
                     </p>
                   </div>
                 </div>
-                <Progress value={75} className="h-2" />
+                <Progress value={75} className='h-2' />
               </div>
-              <div className="space-y-2">
-                <div className="flex items-center">
-                  <Avatar className="mr-2 h-9 w-9">
-                    <AvatarImage src="/placeholder-avatar-3.jpg" />
+              <div className='space-y-2'>
+                <div className='flex items-center'>
+                  <Avatar className='mr-2 h-9 w-9'>
+                    <AvatarImage src='/placeholder-avatar-3.jpg' />
                     <AvatarFallback>LT</AvatarFallback>
                   </Avatar>
                   <div>
-                    <p className="text-sm font-medium">Lisa Thompson</p>
-                    <p className="text-muted-foreground text-xs">
+                    <p className='text-sm font-medium'>Lisa Thompson</p>
+                    <p className='text-muted-foreground text-xs'>
                       8 tickets resolved
                     </p>
                   </div>
                 </div>
-                <Progress value={68} className="h-2" />
+                <Progress value={68} className='h-2' />
               </div>
             </div>
           </CardContent>
@@ -549,81 +551,81 @@ function CustomerServiceDashboard({ user }: UserType) {
 // Customer Dashboard Component
 function CustomerDashboard({ user }: UserType) {
   return (
-    <div className="space-y-4">
-      <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
+    <div className='space-y-4'>
+      <div className='flex flex-col justify-between gap-4 sm:flex-row sm:items-center'>
         <div>
-          <h2 className="text-3xl font-bold tracking-tight">
+          <h2 className='text-3xl font-bold tracking-tight'>
             Welcome back, {user.name || 'Customer'}
           </h2>
-          <p className="text-muted-foreground">
+          <p className='text-muted-foreground'>
             Here&#39;s what&#39;s happening with your account
           </p>
         </div>
-        <Link href="/products">
+        <Link href='/products'>
           <Button>
-            <ShoppingBag className="mr-2 h-4 w-4" />
+            <ShoppingBag className='mr-2 h-4 w-4' />
             Continue Shopping
           </Button>
         </Link>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+      <div className='grid gap-4 md:grid-cols-2 lg:grid-cols-4'>
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Active Orders</CardTitle>
-            <Package className="text-muted-foreground h-4 w-4" />
+          <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
+            <CardTitle className='text-sm font-medium'>Active Orders</CardTitle>
+            <Package className='text-muted-foreground h-4 w-4' />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">3</div>
-            <p className="text-muted-foreground text-xs">1 out for delivery</p>
+            <div className='text-2xl font-bold'>3</div>
+            <p className='text-muted-foreground text-xs'>1 out for delivery</p>
           </CardContent>
         </Card>
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Reward Points</CardTitle>
-            <BadgePercent className="text-muted-foreground h-4 w-4" />
+          <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
+            <CardTitle className='text-sm font-medium'>Reward Points</CardTitle>
+            <BadgePercent className='text-muted-foreground h-4 w-4' />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">2,840</div>
-            <p className="text-muted-foreground text-xs">
+            <div className='text-2xl font-bold'>2,840</div>
+            <p className='text-muted-foreground text-xs'>
               ৳28.40 redeemable value
             </p>
           </CardContent>
         </Card>
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Wishlist</CardTitle>
-            <Heart className="text-muted-foreground h-4 w-4" />
+          <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
+            <CardTitle className='text-sm font-medium'>Wishlist</CardTitle>
+            <Heart className='text-muted-foreground h-4 w-4' />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">12</div>
-            <p className="text-muted-foreground text-xs">3 items on sale now</p>
+            <div className='text-2xl font-bold'>12</div>
+            <p className='text-muted-foreground text-xs'>3 items on sale now</p>
           </CardContent>
         </Card>
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
+          <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
+            <CardTitle className='text-sm font-medium'>
               Recent Reviews
             </CardTitle>
-            <Star className="text-muted-foreground h-4 w-4" />
+            <Star className='text-muted-foreground h-4 w-4' />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">4</div>
-            <p className="text-muted-foreground text-xs">
+            <div className='text-2xl font-bold'>4</div>
+            <p className='text-muted-foreground text-xs'>
               You&#39;ve left 4 product reviews
             </p>
           </CardContent>
         </Card>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
-        <Card className="col-span-4">
+      <div className='grid gap-4 md:grid-cols-2 lg:grid-cols-7'>
+        <Card className='col-span-4'>
           <CardHeader>
             <CardTitle>Order Status</CardTitle>
             <CardDescription>Track your recent purchases</CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="space-y-5">
+            <div className='space-y-5'>
               {[
                 {
                   id: '#OR-38562',
@@ -647,19 +649,20 @@ function CustomerDashboard({ user }: UserType) {
                   icon: Package,
                 },
               ].map((order, i) => (
-                <div key={i} className="flex items-center">
-                  <div className="bg-primary/10 mr-3 flex h-10 w-10 items-center justify-center rounded">
-                    <order.icon className="text-primary h-5 w-5" />
+                // biome-ignore lint: error
+                <div key={i} className='flex items-center'>
+                  <div className='bg-primary/10 mr-3 flex h-10 w-10 items-center justify-center rounded'>
+                    <order.icon className='text-primary h-5 w-5' />
                   </div>
-                  <div className="flex-1">
-                    <p className="text-sm font-medium">
+                  <div className='flex-1'>
+                    <p className='text-sm font-medium'>
                       {order.id}: {order.product}
                     </p>
-                    <p className="text-muted-foreground text-xs">
+                    <p className='text-muted-foreground text-xs'>
                       {order.status} • {order.eta}
                     </p>
                   </div>
-                  <Button variant="outline" size="sm">
+                  <Button variant='outline' size='sm'>
                     Track
                   </Button>
                 </div>
@@ -667,7 +670,7 @@ function CustomerDashboard({ user }: UserType) {
             </div>
           </CardContent>
           <CardFooter>
-            <Button variant="outline" className="w-full">
+            <Button variant='outline' className='w-full'>
               View Order History
             </Button>
           </CardFooter>

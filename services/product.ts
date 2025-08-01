@@ -2,57 +2,57 @@ import { QUERY_KEYS } from '@/lib/constants';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
 
-export class SkuService {
-  private static cleanText(text: string): string {
+export const SkuService = {
+  cleanText(text: string): string {
     return text.replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
-  }
+  },
 
   /**
    * Generate SKU: CAT-NAME-SEQ
    */
-  static generateSku(
+  generateSku(
     category: string,
     productName: string,
-    sequenceNumber?: number
+    sequenceNumber?: number,
   ): string {
-    const catCode = this.cleanText(category).substring(0, 3) || 'CAT';
-    const nameCode = this.cleanText(productName).substring(0, 3) || 'PRO';
+    const catCode = SkuService.cleanText(category).substring(0, 3) || 'CAT';
+    const nameCode = SkuService.cleanText(productName).substring(0, 3) || 'PRO';
     const seq = sequenceNumber ?? Math.floor(Date.now() % 100000);
     const seqStr = `-${String(seq).padStart(4, '0')}`;
     return `${catCode}-${nameCode}${seqStr}`;
-  }
+  },
 
   /**
    * Suggest SKU with random sequence
    */
-  static suggestSku(category: string, productName: string): string {
+  suggestSku(category: string, productName: string): string {
     if (!category || !productName) {
       throw new Error(
-        'Category and Product Name are required for SKU generation'
+        'Category and Product Name are required for SKU generation',
       );
     }
     const randomNum = Math.floor(1000 + Math.random() * 9000);
-    return this.generateSku(category, productName, randomNum);
-  }
+    return SkuService.generateSku(category, productName, randomNum);
+  },
 
   /**
    * Validate SKU: CAT-NAME-SEQ
    */
-  static isValidSku(sku: string): boolean {
+  isValidSku(sku: string): boolean {
     const skuRegex = /^[A-Z0-9]{3}-[A-Z0-9]{3}-\d{4,6}$/;
     return skuRegex.test(sku);
-  }
+  },
 
   /**
    * Clean a SKU string
    */
-  static sanitizeSku(sku: string): string {
+  sanitizeSku(sku: string): string {
     return sku
       .trim()
       .toUpperCase()
-      .replace(/[^A-Z0-9\-]/g, '');
-  }
-}
+      .replace(/[^A-Z0-9-]/g, '');
+  },
+};
 
 export function useCreateProduct() {
   return useMutation({
@@ -64,7 +64,7 @@ export function useCreateProduct() {
           headers: {
             'Content-Type': 'multipart/form-data',
           },
-        }
+        },
       );
       return res.data;
     },
@@ -121,10 +121,11 @@ export function useProductList({
       colors,
     ],
     queryFn: async () => {
+      // biome-ignore lint: error
       const params: Record<string, any> = { currentPage };
 
       // Only add search param if it's not empty
-      if (debouncedSearch && debouncedSearch.trim()) {
+      if (debouncedSearch?.trim()) {
         params.search = debouncedSearch.trim();
       }
 
@@ -177,7 +178,7 @@ export function useSingleProduct({ slug }: { slug: string }) {
   });
 }
 
-export function useDeleteProduct({ id }: { id: string }) {
+export function useDeleteProduct() {
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -185,7 +186,7 @@ export function useDeleteProduct({ id }: { id: string }) {
       const res = await axios.delete(`/api/dashboard/admin/product?id=${id}`);
       return res.data;
     },
-    onSuccess: (data, reviewId) => {
+    onSuccess: () => {
       // Invalidate product reviews queries to refetch data
       queryClient.invalidateQueries({
         queryKey: [
@@ -221,7 +222,7 @@ export function useCreateReview() {
           headers: {
             'Content-Type': 'multipart/form-data',
           },
-        }
+        },
       );
       return res.data;
     },
@@ -234,11 +235,11 @@ export function useDeleteReview() {
   return useMutation({
     mutationFn: async (reviewId: string) => {
       const res = await axios.delete(
-        `/api/public/single-product/review?reviewId=${reviewId}`
+        `/api/public/single-product/review?reviewId=${reviewId}`,
       );
       return res.data;
     },
-    onSuccess: (data, reviewId) => {
+    onSuccess: () => {
       // Invalidate product reviews queries to refetch data
       queryClient.invalidateQueries({
         queryKey: [QUERY_KEYS.PRODUCT_REVIEWS],
@@ -289,7 +290,7 @@ export function useProductReview({
       }
 
       const response = await axios.get(
-        `/api/public/single-product/review?${params.toString()}`
+        `/api/public/single-product/review?${params.toString()}`,
       );
       return response.data;
     },

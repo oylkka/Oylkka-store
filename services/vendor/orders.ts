@@ -1,6 +1,6 @@
-import { QUERY_KEYS } from '@/lib/constants';
-import { Order } from '@/lib/types';
 import { useQuery } from '@tanstack/react-query';
+import { QUERY_KEYS } from '@/lib/constants';
+import type { Order } from '@/lib/types';
 
 interface VendorOrdersResponse {
   orders: Order[];
@@ -81,7 +81,7 @@ export function useSingleVendorOrder({ orderId }: { orderId: string }) {
         `/api/dashboard/vendor/orders/single-order`,
         {
           params: { orderId: orderId },
-        }
+        },
       );
       return response.data;
     },
@@ -101,7 +101,7 @@ export async function updateOrderStatus(data: UpdateOrderStatusData) {
   try {
     const response = await axios.patch(
       '/api/dashboard/vendor/orders/single-order',
-      data
+      data,
     );
     return response.data;
   } catch (error) {
@@ -128,9 +128,6 @@ export function useUpdateOrderStatus() {
           QUERY_KEYS.SINGLE_VENDOR_ORDER,
         ],
       });
-    },
-    onError: (error) => {
-      console.error('Failed to update order status:', error);
     },
   });
 }

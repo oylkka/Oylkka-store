@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 
 import { getAuthenticatedUser } from '@/features/auth/get-user';
 import { db } from '@/lib/db';
@@ -56,11 +56,11 @@ export async function POST(req: NextRequest) {
     });
 
     return NextResponse.json(newAddress, { status: 201 });
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    // biome-ignore lint: error
   } catch (error) {
     return NextResponse.json(
       { error: 'Failed to create address' },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -78,11 +78,11 @@ export async function GET(req: NextRequest) {
     });
 
     return NextResponse.json(addresses, { status: 200 });
+    // biome-ignore lint: error
   } catch (error) {
-    console.error('[ADDRESS_GET]', error);
     return NextResponse.json(
       { error: 'Failed to fetch addresses' },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -133,13 +133,13 @@ export async function DELETE(req: NextRequest) {
 
     return NextResponse.json(
       { message: 'Address deleted successfully' },
-      { status: 200 }
+      { status: 200 },
     );
+    // biome-ignore lint: error
   } catch (error) {
-    console.error('[ADDRESS_DELETE]', error);
     return NextResponse.json(
       { error: 'Failed to delete address' },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

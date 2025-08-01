@@ -44,7 +44,7 @@ import {
 } from '@/components/ui/select';
 import { Separator } from '@/components/ui/separator';
 import type { Address } from '@/lib/types/address';
-import { addressSchema, type AddressFormData } from '@/schemas/checkout-schema';
+import { type AddressFormData, addressSchema } from '@/schemas/checkout-schema';
 import { useAddress } from '@/services/customer/addresses';
 
 interface AddressFormProps {
@@ -84,7 +84,7 @@ export function AddressForm({
   const handleAddressSelect = (addressId: string) => {
     setSelectedAddressId(addressId);
     const selectedAddress = addresses.find(
-      (addr: AddressType) => addr.id === addressId
+      (addr: AddressType) => addr.id === addressId,
     );
 
     if (selectedAddress) {
@@ -118,56 +118,56 @@ export function AddressForm({
     form.watch('name') || form.watch('address') || form.watch('city');
 
   return (
-    <div className="space-y-6">
-      <Card className="border-muted-foreground/25 bg-muted/30 border-2 border-dashed">
-        <CardHeader className="pb-4">
-          <CardTitle className="flex items-center gap-2 text-lg">
-            <MapPin className="text-primary h-5 w-5" />
+    <div className='space-y-6'>
+      <Card className='border-muted-foreground/25 bg-muted/30 border-2 border-dashed'>
+        <CardHeader className='pb-4'>
+          <CardTitle className='flex items-center gap-2 text-lg'>
+            <MapPin className='text-primary h-5 w-5' />
             Contact & Shipping Information
           </CardTitle>
-          <CardDescription className="text-sm">
+          <CardDescription className='text-sm'>
             Enter your contact details and shipping address for delivery
           </CardDescription>
         </CardHeader>
 
-        <CardContent className="space-y-6">
+        <CardContent className='space-y-6'>
           {/* Saved Addresses Section */}
           {addresses.length > 0 && (
-            <div className="space-y-4">
-              <div className="flex items-center gap-2">
-                <Clock className="text-muted-foreground h-4 w-4" />
-                <h3 className="text-sm font-medium">Quick Select</h3>
+            <div className='space-y-4'>
+              <div className='flex items-center gap-2'>
+                <Clock className='text-muted-foreground h-4 w-4' />
+                <h3 className='text-sm font-medium'>Quick Select</h3>
               </div>
 
-              <div className="flex items-center gap-2">
+              <div className='flex items-center gap-2'>
                 <Select
                   value={selectedAddressId}
                   onValueChange={handleAddressSelect}
                 >
-                  <SelectTrigger className="flex-1">
-                    <SelectValue placeholder="Choose from your saved addresses" />
+                  <SelectTrigger className='flex-1'>
+                    <SelectValue placeholder='Choose from your saved addresses' />
                   </SelectTrigger>
                   <SelectContent>
                     {addresses.map((address: AddressType) => (
                       <SelectItem
                         value={address.id}
                         key={address.id}
-                        className="py-3"
+                        className='py-3'
                       >
-                        <div className="flex w-full items-center gap-2">
-                          <div className="flex-1">
-                            <div className="flex items-center gap-2">
-                              <span className="font-medium">
+                        <div className='flex w-full items-center gap-2'>
+                          <div className='flex-1'>
+                            <div className='flex items-center gap-2'>
+                              <span className='font-medium'>
                                 {address.address.name}
                               </span>
                               {address.isDefault && (
-                                <Badge variant="secondary" className="text-xs">
-                                  <Star className="mr-1 h-3 w-3 fill-current" />
+                                <Badge variant='secondary' className='text-xs'>
+                                  <Star className='mr-1 h-3 w-3 fill-current' />
                                   Default
                                 </Badge>
                               )}
                             </div>
-                            <p className="text-muted-foreground truncate text-xs">
+                            <p className='text-muted-foreground truncate text-xs'>
                               {address.address.address}, {address.address.city}
                             </p>
                           </div>
@@ -179,47 +179,47 @@ export function AddressForm({
 
                 {selectedAddressId && (
                   <Button
-                    variant="outline"
-                    size="icon"
-                    type="button"
+                    variant='outline'
+                    size='icon'
+                    type='button'
                     onClick={clearAddressSelection}
-                    className="shrink-0 bg-transparent"
+                    className='shrink-0 bg-transparent'
                   >
-                    <X className="h-4 w-4" />
+                    <X className='h-4 w-4' />
                   </Button>
                 )}
               </div>
 
-              <Separator className="my-6" />
+              <Separator className='my-6' />
             </div>
           )}
 
           {/* Form Section */}
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+            <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-6'>
               {/* Contact Information */}
-              <div className="space-y-4">
-                <div className="flex items-center gap-2">
-                  <User className="text-muted-foreground h-4 w-4" />
-                  <h3 className="text-sm font-medium">Contact Information</h3>
+              <div className='space-y-4'>
+                <div className='flex items-center gap-2'>
+                  <User className='text-muted-foreground h-4 w-4' />
+                  <h3 className='text-sm font-medium'>Contact Information</h3>
                 </div>
 
-                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                <div className='grid grid-cols-1 gap-4 md:grid-cols-2'>
                   <FormField
                     control={form.control}
-                    name="name"
+                    name='name'
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-sm font-medium">
+                        <FormLabel className='text-sm font-medium'>
                           Full Name
                         </FormLabel>
                         <FormControl>
-                          <div className="relative">
-                            <User className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
+                          <div className='relative'>
+                            <User className='text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2' />
                             <Input
                               {...field}
-                              placeholder="Enter your full name"
-                              className="pl-10"
+                              placeholder='Enter your full name'
+                              className='pl-10'
                             />
                           </div>
                         </FormControl>
@@ -230,20 +230,20 @@ export function AddressForm({
 
                   <FormField
                     control={form.control}
-                    name="email"
+                    name='email'
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-sm font-medium">
+                        <FormLabel className='text-sm font-medium'>
                           Email Address
                         </FormLabel>
                         <FormControl>
-                          <div className="relative">
-                            <Mail className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
+                          <div className='relative'>
+                            <Mail className='text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2' />
                             <Input
                               {...field}
-                              type="email"
-                              placeholder="your.email@example.com"
-                              className="pl-10"
+                              type='email'
+                              placeholder='your.email@example.com'
+                              className='pl-10'
                             />
                           </div>
                         </FormControl>
@@ -254,19 +254,19 @@ export function AddressForm({
 
                   <FormField
                     control={form.control}
-                    name="phone"
+                    name='phone'
                     render={({ field }) => (
-                      <FormItem className="md:col-span-1">
-                        <FormLabel className="text-sm font-medium">
+                      <FormItem className='md:col-span-1'>
+                        <FormLabel className='text-sm font-medium'>
                           Phone Number
                         </FormLabel>
                         <FormControl>
-                          <div className="relative">
-                            <Phone className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
+                          <div className='relative'>
+                            <Phone className='text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2' />
                             <Input
                               {...field}
-                              placeholder="+88 01234567890"
-                              className="pl-10"
+                              placeholder='+88 01234567890'
+                              className='pl-10'
                             />
                           </div>
                         </FormControl>
@@ -280,28 +280,28 @@ export function AddressForm({
               <Separator />
 
               {/* Shipping Address */}
-              <div className="space-y-4">
-                <div className="flex items-center gap-2">
-                  <Home className="text-muted-foreground h-4 w-4" />
-                  <h3 className="text-sm font-medium">Shipping Address</h3>
+              <div className='space-y-4'>
+                <div className='flex items-center gap-2'>
+                  <Home className='text-muted-foreground h-4 w-4' />
+                  <h3 className='text-sm font-medium'>Shipping Address</h3>
                 </div>
 
-                <div className="grid grid-cols-1 gap-4">
+                <div className='grid grid-cols-1 gap-4'>
                   <FormField
                     control={form.control}
-                    name="address"
+                    name='address'
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-sm font-medium">
+                        <FormLabel className='text-sm font-medium'>
                           Street Address
                         </FormLabel>
                         <FormControl>
-                          <div className="relative">
-                            <Navigation className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
+                          <div className='relative'>
+                            <Navigation className='text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2' />
                             <Input
                               {...field}
-                              placeholder="Enter your full street address"
-                              className="pl-10"
+                              placeholder='Enter your full street address'
+                              className='pl-10'
                             />
                           </div>
                         </FormControl>
@@ -310,22 +310,22 @@ export function AddressForm({
                     )}
                   />
 
-                  <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+                  <div className='grid grid-cols-1 gap-4 md:grid-cols-3'>
                     <FormField
                       control={form.control}
-                      name="city"
+                      name='city'
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel className="text-sm font-medium">
+                          <FormLabel className='text-sm font-medium'>
                             City
                           </FormLabel>
                           <FormControl>
-                            <div className="relative">
-                              <Building className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
+                            <div className='relative'>
+                              <Building className='text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2' />
                               <Input
                                 {...field}
-                                placeholder="Enter city"
-                                className="pl-10"
+                                placeholder='Enter city'
+                                className='pl-10'
                               />
                             </div>
                           </FormControl>
@@ -336,14 +336,14 @@ export function AddressForm({
 
                     <FormField
                       control={form.control}
-                      name="district"
+                      name='district'
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel className="text-sm font-medium">
+                          <FormLabel className='text-sm font-medium'>
                             District
                           </FormLabel>
                           <FormControl>
-                            <Input {...field} placeholder="Enter district" />
+                            <Input {...field} placeholder='Enter district' />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -352,14 +352,14 @@ export function AddressForm({
 
                     <FormField
                       control={form.control}
-                      name="postalCode"
+                      name='postalCode'
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel className="text-sm font-medium">
+                          <FormLabel className='text-sm font-medium'>
                             Postal Code
                           </FormLabel>
                           <FormControl>
-                            <Input {...field} placeholder="Enter postal code" />
+                            <Input {...field} placeholder='Enter postal code' />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -372,15 +372,15 @@ export function AddressForm({
               <Separator />
 
               {/* Submit Button */}
-              <div className="flex justify-end pt-4">
+              <div className='flex justify-end pt-4'>
                 <Button
-                  type="submit"
-                  size="lg"
-                  className="flex items-center gap-2 px-8"
+                  type='submit'
+                  size='lg'
+                  className='flex items-center gap-2 px-8'
                   disabled={!isFormFilled}
                 >
                   Continue to Shipping
-                  <ChevronRight className="h-4 w-4" />
+                  <ChevronRight className='h-4 w-4' />
                 </Button>
               </div>
             </form>

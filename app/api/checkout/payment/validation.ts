@@ -1,5 +1,5 @@
 import { db } from '@/lib/db';
-import { CartItem, PaymentData } from '@/lib/types';
+import type { CartItem, PaymentData } from '@/lib/types';
 
 export async function validateCartData(cart: CartItem[]) {
   try {
@@ -58,11 +58,11 @@ export async function validateCartData(cart: CartItem[]) {
 
     // Create maps for easy lookup
     const baseProductMap = new Map(
-      baseProducts.map((product) => [product.id, product])
+      baseProducts.map((product) => [product.id, product]),
     );
 
     const variantMap = new Map(
-      productVariants.map((variant) => [variant.id, variant])
+      productVariants.map((variant) => [variant.id, variant]),
     );
 
     // Validate each cart item
@@ -164,8 +164,8 @@ export async function validateCartData(cart: CartItem[]) {
     }
 
     return { valid: true };
+    // biome-ignore lint: error
   } catch (error) {
-    console.error('Cart validation error:', error);
     return { valid: false, error: 'Database error during cart validation' };
   }
 }

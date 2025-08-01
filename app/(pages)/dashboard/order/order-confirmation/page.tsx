@@ -80,7 +80,7 @@ function formatCurrency(amount: number, currency = 'BDT'): string {
 }
 
 function getStatusVariant(
-  status: string
+  status: string,
 ): 'default' | 'secondary' | 'destructive' | 'outline' {
   switch (status.toLowerCase()) {
     case 'paid':
@@ -107,8 +107,8 @@ function OrderConfirmationContent(): JSX.Element {
   }
   if (isError || !data) {
     return (
-      <div className="flex h-[50vh] items-center justify-center text-red-500">
-        <XCircle className="mr-2 h-6 w-6" /> Something went wrong.
+      <div className='flex h-[50vh] items-center justify-center text-red-500'>
+        <XCircle className='mr-2 h-6 w-6' /> Something went wrong.
       </div>
     );
   }
@@ -117,47 +117,47 @@ function OrderConfirmationContent(): JSX.Element {
   const shipping = order.shippingAddress;
 
   return (
-    <div className="from-muted/30 to-muted/60 min-h-screen bg-gradient-to-br py-8">
-      <div className="mx-auto max-w-4xl px-4">
+    <div className='from-muted/30 to-muted/60 min-h-screen bg-gradient-to-br py-8'>
+      <div className='mx-auto max-w-4xl px-4'>
         {/* Success Header */}
-        <div className="mb-8 text-center">
-          <div className="bg-primary/10 mb-4 inline-flex h-16 w-16 items-center justify-center rounded-full">
-            <CheckCircle2 className="text-primary h-8 w-8" />
+        <div className='mb-8 text-center'>
+          <div className='bg-primary/10 mb-4 inline-flex h-16 w-16 items-center justify-center rounded-full'>
+            <CheckCircle2 className='text-primary h-8 w-8' />
           </div>
-          <h1 className="mb-2 text-3xl font-bold">Order Confirmed!</h1>
-          <p className="text-muted-foreground">
+          <h1 className='mb-2 text-3xl font-bold'>Order Confirmed!</h1>
+          <p className='text-muted-foreground'>
             Thank you for your purchase. Your order has been successfully
             placed.
           </p>
         </div>
 
-        <div className="grid gap-6 lg:grid-cols-3">
+        <div className='grid gap-6 lg:grid-cols-3'>
           {/* Main Order Details */}
-          <div className="space-y-6 lg:col-span-2">
+          <div className='space-y-6 lg:col-span-2'>
             {/* Order Summary Card */}
             <Card>
               <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Package className="h-5 w-5" />
+                <CardTitle className='flex items-center gap-2'>
+                  <Package className='h-5 w-5' />
                   Order Details
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                <div className='grid grid-cols-1 gap-4 md:grid-cols-2'>
                   <InfoItem
-                    label="Order Number"
+                    label='Order Number'
                     value={
-                      <span className="font-mono font-semibold">
+                      <span className='font-mono font-semibold'>
                         #{order.orderNumber}
                       </span>
                     }
                   />
                   <InfoItem
-                    label="Order Date"
+                    label='Order Date'
                     value={formatDate(order.createdAt)}
                   />
                   <InfoItem
-                    label="Order Status"
+                    label='Order Status'
                     value={
                       <Badge variant={getStatusVariant(order.status)}>
                         {order.status.replace('_', ' ')}
@@ -165,7 +165,7 @@ function OrderConfirmationContent(): JSX.Element {
                     }
                   />
                   <InfoItem
-                    label="Payment Status"
+                    label='Payment Status'
                     value={
                       <Badge variant={getStatusVariant(order.paymentStatus)}>
                         {order.paymentStatus.replace('_', ' ')}
@@ -173,15 +173,15 @@ function OrderConfirmationContent(): JSX.Element {
                     }
                   />
                   <InfoItem
-                    label="Payment Method"
+                    label='Payment Method'
                     value={
-                      <div className="flex items-center gap-2">
-                        <CreditCard className="h-4 w-4" />
+                      <div className='flex items-center gap-2'>
+                        <CreditCard className='h-4 w-4' />
                         {order.paymentMethod.replace('_', ' ')}
                       </div>
                     }
                   />
-                  <InfoItem label="Currency" value={order.currency} />
+                  <InfoItem label='Currency' value={order.currency} />
                 </div>
               </CardContent>
             </Card>
@@ -192,11 +192,11 @@ function OrderConfirmationContent(): JSX.Element {
                 <CardTitle>Order Items ({order.items.length})</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="space-y-4">
+                <div className='space-y-4'>
                   {order.items.map((item, index) => (
                     <div key={item.id}>
-                      <div className="flex items-center gap-4">
-                        <div className="bg-muted relative h-16 w-16 overflow-hidden rounded-lg">
+                      <div className='flex items-center gap-4'>
+                        <div className='bg-muted relative h-16 w-16 overflow-hidden rounded-lg'>
                           <Image
                             src={
                               item.image ||
@@ -204,47 +204,47 @@ function OrderConfirmationContent(): JSX.Element {
                             }
                             alt={item.productName}
                             fill
-                            className="object-cover"
+                            className='object-cover'
                           />
                         </div>
-                        <div className="min-w-0 flex-1">
-                          <h3 className="truncate font-medium">
+                        <div className='min-w-0 flex-1'>
+                          <h3 className='truncate font-medium'>
                             {item.productName}
                           </h3>
                           {item.variantInfo && (
-                            <p className="text-muted-foreground text-sm">
+                            <p className='text-muted-foreground text-sm'>
                               {item.variantInfo.variantName}
                             </p>
                           )}
-                          <div className="mt-1 flex items-center gap-4">
-                            <span className="text-muted-foreground text-sm">
+                          <div className='mt-1 flex items-center gap-4'>
+                            <span className='text-muted-foreground text-sm'>
                               Qty: {item.quantity}
                             </span>
-                            <span className="font-semibold">
+                            <span className='font-semibold'>
                               {formatCurrency(item.price, order.currency)}
                             </span>
                             {item.discount > 0 && (
-                              <Badge variant="secondary" className="text-xs">
+                              <Badge variant='secondary' className='text-xs'>
                                 -{formatCurrency(item.discount, order.currency)}{' '}
                                 off
                               </Badge>
                             )}
                           </div>
-                          <Badge variant="outline" className="mt-1 text-xs">
+                          <Badge variant='outline' className='mt-1 text-xs'>
                             {item.status.replace('_', ' ')}
                           </Badge>
                         </div>
-                        <div className="text-right">
-                          <p className="font-semibold">
+                        <div className='text-right'>
+                          <p className='font-semibold'>
                             {formatCurrency(
                               (item.price - item.discount) * item.quantity,
-                              order.currency
+                              order.currency,
                             )}
                           </p>
                         </div>
                       </div>
                       {index < order.items.length - 1 && (
-                        <Separator className="mt-4" />
+                        <Separator className='mt-4' />
                       )}
                     </div>
                   ))}
@@ -254,34 +254,34 @@ function OrderConfirmationContent(): JSX.Element {
           </div>
 
           {/* Sidebar */}
-          <div className="space-y-6">
+          <div className='space-y-6'>
             {/* Shipping Address */}
             <Card>
               <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <MapPin className="h-5 w-5" />
+                <CardTitle className='flex items-center gap-2'>
+                  <MapPin className='h-5 w-5' />
                   Shipping Address
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="space-y-2 text-sm">
-                  <p className="font-semibold">{shipping.name}</p>
-                  <p className="text-muted-foreground">{shipping.address1}</p>
+                <div className='space-y-2 text-sm'>
+                  <p className='font-semibold'>{shipping.name}</p>
+                  <p className='text-muted-foreground'>{shipping.address1}</p>
                   {shipping.address2 && (
-                    <p className="text-muted-foreground">{shipping.address2}</p>
+                    <p className='text-muted-foreground'>{shipping.address2}</p>
                   )}
-                  <p className="text-muted-foreground">
+                  <p className='text-muted-foreground'>
                     {shipping.city}, {shipping.district}
                   </p>
-                  <p className="text-muted-foreground">
+                  <p className='text-muted-foreground'>
                     {shipping.country} {shipping.postalCode}
                   </p>
-                  <Separator className="my-3" />
-                  <div className="space-y-1">
-                    <p className="text-muted-foreground">
+                  <Separator className='my-3' />
+                  <div className='space-y-1'>
+                    <p className='text-muted-foreground'>
                       Phone: {shipping.phone}
                     </p>
-                    <p className="text-muted-foreground">
+                    <p className='text-muted-foreground'>
                       Email: {shipping.email}
                     </p>
                   </div>
@@ -295,35 +295,35 @@ function OrderConfirmationContent(): JSX.Element {
                 <CardTitle>Order Summary</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="space-y-3">
-                  <div className="flex justify-between text-sm">
-                    <span className="text-muted-foreground">Subtotal</span>
+                <div className='space-y-3'>
+                  <div className='flex justify-between text-sm'>
+                    <span className='text-muted-foreground'>Subtotal</span>
                     <span>
                       {formatCurrency(order.subtotal, order.currency)}
                     </span>
                   </div>
                   {order.discount > 0 && (
-                    <div className="flex justify-between text-sm">
-                      <span className="text-muted-foreground">Discount</span>
-                      <span className="text-primary">
+                    <div className='flex justify-between text-sm'>
+                      <span className='text-muted-foreground'>Discount</span>
+                      <span className='text-primary'>
                         -{formatCurrency(order.discount, order.currency)}
                       </span>
                     </div>
                   )}
-                  <div className="flex justify-between text-sm">
-                    <span className="text-muted-foreground">Shipping</span>
+                  <div className='flex justify-between text-sm'>
+                    <span className='text-muted-foreground'>Shipping</span>
                     <span>
                       {formatCurrency(order.shipping, order.currency)}
                     </span>
                   </div>
                   {order.tax > 0 && (
-                    <div className="flex justify-between text-sm">
-                      <span className="text-muted-foreground">Tax</span>
+                    <div className='flex justify-between text-sm'>
+                      <span className='text-muted-foreground'>Tax</span>
                       <span>{formatCurrency(order.tax, order.currency)}</span>
                     </div>
                   )}
                   <Separator />
-                  <div className="flex justify-between text-lg font-semibold">
+                  <div className='flex justify-between text-lg font-semibold'>
                     <span>Total</span>
                     <span>{formatCurrency(order.total, order.currency)}</span>
                   </div>
@@ -334,17 +334,17 @@ function OrderConfirmationContent(): JSX.Element {
             {/* Estimated Delivery */}
             <Card>
               <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Calendar className="h-5 w-5" />
+                <CardTitle className='flex items-center gap-2'>
+                  <Calendar className='h-5 w-5' />
                   Estimated Delivery
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-muted-foreground mb-2 text-sm">
+                <p className='text-muted-foreground mb-2 text-sm'>
                   Your order will be delivered within
                 </p>
-                <p className="text-lg font-semibold">5-7 business days</p>
-                <p className="text-muted-foreground mt-2 text-xs">
+                <p className='text-lg font-semibold'>5-7 business days</p>
+                <p className='text-muted-foreground mt-2 text-xs'>
                   You&#39;ll receive a tracking number via email once your order
                   ships.
                 </p>
@@ -354,11 +354,11 @@ function OrderConfirmationContent(): JSX.Element {
         </div>
 
         {/* Footer Message */}
-        <div className="mt-8 text-center">
-          <Card className="bg-primary/5 border-primary/20">
-            <CardContent className="pt-6">
-              <p className="mb-2 font-medium">Need help with your order?</p>
-              <p className="text-muted-foreground text-sm">
+        <div className='mt-8 text-center'>
+          <Card className='bg-primary/5 border-primary/20'>
+            <CardContent className='pt-6'>
+              <p className='mb-2 font-medium'>Need help with your order?</p>
+              <p className='text-muted-foreground text-sm'>
                 Contact our support team at support@oylkka.com or call
                 +880-123-456-789
               </p>
@@ -379,7 +379,7 @@ function InfoItem({
 }): JSX.Element {
   return (
     <div>
-      <p className="text-muted-foreground mb-1 text-sm font-semibold">
+      <p className='text-muted-foreground mb-1 text-sm font-semibold'>
         {label}
       </p>
       <div>{value}</div>
@@ -389,28 +389,29 @@ function InfoItem({
 
 function OrderSkeleton(): JSX.Element {
   return (
-    <div className="from-muted/30 to-muted/60 min-h-screen bg-gradient-to-br py-8">
-      <div className="mx-auto max-w-4xl px-4">
+    <div className='from-muted/30 to-muted/60 min-h-screen bg-gradient-to-br py-8'>
+      <div className='mx-auto max-w-4xl px-4'>
         {/* Success Header Skeleton */}
-        <div className="mb-8 text-center">
-          <Skeleton className="mb-4 inline-block h-16 w-16 rounded-full" />
-          <Skeleton className="mx-auto mb-2 h-8 w-64" />
-          <Skeleton className="mx-auto h-4 w-96" />
+        <div className='mb-8 text-center'>
+          <Skeleton className='mb-4 inline-block h-16 w-16 rounded-full' />
+          <Skeleton className='mx-auto mb-2 h-8 w-64' />
+          <Skeleton className='mx-auto h-4 w-96' />
         </div>
 
-        <div className="grid gap-6 lg:grid-cols-3">
+        <div className='grid gap-6 lg:grid-cols-3'>
           {/* Main Content Skeleton */}
-          <div className="space-y-6 lg:col-span-2">
+          <div className='space-y-6 lg:col-span-2'>
             <Card>
               <CardHeader>
-                <Skeleton className="h-6 w-32" />
+                <Skeleton className='h-6 w-32' />
               </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
+              <CardContent className='space-y-4'>
+                <div className='grid grid-cols-2 gap-4'>
                   {Array.from({ length: 6 }).map((_, i) => (
-                    <div key={i} className="space-y-2">
-                      <Skeleton className="h-4 w-24" />
-                      <Skeleton className="h-4 w-32" />
+                    //  biome-ignore lint: error
+                    <div key={i} className='space-y-2'>
+                      <Skeleton className='h-4 w-24' />
+                      <Skeleton className='h-4 w-32' />
                     </div>
                   ))}
                 </div>
@@ -419,18 +420,19 @@ function OrderSkeleton(): JSX.Element {
 
             <Card>
               <CardHeader>
-                <Skeleton className="h-6 w-32" />
+                <Skeleton className='h-6 w-32' />
               </CardHeader>
-              <CardContent className="space-y-4">
+              <CardContent className='space-y-4'>
                 {Array.from({ length: 3 }).map((_, i) => (
-                  <div key={i} className="flex items-center gap-4">
-                    <Skeleton className="h-16 w-16 rounded-lg" />
-                    <div className="flex-1 space-y-2">
-                      <Skeleton className="h-4 w-48" />
-                      <Skeleton className="h-3 w-32" />
-                      <Skeleton className="h-3 w-24" />
+                  //  biome-ignore lint: error
+                  <div key={i} className='flex items-center gap-4'>
+                    <Skeleton className='h-16 w-16 rounded-lg' />
+                    <div className='flex-1 space-y-2'>
+                      <Skeleton className='h-4 w-48' />
+                      <Skeleton className='h-3 w-32' />
+                      <Skeleton className='h-3 w-24' />
                     </div>
-                    <Skeleton className="h-4 w-16" />
+                    <Skeleton className='h-4 w-16' />
                   </div>
                 ))}
               </CardContent>
@@ -438,15 +440,17 @@ function OrderSkeleton(): JSX.Element {
           </div>
 
           {/* Sidebar Skeleton */}
-          <div className="space-y-6">
+          <div className='space-y-6'>
             {Array.from({ length: 3 }).map((_, i) => (
+              //  biome-ignore lint: error
               <Card key={i}>
                 <CardHeader>
-                  <Skeleton className="h-6 w-32" />
+                  <Skeleton className='h-6 w-32' />
                 </CardHeader>
-                <CardContent className="space-y-2">
+                <CardContent className='space-y-2'>
                   {Array.from({ length: 4 }).map((_, j) => (
-                    <Skeleton key={j} className="h-4 w-full" />
+                    //  biome-ignore lint: error
+                    <Skeleton key={j} className='h-4 w-full' />
                   ))}
                 </CardContent>
               </Card>
@@ -460,8 +464,8 @@ function OrderSkeleton(): JSX.Element {
 
 function LoadingState(): JSX.Element {
   return (
-    <div className="flex h-[50vh] items-center justify-center">
-      <Loader2 className="text-primary h-6 w-6 animate-spin" />
+    <div className='flex h-[50vh] items-center justify-center'>
+      <Loader2 className='text-primary h-6 w-6 animate-spin' />
     </div>
   );
 }

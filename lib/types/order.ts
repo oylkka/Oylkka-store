@@ -10,7 +10,7 @@ export interface Address {
   phone: string;
   email: string;
   isDefault: boolean;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  // biome-ignore lint: error
   coordinates: any | null;
 }
 
@@ -45,9 +45,9 @@ export interface OrderMetadata {
 }
 
 export interface Order {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  // biome-ignore lint: error
   items: any;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  // biome-ignore lint: error
   user: any;
   shippingAddress: Address;
   billingAddress: Address | null;

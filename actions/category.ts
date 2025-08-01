@@ -1,8 +1,8 @@
 'use server';
 
+import slugify from 'slugify';
 import { DeleteImage, UploadImage } from '@/features/cloudinary';
 import { db } from '@/lib/db';
-import slugify from 'slugify';
 
 /**
  * Ensures a string is a valid slug format using slugify
@@ -23,7 +23,7 @@ function formatSlug(input: string): string {
  */
 export async function checkCategorySlugUniqueness(
   slug: string,
-  currentId?: string
+  currentId?: string,
 ) {
   try {
     // Basic validation
@@ -239,12 +239,7 @@ export async function updateCategory(formData: FormData) {
 
       // Delete old image if it exists
       if (existingCategory.image?.publicId) {
-        try {
-          await DeleteImage(existingCategory.image.publicId);
-        } catch (deleteError) {
-          console.warn('Failed to delete old image:', deleteError);
-          // Continue with update even if old image deletion fails
-        }
+        await DeleteImage(existingCategory.image.publicId);
       }
     }
 
@@ -267,8 +262,8 @@ export async function updateCategory(formData: FormData) {
       category: updatedCategory,
       message: 'Category updated successfully.',
     };
+    // biome-ignore lint: error
   } catch (error) {
-    console.error('Error updating category:', error);
     return {
       success: false,
       message: 'An unexpected error occurred while updating the category.',
@@ -358,7 +353,7 @@ export async function deleteCategory(
     reassignSubcategories?: string | null; // New parent for subcategories
     reassignProducts?: string | null; // New category for products
     reassignPosts?: string | null; // New category for posts
-  } = {}
+  } = {},
 ) {
   try {
     if (!id) {
@@ -444,12 +439,7 @@ export async function deleteCategory(
 
     // Clean up associated image after successful deletion
     if (category.image?.publicId) {
-      try {
-        await DeleteImage(category.image.publicId);
-      } catch (imageError) {
-        console.warn('Failed to delete category image:', imageError);
-        // Don't fail the entire operation if image deletion fails
-      }
+      await DeleteImage(category.image.publicId);
     }
 
     return {
@@ -458,7 +448,6 @@ export async function deleteCategory(
       deletedCategory: result,
     };
   } catch (error) {
-    console.error('Error deleting category:', error);
     return {
       success: false,
       message: 'An unexpected error occurred while deleting the category.',

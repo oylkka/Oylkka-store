@@ -67,23 +67,23 @@ export function ChatConversation() {
 
   if (error) {
     return (
-      <div className="from-background to-muted/20 flex h-full items-center justify-center bg-gradient-to-br">
-        <Card className="bg-background/80 border-0 shadow-xl backdrop-blur-sm">
-          <CardContent className="p-8 text-center">
-            <p className="text-destructive mb-4">Error: {error}</p>
-            <div className="flex justify-center gap-2">
+      <div className='from-background to-muted/20 flex h-full items-center justify-center bg-gradient-to-br'>
+        <Card className='bg-background/80 border-0 shadow-xl backdrop-blur-sm'>
+          <CardContent className='p-8 text-center'>
+            <p className='text-destructive mb-4'>Error: {error}</p>
+            <div className='flex justify-center gap-2'>
               <Button
                 onClick={refetchData}
-                variant="outline"
-                className="rounded-full"
+                variant='outline'
+                className='rounded-full'
               >
-                <RefreshCw className="mr-2 h-4 w-4" />
+                <RefreshCw className='mr-2 h-4 w-4' />
                 Retry
               </Button>
               <Button
                 onClick={handleBackNavigation}
-                variant="outline"
-                className="rounded-full"
+                variant='outline'
+                className='rounded-full'
               >
                 Go Back
               </Button>
@@ -99,7 +99,7 @@ export function ChatConversation() {
   }
 
   return (
-    <div className="from-background to-muted/20 flex h-full flex-col bg-gradient-to-br">
+    <div className='from-background to-muted/20 flex h-full flex-col bg-gradient-to-br'>
       <ChatHeader
         conversation={conversation}
         onlineUsers={onlineUsers}

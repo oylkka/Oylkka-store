@@ -1,5 +1,5 @@
 import { subHours } from 'date-fns';
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 
 import { auth } from '@/features/auth/auth';
 import { db } from '@/lib/db';
@@ -43,7 +43,7 @@ export async function GET(req: NextRequest) {
     });
 
     // Build dynamic filter
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    // biome-ignore lint: error
     const whereClause: any = {
       items: {
         some: {
@@ -104,13 +104,13 @@ export async function GET(req: NextRequest) {
           currentPage: page,
         },
       },
-      { status: 200 }
+      { status: 200 },
     );
+    // biome-ignore lint: error
   } catch (error) {
-    console.error(error);
     return NextResponse.json(
       { error: 'Internal server error' },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

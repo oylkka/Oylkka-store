@@ -2,7 +2,7 @@
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { AlertCircle, Loader2, PlusCircle, RefreshCw } from 'lucide-react';
-import { JSX, useEffect, useRef, useState } from 'react';
+import { type JSX, useEffect, useRef, useState } from 'react';
 import { useForm, useWatch } from 'react-hook-form';
 import slugify from 'slugify';
 import { toast } from 'sonner';
@@ -117,7 +117,7 @@ export default function AddCategory(): JSX.Element {
     });
   };
 
-  // Auto-generate slug from name when name changes
+  //  biome-ignore lint: error
   useEffect(() => {
     if (name && !isSlugManuallyEdited) {
       const generatedSlug = formatSlugInput(name);
@@ -127,7 +127,7 @@ export default function AddCategory(): JSX.Element {
     }
   }, [name, form, isSlugManuallyEdited, slug]);
 
-  // Check slug when it changes (with debounce)
+  //  biome-ignore lint: error
   useEffect(() => {
     // Only run checks if slug is valid and not empty
     if (slug && slug.length >= 2) {
@@ -161,7 +161,7 @@ export default function AddCategory(): JSX.Element {
       setSlugSuggestions([]);
 
       const result = (await checkCategorySlugUniqueness(
-        slugValue
+        slugValue,
       )) as SlugCheckResponse;
 
       if (!result.isUnique) {
@@ -169,6 +169,7 @@ export default function AddCategory(): JSX.Element {
         setSlugError('This slug is already in use.');
       }
     } catch (error) {
+      //  biome-ignore lint: error
       console.error('Error checking slug:', error);
     } finally {
       setIsCheckingSlug(false);
@@ -232,7 +233,7 @@ export default function AddCategory(): JSX.Element {
     toast.promise(createCategory(formData), {
       loading: 'Creating category...',
 
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      // biome-ignore lint: error
       success: (result: any) => {
         if (result.success) {
           // Reset the form including the image
@@ -249,7 +250,6 @@ export default function AddCategory(): JSX.Element {
         }
       },
       error: (error: unknown) => {
-        console.error('Error creating category:', error);
         return error instanceof Error ? error.message : 'Something went wrong';
       },
     });
@@ -264,30 +264,30 @@ export default function AddCategory(): JSX.Element {
   };
 
   return (
-    <div className="container mx-auto max-w-3xl py-10">
-      <Card className="w-full">
+    <div className='container mx-auto max-w-3xl py-10'>
+      <Card className='w-full'>
         <CardHeader>
-          <CardTitle className="text-center text-2xl font-semibold">
+          <CardTitle className='text-center text-2xl font-semibold'>
             Add New Category
           </CardTitle>
-          <CardDescription className="text-center">
+          <CardDescription className='text-center'>
             Create a new product category or subcategory
           </CardDescription>
         </CardHeader>
         <CardContent>
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-              <div className="grid gap-6 md:grid-cols-2">
-                <div className="space-y-6">
+            <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-8'>
+              <div className='grid gap-6 md:grid-cols-2'>
+                <div className='space-y-6'>
                   {/* Name */}
                   <FormField
                     control={form.control}
-                    name="name"
+                    name='name'
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Name</FormLabel>
                         <FormControl>
-                          <Input placeholder="Category name" {...field} />
+                          <Input placeholder='Category name' {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -297,14 +297,14 @@ export default function AddCategory(): JSX.Element {
                   {/* Slug */}
                   <FormField
                     control={form.control}
-                    name="slug"
+                    name='slug'
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Slug</FormLabel>
-                        <div className="flex space-x-2">
+                        <div className='flex space-x-2'>
                           <FormControl>
                             <Input
-                              placeholder="category-slug"
+                              placeholder='category-slug'
                               {...field}
                               className={
                                 field.value && !slugError
@@ -330,45 +330,45 @@ export default function AddCategory(): JSX.Element {
                             />
                           </FormControl>
                           <Button
-                            type="button"
-                            variant="outline"
-                            size="icon"
+                            type='button'
+                            variant='outline'
+                            size='icon'
                             disabled={isCheckingSlug || !field.value}
                             onClick={handleManualSlugCheck}
                           >
                             {isCheckingSlug ? (
-                              <Loader2 className="h-4 w-4 animate-spin" />
+                              <Loader2 className='h-4 w-4 animate-spin' />
                             ) : (
-                              <RefreshCw className="h-4 w-4" />
+                              <RefreshCw className='h-4 w-4' />
                             )}
                           </Button>
                         </div>
 
                         {isCheckingSlug && (
-                          <div className="text-muted-foreground mt-2 text-xs">
+                          <div className='text-muted-foreground mt-2 text-xs'>
                             Checking availability...
                           </div>
                         )}
 
                         {slugError && (
-                          <Alert variant="destructive" className="mt-2">
-                            <AlertCircle className="h-4 w-4" />
+                          <Alert variant='destructive' className='mt-2'>
+                            <AlertCircle className='h-4 w-4' />
                             <AlertTitle>Error</AlertTitle>
                             <AlertDescription>{slugError}</AlertDescription>
                           </Alert>
                         )}
 
                         {slugSuggestions.length > 0 && (
-                          <div className="mt-2">
-                            <p className="text-muted-foreground mb-2 text-sm">
+                          <div className='mt-2'>
+                            <p className='text-muted-foreground mb-2 text-sm'>
                               Suggested alternatives:
                             </p>
-                            <div className="flex flex-wrap gap-2">
+                            <div className='flex flex-wrap gap-2'>
                               {slugSuggestions.map((suggestion) => (
                                 <Badge
                                   key={suggestion}
-                                  variant="outline"
-                                  className="hover:bg-primary hover:text-primary-foreground cursor-pointer transition-colors"
+                                  variant='outline'
+                                  className='hover:bg-primary hover:text-primary-foreground cursor-pointer transition-colors'
                                   onClick={() =>
                                     applySlugSuggestion(suggestion)
                                   }
@@ -392,7 +392,7 @@ export default function AddCategory(): JSX.Element {
                   {/* Parent Category */}
                   <FormField
                     control={form.control}
-                    name="parentId"
+                    name='parentId'
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Parent Category</FormLabel>
@@ -403,26 +403,26 @@ export default function AddCategory(): JSX.Element {
                         >
                           <FormControl>
                             <SelectTrigger>
-                              <SelectValue placeholder="Select parent category" />
+                              <SelectValue placeholder='Select parent category' />
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
                             {/* Default option for no parent */}
-                            <SelectItem value="none">
+                            <SelectItem value='none'>
                               None (Top-level category)
                             </SelectItem>
 
                             {/* Loading state */}
                             {isPending && (
-                              <div className="text-muted-foreground p-2 text-sm">
-                                <Loader2 className="mr-2 inline h-4 w-4 animate-spin" />
+                              <div className='text-muted-foreground p-2 text-sm'>
+                                <Loader2 className='mr-2 inline h-4 w-4 animate-spin' />
                                 Loading categories...
                               </div>
                             )}
 
                             {/* Error state */}
                             {isError && (
-                              <div className="p-2 text-sm text-red-500">
+                              <div className='p-2 text-sm text-red-500'>
                                 Failed to load categories
                               </div>
                             )}
@@ -431,7 +431,7 @@ export default function AddCategory(): JSX.Element {
                             {!isPending &&
                               !isError &&
                               (!data || data.length === 0) && (
-                                <div className="text-muted-foreground p-2 text-sm">
+                                <div className='text-muted-foreground p-2 text-sm'>
                                   No categories found
                                 </div>
                               )}
@@ -457,16 +457,16 @@ export default function AddCategory(): JSX.Element {
                   />
                 </div>
 
-                <div className="space-y-6">
+                <div className='space-y-6'>
                   {/* Image */}
                   <FormField
                     control={form.control}
-                    name="image"
+                    name='image'
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="flex items-center">
+                        <FormLabel className='flex items-center'>
                           Category Image
-                          <span className="ml-1 text-red-500">*</span>
+                          <span className='ml-1 text-red-500'>*</span>
                         </FormLabel>
                         <FormControl>
                           <ImageUpload
@@ -489,14 +489,14 @@ export default function AddCategory(): JSX.Element {
                   {/* Description */}
                   <FormField
                     control={form.control}
-                    name="description"
+                    name='description'
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Description</FormLabel>
                         <FormControl>
                           <Textarea
-                            placeholder="Brief description of the category"
-                            className="h-32 resize-none"
+                            placeholder='Brief description of the category'
+                            className='h-32 resize-none'
                             {...field}
                           />
                         </FormControl>
@@ -508,10 +508,10 @@ export default function AddCategory(): JSX.Element {
                   {/* Featured */}
                   <FormField
                     control={form.control}
-                    name="featured"
+                    name='featured'
                     render={({ field }) => (
-                      <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm">
-                        <div className="space-y-0.5">
+                      <FormItem className='flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm'>
+                        <div className='space-y-0.5'>
                           <FormLabel>Featured Category</FormLabel>
                           <FormDescription>
                             Display prominently on the website
@@ -530,11 +530,11 @@ export default function AddCategory(): JSX.Element {
               </div>
 
               <Button
-                type="submit"
-                className="w-full transition-all duration-200 hover:scale-[1.02]"
+                type='submit'
+                className='w-full transition-all duration-200 hover:scale-[1.02]'
                 disabled={isCheckingSlug || !!slugError}
               >
-                <PlusCircle className="mr-2 h-4 w-4" />
+                <PlusCircle className='mr-2 h-4 w-4' />
                 Create Category
               </Button>
             </form>

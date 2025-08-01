@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 
 import { bkashConfig } from '@/lib/bkash';
 import { db } from '@/lib/db';
@@ -15,10 +15,9 @@ export async function GET(req: NextRequest) {
     const myUrl = process.env.NEXT_PUBLIC_SITE_URL;
 
     if (!paymentID) {
-      console.error('No paymentID in callback');
       return NextResponse.redirect(
         `${myUrl}/dashboard/order/cancel?error=no_payment_id`,
-        303
+        303,
       );
     }
 
@@ -46,7 +45,7 @@ export async function GET(req: NextRequest) {
           data: {
             paymentStatus: PaymentStatus.FAILED,
             metadata: {
-              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              // biome-ignore lint: error
               ...((order.metadata as Record<string, any>) || {}),
               paymentFailedAt: new Date().toISOString(),
               paymentFailureReason:
@@ -59,7 +58,7 @@ export async function GET(req: NextRequest) {
 
       return NextResponse.redirect(
         `${myUrl}/dashboard/order/cancel?reason=${encodeURIComponent(statusMessage || 'Payment failed')}`,
-        303
+        303,
       );
     }
 
@@ -82,7 +81,7 @@ export async function GET(req: NextRequest) {
         if (!orderNumber) {
           return NextResponse.redirect(
             `${myUrl}/dashboard/order/cancel?error=no_order_reference`,
-            303
+            303,
           );
         }
 
@@ -93,16 +92,15 @@ export async function GET(req: NextRequest) {
           });
 
           if (!order) {
-            console.error('Order not found for:', orderNumber);
             return NextResponse.redirect(
               `${myUrl}/dashboard/order/cancel?error=order_not_found`,
-              303
+              303,
             );
           }
         }
 
         // Update order with success information
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // biome-ignore lint: error
         const currentMetadata = (order.metadata as Record<string, any>) || {};
         const updatedOrder = await db.order.update({
           where: { id: order.id },
@@ -131,14 +129,10 @@ export async function GET(req: NextRequest) {
 
         return NextResponse.redirect(
           `${myUrl}/dashboard/order/order-confirmation?orderId=${updatedOrder.orderNumber}`,
-          303
+          303,
         );
       } else {
         // Both execution and query show failure - handle payment failure
-        console.error(
-          'Payment both execution and query failed:',
-          executePaymentResponse
-        );
 
         // Get order number from the failed execution response
         const orderNumber = executePaymentResponse.merchantInvoiceNumber;
@@ -156,7 +150,7 @@ export async function GET(req: NextRequest) {
             // Update order with failure information
 
             const currentMetadata =
-              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              // biome-ignore lint: error
               (order.metadata as Record<string, any>) || {};
             await db.order.update({
               where: { id: order.id },
@@ -175,7 +169,7 @@ export async function GET(req: NextRequest) {
 
         return NextResponse.redirect(
           `${myUrl}/dashboard/order/cancel?error=${encodeURIComponent(executePaymentResponse.statusMessage || 'Payment execution failed')}`,
-          303
+          303,
         );
       }
     }
@@ -190,16 +184,15 @@ export async function GET(req: NextRequest) {
       });
 
       if (!order) {
-        console.error('Order not found for:', orderNumber);
         return NextResponse.redirect(
           `${myUrl}/dashboard/order/cancel?error=order_not_found`,
-          303
+          303,
         );
       }
     }
 
     // Update the order with payment details
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    // biome-ignore lint: error
     const currentMetadata = (order.metadata as Record<string, any>) || {};
     const updatedOrder = await db.order.update({
       where: { id: order.id },
@@ -224,14 +217,14 @@ export async function GET(req: NextRequest) {
     // Redirect to success page
     return NextResponse.redirect(
       `${myUrl}/dashboard/order/order-confirmation?orderId=${updatedOrder.orderNumber}`,
-      303
+      303,
     );
+    // biome-ignore lint: error
   } catch (error) {
-    console.error('Callback processing error:', error);
     const myUrl = process.env.NEXT_PUBLIC_SITE_URL;
     return NextResponse.redirect(
       `${myUrl}/dashboard/order/cancel?error=server_error`,
-      303
+      303,
     );
   }
 }
@@ -255,6 +248,6 @@ async function updateProductStock(orderId: string) {
         },
       });
     }
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    // biome-ignore lint: error
   } catch (error) {}
 }

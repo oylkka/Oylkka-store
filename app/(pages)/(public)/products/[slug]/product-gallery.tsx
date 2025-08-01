@@ -74,11 +74,12 @@ export default function ProductGallery({
   };
 
   return (
-    <div className="space-y-4">
+    <div className='space-y-4'>
       <Dialog>
+        {/* biome-ignore lint: error */}
         <div
           ref={imageContainerRef}
-          className="bg-secondary relative h-80 w-full cursor-zoom-in overflow-hidden rounded-lg md:h-[500px]"
+          className='bg-secondary relative h-80 w-full cursor-zoom-in overflow-hidden rounded-lg md:h-[500px]'
           onMouseMove={handleMouseMove}
           onMouseEnter={() => setMagnify(true)}
           onMouseLeave={() => setMagnify(false)}
@@ -86,15 +87,15 @@ export default function ProductGallery({
           <Image
             src={images[selectedImage]?.url}
             alt={`${productName} - ${images[selectedImage]?.alt || `view ${selectedImage + 1}`}`}
-            className="object-contain transition-opacity duration-300"
+            className='object-contain transition-opacity duration-300'
             fill
             priority
-            sizes="(max-width: 768px) 100vw, 50vw"
+            sizes='(max-width: 768px) 100vw, 50vw'
           />
 
           {magnify && (
             <div
-              className="pointer-events-none absolute inset-0 transition-opacity duration-200"
+              className='pointer-events-none absolute inset-0 transition-opacity duration-200'
               style={{
                 backgroundImage: `url(${images[selectedImage]?.url})`,
                 backgroundPosition: `${magnifyPosition.x}% ${magnifyPosition.y}%`,
@@ -107,33 +108,33 @@ export default function ProductGallery({
           )}
 
           {discountPercent > 0 && (
-            <Badge className="absolute top-4 left-4 z-20 bg-red-500 hover:bg-red-600">
+            <Badge className='absolute top-4 left-4 z-20 bg-red-500 hover:bg-red-600'>
               -{discountPercent}%
             </Badge>
           )}
 
           <DialogTrigger asChild>
             <Button
-              variant="secondary"
-              size="icon"
-              className="absolute right-4 bottom-4 z-20"
+              variant='secondary'
+              size='icon'
+              className='absolute right-4 bottom-4 z-20'
             >
-              <Maximize2 className="h-5 w-5" />
+              <Maximize2 className='h-5 w-5' />
             </Button>
           </DialogTrigger>
         </div>
-        <DialogContent className="max-w-4xl">
-          <DialogHeader className="hidden">
+        <DialogContent className='max-w-4xl'>
+          <DialogHeader className='hidden'>
             <DialogTitle>{productName}</DialogTitle>
           </DialogHeader>
-          <div className="h-full w-full">
+          <div className='h-full w-full'>
             <Image
               src={
                 images[selectedImage]?.url ||
                 '/placeholder.svg?height=800&width=800'
               }
               alt={`${productName} - ${images[selectedImage]?.alt || `view ${selectedImage + 1}`}`}
-              className="object-contain"
+              className='object-contain'
               width={2000}
               height={2000}
             />
@@ -141,32 +142,33 @@ export default function ProductGallery({
         </DialogContent>
       </Dialog>
 
-      <Carousel className="w-full">
+      <Carousel className='w-full'>
         <CarouselContent>
           {images.map((image, index) => (
-            <CarouselItem key={image.publicId || index} className="basis-1/5">
+            <CarouselItem key={image.publicId || index} className='basis-1/5'>
+              {/* biome-ignore lint: error */}
               <div
                 className={cn(
                   'relative h-24 cursor-pointer rounded-md border-2 transition-all',
                   selectedImage === index
                     ? 'border-primary ring-primary/20 ring-2'
-                    : 'border-transparent'
+                    : 'border-transparent',
                 )}
                 onClick={() => handleThumbnailClick(index)}
               >
                 <Image
                   src={image.url || '/placeholder.svg?height=100&width=100'}
                   alt={`${productName} - ${image.alt || `view ${index + 1}`}`}
-                  className="rounded-md object-cover"
+                  className='rounded-md object-cover'
                   fill
-                  sizes="100px"
+                  sizes='100px'
                 />
               </div>
             </CarouselItem>
           ))}
         </CarouselContent>
-        <CarouselPrevious className="left-0" />
-        <CarouselNext className="right-0" />
+        <CarouselPrevious className='left-0' />
+        <CarouselNext className='right-0' />
       </Carousel>
     </div>
   );

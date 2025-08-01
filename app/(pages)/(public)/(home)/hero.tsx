@@ -104,12 +104,12 @@ export default function HeroSection() {
 
   return (
     <section
-      className="relative w-full overflow-hidden"
+      className='relative w-full overflow-hidden'
       onTouchStart={handleTouchStart}
       onTouchMove={handleTouchMove}
       onTouchEnd={handleTouchEnd}
     >
-      <div className="relative h-[40vh] w-full md:h-[70vh] lg:h-[91vh]">
+      <div className='relative h-[40vh] w-full md:h-[70vh] lg:h-[91vh]'>
         {data.map((slide: HeroBanner, index: number) => (
           <div
             key={slide.id}
@@ -117,16 +117,16 @@ export default function HeroSection() {
               'absolute inset-0 h-full w-full transition-opacity duration-1000',
               index === currentSlide
                 ? 'opacity-100'
-                : 'pointer-events-none opacity-0'
+                : 'pointer-events-none opacity-0',
             )}
           >
-            <div className="absolute inset-0 overflow-hidden">
+            <div className='absolute inset-0 overflow-hidden'>
               <Image
                 src={slide.image.url || '/placeholder.svg'}
                 alt={slide.title}
                 fill
                 priority={index === 0}
-                className="object-cover object-center"
+                className='object-cover object-center'
               />
               <div
                 className={cn(
@@ -135,13 +135,13 @@ export default function HeroSection() {
                     ? 'bg-gradient-to-r from-black/80 via-black/50 to-black/20'
                     : slide.alignment === 'center'
                       ? 'bg-gradient-to-r from-black/60 via-black/20 to-black/60'
-                      : 'bg-gradient-to-l from-black/80 via-black/50 to-black/20'
+                      : 'bg-gradient-to-l from-black/80 via-black/50 to-black/20',
                 )}
-                aria-hidden="true" // Accessibility: Hide decorative overlay
+                aria-hidden='true' // Accessibility: Hide decorative overlay
               />
             </div>
 
-            <div className="relative z-10 flex h-full items-center">
+            <div className='relative z-10 flex h-full items-center'>
               <div
                 className={cn(
                   'container mx-auto flex px-2 md:px-0',
@@ -149,31 +149,31 @@ export default function HeroSection() {
                     ? 'justify-start'
                     : slide.alignment === 'center'
                       ? 'justify-center text-center'
-                      : 'justify-end'
+                      : 'justify-end',
                 )}
               >
-                <div className="max-w-md space-y-2 md:max-w-lg md:space-y-4 lg:max-w-xl">
+                <div className='max-w-md space-y-2 md:max-w-lg md:space-y-4 lg:max-w-xl'>
                   {slide.bannerTag && (
                     <Badge
-                      className="bg-white/90 text-black md:mb-2 md:rounded-md md:px-3 md:py-1 md:text-sm md:font-medium"
-                      variant="secondary"
+                      className='bg-white/90 text-black md:mb-2 md:rounded-md md:px-3 md:py-1 md:text-sm md:font-medium'
+                      variant='secondary'
                     >
                       {slide.bannerTag}
                     </Badge>
                   )}
-                  <h2 className="font-heading text-xl font-bold tracking-tight text-white sm:text-4xl md:text-5xl lg:text-6xl">
+                  <h2 className='font-heading text-xl font-bold tracking-tight text-white sm:text-4xl md:text-5xl lg:text-6xl'>
                     {slide.title}
                   </h2>
-                  <p className="text-lg font-medium text-white md:text-2xl">
+                  <p className='text-lg font-medium text-white md:text-2xl'>
                     {slide.subTitle}
                   </p>
-                  <p className="text-sm text-white/90 md:text-lg">
+                  <p className='text-sm text-white/90 md:text-lg'>
                     {slide.description}
                   </p>
                   <div
                     className={cn(
                       'flex flex-wrap gap-3 pt-2',
-                      slide.alignment === 'center' && 'justify-center'
+                      slide.alignment === 'center' && 'justify-center',
                     )}
                   >
                     {slide.primaryActionText && slide.primaryActionLink && (
@@ -186,8 +186,8 @@ export default function HeroSection() {
                     {slide.secondaryActionText && slide.secondaryActionLink && (
                       <Button
                         asChild
-                        variant="outline"
-                        className="border-white/20 bg-white/10 text-white hover:bg-white/20"
+                        variant='outline'
+                        className='border-white/20 bg-white/10 text-white hover:bg-white/20'
                       >
                         <Link href={slide.secondaryActionLink}>
                           {slide.secondaryActionText}
@@ -201,15 +201,17 @@ export default function HeroSection() {
           </div>
         ))}
 
-        <div className="absolute right-0 bottom-4 left-0 z-20 flex justify-center gap-2">
+        <div className='absolute right-0 bottom-4 left-0 z-20 flex justify-center gap-2'>
           {data.map((_: HeroBanner, index: number) => (
             <button
+              type='button'
+              // biome-ignore lint: error
               key={index}
               className={cn(
                 'h-2 w-2 rounded-full transition-all',
                 index === currentSlide
                   ? 'w-8 bg-white'
-                  : 'bg-white/50 hover:bg-white/80'
+                  : 'bg-white/50 hover:bg-white/80',
               )}
               onClick={() => goToSlide(index)}
               aria-label={`Go to slide ${index + 1}`}
@@ -223,31 +225,31 @@ export default function HeroSection() {
 
 function HeroSkeleton() {
   return (
-    <div className="relative h-[40vh] w-full md:h-[70vh] lg:h-[91vh]">
-      <div className="bg-muted absolute inset-0 animate-pulse" />
-      <div className="relative z-10 flex h-full items-center">
-        <div className="container mx-auto px-2 md:px-0">
-          <div className="max-w-md space-y-2 md:max-w-lg md:space-y-4 lg:max-w-xl">
-            <div className="bg-muted-foreground/20 h-6 w-24 rounded" />
-            <div className="bg-muted-foreground/30 h-10 w-3/4 rounded" />
-            <div className="bg-muted-foreground/30 h-8 w-2/3 rounded" />
-            <div className="space-y-2">
-              <div className="bg-muted-foreground/20 h-4 w-full rounded" />
-              <div className="bg-muted-foreground/20 h-4 w-5/6 rounded" />
-              <div className="bg-muted-foreground/20 h-4 w-4/6 rounded" />
+    <div className='relative h-[40vh] w-full md:h-[70vh] lg:h-[91vh]'>
+      <div className='bg-muted absolute inset-0 animate-pulse' />
+      <div className='relative z-10 flex h-full items-center'>
+        <div className='container mx-auto px-2 md:px-0'>
+          <div className='max-w-md space-y-2 md:max-w-lg md:space-y-4 lg:max-w-xl'>
+            <div className='bg-muted-foreground/20 h-6 w-24 rounded' />
+            <div className='bg-muted-foreground/30 h-10 w-3/4 rounded' />
+            <div className='bg-muted-foreground/30 h-8 w-2/3 rounded' />
+            <div className='space-y-2'>
+              <div className='bg-muted-foreground/20 h-4 w-full rounded' />
+              <div className='bg-muted-foreground/20 h-4 w-5/6 rounded' />
+              <div className='bg-muted-foreground/20 h-4 w-4/6 rounded' />
             </div>
-            <div className="flex gap-3 pt-2">
-              <div className="bg-muted-foreground/30 h-10 w-32 rounded" />
-              <div className="bg-muted-foreground/20 h-10 w-32 rounded" />
+            <div className='flex gap-3 pt-2'>
+              <div className='bg-muted-foreground/30 h-10 w-32 rounded' />
+              <div className='bg-muted-foreground/20 h-10 w-32 rounded' />
             </div>
           </div>
         </div>
       </div>
-      <div className="absolute right-0 bottom-4 left-0 z-20 flex justify-center gap-2">
+      <div className='absolute right-0 bottom-4 left-0 z-20 flex justify-center gap-2'>
         {[0, 1, 2].map((index) => (
           <div
             key={index}
-            className="bg-muted-foreground/30 h-2 w-2 rounded-full"
+            className='bg-muted-foreground/30 h-2 w-2 rounded-full'
           />
         ))}
       </div>
@@ -257,9 +259,9 @@ function HeroSkeleton() {
 
 function HeroError() {
   return (
-    <div className="w-full p-6">
-      <Alert variant="destructive">
-        <AlertCircle className="h-4 w-4" />
+    <div className='w-full p-6'>
+      <Alert variant='destructive'>
+        <AlertCircle className='h-4 w-4' />
         <AlertTitle>Failed to load</AlertTitle>
         <AlertDescription>
           We couldn’t load the hero banner. Please try again later.

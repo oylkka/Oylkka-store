@@ -1,5 +1,5 @@
-import { QUERY_KEYS } from '@/lib/constants';
 import { useQuery } from '@tanstack/react-query';
+import { QUERY_KEYS } from '@/lib/constants';
 
 export function useAdminCategoryList() {
   return useQuery({
@@ -16,7 +16,7 @@ export function useSingleCategory({ slug }: { slug: string }) {
     queryKey: [QUERY_KEYS.SINGLE_CATEGORY, slug],
     queryFn: async () => {
       const response = await fetch(
-        `/api/dashboard/admin/category/single-category?slug=${slug}`
+        `/api/dashboard/admin/category/single-category?slug=${slug}`,
       );
       return response.json();
     },

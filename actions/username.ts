@@ -11,7 +11,7 @@ export interface UsernameCheckResult {
 }
 
 export async function checkUsername(
-  username: string
+  username: string,
 ): Promise<UsernameCheckResult> {
   // Validate input
   if (!username) {
@@ -105,8 +105,8 @@ export async function checkUsername(
     }
 
     return { available: true };
+    // biome-ignore lint: error
   } catch (error) {
-    console.error('Username check error:', error);
     return {
       available: false,
       error: 'Failed to check username',

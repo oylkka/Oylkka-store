@@ -28,11 +28,12 @@ export default function ShopBrandingSection() {
   const [bannerPreviewUrl, setBannerPreviewUrl] = useState<string | null>(null);
 
   // Update preview URLs when form values change
+  // biome-ignore lint: error
   useEffect(() => {
     // Only create new object URLs when the File objects change
     if (shopLogo instanceof File) {
       // Clean up previous URL before creating a new one
-      if (logoPreviewUrl && logoPreviewUrl.startsWith('blob:')) {
+      if (logoPreviewUrl?.startsWith('blob:')) {
         URL.revokeObjectURL(logoPreviewUrl);
       }
       const url = URL.createObjectURL(shopLogo);
@@ -41,7 +42,7 @@ export default function ShopBrandingSection() {
 
     if (shopBanner instanceof File) {
       // Clean up previous URL before creating a new one
-      if (bannerPreviewUrl && bannerPreviewUrl.startsWith('blob:')) {
+      if (bannerPreviewUrl?.startsWith('blob:')) {
         URL.revokeObjectURL(bannerPreviewUrl);
       }
       const url = URL.createObjectURL(shopBanner);
@@ -50,10 +51,10 @@ export default function ShopBrandingSection() {
 
     // Cleanup function to revoke object URLs when component unmounts
     return () => {
-      if (logoPreviewUrl && logoPreviewUrl.startsWith('blob:')) {
+      if (logoPreviewUrl?.startsWith('blob:')) {
         URL.revokeObjectURL(logoPreviewUrl);
       }
-      if (bannerPreviewUrl && bannerPreviewUrl.startsWith('blob:')) {
+      if (bannerPreviewUrl?.startsWith('blob:')) {
         URL.revokeObjectURL(bannerPreviewUrl);
       }
     };
@@ -123,71 +124,71 @@ export default function ShopBrandingSection() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className='space-y-6'>
       {/* Logo Upload Section */}
-      <div className="rounded-lg border p-6">
-        <h3 className="mb-2 text-base font-semibold">Shop Logo</h3>
-        <p className="text-muted-foreground mb-4 text-sm">
+      <div className='rounded-lg border p-6'>
+        <h3 className='mb-2 text-base font-semibold'>Shop Logo</h3>
+        <p className='text-muted-foreground mb-4 text-sm'>
           Upload a logo to represent your brand
         </p>
 
-        <div className="grid gap-6 md:grid-cols-2">
-          <div className="space-y-4">
+        <div className='grid gap-6 md:grid-cols-2'>
+          <div className='space-y-4'>
             {logoPreviewUrl ? (
-              <div className="relative h-40 w-40 overflow-hidden rounded-md border-2 border-dashed border-gray-300 bg-gray-50">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
+              <div className='relative h-40 w-40 overflow-hidden rounded-md border-2 border-dashed border-gray-300 bg-gray-50'>
+                {/* biome-ignore lint: error */}
                 <img
                   src={logoPreviewUrl || '/placeholder.svg'}
-                  alt="Logo preview"
-                  className="h-full w-full object-contain p-2"
+                  alt='Logo preview'
+                  className='h-full w-full object-contain p-2'
                 />
                 <Button
-                  size="icon"
-                  variant="destructive"
-                  className="absolute top-2 right-2 h-6 w-6"
+                  size='icon'
+                  variant='destructive'
+                  className='absolute top-2 right-2 h-6 w-6'
                   onClick={removeLogo}
-                  type="button"
+                  type='button'
                 >
-                  <X className="h-4 w-4" />
+                  <X className='h-4 w-4' />
                 </Button>
               </div>
             ) : (
-              <div className="relative flex h-40 w-40 cursor-pointer flex-col items-center justify-center rounded-md border-2 border-dashed border-gray-300 bg-gray-50 transition-all hover:bg-gray-100">
+              <div className='relative flex h-40 w-40 cursor-pointer flex-col items-center justify-center rounded-md border-2 border-dashed border-gray-300 bg-gray-50 transition-all hover:bg-gray-100'>
                 <input
                   ref={(el) => {
                     fileInputRefs.current.logo = el;
                   }}
-                  id="logo-upload"
-                  type="file"
-                  accept="image/*"
-                  className="absolute inset-0 cursor-pointer opacity-0"
+                  id='logo-upload'
+                  type='file'
+                  accept='image/*'
+                  className='absolute inset-0 cursor-pointer opacity-0'
                   onChange={handleLogoChange}
                   disabled={logoUploading}
                   onClick={(e) => e.stopPropagation()}
                 />
                 {logoUploading ? (
-                  <div className="border-primary h-6 w-6 animate-spin rounded-full border-2 border-t-transparent" />
+                  <div className='border-primary h-6 w-6 animate-spin rounded-full border-2 border-t-transparent' />
                 ) : (
                   <>
-                    <Upload className="text-muted-foreground mb-2 h-10 w-10" />
-                    <span className="text-muted-foreground text-sm font-medium">
+                    <Upload className='text-muted-foreground mb-2 h-10 w-10' />
+                    <span className='text-muted-foreground text-sm font-medium'>
                       Upload Logo
                     </span>
-                    <span className="text-muted-foreground mt-1 text-xs">
+                    <span className='text-muted-foreground mt-1 text-xs'>
                       Click or drag & drop
                     </span>
                   </>
                 )}
               </div>
             )}
-            <p className="text-muted-foreground text-xs">
+            <p className='text-muted-foreground text-xs'>
               Recommended size: 250x250 pixels (square)
             </p>
           </div>
 
-          <div className="flex flex-col justify-center">
-            <h4 className="mb-2 text-sm font-medium">Logo Guidelines:</h4>
-            <ul className="text-muted-foreground space-y-1 text-xs">
+          <div className='flex flex-col justify-center'>
+            <h4 className='mb-2 text-sm font-medium'>Logo Guidelines:</h4>
+            <ul className='text-muted-foreground space-y-1 text-xs'>
               <li>• PNG or JPG format (transparent background preferred)</li>
               <li>• Maximum file size: 500KB</li>
               <li>• Should be clearly visible at small sizes</li>
@@ -198,64 +199,64 @@ export default function ShopBrandingSection() {
       </div>
 
       {/* Banner Upload Section */}
-      <div className="rounded-lg border p-6">
-        <h3 className="mb-2 text-base font-semibold">Shop Banner</h3>
-        <p className="text-muted-foreground mb-4 text-sm">
+      <div className='rounded-lg border p-6'>
+        <h3 className='mb-2 text-base font-semibold'>Shop Banner</h3>
+        <p className='text-muted-foreground mb-4 text-sm'>
           Add a banner image to showcase your shop
         </p>
 
-        <div className="space-y-4">
+        <div className='space-y-4'>
           {bannerPreviewUrl ? (
-            <div className="relative overflow-hidden rounded-md border border-gray-300">
+            <div className='relative overflow-hidden rounded-md border border-gray-300'>
               <div
-                className="relative"
+                className='relative'
                 style={{ paddingTop: '31.25%' /* 16:5 aspect ratio */ }}
               >
-                {/* eslint-disable-next-line @next/next/no-img-element */}
+                {/* biome-ignore lint: error */}
                 <img
                   src={bannerPreviewUrl || '/placeholder.svg'}
-                  alt="Banner preview"
-                  className="absolute inset-0 h-full w-full object-cover"
+                  alt='Banner preview'
+                  className='absolute inset-0 h-full w-full object-cover'
                 />
                 <Button
-                  size="icon"
-                  variant="destructive"
-                  className="absolute top-2 right-2 h-6 w-6"
+                  size='icon'
+                  variant='destructive'
+                  className='absolute top-2 right-2 h-6 w-6'
                   onClick={removeBanner}
-                  type="button"
+                  type='button'
                 >
-                  <X className="h-4 w-4" />
+                  <X className='h-4 w-4' />
                 </Button>
               </div>
             </div>
           ) : (
-            <div className="hover:border-primary relative overflow-hidden rounded-md border border-gray-300 transition-all hover:shadow-sm">
+            <div className='hover:border-primary relative overflow-hidden rounded-md border border-gray-300 transition-all hover:shadow-sm'>
               <div
-                className="relative"
+                className='relative'
                 style={{ paddingTop: '31.25%' /* 16:5 aspect ratio */ }}
               >
                 <input
                   ref={(el) => {
                     fileInputRefs.current.banner = el;
                   }}
-                  id="banner-upload"
-                  type="file"
-                  accept="image/*"
-                  className="absolute inset-0 z-10 cursor-pointer opacity-0"
+                  id='banner-upload'
+                  type='file'
+                  accept='image/*'
+                  className='absolute inset-0 z-10 cursor-pointer opacity-0'
                   onChange={handleBannerChange}
                   disabled={bannerUploading}
                   onClick={(e) => e.stopPropagation()}
                 />
-                <div className="absolute inset-0 flex h-full w-full flex-col items-center justify-center bg-gray-50 text-center">
+                <div className='absolute inset-0 flex h-full w-full flex-col items-center justify-center bg-gray-50 text-center'>
                   {bannerUploading ? (
-                    <div className="border-primary h-8 w-8 animate-spin rounded-full border-2 border-t-transparent" />
+                    <div className='border-primary h-8 w-8 animate-spin rounded-full border-2 border-t-transparent' />
                   ) : (
                     <>
-                      <Upload className="text-muted-foreground mb-2 h-10 w-10" />
-                      <span className="text-muted-foreground text-sm font-medium">
+                      <Upload className='text-muted-foreground mb-2 h-10 w-10' />
+                      <span className='text-muted-foreground text-sm font-medium'>
                         Upload Banner
                       </span>
-                      <span className="text-muted-foreground mt-1 text-xs">
+                      <span className='text-muted-foreground mt-1 text-xs'>
                         Recommended size: 1600x500 pixels
                       </span>
                     </>
@@ -265,9 +266,9 @@ export default function ShopBrandingSection() {
             </div>
           )}
 
-          <div className="rounded-md bg-gray-50 p-3">
-            <h4 className="mb-2 text-sm font-medium">Banner Tips:</h4>
-            <ul className="text-muted-foreground space-y-1 text-xs">
+          <div className='rounded-md bg-gray-50 p-3'>
+            <h4 className='mb-2 text-sm font-medium'>Banner Tips:</h4>
+            <ul className='text-muted-foreground space-y-1 text-xs'>
               <li>• High-quality image that represents your brand</li>
               <li>• Include key products or services</li>
               <li>• Ensure text is readable if included in the image</li>

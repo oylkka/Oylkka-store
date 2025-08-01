@@ -18,7 +18,7 @@ export function SignOut() {
   return (
     <AlertDialog>
       <AlertDialogTrigger asChild>
-        <Button variant="destructive">Sign Out</Button>
+        <Button variant='destructive'>Sign Out</Button>
       </AlertDialogTrigger>
       <AlertDialogContent>
         <AlertDialogHeader>
@@ -31,7 +31,7 @@ export function SignOut() {
           <AlertDialogCancel>Cancel</AlertDialogCancel>
           <form action={signOutAction}>
             <AlertDialogAction asChild>
-              <Button variant="destructive" className="w-full" type="submit">
+              <Button variant='destructive' className='w-full' type='submit'>
                 Sign Out
               </Button>
             </AlertDialogAction>

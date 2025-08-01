@@ -32,13 +32,13 @@ export default function VariantGenerateAlert() {
 
     window.addEventListener(
       'attributeHierarchyChange',
-      handleHierarchyChange as EventListener
+      handleHierarchyChange as EventListener,
     );
 
     return () => {
       window.removeEventListener(
         'attributeHierarchyChange',
-        handleHierarchyChange as EventListener
+        handleHierarchyChange as EventListener,
       );
     };
   }, []);
@@ -48,12 +48,12 @@ export default function VariantGenerateAlert() {
 
   if (!hasAttributes && !hasValidSku) {
     return (
-      <Alert className="mb-4 bg-amber-50">
-        <AlertCircle className="h-4 w-4 text-amber-600" />
-        <AlertTitle className="text-amber-700">
+      <Alert className='mb-4 bg-amber-50'>
+        <AlertCircle className='h-4 w-4 text-amber-600' />
+        <AlertTitle className='text-amber-700'>
           No Product Variants Yet
         </AlertTitle>
-        <AlertDescription className="text-amber-600">
+        <AlertDescription className='text-amber-600'>
           Define product attributes and a unique SKU in the form above to
           generate product variants.
         </AlertDescription>
@@ -63,12 +63,12 @@ export default function VariantGenerateAlert() {
 
   if (!hasAttributes) {
     return (
-      <Alert className="mb-4 bg-amber-50">
-        <AlertCircle className="h-4 w-4 text-amber-600" />
-        <AlertTitle className="text-amber-700">
+      <Alert className='mb-4 bg-amber-50'>
+        <AlertCircle className='h-4 w-4 text-amber-600' />
+        <AlertTitle className='text-amber-700'>
           No Product Attributes
         </AlertTitle>
-        <AlertDescription className="text-amber-600">
+        <AlertDescription className='text-amber-600'>
           Define product attributes in the form above to generate product
           variants.
         </AlertDescription>
@@ -78,10 +78,10 @@ export default function VariantGenerateAlert() {
 
   if (!hasValidSku) {
     return (
-      <Alert className="mb-4 bg-amber-50">
-        <AlertCircle className="h-4 w-4 text-amber-600" />
-        <AlertTitle className="text-amber-700">No Product SKU</AlertTitle>
-        <AlertDescription className="text-amber-600">
+      <Alert className='mb-4 bg-amber-50'>
+        <AlertCircle className='h-4 w-4 text-amber-600' />
+        <AlertTitle className='text-amber-700'>No Product SKU</AlertTitle>
+        <AlertDescription className='text-amber-600'>
           A product SKU is required before generating variants. Please define a
           unique SKU for this product.
         </AlertDescription>
@@ -107,7 +107,7 @@ export default function VariantGenerateAlert() {
               (Array.isArray(attributes[attr]) ? attributes[attr].length : 1)
             );
           },
-          1
+          1,
         );
 
         return primaryCount * secondaryCount;
@@ -119,13 +119,13 @@ export default function VariantGenerateAlert() {
     // Default calculation for all combinations
     return Object.values(attributes).reduce(
       (acc, values) => acc * (Array.isArray(values) ? values.length : 1),
-      1
+      1,
     );
   };
 
   return (
-    <Alert className="bg-primary/5 mb-4">
-      <Info className="h-4 w-4" />
+    <Alert className='bg-primary/5 mb-4'>
+      <Info className='h-4 w-4' />
       <AlertTitle>Product Variants</AlertTitle>
       <AlertDescription>
         {attributeHierarchy.primary ? (
@@ -146,7 +146,7 @@ export default function VariantGenerateAlert() {
           </>
         )}
         {Object.keys(attributes).length > 0 && (
-          <span className="mt-1 block font-semibold">
+          <span className='mt-1 block font-semibold'>
             Number of possible variants: {calculateVariantCount()}
           </span>
         )}

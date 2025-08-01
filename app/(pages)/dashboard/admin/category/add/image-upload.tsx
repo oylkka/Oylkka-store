@@ -25,7 +25,7 @@ export const ImageUpload = forwardRef<
 >(
   (
     { onChange, disabled, previewUrl, onPreviewChange, required = false },
-    ref
+    ref,
   ) => {
     // Use internal preview state if not provided by parent
     const [internalPreview, setInternalPreview] = useState<string | null>(null);
@@ -61,7 +61,7 @@ export const ImageUpload = forwardRef<
       // Check file size
       if (file.size > MAX_FILE_SIZE) {
         setError(
-          `File size exceeds 500 KB. Current size: ${(file.size / 1024).toFixed(2)} KB`
+          `File size exceeds 500 KB. Current size: ${(file.size / 1024).toFixed(2)} KB`,
         );
         // Reset the file input
         if (fileInputRef.current) {
@@ -113,62 +113,62 @@ export const ImageUpload = forwardRef<
     };
 
     return (
-      <div className="flex flex-col items-center gap-4">
+      <div className='flex flex-col items-center gap-4'>
         <input
-          type="file"
-          id="image-upload"
-          accept="image/*"
+          type='file'
+          id='image-upload'
+          accept='image/*'
           onChange={handleChange}
           disabled={disabled}
-          className="hidden"
+          className='hidden'
           ref={fileInputRef}
           required={required}
         />
 
         {error && (
-          <Alert variant="destructive" className="w-full">
-            <AlertCircle className="h-4 w-4" />
+          <Alert variant='destructive' className='w-full'>
+            <AlertCircle className='h-4 w-4' />
             <AlertDescription>{error}</AlertDescription>
           </Alert>
         )}
 
         {preview ? (
-          <div className="relative h-40 w-40 overflow-hidden rounded-md border">
+          <div className='relative h-40 w-40 overflow-hidden rounded-md border'>
             <Image
               src={preview || '/placeholder.svg'}
-              alt="Preview"
+              alt='Preview'
               fill
-              className="object-cover"
+              className='object-cover'
             />
             <Button
-              type="button"
+              type='button'
               onClick={handleRemove}
-              variant="destructive"
-              size="icon"
-              className="absolute top-1 right-1 h-6 w-6 rounded-full p-0 opacity-80 transition-opacity hover:opacity-100"
+              variant='destructive'
+              size='icon'
+              className='absolute top-1 right-1 h-6 w-6 rounded-full p-0 opacity-80 transition-opacity hover:opacity-100'
               disabled={disabled}
             >
-              <X className="h-4 w-4" />
+              <X className='h-4 w-4' />
             </Button>
           </div>
         ) : (
           <label
-            htmlFor="image-upload"
+            htmlFor='image-upload'
             className={`border-muted-foreground/50 bg-muted/50 hover:border-muted-foreground/80 hover:bg-muted flex h-40 w-40 cursor-pointer flex-col items-center justify-center gap-2 rounded-md border border-dashed p-4 text-center transition-colors ${
               required ? 'ring-red-500 focus-within:ring-2' : ''
             }`}
           >
-            <UploadCloud className="text-muted-foreground h-10 w-10" />
-            <p className="text-muted-foreground text-sm">
+            <UploadCloud className='text-muted-foreground h-10 w-10' />
+            <p className='text-muted-foreground text-sm'>
               Click to upload an image
-              {required && <span className="ml-1 text-red-500">*</span>}
+              {required && <span className='ml-1 text-red-500'>*</span>}
             </p>
-            <p className="text-muted-foreground text-xs">Max size: 500 KB</p>
+            <p className='text-muted-foreground text-xs'>Max size: 500 KB</p>
           </label>
         )}
       </div>
     );
-  }
+  },
 );
 
 ImageUpload.displayName = 'ImageUpload';

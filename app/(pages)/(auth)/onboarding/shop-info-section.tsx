@@ -18,8 +18,8 @@ export default function ShopInfoSection() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <ShoppingBag className="text-primary" />
+        <CardTitle className='flex items-center gap-2'>
+          <ShoppingBag className='text-primary' />
           Shop Information
         </CardTitle>
         <CardDescription>
@@ -27,11 +27,11 @@ export default function ShopInfoSection() {
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <div className="grid gap-8 lg:grid-cols-3">
-          <div className="space-y-8 lg:col-span-2">
+        <div className='grid gap-8 lg:grid-cols-3'>
+          <div className='space-y-8 lg:col-span-2'>
             {/* Basic Info Section */}
             <div>
-              <h3 className="mb-4 text-lg font-medium">Basic Information</h3>
+              <h3 className='mb-4 text-lg font-medium'>Basic Information</h3>
               <ShopBasicInfo />
             </div>
 
@@ -39,7 +39,7 @@ export default function ShopInfoSection() {
 
             {/* Branding Section */}
             <div>
-              <h3 className="mb-4 text-lg font-medium">Shop Branding</h3>
+              <h3 className='mb-4 text-lg font-medium'>Shop Branding</h3>
               <ShopBrandingSection />
             </div>
 
@@ -47,14 +47,14 @@ export default function ShopInfoSection() {
 
             {/* Contact Section */}
             <div>
-              <h3 className="mb-4 text-lg font-medium">
+              <h3 className='mb-4 text-lg font-medium'>
                 Contact & Social Media
               </h3>
               <ShopContactSection />
             </div>
           </div>
 
-          <div className="hidden lg:block">
+          <div className='hidden lg:block'>
             <ShopPreview />
           </div>
         </div>

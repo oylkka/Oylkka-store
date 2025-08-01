@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 
 import { auth } from '@/features/auth/auth';
 import { UploadImage } from '@/features/cloudinary';
@@ -25,7 +25,7 @@ function getFileValues(formData: FormData, key: string): File[] {
 }
 
 function mapFormData(formData: FormData) {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  // biome-ignore lint: error
   const mappedData: Record<string, any> = {};
 
   // Handle all base key-value pairs
@@ -50,8 +50,8 @@ function mapFormData(formData: FormData) {
   if (mappedData.variants) {
     try {
       mappedData.variants = JSON.parse(mappedData.variants);
+      // biome-ignore lint: error
     } catch (error) {
-      console.error('❌ Failed to parse variants:', error);
       mappedData.variants = [];
     }
   } else {
@@ -85,7 +85,7 @@ export async function POST(req: NextRequest) {
     if (!shop) {
       return NextResponse.json(
         { message: 'Create a shop first' },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -101,11 +101,11 @@ export async function POST(req: NextRequest) {
             url: result.secure_url,
             publicId: result.public_id,
           };
-          // eslint-disable-next-line @typescript-eslint/no-unused-vars
+          // biome-ignore lint: error
         } catch (error) {
           return null;
         }
-      })
+      }),
     );
     const productImages = productImageUploads.filter(Boolean);
 
@@ -116,18 +116,11 @@ export async function POST(req: NextRequest) {
     > = {};
     for (const [variantId, file] of Object.entries(mappedData.variantImages)) {
       if (file instanceof File) {
-        try {
-          const result = await UploadImage(file as File, 'product-variants');
-          variantImageUploads[variantId] = {
-            url: result.secure_url,
-            publicId: result.public_id,
-          };
-        } catch (error) {
-          console.error(
-            `❌ Variant image upload failed for ${variantId}:`,
-            error
-          );
-        }
+        const result = await UploadImage(file as File, 'product-variants');
+        variantImageUploads[variantId] = {
+          url: result.secure_url,
+          publicId: result.public_id,
+        };
       }
     }
 
@@ -146,10 +139,10 @@ export async function POST(req: NextRequest) {
 
     // Map variant data
     const variantsData = (mappedData.variants || []).map(
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      // biome-ignore lint: error
       (variant: any, index: number) => {
         const variantId = variant.id || `auto-${index}`;
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // biome-ignore lint: error
         const variantData: any = {
           name: variant.name || '',
           sku: variant.sku || '',
@@ -170,7 +163,7 @@ export async function POST(req: NextRequest) {
         }
 
         return variantData;
-      }
+      },
     );
 
     const categoryId = await db.category.findUnique({
@@ -181,7 +174,7 @@ export async function POST(req: NextRequest) {
     if (!categoryId) {
       return NextResponse.json(
         { message: 'Category not found' },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -222,13 +215,13 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json(
       { message: 'Product created successfully' },
-      { status: 201 }
+      { status: 201 },
     );
+    // biome-ignore lint: error
   } catch (error) {
-    console.error('❌ Product creation error:', error);
     return NextResponse.json(
       { message: 'Something went wrong' },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

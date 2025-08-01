@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 import nodemailer from 'nodemailer';
 import { z } from 'zod';
 
@@ -35,21 +35,19 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json(
       { message: 'Email sent successfully' },
-      { status: 200 }
+      { status: 200 },
     );
   } catch (error) {
-    console.error('Email error:', error);
-
     if (error instanceof z.ZodError) {
       return NextResponse.json(
         { message: 'Invalid input data', errors: error.errors },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
     return NextResponse.json(
       { message: 'Internal Server Error' },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

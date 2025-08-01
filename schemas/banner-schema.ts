@@ -15,7 +15,7 @@ const BaseBannerSchema = z.object({
     .optional()
     .refine(
       (val) => !val || val.startsWith('http'),
-      'URL must start with http:// or https://'
+      'URL must start with http:// or https://',
     ),
   secondaryActionText: z.string().optional(),
   secondaryActionLink: z
@@ -23,7 +23,7 @@ const BaseBannerSchema = z.object({
     .optional()
     .refine(
       (val) => !val || val.startsWith('http'),
-      'URL must start with http:// or https://'
+      'URL must start with http:// or https://',
     ),
   bannerPosition: z.enum(['home_top', 'home_bottom', 'sidebar', 'footer'], {
     required_error: 'Please select a position',
@@ -44,7 +44,7 @@ export const BannerFormSchema = BaseBannerSchema.extend({
         ['image/jpeg', 'image/png', 'image/webp'].includes(files[0]?.type),
       {
         message: 'An image file (JPEG, PNG, or WEBP) is required',
-      }
+      },
     )
     .refine(
       (files) =>
@@ -53,7 +53,7 @@ export const BannerFormSchema = BaseBannerSchema.extend({
         (files instanceof FileList && files[0]?.size <= 512000), // 500KB = 512000 bytes
       {
         message: 'Image size must not exceed 500KB',
-      }
+      },
     ),
 })
   .refine(
@@ -64,7 +64,7 @@ export const BannerFormSchema = BaseBannerSchema.extend({
     {
       message: 'End date must be after start date',
       path: ['endDate'],
-    }
+    },
   )
   .refine((data) => !data.secondaryActionText || data.secondaryActionLink, {
     message: 'Secondary action link is required when text is provided',
@@ -104,7 +104,7 @@ export const EditBannerFormSchema = BaseBannerSchema.extend({
       message:
         'An image is required. Please upload a new image or keep the existing one.',
       path: ['image'],
-    }
+    },
   )
   .refine(
     (data) => {
@@ -120,7 +120,7 @@ export const EditBannerFormSchema = BaseBannerSchema.extend({
     {
       message: 'Image must be JPEG, PNG, or WEBP format',
       path: ['image'],
-    }
+    },
   )
   .refine(
     (data) => {
@@ -133,7 +133,7 @@ export const EditBannerFormSchema = BaseBannerSchema.extend({
     {
       message: 'Image size must not exceed 500KB',
       path: ['image'],
-    }
+    },
   )
   .refine(
     (data) =>
@@ -143,7 +143,7 @@ export const EditBannerFormSchema = BaseBannerSchema.extend({
     {
       message: 'End date must be after start date',
       path: ['endDate'],
-    }
+    },
   )
   .refine((data) => !data.secondaryActionText || data.secondaryActionLink, {
     message: 'Secondary action link is required when text is provided',

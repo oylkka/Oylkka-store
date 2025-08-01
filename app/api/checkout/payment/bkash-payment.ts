@@ -2,14 +2,14 @@ import { NextResponse } from 'next/server';
 
 import { bkashConfig } from '@/lib/bkash';
 import { db } from '@/lib/db';
-import { PaymentData } from '@/lib/types';
+import type { PaymentData } from '@/lib/types';
 import { createPayment } from '@/services/bkash';
 
 export async function handleBkashPayment(
   data: PaymentData,
   userId: string,
   orderNumber: string,
-  myUrl: string
+  myUrl: string,
 ) {
   try {
     // First, get all unique product IDs from the cart
@@ -121,7 +121,7 @@ export async function handleBkashPayment(
 
     const createPaymentResponse = await createPayment(
       bkashConfig,
-      paymentDetails
+      paymentDetails,
     );
 
     if (createPaymentResponse.statusCode !== '0000') {
@@ -131,7 +131,7 @@ export async function handleBkashPayment(
         data: {
           paymentStatus: 'FAILED',
           metadata: {
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            // biome-ignore lint: error
             ...(order.metadata as Record<string, any>),
             paymentError: createPaymentResponse,
           },
@@ -146,7 +146,7 @@ export async function handleBkashPayment(
     }
 
     // Update order with payment initiation details
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    // biome-ignore lint: error
     const currentMetadata = (order.metadata as Record<string, any>) || {};
     await db.order.update({
       where: { orderNumber },
@@ -167,7 +167,7 @@ export async function handleBkashPayment(
       paymentMethod: 'BKASH',
     });
   } catch (error) {
-    console.error('bKash payment error:', error);
+    // biome-ignore lint: error
     throw error;
   }
 }

@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 
 import { getAuthenticatedUser } from '@/features/auth/get-user';
 import { db } from '@/lib/db';
@@ -88,15 +88,12 @@ export async function GET(req: NextRequest) {
             variantSku: variantData.sku,
           }),
         };
-      })
+      }),
     );
 
     return NextResponse.json(simplifiedCartItems);
+    // biome-ignore lint: error
   } catch (error) {
-    console.error('Error fetching cart:', {
-      error: error instanceof Error ? error.message : 'Unknown error',
-      stack: error instanceof Error ? error.stack : undefined,
-    });
     return new NextResponse('Internal Server Error', { status: 500 });
   }
 }
@@ -138,7 +135,7 @@ export async function POST(req: NextRequest) {
       }
 
       const selectedVariant = product.variants.find(
-        (v) => v.id === selectedVariantId
+        (v) => v.id === selectedVariantId,
       );
       if (!selectedVariant) {
         return new NextResponse('Variant not found', { status: 404 });
@@ -180,8 +177,8 @@ export async function POST(req: NextRequest) {
     }
 
     return new NextResponse('Item added to cart', { status: 201 });
+    // biome-ignore lint: error
   } catch (error) {
-    console.error('Error adding to cart:', error);
     return new NextResponse('Internal Server Error', { status: 500 });
   }
 }
@@ -217,8 +214,8 @@ export async function DELETE(req: NextRequest) {
     });
 
     return new NextResponse('Item removed successfully');
+    // biome-ignore lint: error
   } catch (error) {
-    console.error('Cart delete error:', error);
     return new NextResponse('Internal Server Error', { status: 500 });
   }
 }
@@ -254,8 +251,8 @@ export async function PATCH(req: NextRequest) {
     });
 
     return NextResponse.json(updatedItem);
+    // biome-ignore lint: error
   } catch (error) {
-    console.error('Cart update error:', error);
     return new NextResponse('Internal Server Error', { status: 500 });
   }
 }

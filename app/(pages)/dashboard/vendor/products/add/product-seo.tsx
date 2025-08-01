@@ -17,7 +17,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 
-import { ProductFormValues } from './product-form-type';
+import type { ProductFormValues } from './product-form-type';
 
 export default function ProductSeo() {
   const { control } = useFormContext<ProductFormValues>();
@@ -30,15 +30,15 @@ export default function ProductSeo() {
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <div className="space-y-4">
+        <div className='space-y-4'>
           <FormField
             control={control}
-            name="metaTitle"
+            name='metaTitle'
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Meta Title</FormLabel>
                 <FormControl>
-                  <Input placeholder="Meta title for SEO" {...field} />
+                  <Input placeholder='Meta title for SEO' {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -47,14 +47,14 @@ export default function ProductSeo() {
 
           <FormField
             control={control}
-            name="metaDescription"
+            name='metaDescription'
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Meta Description</FormLabel>
                 <FormControl>
                   <Textarea
-                    id="metaDescription"
-                    placeholder="Meta description for SEO"
+                    id='metaDescription'
+                    placeholder='Meta description for SEO'
                     rows={3}
                     {...field}
                   />

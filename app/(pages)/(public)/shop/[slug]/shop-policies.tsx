@@ -23,42 +23,42 @@ const itemVariants = {
 
 export default function ShopPolicies({ shop }: { shop: ShopType }) {
   return (
-    <motion.div variants={itemVariants} initial="hidden" animate="visible">
+    <motion.div variants={itemVariants} initial='hidden' animate='visible'>
       <Card>
         <CardHeader>
-          <CardTitle className="text-2xl">Shop Policies</CardTitle>
+          <CardTitle className='text-2xl'>Shop Policies</CardTitle>
           <CardDescription>
             Learn about {shop.name}&apos;s shipping, returns, and other
             policies.
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="space-y-6">
+          <div className='space-y-6'>
             {shop.policies ? (
               <>
                 <div>
-                  <h3 className="text-lg font-medium">Shipping Policy</h3>
-                  <p className="mt-2 text-gray-600">
+                  <h3 className='text-lg font-medium'>Shipping Policy</h3>
+                  <p className='mt-2 text-gray-600'>
                     {shop.policies.shipping || 'No shipping policy available.'}
                   </p>
                 </div>
                 <Separator />
                 <div>
-                  <h3 className="text-lg font-medium">Return Policy</h3>
-                  <p className="mt-2 text-gray-600">
+                  <h3 className='text-lg font-medium'>Return Policy</h3>
+                  <p className='mt-2 text-gray-600'>
                     {shop.policies.returns || 'No return policy available.'}
                   </p>
                 </div>
                 <Separator />
                 <div>
-                  <h3 className="text-lg font-medium">Privacy Policy</h3>
-                  <p className="mt-2 text-gray-600">
+                  <h3 className='text-lg font-medium'>Privacy Policy</h3>
+                  <p className='mt-2 text-gray-600'>
                     {shop.policies.privacy || 'No privacy policy available.'}
                   </p>
                 </div>
               </>
             ) : (
-              <p className="text-gray-600">
+              <p className='text-gray-600'>
                 No policies have been specified for this shop.
               </p>
             )}

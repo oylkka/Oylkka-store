@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 
 import { db } from '@/lib/db';
 import { ProductStatus } from '@/prisma/output';
@@ -12,7 +12,7 @@ export async function GET(req: NextRequest) {
     if (!slug) {
       return NextResponse.json(
         { error: 'Product ID is required' },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -118,9 +118,9 @@ export async function GET(req: NextRequest) {
       // Attribute similarity (product specs)
       if (product.attributes && currentProduct.attributes) {
         try {
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          // biome-ignore lint: error
           const productAttrs = product.attributes as Record<string, any>;
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          // biome-ignore lint: error
           const currentAttrs = currentProduct.attributes as Record<string, any>;
 
           // Count matching attribute keys and values
@@ -133,7 +133,7 @@ export async function GET(req: NextRequest) {
             }
           }
         } catch (e) {
-          // Handle if attributes isn't a proper JSON object
+          // biome-ignore lint: error
           console.warn('Error processing attributes:', e);
         }
       }
@@ -229,11 +229,11 @@ export async function GET(req: NextRequest) {
     }
 
     return NextResponse.json({ products: responseProducts });
+    // biome-ignore lint: error
   } catch (error) {
-    console.error('Error fetching related products:', error);
     return NextResponse.json(
       { error: 'Internal server error' },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

@@ -1,9 +1,10 @@
 'use client';
 import React, { forwardRef, useCallback } from 'react';
-import { useTimescape, type Options } from 'timescape/react';
+import { type Options, useTimescape } from 'timescape/react';
 
 import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
+
 // @source: https://github.com/dan-lee/timescape?tab=readme-ov-file
 
 const timePickerInputBase =
@@ -61,22 +62,22 @@ const DatetimeGrid = forwardRef<
       timescape: Pick<TimescapeReturn, 'getRootProps' | 'getInputProps'>;
       placeholders: InputPlaceholders;
     },
-    ref
+    ref,
   ) => {
     return (
       <div
         className={cn(
           'flex w-fit items-center border-2 p-1',
           className,
-          'border-input selection:text-foreground gap-1 rounded-md selection:bg-transparent'
+          'border-input selection:text-foreground gap-1 rounded-md selection:bg-transparent',
         )}
         {...timescape.getRootProps()}
         ref={ref}
       >
-        {!!format?.length
+        {format?.length
           ? format.map((group, i) => (
               <React.Fragment key={i === 0 ? 'dates' : 'times'}>
-                {!!group?.length
+                {group?.length
                   ? group.map((unit, j) => (
                       <React.Fragment key={unit}>
                         <Input
@@ -104,7 +105,7 @@ const DatetimeGrid = forwardRef<
                   <span
                     className={cn(
                       timePickerSeparatorBase,
-                      'text-xl opacity-30'
+                      'text-xl opacity-30',
                     )}
                   >
                     |
@@ -115,7 +116,7 @@ const DatetimeGrid = forwardRef<
           : null}
       </div>
     );
-  }
+  },
 );
 
 DatetimeGrid.displayName = 'DatetimeGrid';
@@ -143,13 +144,13 @@ export const DatetimePicker = forwardRef<HTMLDivElement, DateTimeInput>(
       onChange,
       className,
     },
-    ref
+    ref,
   ) => {
     const handleDateChange = useCallback(
       (nextDate: Date | undefined) => {
         onChange?.(nextDate);
       },
-      [onChange]
+      [onChange],
     );
     const timescape = useTimescape({
       date: value,
@@ -165,7 +166,7 @@ export const DatetimePicker = forwardRef<HTMLDivElement, DateTimeInput>(
         ref={ref}
       />
     );
-  }
+  },
 );
 
 DatetimePicker.displayName = 'DatetimePicker';

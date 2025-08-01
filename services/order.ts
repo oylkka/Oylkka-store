@@ -1,6 +1,6 @@
-import { QUERY_KEYS } from '@/lib/constants';
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
+import { QUERY_KEYS } from '@/lib/constants';
 
 export function useOrderConfirmation({ id }: { id: string }) {
   return useQuery({
@@ -10,7 +10,7 @@ export function useOrderConfirmation({ id }: { id: string }) {
         `/api/dashboard/customer/order/single-order`,
         {
           params: { orderId: id },
-        }
+        },
       );
       return response.data;
     },
@@ -35,7 +35,7 @@ export function useAdminOrderList({
         '/api/dashboard/admin/order/order-list',
         {
           params: { currentPage, status, search },
-        }
+        },
       );
       return response.data;
     },
@@ -50,7 +50,7 @@ export function useSignleOrderInfo({ orderId }: { orderId: string }) {
         '/api/dashboard/admin/order/single-order',
         {
           params: { orderId },
-        }
+        },
       );
       return response.data;
     },

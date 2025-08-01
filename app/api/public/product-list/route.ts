@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 
 import { getAuthenticatedUser } from '@/features/auth/get-user';
 import { db } from '@/lib/db';
@@ -13,10 +13,12 @@ export async function GET(req: NextRequest) {
     const category = searchParams.get('category');
     const sortBy = searchParams.get('sortBy');
     const minPrice = searchParams.get('minPrice')
-      ? parseFloat(searchParams.get('minPrice')!)
+      ? // biome-ignore lint: error
+        parseFloat(searchParams.get('minPrice')!)
       : null;
     const maxPrice = searchParams.get('maxPrice')
-      ? parseFloat(searchParams.get('maxPrice')!)
+      ? // biome-ignore lint: error
+        parseFloat(searchParams.get('maxPrice')!)
       : null;
     const sizes = searchParams.get('sizes')?.split(',').filter(Boolean) || [];
     const colors = searchParams.get('colors')?.split(',').filter(Boolean) || [];
@@ -24,11 +26,11 @@ export async function GET(req: NextRequest) {
     const limit = 16;
 
     // Build the where clause for filtering
-    //  eslint-disable-next-line @typescript-eslint/no-explicit-any
+    // biome-ignore lint: error
     const whereClause: any = {};
 
     // Add search functionality
-    if (search && search.trim()) {
+    if (search?.trim()) {
       const searchTerm = search.trim();
       whereClause.OR = [
         {
@@ -70,7 +72,7 @@ export async function GET(req: NextRequest) {
     }
 
     // Build the orderBy clause
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    // biome-ignore lint: error
     let orderBy: any = { createdAt: 'desc' };
 
     switch (sortBy) {
@@ -188,11 +190,11 @@ export async function GET(req: NextRequest) {
         resultsCount: totalProducts,
       },
     });
+    // biome-ignore lint: error
   } catch (error) {
-    console.error('Error retrieving products:', error);
     return NextResponse.json(
       { error: 'Internal server error' },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

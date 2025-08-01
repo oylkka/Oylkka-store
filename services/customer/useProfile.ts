@@ -1,10 +1,10 @@
 'use client';
-import { QUERY_KEYS } from '@/lib/constants';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
-import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
+import { useSession } from 'next-auth/react';
 import { toast } from 'sonner';
+import { QUERY_KEYS } from '@/lib/constants';
 
 export function useProfile() {
   return useQuery({
@@ -72,7 +72,7 @@ async function updateProfileAPI({
       headers: {
         'Content-Type': 'multipart/form-data',
       },
-    }
+    },
   );
 
   return data;
@@ -95,7 +95,6 @@ export function useUpdateProfile(options: UseUpdateProfileOptions = {}) {
     onSuccess,
     onError,
     redirectPath = '/profile',
-    showSuccessMessage = true,
     showErrorMessage = true,
   } = options;
 
@@ -109,12 +108,13 @@ export function useUpdateProfile(options: UseUpdateProfileOptions = {}) {
           id: loadingToast,
         });
         return result;
+        // biome-ignore lint: error
       } catch (error: any) {
         toast.error(
           error?.response?.data?.message ||
             error.message ||
             'Failed to update profile.',
-          { id: loadingToast }
+          { id: loadingToast },
         );
         throw error;
       }
@@ -133,7 +133,6 @@ export function useUpdateProfile(options: UseUpdateProfileOptions = {}) {
 
       if (onSuccess) {
         onSuccess(data);
-        console.log(data);
       } else if (redirectPath) {
         router.push(redirectPath);
       }

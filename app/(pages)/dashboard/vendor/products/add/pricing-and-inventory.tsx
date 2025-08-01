@@ -13,7 +13,7 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 
-import { ProductFormValues } from './product-form-type';
+import type { ProductFormValues } from './product-form-type';
 
 export default function PriceAndInventory() {
   const { control, setValue } = useFormContext<ProductFormValues>();
@@ -32,7 +32,7 @@ export default function PriceAndInventory() {
       discountPrice < price
     ) {
       const discountPercent = Math.round(
-        ((price - discountPrice) / price) * 100
+        ((price - discountPrice) / price) * 100,
       );
       setValue('discountPercent', discountPercent);
     } else {
@@ -45,11 +45,11 @@ export default function PriceAndInventory() {
       <CardHeader>
         <CardTitle>Price &amp; Stock</CardTitle>
       </CardHeader>
-      <CardContent className="space-y-4">
-        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
+      <CardContent className='space-y-4'>
+        <div className='grid grid-cols-2 gap-4 sm:grid-cols-3'>
           <FormField
             control={control}
-            name="price"
+            name='price'
             render={({ field }) => (
               <FormItem>
                 <FormLabel>
@@ -57,13 +57,13 @@ export default function PriceAndInventory() {
                 </FormLabel>
                 <FormControl>
                   <Input
-                    type="number"
-                    placeholder="Product Price"
+                    type='number'
+                    placeholder='Product Price'
                     {...field}
                     value={field.value === 0 ? '' : field.value}
                     onChange={(e) =>
                       field.onChange(
-                        e.target.value === '' ? 0 : parseFloat(e.target.value)
+                        e.target.value === '' ? 0 : parseFloat(e.target.value),
                       )
                     }
                   />
@@ -75,21 +75,21 @@ export default function PriceAndInventory() {
 
           <FormField
             control={control}
-            name="discountPrice"
+            name='discountPrice'
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Discount Price</FormLabel>
                 <FormControl>
                   <Input
-                    type="number"
-                    placeholder="Discount price"
+                    type='number'
+                    placeholder='Discount price'
                     {...field}
                     value={field.value || ''}
                     onChange={(e) =>
                       field.onChange(
                         e.target.value === ''
                           ? undefined
-                          : parseFloat(e.target.value)
+                          : parseFloat(e.target.value),
                       )
                     }
                   />
@@ -100,17 +100,17 @@ export default function PriceAndInventory() {
           />
           <FormField
             control={control}
-            name="discountPercent"
+            name='discountPercent'
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Discount %</FormLabel>
                 <FormControl>
                   <Input
-                    type="number"
+                    type='number'
                     readOnly
                     {...field}
                     value={field.value !== undefined ? field.value : '0'}
-                    className="cursor-not-allowed"
+                    className='cursor-not-allowed'
                   />
                 </FormControl>
                 <FormMessage />
@@ -120,7 +120,7 @@ export default function PriceAndInventory() {
 
           <FormField
             control={control}
-            name="stock"
+            name='stock'
             render={({ field }) => (
               <FormItem>
                 <FormLabel>
@@ -128,13 +128,13 @@ export default function PriceAndInventory() {
                 </FormLabel>
                 <FormControl>
                   <Input
-                    type="number"
-                    placeholder="Stock quantity"
+                    type='number'
+                    placeholder='Stock quantity'
                     {...field}
                     value={field.value === 0 ? '' : field.value}
                     onChange={(e) =>
                       field.onChange(
-                        e.target.value === '' ? 0 : parseInt(e.target.value)
+                        e.target.value === '' ? 0 : parseInt(e.target.value),
                       )
                     }
                   />
@@ -145,7 +145,7 @@ export default function PriceAndInventory() {
           />
           <FormField
             control={control}
-            name="lowStockAlert"
+            name='lowStockAlert'
             render={({ field }) => (
               <FormItem>
                 <FormLabel>
@@ -153,13 +153,13 @@ export default function PriceAndInventory() {
                 </FormLabel>
                 <FormControl>
                   <Input
-                    type="number"
-                    placeholder="Alert threshold"
+                    type='number'
+                    placeholder='Alert threshold'
                     {...field}
                     value={field.value === 0 ? '' : field.value}
                     onChange={(e) =>
                       field.onChange(
-                        e.target.value === '' ? 0 : parseInt(e.target.value)
+                        e.target.value === '' ? 0 : parseInt(e.target.value),
                       )
                     }
                   />

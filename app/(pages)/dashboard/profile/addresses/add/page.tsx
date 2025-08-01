@@ -5,7 +5,7 @@ import { MapPin, Plus } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
-import * as z from 'zod';
+import type * as z from 'zod';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -58,7 +58,7 @@ export default function AddAddressPage() {
             form.reset();
             router.push('/dashboard/profile/addresses');
           },
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          // biome-ignore lint: error
           onError: (error: any) => {
             reject(error?.response?.data?.message || 'Failed to add address.');
           },
@@ -68,27 +68,27 @@ export default function AddAddressPage() {
         loading: 'Adding address...',
         success: 'Address added successfully!',
         error: (err) => err.toString(),
-      }
+      },
     );
   }
 
   return (
-    <div className="min-h-screen py-8">
-      <div className="container mx-auto max-w-2xl px-4">
-        <div className="mb-8">
-          <div className="mb-2 flex items-center gap-2">
-            <MapPin className="text-primary h-6 w-6" />
-            <h1 className="text-3xl font-bold">Add New Address</h1>
+    <div className='min-h-screen py-8'>
+      <div className='container mx-auto max-w-2xl px-4'>
+        <div className='mb-8'>
+          <div className='mb-2 flex items-center gap-2'>
+            <MapPin className='text-primary h-6 w-6' />
+            <h1 className='text-3xl font-bold'>Add New Address</h1>
           </div>
-          <p className="text-muted-foreground">
+          <p className='text-muted-foreground'>
             Add a new delivery address to your account
           </p>
         </div>
 
         <Card>
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Plus className="h-5 w-5" />
+            <CardTitle className='flex items-center gap-2'>
+              <Plus className='h-5 w-5' />
               Address Details
             </CardTitle>
             <CardDescription>
@@ -99,17 +99,17 @@ export default function AddAddressPage() {
             <Form {...form}>
               <form
                 onSubmit={form.handleSubmit(onSubmit)}
-                className="space-y-6"
+                className='space-y-6'
               >
-                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                <div className='grid grid-cols-1 gap-4 md:grid-cols-2'>
                   <FormField
                     control={form.control}
-                    name="name"
+                    name='name'
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Full Name</FormLabel>
                         <FormControl>
-                          <Input placeholder="John Doe" {...field} />
+                          <Input placeholder='John Doe' {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -117,12 +117,12 @@ export default function AddAddressPage() {
                   />
                   <FormField
                     control={form.control}
-                    name="phone"
+                    name='phone'
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Phone Number</FormLabel>
                         <FormControl>
-                          <Input placeholder="+88 01234567890" {...field} />
+                          <Input placeholder='+88 01234567890' {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -132,14 +132,14 @@ export default function AddAddressPage() {
 
                 <FormField
                   control={form.control}
-                  name="email"
+                  name='email'
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Email Address</FormLabel>
                       <FormControl>
                         <Input
-                          placeholder="john@example.com"
-                          type="email"
+                          placeholder='john@example.com'
+                          type='email'
                           {...field}
                         />
                       </FormControl>
@@ -150,14 +150,14 @@ export default function AddAddressPage() {
 
                 <FormField
                   control={form.control}
-                  name="address"
+                  name='address'
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Street Address</FormLabel>
                       <FormControl>
                         <Textarea
-                          placeholder="123 Main Street, Apartment 4B"
-                          className="min-h-[80px]"
+                          placeholder='123 Main Street, Apartment 4B'
+                          className='min-h-[80px]'
                           {...field}
                         />
                       </FormControl>
@@ -166,15 +166,15 @@ export default function AddAddressPage() {
                   )}
                 />
 
-                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                <div className='grid grid-cols-1 gap-4 md:grid-cols-2'>
                   <FormField
                     control={form.control}
-                    name="city"
+                    name='city'
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>City</FormLabel>
                         <FormControl>
-                          <Input placeholder="Dhaka" {...field} />
+                          <Input placeholder='Dhaka' {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -182,12 +182,12 @@ export default function AddAddressPage() {
                   />
                   <FormField
                     control={form.control}
-                    name="district"
+                    name='district'
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>District</FormLabel>
                         <FormControl>
-                          <Input placeholder="Dhaka" {...field} />
+                          <Input placeholder='Dhaka' {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -197,12 +197,12 @@ export default function AddAddressPage() {
 
                 <FormField
                   control={form.control}
-                  name="postalCode"
+                  name='postalCode'
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Postal Code</FormLabel>
                       <FormControl>
-                        <Input placeholder="10001" {...field} />
+                        <Input placeholder='10001' {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -211,18 +211,18 @@ export default function AddAddressPage() {
 
                 <FormField
                   control={form.control}
-                  name="isDefault"
+                  name='isDefault'
                   render={({ field }) => (
-                    <FormItem className="flex flex-row items-start space-y-0 space-x-3 rounded-md border p-4">
+                    <FormItem className='flex flex-row items-start space-y-0 space-x-3 rounded-md border p-4'>
                       <FormControl>
                         <Checkbox
                           checked={field.value}
                           onCheckedChange={field.onChange}
                         />
                       </FormControl>
-                      <div className="space-y-1 leading-none">
+                      <div className='space-y-1 leading-none'>
                         <FormLabel>Set as default address</FormLabel>
-                        <p className="text-muted-foreground text-sm">
+                        <p className='text-muted-foreground text-sm'>
                           Use this address as your default delivery address.
                         </p>
                       </div>
@@ -230,14 +230,14 @@ export default function AddAddressPage() {
                   )}
                 />
 
-                <div className="flex gap-4 pt-4">
-                  <Button type="submit" className="flex-1" disabled={isPending}>
+                <div className='flex gap-4 pt-4'>
+                  <Button type='submit' className='flex-1' disabled={isPending}>
                     {isPending ? 'Adding...' : 'Add Address'}
                   </Button>
                   <Button
-                    type="button"
-                    variant="outline"
-                    className="flex-1 bg-transparent"
+                    type='button'
+                    variant='outline'
+                    className='flex-1 bg-transparent'
                     onClick={() => router.back()}
                   >
                     Cancel

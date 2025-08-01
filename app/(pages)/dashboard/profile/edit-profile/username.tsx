@@ -2,8 +2,8 @@
 'use client';
 
 import { AlertCircle, AtSign, Check, Loader2 } from 'lucide-react';
-import { JSX } from 'react';
-import { Control } from 'react-hook-form';
+import type { JSX } from 'react';
+import type { Control } from 'react-hook-form';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -15,7 +15,7 @@ import {
 import { Input } from '@/components/ui/input';
 
 interface UsernameFieldProps {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  // biome-ignore lint: error
   control: Control<any>;
   username: string | undefined;
   isUsernameValid: boolean;
@@ -39,17 +39,17 @@ export function UsernameField({
   return (
     <FormField
       control={control}
-      name="username"
+      name='username'
       render={({ field }) => (
         <FormItem>
-          <FormLabel className="flex items-center gap-2">
-            <AtSign className="h-4 w-4" />
-            Username <span className="text-red-500">*</span>
+          <FormLabel className='flex items-center gap-2'>
+            <AtSign className='h-4 w-4' />
+            Username <span className='text-red-500'>*</span>
           </FormLabel>
-          <div className="relative">
+          <div className='relative'>
             <FormControl>
               <Input
-                placeholder="Choose a unique username"
+                placeholder='Choose a unique username'
                 {...field}
                 aria-invalid={usernameErrorMessage ? 'true' : 'false'}
                 aria-describedby={
@@ -73,13 +73,13 @@ export function UsernameField({
               />
             </FormControl>
             {username && (
-              <div className="absolute top-1/2 right-3 -translate-y-1/2">
+              <div className='absolute top-1/2 right-3 -translate-y-1/2'>
                 {isPending ? (
-                  <Loader2 className="h-4 w-4 animate-spin text-slate-400" />
+                  <Loader2 className='h-4 w-4 animate-spin text-slate-400' />
                 ) : isUsernameValid ? (
-                  <Check className="h-4 w-4 text-green-500" />
+                  <Check className='h-4 w-4 text-green-500' />
                 ) : usernameErrorMessage ? (
-                  <AlertCircle className="h-4 w-4 text-red-500" />
+                  <AlertCircle className='h-4 w-4 text-red-500' />
                 ) : null}
               </div>
             )}
@@ -87,30 +87,30 @@ export function UsernameField({
 
           {usernameErrorMessage && !isPending && (
             <p
-              id="username-error"
-              className="mt-1 text-sm font-medium text-red-500"
+              id='username-error'
+              className='mt-1 text-sm font-medium text-red-500'
             >
               {usernameErrorMessage}
             </p>
           )}
 
           {usernameSuggestions.length > 0 && (
-            <div className="mt-2 rounded-md border border-slate-200 bg-slate-50 p-3">
-              <p className="mb-2 text-sm font-medium text-slate-700">
+            <div className='mt-2 rounded-md border border-slate-200 bg-slate-50 p-3'>
+              <p className='mb-2 text-sm font-medium text-slate-700'>
                 Try one of these instead:
               </p>
-              <div className="flex flex-wrap gap-2">
+              <div className='flex flex-wrap gap-2'>
                 {usernameSuggestions.map((suggestion) => (
                   <Button
                     key={suggestion}
-                    type="button"
-                    variant="outline"
-                    size="sm"
+                    type='button'
+                    variant='outline'
+                    size='sm'
                     onClick={() => {
                       setValue('username', suggestion);
                       onCheckUsername(suggestion);
                     }}
-                    className="text-sm"
+                    className='text-sm'
                   >
                     {suggestion}
                   </Button>

@@ -1,4 +1,5 @@
-import { CartItem } from './order';
+import type { CartItem } from './order';
+
 export * from './banners';
 export * from './order';
 export interface CategoriesType {
@@ -59,7 +60,7 @@ export interface ProductVariant {
   attributes: {
     color?: string;
     size?: string;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    // biome-ignore lint: error
     [key: string]: any;
   };
   image: ProductImage | null;
@@ -98,7 +99,7 @@ export interface Product {
   images: ProductImage[];
   tags: string[];
   dimensions?: ProductDimensions | null;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  // biome-ignore lint: error
   attributes?: any;
   rating?: number;
   reviewCount?: number;
@@ -207,7 +208,7 @@ export interface ShopType {
   logo?: ProductImage | null;
   bannerImage?: ProductImage | null;
   socialLinks?: SocialLinks | null;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  // biome-ignore lint: error
   policies?: any | null;
   isVerified: boolean;
   createdAt: string;

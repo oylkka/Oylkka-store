@@ -61,11 +61,11 @@ export async function GET() {
     });
 
     return NextResponse.json(filteredBanners, { status: 200 });
+    // biome-ignore lint: error
   } catch (error) {
-    console.error('Error fetching banners:', error);
     return NextResponse.json(
       { error: 'Internal Server Error' },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

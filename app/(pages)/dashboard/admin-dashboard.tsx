@@ -55,12 +55,12 @@ export default function AdminDashboard() {
     };
 
     const IconComponent = iconMap[type] || ActivityIcon;
-    return <IconComponent className="h-4 w-4" />;
+    return <IconComponent className='h-4 w-4' />;
   };
 
   const getActivityColor = (
     type: ActivityType,
-    status?: PaymentStatus
+    status?: PaymentStatus,
   ): string => {
     switch (type) {
       case 'ORDER':
@@ -120,15 +120,18 @@ export default function AdminDashboard() {
       stars.push(
         <Star
           key={`filled-${i}`}
-          className="h-4 w-4 fill-amber-400 text-amber-400"
-        />
+          className='h-4 w-4 fill-amber-400 text-amber-400'
+        />,
       );
     }
 
     // Empty stars
     for (let i = rating; i < 5; i++) {
       stars.push(
-        <Star key={`empty-${i}`} className="text-muted-foreground/30 h-4 w-4" />
+        <Star
+          key={`empty-${i}`}
+          className='text-muted-foreground/30 h-4 w-4'
+        />,
       );
     }
 
@@ -137,10 +140,10 @@ export default function AdminDashboard() {
 
   if (isPending) {
     return (
-      <div className="flex h-96 items-center justify-center">
-        <div className="text-center">
-          <div className="mx-auto h-8 w-8 animate-spin rounded-full border-b-2 border-gray-900" />
-          <p className="mt-2 text-gray-600">Loading dashboard...</p>
+      <div className='flex h-96 items-center justify-center'>
+        <div className='text-center'>
+          <div className='mx-auto h-8 w-8 animate-spin rounded-full border-b-2 border-gray-900' />
+          <p className='mt-2 text-gray-600'>Loading dashboard...</p>
         </div>
       </div>
     );
@@ -148,12 +151,12 @@ export default function AdminDashboard() {
 
   if (isError || !data) {
     return (
-      <div className="flex h-96 items-center justify-center">
-        <div className="text-center">
-          <h3 className="text-lg font-semibold text-gray-900">
+      <div className='flex h-96 items-center justify-center'>
+        <div className='text-center'>
+          <h3 className='text-lg font-semibold text-gray-900'>
             Error loading dashboard
           </h3>
-          <p className="mt-1 text-gray-500">Please try again later</p>
+          <p className='mt-1 text-gray-500'>Please try again later</p>
         </div>
       </div>
     );
@@ -175,93 +178,93 @@ export default function AdminDashboard() {
   };
 
   return (
-    <main className="flex flex-1 flex-col gap-8">
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <Card className="overflow-hidden p-0">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 bg-gradient-to-r from-violet-500 to-violet-600 p-6 pb-2 text-white">
-            <CardTitle className="text-sm font-medium">Total Orders</CardTitle>
-            <ShoppingCart className="h-5 w-5 text-white" />
+    <main className='flex flex-1 flex-col gap-8'>
+      <div className='grid gap-4 md:grid-cols-2 lg:grid-cols-4'>
+        <Card className='overflow-hidden p-0'>
+          <CardHeader className='flex flex-row items-center justify-between space-y-0 bg-gradient-to-r from-violet-500 to-violet-600 p-6 pb-2 text-white'>
+            <CardTitle className='text-sm font-medium'>Total Orders</CardTitle>
+            <ShoppingCart className='h-5 w-5 text-white' />
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold">{data.stats.orders}</div>
-            <p className="text-muted-foreground text-xs">Total orders placed</p>
+            <div className='text-3xl font-bold'>{data.stats.orders}</div>
+            <p className='text-muted-foreground text-xs'>Total orders placed</p>
           </CardContent>
         </Card>
 
-        <Card className="overflow-hidden p-0">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 bg-gradient-to-r from-pink-500 to-pink-600 p-6 pb-2 text-white">
-            <CardTitle className="text-sm font-medium">
+        <Card className='overflow-hidden p-0'>
+          <CardHeader className='flex flex-row items-center justify-between space-y-0 bg-gradient-to-r from-pink-500 to-pink-600 p-6 pb-2 text-white'>
+            <CardTitle className='text-sm font-medium'>
               Total Products
             </CardTitle>
-            <Package className="h-5 w-5 text-white" />
+            <Package className='h-5 w-5 text-white' />
           </CardHeader>
-          <CardContent className="p-6 pt-4">
-            <div className="text-3xl font-bold">{data.stats.products}</div>
-            <p className="text-muted-foreground text-xs">Products in catalog</p>
+          <CardContent className='p-6 pt-4'>
+            <div className='text-3xl font-bold'>{data.stats.products}</div>
+            <p className='text-muted-foreground text-xs'>Products in catalog</p>
           </CardContent>
         </Card>
 
-        <Card className="overflow-hidden p-0">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 bg-gradient-to-r from-amber-500 to-amber-600 p-6 pb-2 text-white">
-            <CardTitle className="text-sm font-medium">Total Shops</CardTitle>
-            <Store className="h-5 w-5 text-white" />
+        <Card className='overflow-hidden p-0'>
+          <CardHeader className='flex flex-row items-center justify-between space-y-0 bg-gradient-to-r from-amber-500 to-amber-600 p-6 pb-2 text-white'>
+            <CardTitle className='text-sm font-medium'>Total Shops</CardTitle>
+            <Store className='h-5 w-5 text-white' />
           </CardHeader>
-          <CardContent className="p-6 pt-4">
-            <div className="text-3xl font-bold">{data.stats.shops}</div>
-            <p className="text-muted-foreground text-xs">Active shops</p>
+          <CardContent className='p-6 pt-4'>
+            <div className='text-3xl font-bold'>{data.stats.shops}</div>
+            <p className='text-muted-foreground text-xs'>Active shops</p>
           </CardContent>
         </Card>
 
-        <Card className="overflow-hidden p-0">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 bg-gradient-to-r from-cyan-500 to-cyan-600 p-6 pb-2 text-white">
-            <CardTitle className="text-sm font-medium">Total Users</CardTitle>
-            <Users className="h-5 w-5 text-white" />
+        <Card className='overflow-hidden p-0'>
+          <CardHeader className='flex flex-row items-center justify-between space-y-0 bg-gradient-to-r from-cyan-500 to-cyan-600 p-6 pb-2 text-white'>
+            <CardTitle className='text-sm font-medium'>Total Users</CardTitle>
+            <Users className='h-5 w-5 text-white' />
           </CardHeader>
-          <CardContent className="p-6 pt-4">
-            <div className="text-3xl font-bold">{data.stats.users}</div>
-            <p className="text-muted-foreground text-xs">Registered users</p>
+          <CardContent className='p-6 pt-4'>
+            <div className='text-3xl font-bold'>{data.stats.users}</div>
+            <p className='text-muted-foreground text-xs'>Registered users</p>
           </CardContent>
         </Card>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
-        <Card className="col-span-4 overflow-hidden pt-0">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 bg-gradient-to-r from-violet-600 to-violet-500 p-6 text-white">
-            <div className="grid gap-2">
+      <div className='grid gap-4 md:grid-cols-2 lg:grid-cols-7'>
+        <Card className='col-span-4 overflow-hidden pt-0'>
+          <CardHeader className='flex flex-row items-center justify-between space-y-0 bg-gradient-to-r from-violet-600 to-violet-500 p-6 text-white'>
+            <div className='grid gap-2'>
               <CardTitle>Recent Activity</CardTitle>
             </div>
           </CardHeader>
           <CardContent>
-            <div className="space-y-8">
+            <div className='space-y-8'>
               {data.recentActivity.map((activity: Activity) => (
                 <Link
                   href={activityUrl(activity)}
                   key={activity.id}
-                  className="flex items-center"
+                  className='flex items-center'
                 >
-                  <Avatar className="h-9 w-9 border">
+                  <Avatar className='h-9 w-9 border'>
                     <AvatarFallback
                       className={getActivityColor(
                         activity.type,
                         isOrderActivity(activity)
                           ? activity.paymentStatus
-                          : undefined
+                          : undefined,
                       )}
                     >
                       {getActivityIcon(activity.type)}
                     </AvatarFallback>
                   </Avatar>
-                  <div className="ml-4 space-y-1">
-                    <p className="text-sm leading-none font-medium">
+                  <div className='ml-4 space-y-1'>
+                    <p className='text-sm leading-none font-medium'>
                       {activity.user?.name ||
                         (isUserActivity(activity) ? activity.name : null) ||
                         'User'}
                     </p>
-                    <p className="text-muted-foreground text-sm">
+                    <p className='text-muted-foreground text-sm'>
                       {getActivityDescription({ activity })}
                     </p>
                   </div>
-                  <div className="text-muted-foreground ml-auto text-xs">
+                  <div className='text-muted-foreground ml-auto text-xs'>
                     {formatRelativeDate(activity.createdAt)}
                   </div>
                 </Link>
@@ -270,38 +273,37 @@ export default function AdminDashboard() {
           </CardContent>
         </Card>
 
-        <Card className="col-span-3 overflow-hidden pt-0">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 bg-gradient-to-r from-pink-500 to-pink-600 p-6 text-white">
+        <Card className='col-span-3 overflow-hidden pt-0'>
+          <CardHeader className='flex flex-row items-center justify-between space-y-0 bg-gradient-to-r from-pink-500 to-pink-600 p-6 text-white'>
             <CardTitle>Recent Reviews</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="space-y-8">
-              {data &&
-                data.recentReviews &&
+            <div className='space-y-8'>
+              {data?.recentReviews &&
                 data.recentReviews.length > 0 &&
                 data.recentReviews.map((review: ReviewActivity) => (
                   <Link
                     href={`/products/${review.product?.slug}`}
                     key={review.id}
-                    className="flex items-start space-x-4"
+                    className='flex items-start space-x-4'
                   >
                     <Avatar>
                       <AvatarImage src={review.user?.image || ''} />
-                      <AvatarFallback className="bg-pink-100 text-pink-700">
+                      <AvatarFallback className='bg-pink-100 text-pink-700'>
                         {getInitials(review.user?.name || 'User')}
                       </AvatarFallback>
                     </Avatar>
-                    <div className="space-y-2">
-                      <div className="flex items-center gap-2">
-                        <h4 className="font-semibold">{review.user?.name}</h4>
-                        <div className="flex">
+                    <div className='space-y-2'>
+                      <div className='flex items-center gap-2'>
+                        <h4 className='font-semibold'>{review.user?.name}</h4>
+                        <div className='flex'>
                           {renderStarRating(review.rating)}
                         </div>
                       </div>
-                      <p className="text-muted-foreground text-sm">
+                      <p className='text-muted-foreground text-sm'>
                         {review.content}
                       </p>
-                      <div className="text-muted-foreground flex items-center gap-2 text-xs">
+                      <div className='text-muted-foreground flex items-center gap-2 text-xs'>
                         <span>{formatRelativeDate(review.createdAt)}</span>
                         <span>•</span>
                         <span>{review.product?.productName}</span>
@@ -310,11 +312,11 @@ export default function AdminDashboard() {
                   </Link>
                 ))}
               {data.recentReviews.length === 0 && (
-                <div className="flex h-[200px] items-center justify-center rounded-md border border-dashed">
-                  <div className="text-center">
-                    <Star className="text-muted-foreground/50 mx-auto h-6 w-6" />
-                    <h3 className="mt-2 text-sm font-medium">No reviews yet</h3>
-                    <p className="text-muted-foreground mt-1 text-xs">
+                <div className='flex h-[200px] items-center justify-center rounded-md border border-dashed'>
+                  <div className='text-center'>
+                    <Star className='text-muted-foreground/50 mx-auto h-6 w-6' />
+                    <h3 className='mt-2 text-sm font-medium'>No reviews yet</h3>
+                    <p className='text-muted-foreground mt-1 text-xs'>
                       Reviews will appear here when customers leave feedback.
                     </p>
                   </div>
@@ -325,42 +327,41 @@ export default function AdminDashboard() {
         </Card>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-        <Card className="col-span-2 overflow-hidden pt-0">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 bg-gradient-to-r from-orange-600 to-orange-500 p-6 text-white">
+      <div className='grid gap-4 md:grid-cols-2 lg:grid-cols-3'>
+        <Card className='col-span-2 overflow-hidden pt-0'>
+          <CardHeader className='flex flex-row items-center justify-between space-y-0 bg-gradient-to-r from-orange-600 to-orange-500 p-6 text-white'>
             <div>
               <CardTitle>Recent Orders</CardTitle>
             </div>
-            <BarChart3 className="ml-auto h-4 w-4" />
+            <BarChart3 className='ml-auto h-4 w-4' />
           </CardHeader>
           <CardContent>
-            <div className="space-y-4">
-              {data &&
-                data.recentOrders &&
+            <div className='space-y-4'>
+              {data?.recentOrders &&
                 data.recentOrders.length > 0 &&
                 data.recentOrders.map((order: OrderActivity) => (
                   <Link
                     href={`/dashboard/admin/orders/single-order?orderId=${order.orderNumber}`}
                     key={order.id}
-                    className="flex items-center justify-between rounded-lg border p-3"
+                    className='flex items-center justify-between rounded-lg border p-3'
                   >
-                    <div className="flex items-center space-x-4">
-                      <div className="rounded-full bg-violet-100 p-2">
-                        <ShoppingCart className="h-4 w-4 text-violet-700" />
+                    <div className='flex items-center space-x-4'>
+                      <div className='rounded-full bg-violet-100 p-2'>
+                        <ShoppingCart className='h-4 w-4 text-violet-700' />
                       </div>
                       <div>
-                        <p className="text-sm font-medium">
+                        <p className='text-sm font-medium'>
                           {order.user?.name}
                         </p>
-                        <p className="text-muted-foreground text-xs">
+                        <p className='text-muted-foreground text-xs'>
                           Order #{order.id.substring(0, 8)}
                         </p>
                       </div>
                     </div>
-                    <div className="flex items-center space-x-4">
-                      <div className="text-right">
-                        <p className="text-sm font-medium">${order.total}</p>
-                        <p className="text-muted-foreground text-xs">
+                    <div className='flex items-center space-x-4'>
+                      <div className='text-right'>
+                        <p className='text-sm font-medium'>${order.total}</p>
+                        <p className='text-muted-foreground text-xs'>
                           {formatRelativeDate(order.createdAt)}
                         </p>
                       </div>
@@ -378,59 +379,59 @@ export default function AdminDashboard() {
           </CardContent>
         </Card>
 
-        <Card className="overflow-hidden p-0">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 bg-gradient-to-r from-cyan-500 to-cyan-600 p-6 text-white">
+        <Card className='overflow-hidden p-0'>
+          <CardHeader className='flex flex-row items-center justify-between space-y-0 bg-gradient-to-r from-cyan-500 to-cyan-600 p-6 text-white'>
             <CardTitle>User Statistics</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-4">
-                  <div className="rounded-full bg-sky-100 p-2">
-                    <Users className="h-4 w-4 text-sky-700" />
+            <div className='space-y-4'>
+              <div className='flex items-center justify-between'>
+                <div className='flex items-center space-x-4'>
+                  <div className='rounded-full bg-sky-100 p-2'>
+                    <Users className='h-4 w-4 text-sky-700' />
                   </div>
                   <div>
-                    <p className="text-sm font-medium">Total Users</p>
-                    <p className="text-muted-foreground text-xs">
+                    <p className='text-sm font-medium'>Total Users</p>
+                    <p className='text-muted-foreground text-xs'>
                       All registered accounts
                     </p>
                   </div>
                 </div>
-                <p className="text-2xl font-bold">{data.stats.users}</p>
+                <p className='text-2xl font-bold'>{data.stats.users}</p>
               </div>
 
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-4">
-                  <div className="rounded-full bg-amber-100 p-2">
-                    <Store className="h-4 w-4 text-amber-700" />
+              <div className='flex items-center justify-between'>
+                <div className='flex items-center space-x-4'>
+                  <div className='rounded-full bg-amber-100 p-2'>
+                    <Store className='h-4 w-4 text-amber-700' />
                   </div>
                   <div>
-                    <p className="text-sm font-medium">Vendors</p>
-                    <p className="text-muted-foreground text-xs">
+                    <p className='text-sm font-medium'>Vendors</p>
+                    <p className='text-muted-foreground text-xs'>
                       Registered sellers
                     </p>
                   </div>
                 </div>
-                <p className="text-2xl font-bold">{data.stats.shops}</p>
+                <p className='text-2xl font-bold'>{data.stats.shops}</p>
               </div>
 
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-4">
-                  <div className="rounded-full bg-pink-100 p-2">
-                    <Star className="h-4 w-4 text-pink-700" />
+              <div className='flex items-center justify-between'>
+                <div className='flex items-center space-x-4'>
+                  <div className='rounded-full bg-pink-100 p-2'>
+                    <Star className='h-4 w-4 text-pink-700' />
                   </div>
                   <div>
-                    <p className="text-sm font-medium">Average Rating</p>
-                    <p className="text-muted-foreground text-xs">
+                    <p className='text-sm font-medium'>Average Rating</p>
+                    <p className='text-muted-foreground text-xs'>
                       Based on {data.stats.reviews.count} reviews
                     </p>
                   </div>
                 </div>
-                <div className="flex items-center">
-                  <p className="text-2xl font-bold">
+                <div className='flex items-center'>
+                  <p className='text-2xl font-bold'>
                     {data.stats.reviews.averageRating}.0
                   </p>
-                  <Star className="ml-1 h-5 w-5 fill-amber-400 text-amber-400" />
+                  <Star className='ml-1 h-5 w-5 fill-amber-400 text-amber-400' />
                 </div>
               </div>
             </div>

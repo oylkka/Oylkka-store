@@ -30,7 +30,7 @@ export default function Navigation() {
 
   // Determine active index based on current path
   const activeIndex = navItems.findIndex((item) =>
-    item.href === '/' ? pathname === '/' : pathname.startsWith(item.href)
+    item.href === '/' ? pathname === '/' : pathname.startsWith(item.href),
   );
 
   useEffect(() => {
@@ -94,11 +94,11 @@ export default function Navigation() {
   }, [activeIndex, prevActiveIndex]);
 
   return (
-    <nav className="relative flex items-center justify-center">
-      <div className="relative">
+    <nav className='relative flex items-center justify-center'>
+      <div className='relative'>
         {/* Hover Highlight */}
         <div
-          className="bg-primary/10 dark:bg-primary/20 absolute flex items-center rounded-full transition-all duration-300 ease-out"
+          className='bg-primary/10 dark:bg-primary/20 absolute flex items-center rounded-full transition-all duration-300 ease-out'
           style={{
             ...hoverStyle,
             opacity: hoveredIndex !== null ? 1 : 0,
@@ -108,21 +108,23 @@ export default function Navigation() {
 
         {/* Active Indicator */}
         <div
-          className="bg-primary absolute bottom-[-4px] h-[3px] rounded-full transition-all duration-300 ease-out"
+          className='bg-primary absolute bottom-[-4px] h-[3px] rounded-full transition-all duration-300 ease-out'
           style={activeStyle}
         />
 
         {/* Tabs */}
-        <div className="relative flex items-center space-x-1 md:space-x-2">
+        <div className='relative flex items-center space-x-1 md:space-x-2'>
           {navItems.map((item, index) => (
             <Link
+              // biome-ignore lint: error
               key={index}
               href={item.href}
               className={cn(
                 'focus-visible:ring-primary rounded-full outline-none focus-visible:ring-2',
-                'transition-colors duration-300'
+                'transition-colors duration-300',
               )}
             >
+              {/* biome-ignore lint: error */}
               <div
                 ref={(el) => {
                   tabRefs.current[index] = el;
@@ -131,15 +133,15 @@ export default function Navigation() {
                   'cursor-pointer rounded-full px-3 py-2 transition-all duration-300',
                   index === activeIndex
                     ? 'text-primary font-medium'
-                    : 'text-foreground/70 hover:text-foreground'
+                    : 'text-foreground/70 hover:text-foreground',
                 )}
                 onMouseEnter={() => setHoveredIndex(index)}
                 onMouseLeave={() => setHoveredIndex(null)}
               >
-                <div className="flex h-full items-center justify-center text-sm font-medium whitespace-nowrap">
+                <div className='flex h-full items-center justify-center text-sm font-medium whitespace-nowrap'>
                   {item.label}
                   {item.label === 'Sale' && (
-                    <span className="ml-1 inline-flex items-center justify-center rounded-full bg-red-500 px-1.5 py-0.5 text-[10px] font-medium text-white">
+                    <span className='ml-1 inline-flex items-center justify-center rounded-full bg-red-500 px-1.5 py-0.5 text-[10px] font-medium text-white'>
                       20%
                     </span>
                   )}

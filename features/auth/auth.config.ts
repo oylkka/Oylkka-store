@@ -1,7 +1,7 @@
-import { PrismaClient } from '@/prisma/output';
 import type { NextAuthConfig } from 'next-auth';
 import Github from 'next-auth/providers/github';
 import Google from 'next-auth/providers/google';
+import { PrismaClient } from '@/prisma/output';
 
 // Initialize Prisma client for username uniqueness check
 const prisma = new PrismaClient();
@@ -22,7 +22,9 @@ async function usernameExists(username: string): Promise<boolean> {
 export default {
   providers: [
     Google({
+      // biome-ignore lint: error
       clientId: process.env.AUTH_GOOGLE_ID!,
+      // biome-ignore lint: error
       clientSecret: process.env.AUTH_GOOGLE_SECRET!,
 
       authorization: {
@@ -64,7 +66,9 @@ export default {
       },
     }),
     Github({
+      // biome-ignore lint: error
       clientId: process.env.AUTH_GITHUB_ID!,
+      // biome-ignore lint: error
       clientSecret: process.env.AUTH_GITHUB_SECRET!,
       // Similar profile function for GitHub
       profile: async (profile) => {

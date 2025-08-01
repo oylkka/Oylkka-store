@@ -19,7 +19,7 @@ export async function POST(req: NextRequest) {
     if (!recipientId) {
       return NextResponse.json(
         { message: 'Recipient ID is required' },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -29,7 +29,7 @@ export async function POST(req: NextRequest) {
     if (recipientId === currentUserId) {
       return NextResponse.json(
         { message: 'Cannot start a conversation with yourself' },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -41,7 +41,7 @@ export async function POST(req: NextRequest) {
     if (!recipient) {
       return NextResponse.json(
         { message: 'Recipient not found' },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -93,11 +93,11 @@ export async function POST(req: NextRequest) {
     }
 
     return NextResponse.json(conversation);
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    // biome-ignore lint: error
   } catch (error) {
     return NextResponse.json(
       { message: 'Failed to create conversation' },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -138,11 +138,11 @@ export async function GET() {
     });
 
     return NextResponse.json(conversations);
+    // biome-ignore lint: error
   } catch (error) {
-    console.error('Error fetching conversations:', error);
     return NextResponse.json(
       { message: 'Failed to fetch conversations' },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

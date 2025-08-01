@@ -25,12 +25,12 @@ export default function AdminProductsPage() {
 
   if (isError) {
     return (
-      <div className="container mx-auto">
-        <Card className="p-8 text-center">
-          <h2 className="text-destructive mb-2 text-2xl font-semibold">
+      <div className='container mx-auto'>
+        <Card className='p-8 text-center'>
+          <h2 className='text-destructive mb-2 text-2xl font-semibold'>
             Error Loading Products
           </h2>
-          <p className="text-muted-foreground">
+          <p className='text-muted-foreground'>
             Failed to load products. Please try again.
           </p>
         </Card>
@@ -39,7 +39,7 @@ export default function AdminProductsPage() {
   }
 
   return (
-    <div className="container mx-auto space-y-6">
+    <div className='container mx-auto space-y-6'>
       <ProductsHeader
         totalProducts={data?.pagination?.total || 0}
         resultsCount={data?.filterInfo?.resultsCount || 0}
@@ -70,17 +70,18 @@ export default function AdminProductsPage() {
 
 function ProductsTableSkeleton() {
   return (
-    <Card className="p-6">
-      <div className="space-y-4">
+    <Card className='p-6'>
+      <div className='space-y-4'>
         {Array.from({ length: 5 }).map((_, i) => (
-          <div key={i} className="flex items-center space-x-4">
-            <Skeleton className="h-16 w-16 rounded-lg" />
-            <div className="flex-1 space-y-2">
-              <Skeleton className="h-4 w-[250px]" />
-              <Skeleton className="h-4 w-[200px]" />
+          //  biome-ignore lint: error
+          <div key={i} className='flex items-center space-x-4'>
+            <Skeleton className='h-16 w-16 rounded-lg' />
+            <div className='flex-1 space-y-2'>
+              <Skeleton className='h-4 w-[250px]' />
+              <Skeleton className='h-4 w-[200px]' />
             </div>
-            <Skeleton className="h-8 w-[100px]" />
-            <Skeleton className="h-8 w-[80px]" />
+            <Skeleton className='h-8 w-[100px]' />
+            <Skeleton className='h-8 w-[80px]' />
           </div>
         ))}
       </div>

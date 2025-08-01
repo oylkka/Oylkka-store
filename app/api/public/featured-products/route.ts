@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 
 import { getAuthenticatedUser } from '@/features/auth/get-user';
 import { db } from '@/lib/db';
@@ -80,7 +80,7 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({
       products: productWithRatings,
     });
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    // biome-ignore lint: error
   } catch (error) {
     return new Response('Internal Server Error', { status: 500 });
   }

@@ -1,7 +1,7 @@
-import { QUERY_KEYS } from '@/lib/constants';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
 import { toast } from 'sonner';
+import { QUERY_KEYS } from '@/lib/constants';
 
 export function useToggleWishlist() {
   const queryClient = useQueryClient();
@@ -12,7 +12,7 @@ export function useToggleWishlist() {
         '/api/dashboard/customer/wishlist',
         {
           productId,
-        }
+        },
       );
       return response.data;
     },
@@ -29,9 +29,11 @@ export function useToggleWishlist() {
       toast.success(
         data.added
           ? 'Product added to wishlist!'
-          : 'Product removed from wishlist.'
+          : 'Product removed from wishlist.',
       );
     },
+
+    // biome-ignore lint: error
     onError: (err: any) => {
       const errorMessage =
         err.response?.data?.message || 'Failed to update wishlist';

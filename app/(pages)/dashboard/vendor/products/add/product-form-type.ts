@@ -48,14 +48,14 @@ const DimensionsSchema = z
     {
       message:
         'All dimension fields (length, width, height, unit) must be provided together or not at all',
-    }
+    },
   );
 
 // Enhanced Attributes Schema to support variant attributes
 const AttributesSchema = z
   .record(
     z.string(), // Attribute key: color, size, custom-attr, etc.
-    z.union([z.string(), z.array(z.string())])
+    z.union([z.string(), z.array(z.string())]),
   )
   .optional()
   .refine(
@@ -79,7 +79,7 @@ const AttributesSchema = z
       }),
     {
       message: 'Attributes must have non-empty keys and values',
-    }
+    },
   );
 
 // Variant Attribute Schema to validate attribute key-value pairs
@@ -88,11 +88,11 @@ const VariantAttributesSchema = z
   .refine(
     (attrs) =>
       Object.entries(attrs).every(
-        ([key, val]) => key.trim() !== '' && val.trim() !== ''
+        ([key, val]) => key.trim() !== '' && val.trim() !== '',
       ),
     {
       message: 'Variant attributes must have non-empty keys and values',
-    }
+    },
   );
 
 // Enhanced Product Variant Schema
@@ -129,7 +129,7 @@ export const ProductVariantSchema = z
     {
       message: 'Discount price must be less than regular price',
       path: ['discountPrice'],
-    }
+    },
   );
 
 // Main Product Schema
@@ -232,14 +232,14 @@ export const ProductFormSchema = z
     {
       message: 'Discount price must be less than regular price',
       path: ['discountPrice'],
-    }
+    },
   )
   .refine(
     (data) => {
       // Calculate expected discount percent if discountPrice exists
       if (data.discountPrice && data.discountPrice > 0) {
         const calculatedPercent = Math.round(
-          ((data.price - data.discountPrice) / data.price) * 100
+          ((data.price - data.discountPrice) / data.price) * 100,
         );
         return data.discountPercent === calculatedPercent;
       }
@@ -248,7 +248,7 @@ export const ProductFormSchema = z
     {
       message: 'Discount percent does not match calculated value',
       path: ['discountPercent'],
-    }
+    },
   )
   .refine(
     (data) => {
@@ -268,7 +268,7 @@ export const ProductFormSchema = z
     {
       message: 'Condition description is required for this condition',
       path: ['conditionDescription'],
-    }
+    },
   )
   .refine(
     (data) => {
@@ -283,7 +283,7 @@ export const ProductFormSchema = z
     {
       message: 'Variant SKUs must be unique',
       path: ['variants'],
-    }
+    },
   )
   .refine(
     (data) => {
@@ -293,7 +293,7 @@ export const ProductFormSchema = z
       }
 
       const attributeSets = data.variants.map((v) =>
-        JSON.stringify(Object.entries(v.attributes).sort())
+        JSON.stringify(Object.entries(v.attributes).sort()),
       );
 
       return new Set(attributeSets).size === attributeSets.length;
@@ -301,7 +301,7 @@ export const ProductFormSchema = z
     {
       message: 'Variants must have unique attribute combinations',
       path: ['variants'],
-    }
+    },
   );
 
 // Type export

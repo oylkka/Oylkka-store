@@ -1,7 +1,7 @@
+import jwt from 'jsonwebtoken';
+import type { NextRequest } from 'next/server';
 import { auth } from '@/features/auth/auth';
 import { db } from '@/lib/db';
-import jwt from 'jsonwebtoken';
-import { NextRequest } from 'next/server';
 
 // Define a type for our user payload for consistency
 interface UserPayload {
@@ -28,6 +28,7 @@ async function verifyJwt(req: NextRequest): Promise<UserPayload | null> {
   }
 
   try {
+    // biome-ignore lint: error
     const decoded = jwt.verify(token, process.env.JWT_SECRET!) as any;
     // Fetch the latest user data from the database
     const user = await db.user.findUnique({ where: { id: decoded.userId } });
@@ -39,8 +40,8 @@ async function verifyJwt(req: NextRequest): Promise<UserPayload | null> {
       name: user.name,
       role: user.role,
     };
+    // biome-ignore lint: error
   } catch (error) {
-    console.error('JWT verification failed:', error);
     return null;
   }
 }
@@ -52,11 +53,11 @@ async function verifyJwt(req: NextRequest): Promise<UserPayload | null> {
  * @returns The user object or null if not authenticated.
  */
 export async function getAuthenticatedUser(
-  req: NextRequest
+  req: NextRequest,
 ): Promise<UserPayload | null> {
   // 1. Try to get the user from the NextAuth session (for web)
   const session = await auth();
-  if (session && session.user) {
+  if (session?.user) {
     return {
       id: session.user.id,
       email: session.user.email,

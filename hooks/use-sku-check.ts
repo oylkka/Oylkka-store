@@ -1,5 +1,5 @@
 import { useMutation } from '@tanstack/react-query';
-import axios, { AxiosError } from 'axios';
+import axios, { type AxiosError } from 'axios';
 import { useCallback } from 'react';
 import { useDebouncedCallback } from 'use-debounce';
 
@@ -24,25 +24,22 @@ export function useSkuCheck() {
 
       const response = await axios.post<SkuCheckResponse>(
         '/api/dashboard/vendor/add-product/sku',
-        { sku: trimmedSku }
+        { sku: trimmedSku },
       );
       return response.data;
-    },
-    onError: (err) => {
-      console.error('SKU check error:', err);
     },
   });
 
   const debouncedCheckSkuAvailability = useDebouncedCallback(
     (sku: string) => checkSku(sku),
-    500
+    500,
   );
 
   const checkSkuAvailability = useCallback(
     (sku: string) => {
       debouncedCheckSkuAvailability(sku);
     },
-    [debouncedCheckSkuAvailability]
+    [debouncedCheckSkuAvailability],
   );
 
   return {

@@ -50,32 +50,32 @@ export default function SearchBar({
   return (
     <div className={isHidden ? 'hidden' : 'relative w-full'}>
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="w-full">
+        <form onSubmit={form.handleSubmit(onSubmit)} className='w-full'>
           <FormField
             control={form.control}
-            name="search"
+            name='search'
             render={({ field }) => (
               <FormItem>
                 <FormControl>
-                  <div className="relative flex w-full">
+                  <div className='relative flex w-full'>
                     <Input
                       {...field}
-                      placeholder="Search products..."
+                      placeholder='Search products...'
                       className={`border-border/50 bg-background focus-visible:border-primary/50 focus-visible:ring-primary/30 h-10 rounded-full pr-10 pl-10 shadow-sm transition-all focus-visible:ring-1 focus-visible:ring-offset-0 md:min-w-max ${isMobile ? 'h-9 w-full' : ''}`}
-                      autoComplete="off"
+                      autoComplete='off'
                     />
                     <Search
-                      className="text-muted-foreground group-focus-within:text-primary absolute top-1/2 left-3 -translate-y-1/2 transition-colors"
+                      className='text-muted-foreground group-focus-within:text-primary absolute top-1/2 left-3 -translate-y-1/2 transition-colors'
                       size={18}
                     />
                     {field.value?.length > 0 && (
                       <button
-                        type="button"
-                        className="text-muted-foreground hover:bg-muted hover:text-foreground absolute top-1/2 right-3 -translate-y-1/2 rounded-full p-0.5 transition-colors"
+                        type='button'
+                        className='text-muted-foreground hover:bg-muted hover:text-foreground absolute top-1/2 right-3 -translate-y-1/2 rounded-full p-0.5 transition-colors'
                         onClick={clearInput}
                       >
                         <X size={16} />
-                        <span className="sr-only">Clear search</span>
+                        <span className='sr-only'>Clear search</span>
                       </button>
                     )}
                   </div>
@@ -92,5 +92,5 @@ export default function SearchBar({
 
 // Export the icon component for reuse
 SearchBar.Icon = function SearchIcon() {
-  return <Search className="h-5 w-5" />;
+  return <Search className='h-5 w-5' />;
 };

@@ -73,19 +73,19 @@ export default function ShopBasicInfo() {
   }, [shopName, setValue]);
 
   return (
-    <div className="mt-6 space-y-6">
-      <div className="grid gap-6 md:grid-cols-2">
+    <div className='mt-6 space-y-6'>
+      <div className='grid gap-6 md:grid-cols-2'>
         <FormField
           control={control}
-          name="shopName"
+          name='shopName'
           render={({ field }) => (
             <FormItem>
-              <FormLabel className="flex items-center gap-1.5">
-                <Building className="text-muted-foreground h-4 w-4" />
+              <FormLabel className='flex items-center gap-1.5'>
+                <Building className='text-muted-foreground h-4 w-4' />
                 Shop Name *
               </FormLabel>
               <FormControl>
-                <Input placeholder="Your Shop Name" {...field} />
+                <Input placeholder='Your Shop Name' {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -94,17 +94,17 @@ export default function ShopBasicInfo() {
 
         <FormField
           control={control}
-          name="shopSlug"
+          name='shopSlug'
           render={({ field }) => (
             <FormItem>
-              <FormLabel className="flex items-center gap-1.5">
-                <Link className="text-muted-foreground h-4 w-4" />
+              <FormLabel className='flex items-center gap-1.5'>
+                <Link className='text-muted-foreground h-4 w-4' />
                 Shop Slug *
               </FormLabel>
-              <div className="relative">
+              <div className='relative'>
                 <FormControl>
                   <Input
-                    placeholder="your-shop-slug"
+                    placeholder='your-shop-slug'
                     {...field}
                     onChange={(e) => {
                       // Just set the value directly - slugify is already applied
@@ -120,20 +120,20 @@ export default function ShopBasicInfo() {
         />
       </div>
 
-      <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+      <div className='grid grid-cols-1 gap-6 md:grid-cols-2'>
         <FormField
           control={control}
-          name="shopCategory"
+          name='shopCategory'
           render={({ field }) => (
             <FormItem>
-              <FormLabel className="flex items-center gap-1.5">
-                <Tag className="text-muted-foreground h-4 w-4" />
+              <FormLabel className='flex items-center gap-1.5'>
+                <Tag className='text-muted-foreground h-4 w-4' />
                 Shop Category *
               </FormLabel>
               <Select onValueChange={field.onChange} value={field.value || ''}>
                 <FormControl>
                   <SelectTrigger>
-                    <SelectValue placeholder="Select your shop category" />
+                    <SelectValue placeholder='Select your shop category' />
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
@@ -151,16 +151,16 @@ export default function ShopBasicInfo() {
 
         <FormField
           control={control}
-          name="shopAddress"
+          name='shopAddress'
           render={({ field }) => (
             <FormItem>
-              <FormLabel className="flex items-center gap-1.5">
-                <MapPin className="text-muted-foreground h-4 w-4" />
+              <FormLabel className='flex items-center gap-1.5'>
+                <MapPin className='text-muted-foreground h-4 w-4' />
                 Shop Address
               </FormLabel>
               <FormControl>
                 <Input
-                  placeholder="123 Market St, San Francisco, CA"
+                  placeholder='123 Market St, San Francisco, CA'
                   {...field}
                 />
               </FormControl>
@@ -172,14 +172,14 @@ export default function ShopBasicInfo() {
 
       <FormField
         control={control}
-        name="shopDescription"
+        name='shopDescription'
         render={({ field }) => (
           <FormItem>
             <FormLabel>Shop Description</FormLabel>
             <FormControl>
               <Textarea
-                placeholder="Tell customers about your shop, products, and what makes your business unique..."
-                className="min-h-[120px] resize-y"
+                placeholder='Tell customers about your shop, products, and what makes your business unique...'
+                className='min-h-[120px] resize-y'
                 {...field}
               />
             </FormControl>

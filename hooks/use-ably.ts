@@ -2,12 +2,13 @@
 import { useCallback, useEffect, useState } from 'react';
 
 export function useAbly(conversationId: string | null) {
+  // biome-ignore lint: error
   const [ably, setAbly] = useState<any>(null);
   const [isConnected, setIsConnected] = useState(false);
   const [connectionError, setConnectionError] = useState<string | null>(null);
   const [connectionState, setConnectionState] = useState<string>('initialized');
   const [onlineUsers, setOnlineUsers] = useState<string[]>([]); // New state for online users
-
+  // biome-ignore lint: error
   useEffect(() => {
     if (!conversationId) {
       if (ably) {
@@ -19,33 +20,29 @@ export function useAbly(conversationId: string | null) {
       }
       return;
     }
-
+    // biome-ignore lint: error
     let realtimeInstance: any = null;
     let connectionTimeout: NodeJS.Timeout;
 
     const connectAbly = async () => {
       try {
-        console.log('Starting Ably connection...');
         setConnectionError(null);
         setConnectionState('connecting');
 
         const { Realtime } = await import('ably');
 
-        // Test the auth endpoint
-        console.log('Testing auth endpoint...');
         const authResponse = await fetch(
-          `/api/chat/ably/ably-auth?conversationId=${conversationId}`
+          `/api/chat/ably/ably-auth?conversationId=${conversationId}`,
         );
 
         if (!authResponse.ok) {
           const errorText = await authResponse.text();
           throw new Error(
-            `Auth endpoint failed: ${authResponse.status} - ${errorText}`
+            `Auth endpoint failed: ${authResponse.status} - ${errorText}`,
           );
         }
 
         const tokenRequest = await authResponse.json();
-        console.log('Auth token received:', tokenRequest);
 
         realtimeInstance = new Realtime({
           authUrl: `/api/chat/ably/ably-auth?conversationId=${conversationId}`,
@@ -55,16 +52,14 @@ export function useAbly(conversationId: string | null) {
 
         // Set a connection timeout
         connectionTimeout = setTimeout(() => {
-          console.error('Ably connection timeout after 15 seconds');
           setConnectionError(
-            'Connection timeout - please check your network and try again'
+            'Connection timeout - please check your network and try again',
           );
           setConnectionState('failed');
         }, 15000);
 
         // Connection state listeners
         realtimeInstance.connection.on('connected', () => {
-          console.log('✅ Ably connection state: connected');
           clearTimeout(connectionTimeout);
           setIsConnected(true);
           setConnectionState('connected');
@@ -72,40 +67,35 @@ export function useAbly(conversationId: string | null) {
         });
 
         realtimeInstance.connection.on('connecting', () => {
-          console.log('🔄 Ably connection state: connecting');
           setIsConnected(false);
           setConnectionState('connecting');
         });
 
         realtimeInstance.connection.on('disconnected', () => {
-          console.log('❌ Ably connection state: disconnected');
           setIsConnected(false);
           setConnectionState('disconnected');
           setOnlineUsers([]); // Clear online users
         });
-
+        // biome-ignore lint: error
         realtimeInstance.connection.on('failed', (error: any) => {
-          console.error('💥 Ably connection state: failed', error);
           clearTimeout(connectionTimeout);
           setIsConnected(false);
           setConnectionState('failed');
           setConnectionError(
-            `Connection failed: ${error.message || 'Unknown error'}`
+            `Connection failed: ${error.message || 'Unknown error'}`,
           );
           setOnlineUsers([]); // Clear online users
         });
 
         realtimeInstance.connection.on('suspended', () => {
-          console.log('⏸️ Ably connection state: suspended');
           setIsConnected(false);
           setConnectionState('suspended');
           setOnlineUsers([]); // Clear online users
         });
-
+        // biome-ignore lint: error
         realtimeInstance.connection.on('error', (error: any) => {
-          console.error('🚨 Ably connection error:', error);
           setConnectionError(
-            `Connection error: ${error.message || 'Unknown error'}`
+            `Connection error: ${error.message || 'Unknown error'}`,
           );
         });
 
@@ -120,35 +110,27 @@ export function useAbly(conversationId: string | null) {
 
         // Presence setup
         const channel = realtimeInstance.channels.get(`chat:${conversationId}`);
+        // biome-ignore lint: error
         channel.presence.subscribe('enter', (member: any) => {
           setOnlineUsers((prev) => {
             const updated = [...prev, member.clientId].filter(
-              (id, index, self) => self.indexOf(id) === index
+              (id, index, self) => self.indexOf(id) === index,
             );
-            console.log(
-              'User entered:',
-              member.clientId,
-              'Online users:',
-              updated
-            );
+
             return updated;
           });
         });
-
+        // biome-ignore lint: error
         channel.presence.subscribe('leave', (member: any) => {
           setOnlineUsers((prev) => {
             const updated = prev.filter((id) => id !== member.clientId);
-            console.log(
-              'User left:',
-              member.clientId,
-              'Online users:',
-              updated
-            );
+
             return updated;
           });
         });
-
+        // biome-ignore lint: error
         channel.presence.subscribe('update', (member: any) => {
+          // biome-ignore lint: error
           console.log('Presence update for:', member.clientId);
         });
 
@@ -156,17 +138,16 @@ export function useAbly(conversationId: string | null) {
         channel.presence.enter();
 
         // Get current presence members
+        // biome-ignore lint: error
         channel.presence.get((err: any, members: any[]) => {
           if (err) {
-            console.error('Error fetching presence:', err);
             return;
           }
           const userIds = members.map((m) => m.clientId);
           setOnlineUsers(userIds);
-          console.log('Initial online users:', userIds);
         });
+        // biome-ignore lint: error
       } catch (error: any) {
-        console.error('❌ Ably setup error:', error);
         setConnectionError(`Setup error: ${error.message}`);
         setIsConnected(false);
         setConnectionState('failed');
@@ -179,7 +160,6 @@ export function useAbly(conversationId: string | null) {
     return () => {
       clearTimeout(connectionTimeout);
       if (realtimeInstance) {
-        console.log('🔌 Closing Ably connection...');
         const channel = realtimeInstance.channels.get(`chat:${conversationId}`);
         channel.presence.leave(); // Leave presence
         realtimeInstance.close();
@@ -193,12 +173,11 @@ export function useAbly(conversationId: string | null) {
   const getChannel = useCallback(
     (channelName: string) => {
       if (!ably) {
-        console.warn('Ably instance not available for channel:', channelName);
         return null;
       }
       return ably.channels.get(channelName);
     },
-    [ably]
+    [ably],
   );
 
   return {

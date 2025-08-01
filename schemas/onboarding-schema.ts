@@ -10,7 +10,7 @@ export const onboardingSchema = z
       .max(30, 'Username cannot exceed 30 characters')
       .regex(
         /^[a-zA-Z0-9._]+$/,
-        'Username can only contain letters, numbers, periods, and underscores'
+        'Username can only contain letters, numbers, periods, and underscores',
       ),
     email: z
       .string()
@@ -33,7 +33,7 @@ export const onboardingSchema = z
         },
         {
           message: 'Invalid Bangladeshi mobile number',
-        }
+        },
       ),
     role: z.enum(['CUSTOMER', 'VENDOR'], {
       required_error: 'Please select a role',
@@ -84,7 +84,7 @@ export const onboardingSchema = z
     {
       message: 'Required shop information missing',
       path: ['role'], // This sets the error at the role field level
-    }
+    },
   )
   .superRefine((data, ctx) => {
     // Only add specific field errors if the user is a VENDOR

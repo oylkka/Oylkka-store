@@ -31,20 +31,20 @@ export const ImagePreview: React.FC<ImagePreviewProps> = ({
   }
 
   return (
-    <div className="group relative h-20 w-20 overflow-hidden rounded-lg border">
+    <div className='group relative h-20 w-20 overflow-hidden rounded-lg border'>
       <Image
         fill
         src={imageUrl || '/placeholder.svg'}
-        alt="Review upload preview"
-        className="object-cover"
+        alt='Review upload preview'
+        className='object-cover'
       />
       <button
-        type="button"
+        type='button'
         onClick={onRemove}
-        className="absolute top-1 right-1 z-10 rounded-full bg-black/60 p-1 text-white opacity-0 transition-opacity group-hover:opacity-100 focus:opacity-100"
-        aria-label="Remove image"
+        className='absolute top-1 right-1 z-10 rounded-full bg-black/60 p-1 text-white opacity-0 transition-opacity group-hover:opacity-100 focus:opacity-100'
+        aria-label='Remove image'
       >
-        <X className="h-3 w-3" />
+        <X className='h-3 w-3' />
       </button>
     </div>
   );

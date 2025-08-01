@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 
 import { getAuthenticatedUser } from '@/features/auth/get-user';
 import { db } from '@/lib/db';
@@ -16,7 +16,7 @@ export async function GET(req: NextRequest) {
       },
     });
     return NextResponse.json(address, { status: 200 });
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    // biome-ignore lint: error
   } catch (error) {
     return NextResponse.json('Internal Server Error', { status: 500 });
   }
@@ -34,7 +34,7 @@ export async function PUT(req: NextRequest) {
     if (!id) {
       return NextResponse.json(
         { error: 'Address ID is required' },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -95,11 +95,11 @@ export async function PUT(req: NextRequest) {
     });
 
     return NextResponse.json(updated, { status: 200 });
+    // biome-ignore lint: error
   } catch (error) {
-    console.error('[ADDRESS_PUT]', error);
     return NextResponse.json(
       { error: 'Internal Server Error' },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

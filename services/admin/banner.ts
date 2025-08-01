@@ -1,9 +1,9 @@
-import { QUERY_KEYS } from '@/lib/constants';
-import { cleanFormData } from '@/lib/utils';
-import { BannerFormSchema, EditBannerFormType } from '@/schemas';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
-import { z } from 'zod';
+import type { z } from 'zod';
+import { QUERY_KEYS } from '@/lib/constants';
+import { cleanFormData } from '@/lib/utils';
+import type { BannerFormSchema, EditBannerFormType } from '@/schemas';
 
 export type BannerFormValues = z.infer<typeof BannerFormSchema>;
 
@@ -42,7 +42,7 @@ export function useBannerMutation() {
       toast.success('Banner created successfully!');
       queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.HERO_BANNER] });
     },
-
+    // biome-ignore lint: error
     onError: (error: any) => {
       toast.error(`Error: ${error.message || 'Failed to create banner'}`);
     },
@@ -68,16 +68,11 @@ export function useSingleBanner({ id }: { id: string }) {
     queryKey: [QUERY_KEYS.SINGLE_BANNER, id],
     queryFn: async () => {
       const response = await fetch(
-        `/api/dashboard/admin/banners/single-banner?id=${id}`
+        `/api/dashboard/admin/banners/single-banner?id=${id}`,
       );
       return response.json();
     },
   });
-}
-
-interface UpdateBannerVariables {
-  id: string;
-  data: FormData;
 }
 
 import axios from 'axios';
@@ -99,7 +94,7 @@ export function useUpdateBanner() {
           headers: {
             'Content-Type': 'multipart/form-data',
           },
-        }
+        },
       );
       return response.data;
     },
@@ -121,7 +116,7 @@ export function useUpdateBanner() {
 
 export function prepareFormData(
   values: EditBannerFormType,
-  id: string
+  id: string,
 ): FormData {
   const formData = new FormData();
   const cleanedValues = cleanFormData(values);

@@ -1,8 +1,8 @@
-import { randomUUID } from 'crypto';
+import { randomUUID } from 'node:crypto';
 
 import { google } from 'googleapis';
 import jwt from 'jsonwebtoken';
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 
 import { db } from '@/lib/db';
 
@@ -20,7 +20,7 @@ export async function POST(req: NextRequest) {
     if (!payload || !payload.email) {
       return NextResponse.json(
         { error: 'Invalid Google token' },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -81,19 +81,20 @@ export async function POST(req: NextRequest) {
         name: userInDb.name,
         role: userInDb.role,
       },
+      // biome-ignore lint: error
       process.env.JWT_SECRET!,
-      { expiresIn: '7d' }
+      { expiresIn: '7d' },
     );
 
     return NextResponse.json(
       { message: 'Success', token, user: userInDb, sessionToken },
-      { status: 200 }
+      { status: 200 },
     );
+    // biome-ignore lint: error
   } catch (error) {
-    console.error('API Error:', error);
     return NextResponse.json(
       { message: 'Internal Server Error' },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

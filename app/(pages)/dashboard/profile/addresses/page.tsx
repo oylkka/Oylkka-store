@@ -62,9 +62,9 @@ export default function UserAddresses() {
       toast.success('Address deleted successfully');
       setDeleteDialogOpen(false);
       setAddressToDelete(null);
+      // biome-ignore lint: error
     } catch (error) {
       toast.error('Failed to delete address');
-      console.error('Delete error:', error);
     }
   };
 
@@ -75,25 +75,26 @@ export default function UserAddresses() {
 
   if (isLoading) {
     return (
-      <div className="container mx-auto max-w-4xl px-4 py-8">
-        <div className="mb-8">
-          <Skeleton className="mb-2 h-8 w-48" />
-          <Skeleton className="h-4 w-96" />
+      <div className='container mx-auto max-w-4xl px-4 py-8'>
+        <div className='mb-8'>
+          <Skeleton className='mb-2 h-8 w-48' />
+          <Skeleton className='h-4 w-96' />
         </div>
-        <div className="grid gap-6 md:grid-cols-2">
+        <div className='grid gap-6 md:grid-cols-2'>
           {[...Array(4)].map((_, i) => (
-            <Card key={i} className="animate-pulse">
-              <CardHeader className="pb-3">
-                <Skeleton className="h-6 w-32" />
-                <Skeleton className="h-4 w-20" />
+            // biome-ignore lint: error
+            <Card key={i} className='animate-pulse'>
+              <CardHeader className='pb-3'>
+                <Skeleton className='h-6 w-32' />
+                <Skeleton className='h-4 w-20' />
               </CardHeader>
-              <CardContent className="space-y-3">
-                <Skeleton className="h-4 w-full" />
-                <Skeleton className="h-4 w-3/4" />
-                <Skeleton className="h-4 w-1/2" />
-                <div className="flex gap-2 pt-2">
-                  <Skeleton className="h-8 w-16" />
-                  <Skeleton className="h-8 w-16" />
+              <CardContent className='space-y-3'>
+                <Skeleton className='h-4 w-full' />
+                <Skeleton className='h-4 w-3/4' />
+                <Skeleton className='h-4 w-1/2' />
+                <div className='flex gap-2 pt-2'>
+                  <Skeleton className='h-8 w-16' />
+                  <Skeleton className='h-8 w-16' />
                 </div>
               </CardContent>
             </Card>
@@ -105,21 +106,21 @@ export default function UserAddresses() {
 
   if (isError) {
     return (
-      <div className="container mx-auto max-w-4xl px-4 py-8">
-        <Card className="border-red-200 bg-red-50">
-          <CardContent className="flex items-center justify-center py-12">
-            <div className="text-center">
-              <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-red-100">
-                <MapPin className="h-6 w-6 text-red-600" />
+      <div className='container mx-auto max-w-4xl px-4 py-8'>
+        <Card className='border-red-200 bg-red-50'>
+          <CardContent className='flex items-center justify-center py-12'>
+            <div className='text-center'>
+              <div className='mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-red-100'>
+                <MapPin className='h-6 w-6 text-red-600' />
               </div>
-              <h3 className="mb-2 text-lg font-semibold text-red-900">
+              <h3 className='mb-2 text-lg font-semibold text-red-900'>
                 Failed to load addresses
               </h3>
-              <p className="mb-4 text-red-700">
+              <p className='mb-4 text-red-700'>
                 There was an error loading your saved addresses.
               </p>
               <Button
-                variant="outline"
+                variant='outline'
                 onClick={() => window.location.reload()}
               >
                 Try Again
@@ -132,19 +133,19 @@ export default function UserAddresses() {
   }
 
   return (
-    <div className="container mx-auto max-w-4xl px-4 py-8">
+    <div className='container mx-auto max-w-4xl px-4 py-8'>
       {/* Header Section */}
-      <div className="mb-8">
-        <div className="mb-4 flex items-center justify-between">
+      <div className='mb-8'>
+        <div className='mb-4 flex items-center justify-between'>
           <div>
-            <h1 className="text-3xl font-bold tracking-tight">My Addresses</h1>
-            <p className="text-muted-foreground mt-1">
+            <h1 className='text-3xl font-bold tracking-tight'>My Addresses</h1>
+            <p className='text-muted-foreground mt-1'>
               Manage your delivery addresses
             </p>
           </div>
-          <Link href="/dashboard/profile/addresses/add" passHref>
-            <Button size="lg" className="shadow-sm">
-              <Plus className="mr-2 h-4 w-4" />
+          <Link href='/dashboard/profile/addresses/add' passHref>
+            <Button size='lg' className='shadow-sm'>
+              <Plus className='mr-2 h-4 w-4' />
               Add New Address
             </Button>
           </Link>
@@ -153,7 +154,7 @@ export default function UserAddresses() {
 
       {/* Addresses Grid */}
       {data && data.length > 0 ? (
-        <div className="grid gap-6 md:grid-cols-2">
+        <div className='grid gap-6 md:grid-cols-2'>
           {data.map((address: Address) => (
             <Card
               key={address.id}
@@ -165,26 +166,26 @@ export default function UserAddresses() {
             >
               {/* Default Badge */}
               {address.isDefault && (
-                <div className="absolute -top-2 -right-2">
-                  <Badge className="bg-primary text-primary-foreground shadow-sm">
-                    <Star className="mr-1 h-3 w-3 fill-current" />
+                <div className='absolute -top-2 -right-2'>
+                  <Badge className='bg-primary text-primary-foreground shadow-sm'>
+                    <Star className='mr-1 h-3 w-3 fill-current' />
                     Default
                   </Badge>
                 </div>
               )}
 
-              <CardHeader className="pb-4">
-                <div className="flex items-start justify-between">
-                  <div className="flex items-center gap-2">
-                    <div className="bg-primary/10 flex h-10 w-10 items-center justify-center rounded-full">
-                      <MapPin className="text-primary h-5 w-5" />
+              <CardHeader className='pb-4'>
+                <div className='flex items-start justify-between'>
+                  <div className='flex items-center gap-2'>
+                    <div className='bg-primary/10 flex h-10 w-10 items-center justify-center rounded-full'>
+                      <MapPin className='text-primary h-5 w-5' />
                     </div>
                     <div>
-                      <h3 className="text-lg font-semibold">
+                      <h3 className='text-lg font-semibold'>
                         {address.address.name}
                       </h3>
                       {address.isDefault && (
-                        <p className="text-muted-foreground text-sm">
+                        <p className='text-muted-foreground text-sm'>
                           Primary address
                         </p>
                       )}
@@ -193,36 +194,36 @@ export default function UserAddresses() {
                 </div>
               </CardHeader>
 
-              <CardContent className="space-y-4">
+              <CardContent className='space-y-4'>
                 {/* Contact Information */}
-                <div className="space-y-2">
-                  <div className="flex items-center gap-2 text-sm">
-                    <Mail className="text-muted-foreground h-4 w-4" />
-                    <span className="text-muted-foreground">
+                <div className='space-y-2'>
+                  <div className='flex items-center gap-2 text-sm'>
+                    <Mail className='text-muted-foreground h-4 w-4' />
+                    <span className='text-muted-foreground'>
                       {address.address.email}
                     </span>
                   </div>
-                  <div className="flex items-center gap-2 text-sm">
-                    <Phone className="text-muted-foreground h-4 w-4" />
-                    <span className="text-muted-foreground">
+                  <div className='flex items-center gap-2 text-sm'>
+                    <Phone className='text-muted-foreground h-4 w-4' />
+                    <span className='text-muted-foreground'>
                       {address.address.phone}
                     </span>
                   </div>
                 </div>
 
                 {/* Address Information */}
-                <div className="space-y-2 border-t pt-2">
-                  <div className="flex items-start gap-2">
-                    <Navigation className="text-muted-foreground mt-0.5 h-4 w-4 flex-shrink-0" />
-                    <div className="text-sm">
-                      <p className="font-medium">{address.address.address}</p>
-                      <div className="text-muted-foreground mt-1 flex items-center gap-1">
-                        <Building className="h-3 w-3" />
+                <div className='space-y-2 border-t pt-2'>
+                  <div className='flex items-start gap-2'>
+                    <Navigation className='text-muted-foreground mt-0.5 h-4 w-4 flex-shrink-0' />
+                    <div className='text-sm'>
+                      <p className='font-medium'>{address.address.address}</p>
+                      <div className='text-muted-foreground mt-1 flex items-center gap-1'>
+                        <Building className='h-3 w-3' />
                         <span>
                           {address.address.city}, {address.address.district}
                         </span>
                       </div>
-                      <p className="text-muted-foreground">
+                      <p className='text-muted-foreground'>
                         Postal Code: {address.address.postalCode}
                       </p>
                     </div>
@@ -230,18 +231,18 @@ export default function UserAddresses() {
                 </div>
 
                 {/* Action Buttons */}
-                <div className="flex gap-2 border-t pt-4">
+                <div className='flex gap-2 border-t pt-4'>
                   <Button
-                    variant="outline"
-                    size="sm"
-                    className="flex-1 bg-transparent"
+                    variant='outline'
+                    size='sm'
+                    className='flex-1 bg-transparent'
                     onClick={() =>
                       router.push(
-                        `/dashboard/profile/addresses/edit?addressesId=${address.id}`
+                        `/dashboard/profile/addresses/edit?addressesId=${address.id}`,
                       )
                     }
                   >
-                    <Edit className="mr-2 h-3 w-3" />
+                    <Edit className='mr-2 h-3 w-3' />
                     Edit
                   </Button>
                   <Dialog
@@ -250,12 +251,12 @@ export default function UserAddresses() {
                   >
                     <DialogTrigger asChild>
                       <Button
-                        variant="outline"
-                        size="sm"
-                        className="bg-transparent text-red-600 hover:bg-red-50 hover:text-red-700"
+                        variant='outline'
+                        size='sm'
+                        className='bg-transparent text-red-600 hover:bg-red-50 hover:text-red-700'
                         onClick={() => openDeleteDialog(address)}
                       >
-                        <Trash2 className="mr-2 h-3 w-3" />
+                        <Trash2 className='mr-2 h-3 w-3' />
                         Delete
                       </Button>
                     </DialogTrigger>
@@ -267,19 +268,19 @@ export default function UserAddresses() {
         </div>
       ) : (
         /* Empty State */
-        <Card className="border-dashed">
-          <CardContent className="flex flex-col items-center justify-center py-16">
-            <div className="bg-muted mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full">
-              <MapPin className="text-muted-foreground h-8 w-8" />
+        <Card className='border-dashed'>
+          <CardContent className='flex flex-col items-center justify-center py-16'>
+            <div className='bg-muted mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full'>
+              <MapPin className='text-muted-foreground h-8 w-8' />
             </div>
-            <h3 className="mb-2 text-xl font-semibold">No addresses yet</h3>
-            <p className="text-muted-foreground mb-6 max-w-sm text-center">
+            <h3 className='mb-2 text-xl font-semibold'>No addresses yet</h3>
+            <p className='text-muted-foreground mb-6 max-w-sm text-center'>
               You haven&#39;t added any delivery addresses yet. Add your first
               address to get started.
             </p>
-            <Link href="/dashboard/profile/addresses/add" passHref>
-              <Button size="lg">
-                <Plus className="mr-2 h-4 w-4" />
+            <Link href='/dashboard/profile/addresses/add' passHref>
+              <Button size='lg'>
+                <Plus className='mr-2 h-4 w-4' />
                 Add Your First Address
               </Button>
             </Link>
@@ -298,12 +299,12 @@ export default function UserAddresses() {
           </DialogHeader>
 
           {addressToDelete && (
-            <div className="bg-muted my-4 rounded-lg p-4">
-              <p className="font-medium">{addressToDelete.address.name}</p>
-              <p className="text-muted-foreground text-sm">
+            <div className='bg-muted my-4 rounded-lg p-4'>
+              <p className='font-medium'>{addressToDelete.address.name}</p>
+              <p className='text-muted-foreground text-sm'>
                 {addressToDelete.address.address}
               </p>
-              <p className="text-muted-foreground text-sm">
+              <p className='text-muted-foreground text-sm'>
                 {addressToDelete.address.city},{' '}
                 {addressToDelete.address.district}{' '}
                 {addressToDelete.address.postalCode}
@@ -313,14 +314,14 @@ export default function UserAddresses() {
 
           <DialogFooter>
             <Button
-              variant="outline"
+              variant='outline'
               onClick={() => setDeleteDialogOpen(false)}
               disabled={deleteAddressMutation.isPending}
             >
               Cancel
             </Button>
             <Button
-              variant="destructive"
+              variant='destructive'
               onClick={handleDeleteAddress}
               disabled={deleteAddressMutation.isPending}
             >

@@ -35,19 +35,19 @@ export default function CartClient() {
   const removeItem = useRemoveFromCart();
 
   if (isPending) {
-    return <div className="flex justify-center p-8">Loading your cart...</div>;
+    return <div className='flex justify-center p-8'>Loading your cart...</div>;
   }
 
   if (isError) {
     return (
-      <div className="flex justify-center p-8 text-red-500">
+      <div className='flex justify-center p-8 text-red-500'>
         Error loading cart items
       </div>
     );
   }
 
   if (!data || data.length === 0) {
-    return <div className="flex justify-center p-8">Your cart is empty</div>;
+    return <div className='flex justify-center p-8'>Your cart is empty</div>;
   }
 
   const handleRemoveItem = (itemId: string) => {
@@ -71,96 +71,99 @@ export default function CartClient() {
 
   return (
     <div>
-      <ScrollArea className="h-[50vh] space-y-4 md:h-[55vh]">
+      <ScrollArea className='h-[50vh] space-y-4 md:h-[55vh]'>
         {data.map((item: CartItem) => (
           <div
             key={item.variantId || item.productId}
-            className="grid grid-cols-12 gap-3 border-b pb-4"
+            className='grid grid-cols-12 gap-3 border-b pb-4'
           >
-            <div className="col-span-3">
+            <div className='col-span-3'>
               <Image
                 src={item.image.url}
                 alt={item.name}
-                className="border object-cover md:h-16 md:w-16"
+                className='border object-cover md:h-16 md:w-16'
                 width={200}
                 height={200}
               />
             </div>
-            <div className="col-span-9 space-y-3">
-              <div className="flex justify-between gap-4">
+            <div className='col-span-9 space-y-3'>
+              <div className='flex justify-between gap-4'>
                 <div>
                   <Link
                     href={`/products/${item.slug}`}
-                    className="line-clamp-1 font-bold"
+                    className='line-clamp-1 font-bold'
                   >
                     {item.name}
                   </Link>
-                  <p className="text-muted-foreground text-sm">
+                  <p className='text-muted-foreground text-sm'>
                     {item.variantName}
                   </p>
                 </div>
                 <button
+                  type='button'
                   onClick={() => handleRemoveItem(item.id)}
                   disabled={removeItem.isPending}
-                  className="transition-colors hover:text-red-500"
-                  aria-label="Remove item"
+                  className='transition-colors hover:text-red-500'
+                  aria-label='Remove item'
                 >
                   <X size={18} />
                 </button>
               </div>
 
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2 text-sm">
-                  <div className="grid grid-cols-5 items-center justify-center border">
-                    <div className="col-span-3 flex items-center justify-center p-0.5 md:p-1">
+              <div className='flex items-center justify-between'>
+                <div className='flex items-center gap-2 text-sm'>
+                  <div className='grid grid-cols-5 items-center justify-center border'>
+                    <div className='col-span-3 flex items-center justify-center p-0.5 md:p-1'>
                       {item.quantity}
                     </div>
-                    <div className="col-span-2 border-l">
+                    <div className='col-span-2 border-l'>
                       <button
+                        type='button'
                         onClick={() =>
                           handleUpdateQuantity(item.id, item.quantity + 1)
                         }
-                        className="flex w-full items-center justify-center border-b p-0.5 hover:bg-gray-100 md:p-1 dark:hover:bg-gray-800"
-                        aria-label="Increase quantity"
+                        className='flex w-full items-center justify-center border-b p-0.5 hover:bg-gray-100 md:p-1 dark:hover:bg-gray-800'
+                        aria-label='Increase quantity'
                       >
                         <Plus size={14} />
                       </button>
                       <button
+                        type='button'
                         disabled={isPending || item.quantity === 1}
                         onClick={() =>
                           handleUpdateQuantity(
                             item.id,
-                            Math.max(1, item.quantity - 1)
+                            Math.max(1, item.quantity - 1),
                           )
                         }
-                        className="flex w-full items-center justify-center p-0.5 hover:bg-gray-100 md:p-1 dark:hover:bg-gray-800"
-                        aria-label="Decrease quantity"
+                        className='flex w-full items-center justify-center p-0.5 hover:bg-gray-100 md:p-1 dark:hover:bg-gray-800'
+                        aria-label='Decrease quantity'
                       >
                         <Minus size={14} />
                       </button>
                     </div>
                   </div>
 
-                  <X size={14} className="text-gray-400" />
-                  <p className="text-gray-500">
+                  <X size={14} className='text-gray-400' />
+                  <p className='text-gray-500'>
                     ৳{item.discountPrice?.toFixed(2) ?? item.price.toFixed(2)}
                   </p>
                 </div>
 
-                <p className="font-semibold">
+                <p className='font-semibold'>
                   ৳
                   {((item.discountPrice ?? item.price) * item.quantity).toFixed(
-                    2
+                    2,
                   )}
                 </p>
               </div>
             </div>
           </div>
         ))}
-        <div className="from-background pointer-events-none absolute right-0 bottom-0 left-0 h-8 bg-gradient-to-t to-transparent" />
+        <div className='from-background pointer-events-none absolute right-0 bottom-0 left-0 h-8 bg-gradient-to-t to-transparent' />
       </ScrollArea>
 
-      <div className="mt-4 space-y-2">
+      <div className='mt-4 space-y-2'>
         <Slider
           defaultValue={[subtotal + shippingCost]}
           value={[subtotal + shippingCost]}
@@ -170,31 +173,31 @@ export default function CartClient() {
         />
 
         {subtotal >= shippingThreshold ? (
-          <p className="text-primary text-sm">
+          <p className='text-primary text-sm'>
             🎉 Congratulations! You’ve got free shipping.
           </p>
         ) : (
-          <p className="space-x-1 text-sm">
+          <p className='space-x-1 text-sm'>
             <span>Spend</span>
-            <span className="text-primary">
+            <span className='text-primary'>
               ৳{(shippingThreshold - subtotal).toFixed(0)}
             </span>
             <span>more to get</span>
-            <span className="text-lg font-medium uppercase">free shipping</span>
+            <span className='text-lg font-medium uppercase'>free shipping</span>
           </p>
         )}
 
         <Separator />
 
         <div>
-          <div className="flex justify-between text-lg">
+          <div className='flex justify-between text-lg'>
             <p>Subtotal:</p>
-            <p className="font-bold">৳{subtotal.toFixed(0)}</p>
+            <p className='font-bold'>৳{subtotal.toFixed(0)}</p>
           </div>
-          <div className="flex justify-between">
+          <div className='flex justify-between'>
             <p>Shipping:</p>
             {subtotal >= shippingThreshold ? (
-              <p className="line-through">৳{shippingCost}</p>
+              <p className='line-through'>৳{shippingCost}</p>
             ) : (
               <p>৳{shippingCost}</p>
             )}
@@ -203,9 +206,9 @@ export default function CartClient() {
 
         <Separator />
 
-        <div className="flex justify-between text-lg">
+        <div className='flex justify-between text-lg'>
           <p>Total:</p>
-          <p className="font-bold">
+          <p className='font-bold'>
             ৳
             {subtotal >= shippingThreshold
               ? subtotal.toFixed(0)

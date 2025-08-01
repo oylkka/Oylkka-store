@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 
 import { db } from '@/lib/db';
 
@@ -65,13 +65,13 @@ export async function GET(req: NextRequest) {
 
     return NextResponse.json(
       { shop: { ...shop, products: productsWithRatings } },
-      { status: 200 }
+      { status: 200 },
     );
+    // biome-ignore lint: error
   } catch (error) {
-    console.error('Error retrieving shop:', error);
     return NextResponse.json(
       { error: 'Internal Server Error' },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

@@ -107,7 +107,7 @@ export async function GET() {
     ]
       .sort(
         (a, b) =>
-          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
       )
       .slice(0, 5);
 
@@ -126,11 +126,11 @@ export async function GET() {
       recentActivity,
       recentReviews,
     });
+    // biome-ignore lint: error
   } catch (error) {
-    console.error(error);
     return NextResponse.json(
       { error: 'Internal server error' },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

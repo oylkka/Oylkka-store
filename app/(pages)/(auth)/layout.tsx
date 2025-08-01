@@ -7,12 +7,10 @@ export default function layout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <>
-      <SessionProvider>
-        <Header />
-        {children}
-        <Footer />
-      </SessionProvider>
-    </>
+    <SessionProvider>
+      <Header />
+      {children}
+      <Footer />
+    </SessionProvider>
   );
 }

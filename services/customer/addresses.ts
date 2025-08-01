@@ -1,10 +1,10 @@
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import axios from 'axios';
 import { QUERY_KEYS } from '@/lib/constants';
-import {
+import type {
   AddressFormValues,
   EditAddressFormValues,
 } from '@/schemas/addressesSchema';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import axios from 'axios';
 
 export const useCreateAddress = () => {
   const queryClient = useQueryClient();
@@ -12,7 +12,7 @@ export const useCreateAddress = () => {
     mutationFn: async (data: AddressFormValues) => {
       const response = await axios.post(
         '/api/dashboard/customer/profile/addresses',
-        data
+        data,
       );
       return response.data;
     },
@@ -29,7 +29,7 @@ export const useDeleteAddress = () => {
   return useMutation({
     mutationFn: async (addressId: string) => {
       const response = await axios.delete(
-        `/api/dashboard/customer/profile/addresses?addressId=${addressId}`
+        `/api/dashboard/customer/profile/addresses?addressId=${addressId}`,
       );
       return response.data;
     },
@@ -46,7 +46,7 @@ export function useAddress() {
     queryKey: [QUERY_KEYS.USER_ADDRESSES],
     queryFn: async () => {
       const { data } = await axios.get(
-        '/api/dashboard/customer/profile/addresses'
+        '/api/dashboard/customer/profile/addresses',
       );
       return data;
     },
@@ -58,7 +58,7 @@ export function useSingleAddress({ id }: { id: string }) {
     queryKey: [QUERY_KEYS.SINGLE_ADDRESS],
     queryFn: async () => {
       const { data } = await axios.get(
-        `/api/dashboard/customer/profile/addresses/single-address?id=${id}`
+        `/api/dashboard/customer/profile/addresses/single-address?id=${id}`,
       );
       return data;
     },
@@ -78,7 +78,7 @@ export const useUpdateAddress = () => {
     }) => {
       const response = await axios.put(
         `/api/dashboard/customer/profile/addresses/single-address?id=${id}`,
-        data
+        data,
       );
       return response.data;
     },

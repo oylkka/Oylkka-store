@@ -7,7 +7,7 @@ export default function layout({
   return (
     <>
       <Header />
-      <div className="container mx-auto mb-10">{children}</div>
+      <div className='container mx-auto mb-10'>{children}</div>
       <Footer />
     </>
   );

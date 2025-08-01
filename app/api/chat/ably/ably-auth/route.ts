@@ -1,6 +1,6 @@
 // api/chat/ably/ably-auth/route.ts
 import Ably from 'ably';
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 
 import { auth } from '@/features/auth/auth';
 import { db } from '@/lib/db';
@@ -29,7 +29,7 @@ export async function GET(req: NextRequest) {
     if (!conversationId) {
       return NextResponse.json(
         { message: 'conversationId is required.' },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -42,13 +42,9 @@ export async function GET(req: NextRequest) {
     });
 
     if (!hasAccess) {
-      console.error(
-        '❌ User does not have access to conversation:',
-        conversationId
-      );
       return NextResponse.json(
         { message: 'Access denied to this conversation.' },
-        { status: 403 }
+        { status: 403 },
       );
     }
 
@@ -63,11 +59,11 @@ export async function GET(req: NextRequest) {
     });
 
     return NextResponse.json(tokenRequest);
+    // biome-ignore lint: error
   } catch (error) {
-    console.error('Ably auth error:', error);
     return NextResponse.json(
       { message: 'Internal Server Error' },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

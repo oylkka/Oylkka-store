@@ -44,12 +44,12 @@ export const ReviewCard: React.FC<ReviewCardProps> = ({
     <Card
       className={cn(
         'overflow-hidden',
-        isCurrentUser && 'border-primary ring-primary/50 ring-2'
+        isCurrentUser && 'border-primary ring-primary/50 ring-2',
       )}
     >
-      <CardHeader className="flex-row items-start justify-between gap-3 space-y-0 p-4 pb-2 md:p-6 md:pb-3">
-        <div className="flex items-start gap-3">
-          <Avatar className="h-9 w-9 md:h-10 md:w-10">
+      <CardHeader className='flex-row items-start justify-between gap-3 space-y-0 p-4 pb-2 md:p-6 md:pb-3'>
+        <div className='flex items-start gap-3'>
+          <Avatar className='h-9 w-9 md:h-10 md:w-10'>
             <AvatarImage
               src={review.user?.image || undefined}
               alt={review.user?.name || 'User avatar'}
@@ -59,15 +59,15 @@ export const ReviewCard: React.FC<ReviewCardProps> = ({
             </AvatarFallback>
           </Avatar>
           <div>
-            <p className="text-sm leading-tight font-semibold md:text-base">
+            <p className='text-sm leading-tight font-semibold md:text-base'>
               {review.user?.name || 'Anonymous User'}
             </p>
-            <div className="mt-0.5 flex items-center gap-2">
-              <RatingDisplay rating={review.rating} size="sm" />
+            <div className='mt-0.5 flex items-center gap-2'>
+              <RatingDisplay rating={review.rating} size='sm' />
               {review.verified && (
                 <Badge
-                  variant="secondary"
-                  className="h-5 px-1.5 text-xs font-medium"
+                  variant='secondary'
+                  className='h-5 px-1.5 text-xs font-medium'
                 >
                   Verified
                 </Badge>
@@ -75,7 +75,7 @@ export const ReviewCard: React.FC<ReviewCardProps> = ({
             </div>
           </div>
         </div>
-        <span className="text-muted-foreground pt-1 text-xs whitespace-nowrap">
+        <span className='text-muted-foreground pt-1 text-xs whitespace-nowrap'>
           {new Date(review.createdAt).toLocaleDateString('en-US', {
             year: 'numeric',
             month: 'short',
@@ -84,41 +84,41 @@ export const ReviewCard: React.FC<ReviewCardProps> = ({
         </span>
       </CardHeader>
 
-      <CardContent className="p-4 pt-1 md:p-6 md:pt-2">
+      <CardContent className='p-4 pt-1 md:p-6 md:pt-2'>
         {review.title && (
-          <h4 className="text-md mb-1.5 leading-tight font-semibold">
+          <h4 className='text-md mb-1.5 leading-tight font-semibold'>
             {review.title}
           </h4>
         )}
-        <p className="text-foreground/90 text-sm leading-relaxed">
+        <p className='text-foreground/90 text-sm leading-relaxed'>
           {review.content}
         </p>
 
         <ReviewImages images={review.images || []} />
 
-        <div className="mt-3 flex flex-col items-start gap-2 border-t pt-3 sm:flex-row sm:items-center sm:justify-between">
-          <span className="text-muted-foreground text-xs">
+        <div className='mt-3 flex flex-col items-start gap-2 border-t pt-3 sm:flex-row sm:items-center sm:justify-between'>
+          <span className='text-muted-foreground text-xs'>
             {review.helpful > 0
               ? `${review.helpful} people found this helpful`
               : 'Was this review helpful?'}
           </span>
-          <div className="flex gap-1">
-            <Button variant="outline" size="sm" onClick={handleHelpful}>
+          <div className='flex gap-1'>
+            <Button variant='outline' size='sm' onClick={handleHelpful}>
               Helpful ({review.helpful})
             </Button>
             <Button
-              variant="ghost"
-              size="sm"
-              className="text-muted-foreground hover:text-destructive"
+              variant='ghost'
+              size='sm'
+              className='text-muted-foreground hover:text-destructive'
               onClick={handleReport}
             >
               Report
             </Button>
             {canDelete && (
               <Button
-                variant="ghost"
-                size="sm"
-                className="text-destructive hover:text-destructive hover:bg-destructive/10"
+                variant='ghost'
+                size='sm'
+                className='text-destructive hover:text-destructive hover:bg-destructive/10'
                 onClick={handleDelete}
               >
                 Delete

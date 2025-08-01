@@ -5,8 +5,8 @@ import { useEffect, useState, useTransition } from 'react';
 import { useFormContext, useWatch } from 'react-hook-form';
 import { useDebounce } from 'use-debounce';
 
-import { checkSlugUniqueness, SlugCheckResult } from '@/actions';
-import { OnboardingFormValues } from '@/schemas';
+import { checkSlugUniqueness, type SlugCheckResult } from '@/actions';
+import type { OnboardingFormValues } from '@/schemas';
 
 export function SlugUniquenessChecker() {
   const { control, setError, clearErrors } =
@@ -29,7 +29,7 @@ export function SlugUniquenessChecker() {
     formData.append('shopSlug', debouncedSlug);
 
     startTransition(async () => {
-      const checkResult = await checkSlugUniqueness(null, formData);
+      const checkResult = await checkSlugUniqueness(formData);
       setResult(checkResult);
 
       // Set or clear form error based on the result
@@ -50,23 +50,23 @@ export function SlugUniquenessChecker() {
   }
 
   return (
-    <div className="mt-1.5 flex items-center gap-1.5 text-sm">
+    <div className='mt-1.5 flex items-center gap-1.5 text-sm'>
       {isPending ? (
         <>
-          <Loader2 className="text-muted-foreground h-4 w-4 animate-spin" />
-          <span className="text-muted-foreground">
+          <Loader2 className='text-muted-foreground h-4 w-4 animate-spin' />
+          <span className='text-muted-foreground'>
             Checking availability...
           </span>
         </>
       ) : result?.isUnique ? (
         <>
-          <CheckCircle className="h-4 w-4 text-green-500" />
-          <span className="text-green-500">{result.message}</span>
+          <CheckCircle className='h-4 w-4 text-green-500' />
+          <span className='text-green-500'>{result.message}</span>
         </>
       ) : result && !result.isUnique ? (
         <>
-          <AlertCircle className="h-4 w-4 text-red-500" />
-          <span className="text-red-500">{result.message}</span>
+          <AlertCircle className='h-4 w-4 text-red-500' />
+          <span className='text-red-500'>{result.message}</span>
         </>
       ) : null}
     </div>

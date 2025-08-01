@@ -7,7 +7,7 @@ export default async function Page({
 }) {
   const { slug } = await params;
   return (
-    <div className="mt-8">
+    <div className='mt-8'>
       <ShopContent slug={slug} />
     </div>
   );

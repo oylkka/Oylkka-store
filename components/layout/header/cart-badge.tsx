@@ -18,20 +18,20 @@ export default function CartBadge() {
   return (
     <SheetTrigger asChild>
       <Button
-        variant="ghost"
-        size="icon"
-        className="hover:bg-primary/10 relative rounded-full transition-all"
+        variant='ghost'
+        size='icon'
+        className='hover:bg-primary/10 relative rounded-full transition-all'
       >
-        <ShoppingBag className="h-5 w-5" />
+        <ShoppingBag className='h-5 w-5' />
         {cartItemCount > 0 && (
           <Badge
-            variant="destructive"
-            className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full p-0 text-xs shadow-sm"
+            variant='destructive'
+            className='absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full p-0 text-xs shadow-sm'
           >
             {cartItemCount}
           </Badge>
         )}
-        <span className="sr-only">Shopping cart</span>
+        <span className='sr-only'>Shopping cart</span>
       </Button>
     </SheetTrigger>
   );

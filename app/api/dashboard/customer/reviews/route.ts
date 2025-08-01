@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 
 import { getAuthenticatedUser } from '@/features/auth/get-user';
 import { db } from '@/lib/db';
@@ -39,11 +39,11 @@ export async function GET(req: NextRequest) {
     });
 
     return NextResponse.json(reviews, { status: 200 });
+    // biome-ignore lint: error
   } catch (error) {
-    console.error('[GET_USER_REVIEWS_ERROR]', error);
     return NextResponse.json(
       { message: 'Internal Server Error' },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

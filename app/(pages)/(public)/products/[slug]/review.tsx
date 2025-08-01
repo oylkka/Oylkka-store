@@ -75,7 +75,7 @@ const ProductReviews: React.FC<ProductReviewsProps> = ({ productId }) => {
   const handleSignIn = () => {
     toast.info('Redirecting to sign-in...');
   };
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  // biome-ignore lint: error
   const handleSubmitReview = async (data: any) => {
     if (sessionStatus !== 'authenticated' || !session?.user?.id) {
       toast.error('Please log in to submit a review.');
@@ -99,7 +99,7 @@ const ProductReviews: React.FC<ProductReviewsProps> = ({ productId }) => {
       formData.append('title', data.title);
     }
     (data.images || []).forEach((file: File) =>
-      formData.append('images', file)
+      formData.append('images', file),
     );
 
     try {
@@ -112,10 +112,9 @@ const ProductReviews: React.FC<ProductReviewsProps> = ({ productId }) => {
       setReviewDialogOpen(false);
       await refetchReviews();
     } catch (err) {
-      console.error('Review submission error:', err);
       const errorMessage =
         err instanceof Error ? err.message : 'Failed to submit review.';
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      // biome-ignore lint: error
       if (err instanceof Error && (err as any).response?.status === 409) {
         toast.error("You've already reviewed this product.", {
           id: submissionToastId,
@@ -151,7 +150,6 @@ const ProductReviews: React.FC<ProductReviewsProps> = ({ productId }) => {
       setReviewToDeleteId(null);
       // refetchReviews is handled by the useDeleteReview hook's query invalidation
     } catch (err) {
-      console.error('Review deletion error:', err);
       const errorMessage =
         err instanceof Error ? err.message : 'Failed to delete review.';
 
@@ -187,23 +185,23 @@ const ProductReviews: React.FC<ProductReviewsProps> = ({ productId }) => {
 
   if (isLoadingReviews) {
     return (
-      <div className="flex min-h-[300px] items-center justify-center py-12">
-        <Loader2 className="text-primary h-8 w-8 animate-spin" />
-        <span className="ml-3 text-lg">Loading reviews...</span>
+      <div className='flex min-h-[300px] items-center justify-center py-12'>
+        <Loader2 className='text-primary h-8 w-8 animate-spin' />
+        <span className='ml-3 text-lg'>Loading reviews...</span>
       </div>
     );
   }
 
   if (reviewsError) {
     return (
-      <div className="border-destructive/50 bg-destructive/10 rounded-lg border p-6 text-center">
-        <p className="text-destructive-foreground">
+      <div className='border-destructive/50 bg-destructive/10 rounded-lg border p-6 text-center'>
+        <p className='text-destructive-foreground'>
           Oops! Failed to load reviews.
         </p>
         <Button
-          variant="outline"
+          variant='outline'
           onClick={() => refetchReviews()}
-          className="mt-4"
+          className='mt-4'
         >
           <Loader2
             className={`mr-2 h-4 w-4 ${isLoadingReviews ? 'animate-spin' : ''}`}
@@ -219,10 +217,10 @@ const ProductReviews: React.FC<ProductReviewsProps> = ({ productId }) => {
   const isSubmittingOrDeleting = isSubmittingReview || isDeletingReview;
 
   return (
-    <div className="space-y-8 font-sans">
-      <div className="flex flex-col gap-x-8 gap-y-6 md:flex-row">
+    <div className='space-y-8 font-sans'>
+      <div className='flex flex-col gap-x-8 gap-y-6 md:flex-row'>
         {/* Review Summary */}
-        <div className="w-full md:w-1/3 lg:w-1/4">
+        <div className='w-full md:w-1/3 lg:w-1/4'>
           <ReviewSummary
             totalReviews={totalReviews}
             avgRating={avgRating}
@@ -236,18 +234,18 @@ const ProductReviews: React.FC<ProductReviewsProps> = ({ productId }) => {
         </div>
 
         {/* Review List */}
-        <div className="w-full md:w-2/3 lg:w-3/4">
-          <div className="mb-4 flex flex-col items-start justify-between gap-2 sm:flex-row sm:items-center">
-            <h3 className="text-lg font-semibold">
+        <div className='w-full md:w-2/3 lg:w-3/4'>
+          <div className='mb-4 flex flex-col items-start justify-between gap-2 sm:flex-row sm:items-center'>
+            <h3 className='text-lg font-semibold'>
               {totalReviews > 0
                 ? `Showing ${reviews.length} of ${totalReviews} Reviews`
                 : 'Be the First to Review!'}
             </h3>
             {reviews.length > 0 && (
-              <div className="flex gap-2">
+              <div className='flex gap-2'>
                 <Button
-                  variant="outline"
-                  size="sm"
+                  variant='outline'
+                  size='sm'
                   onClick={() => handleSort('Most Recent')}
                   className={
                     sortBy === 'createdAt'
@@ -258,8 +256,8 @@ const ProductReviews: React.FC<ProductReviewsProps> = ({ productId }) => {
                   Most Recent
                 </Button>
                 <Button
-                  variant="ghost"
-                  size="sm"
+                  variant='ghost'
+                  size='sm'
                   onClick={() => handleSort('Highest Rated')}
                   className={
                     sortBy === 'rating'
@@ -270,8 +268,8 @@ const ProductReviews: React.FC<ProductReviewsProps> = ({ productId }) => {
                   Highest Rated
                 </Button>
                 <Button
-                  variant="ghost"
-                  size="sm"
+                  variant='ghost'
+                  size='sm'
                   onClick={() => handleSort('Most Helpful')}
                   className={
                     sortBy === 'helpful'
@@ -286,7 +284,7 @@ const ProductReviews: React.FC<ProductReviewsProps> = ({ productId }) => {
           </div>
 
           {reviews.length > 0 ? (
-            <div className="space-y-5">
+            <div className='space-y-5'>
               {reviews.map((review: ProductReview) => {
                 const isCurrentUserReview = review.userId === session?.user?.id;
                 const canDelete =
@@ -304,24 +302,24 @@ const ProductReviews: React.FC<ProductReviewsProps> = ({ productId }) => {
               })}
             </div>
           ) : (
-            <div className="flex min-h-[200px] flex-col items-center justify-center rounded-lg border-2 border-dashed p-8 text-center">
-              <p className="text-muted-foreground mb-4">
+            <div className='flex min-h-[200px] flex-col items-center justify-center rounded-lg border-2 border-dashed p-8 text-center'>
+              <p className='text-muted-foreground mb-4'>
                 This product hasn&#39;t received any reviews yet.
               </p>
               {isSessionLoading ? (
                 <Button disabled>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Checking
+                  <Loader2 className='mr-2 h-4 w-4 animate-spin' /> Checking
                   status...
                 </Button>
               ) : isAuthenticated ? (
                 !hasUserReviewed && (
                   <Button onClick={handleOpenReviewDialog}>
-                    <MessageSquareText className="mr-2 h-4 w-4" /> Write the
+                    <MessageSquareText className='mr-2 h-4 w-4' /> Write the
                     First Review
                   </Button>
                 )
               ) : (
-                <Button variant="outline" onClick={handleSignIn}>
+                <Button variant='outline' onClick={handleSignIn}>
                   Sign In to Write a Review
                 </Button>
               )}
@@ -329,8 +327,8 @@ const ProductReviews: React.FC<ProductReviewsProps> = ({ productId }) => {
           )}
 
           {reviews.length > 0 && pagination.hasNextPage && (
-            <div className="mt-6 flex justify-center">
-              <Button variant="outline" onClick={handleLoadMore}>
+            <div className='mt-6 flex justify-center'>
+              <Button variant='outline' onClick={handleLoadMore}>
                 Load More Reviews ({totalReviews - reviews.length} remaining)
               </Button>
             </div>

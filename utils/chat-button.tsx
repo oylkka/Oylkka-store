@@ -1,7 +1,8 @@
+import { MessageCircle } from 'lucide-react';
+import type React from 'react';
+import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
-import { MessageCircle } from 'lucide-react';
-import React, { useState } from 'react';
 
 interface MessageVendorButtonProps {
   vendorId: string;
@@ -12,13 +13,10 @@ interface MessageVendorButtonProps {
 
 const MessageVendorButton: React.FC<MessageVendorButtonProps> = ({
   vendorId,
-  vendorName,
   productId,
   className,
 }) => {
   const [isLoading, setIsLoading] = useState(false);
-
-  console.log(vendorId, vendorName, productId);
 
   const handleMessageVendor = async () => {
     try {
@@ -51,8 +49,8 @@ const MessageVendorButton: React.FC<MessageVendorButtonProps> = ({
 
       // Redirect to the conversation
       window.location.href = `/chat/${data.id}`;
+      // biome-ignore lint: error
     } catch (error) {
-      console.error('Error starting conversation:', error);
       alert('Failed to start conversation. Please try again.');
     } finally {
       setIsLoading(false);
@@ -63,13 +61,13 @@ const MessageVendorButton: React.FC<MessageVendorButtonProps> = ({
     <Button
       onClick={handleMessageVendor}
       disabled={isLoading}
-      variant="outline"
+      variant='outline'
       className={cn('flex items-center justify-center gap-2 py-6', className)}
     >
       {isLoading ? (
-        <div className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+        <div className='h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent' />
       ) : (
-        <MessageCircle className="h-4 w-4" />
+        <MessageCircle className='h-4 w-4' />
       )}
       <span>Message Vendor</span>
     </Button>

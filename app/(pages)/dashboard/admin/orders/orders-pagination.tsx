@@ -50,7 +50,7 @@ export default function OrdersPagination({
 
       return `/dashboard/admin/orders?${params.toString()}`;
     },
-    [status, query]
+    [status, query],
   );
 
   // Navigate to a specific page
@@ -104,21 +104,21 @@ export default function OrdersPagination({
   const visiblePages = getVisiblePages();
 
   return (
-    <div className="flex flex-col items-center space-y-4">
+    <div className='flex flex-col items-center space-y-4'>
       <Pagination>
-        <PaginationContent className="flex flex-wrap justify-center gap-2">
+        <PaginationContent className='flex flex-wrap justify-center gap-2'>
           {/* First Page Button */}
           {totalPages > 7 && (
             <PaginationItem>
               <Button
-                variant="outline"
-                size="icon"
-                className="h-9 w-9 rounded-full"
+                variant='outline'
+                size='icon'
+                className='h-9 w-9 rounded-full'
                 onClick={() => navigateToPage(1)}
                 disabled={currentPage === 1}
-                aria-label="Go to first page"
+                aria-label='Go to first page'
               >
-                <ChevronsLeft className="h-4 w-4" />
+                <ChevronsLeft className='h-4 w-4' />
               </Button>
             </PaginationItem>
           )}
@@ -126,14 +126,14 @@ export default function OrdersPagination({
           {/* Previous Button */}
           <PaginationItem>
             <Button
-              variant="outline"
-              size="icon"
-              className="h-9 w-9 rounded-full"
+              variant='outline'
+              size='icon'
+              className='h-9 w-9 rounded-full'
               onClick={() => navigateToPage(currentPage - 1)}
               disabled={currentPage === 1}
-              aria-label="Go to previous page"
+              aria-label='Go to previous page'
             >
-              <ChevronLeft className="h-4 w-4" />
+              <ChevronLeft className='h-4 w-4' />
             </Button>
           </PaginationItem>
 
@@ -159,7 +159,7 @@ export default function OrdersPagination({
                       : 'hover:bg-muted'
                   }`}
                 >
-                  <span className="flex h-full w-full items-center justify-center">
+                  <span className='flex h-full w-full items-center justify-center'>
                     {page}
                   </span>
                 </PaginationLink>
@@ -170,14 +170,14 @@ export default function OrdersPagination({
           {/* Next Button */}
           <PaginationItem>
             <Button
-              variant="outline"
-              size="icon"
-              className="h-9 w-9 rounded-full"
+              variant='outline'
+              size='icon'
+              className='h-9 w-9 rounded-full'
               onClick={() => navigateToPage(currentPage + 1)}
               disabled={currentPage === totalPages}
-              aria-label="Go to next page"
+              aria-label='Go to next page'
             >
-              <ChevronRight className="h-4 w-4" />
+              <ChevronRight className='h-4 w-4' />
             </Button>
           </PaginationItem>
 
@@ -185,21 +185,21 @@ export default function OrdersPagination({
           {totalPages > 7 && (
             <PaginationItem>
               <Button
-                variant="outline"
-                size="icon"
-                className="h-9 w-9 rounded-full"
+                variant='outline'
+                size='icon'
+                className='h-9 w-9 rounded-full'
                 onClick={() => navigateToPage(totalPages)}
                 disabled={currentPage === totalPages}
-                aria-label="Go to last page"
+                aria-label='Go to last page'
               >
-                <ChevronsRight className="h-4 w-4" />
+                <ChevronsRight className='h-4 w-4' />
               </Button>
             </PaginationItem>
           )}
         </PaginationContent>
       </Pagination>
 
-      <div className="text-muted-foreground text-sm">
+      <div className='text-muted-foreground text-sm'>
         Page {currentPage} of {totalPages}
       </div>
     </div>

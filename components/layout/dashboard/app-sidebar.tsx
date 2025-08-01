@@ -1,4 +1,4 @@
-import * as React from 'react';
+import type * as React from 'react';
 
 import {
   Sidebar,
@@ -14,7 +14,7 @@ import { TeamSwitcher } from './team-switcher';
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   return (
-    <Sidebar collapsible="icon" {...props}>
+    <Sidebar collapsible='icon' {...props}>
       <SidebarHeader>
         <TeamSwitcher />
       </SidebarHeader>

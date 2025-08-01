@@ -47,13 +47,13 @@ export default function ProductVariant() {
 
     window.addEventListener(
       'attributeHierarchyChange',
-      handleHierarchyChange as EventListener
+      handleHierarchyChange as EventListener,
     );
 
     return () => {
       window.removeEventListener(
         'attributeHierarchyChange',
-        handleHierarchyChange as EventListener
+        handleHierarchyChange as EventListener,
       );
     };
   }, []);
@@ -79,34 +79,30 @@ export default function ProductVariant() {
   const getReadableColorName = (colorValue: string): string => {
     // Check if it's a hex color
     if (/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/.test(colorValue)) {
-      try {
-        // Get color names from color-namer
-        const names = colorNamer(colorValue);
+      // Get color names from color-namer
+      const names = colorNamer(colorValue);
 
-        // Try to get the most accurate and readable color name
-        // Start with the most recognized naming systems
+      // Try to get the most accurate and readable color name
+      // Start with the most recognized naming systems
 
-        // First priority: Use 'basic' names as they're most common
-        if (names.basic && names.basic.length > 0) {
-          return capitalizeColorName(names.basic[0].name);
-        }
+      // First priority: Use 'basic' names as they're most common
+      if (names.basic && names.basic.length > 0) {
+        return capitalizeColorName(names.basic[0].name);
+      }
 
-        // Second priority: Use 'ntc' (Name That Color) which has good names
-        if (names.ntc && names.ntc.length > 0) {
-          return capitalizeColorName(names.ntc[0].name);
-        }
+      // Second priority: Use 'ntc' (Name That Color) which has good names
+      if (names.ntc && names.ntc.length > 0) {
+        return capitalizeColorName(names.ntc[0].name);
+      }
 
-        // Third priority: Try roygbiv which focuses on standard color names
-        if (names.roygbiv && names.roygbiv.length > 0) {
-          return capitalizeColorName(names.roygbiv[0].name);
-        }
+      // Third priority: Try roygbiv which focuses on standard color names
+      if (names.roygbiv && names.roygbiv.length > 0) {
+        return capitalizeColorName(names.roygbiv[0].name);
+      }
 
-        // Fourth priority: Use pantone for more technical color names
-        if (names.pantone && names.pantone.length > 0) {
-          return capitalizeColorName(names.pantone[0].name);
-        }
-      } catch (error) {
-        console.error('Error getting color name:', error);
+      // Fourth priority: Use pantone for more technical color names
+      if (names.pantone && names.pantone.length > 0) {
+        return capitalizeColorName(names.pantone[0].name);
       }
     }
 
@@ -131,7 +127,7 @@ export default function ProductVariant() {
   // Improved function to create a readable variant name
   const createVariantName = (
     attributes: Record<string, string>,
-    primary: string | null
+    primary: string | null,
   ): string => {
     if (!attributes) {
       return 'Variant';
@@ -170,7 +166,7 @@ export default function ProductVariant() {
   // Helper function to create a short code for SKU generation
   const createAttributeCode = (
     attributeName: string,
-    attributeValue: string
+    attributeValue: string,
   ): string => {
     // For color attributes, use the first 2 chars of the readable name for the code
     if (
@@ -259,7 +255,7 @@ export default function ProductVariant() {
               return false;
             }
             return Object.entries(allAttributes).every(
-              ([key, value]) => v.attributes[key] === value
+              ([key, value]) => v.attributes[key] === value,
             );
           });
 
@@ -330,7 +326,7 @@ export default function ProductVariant() {
 
   // Helper function to generate combinations for secondary attributes
   const generateCombinationsForAttributes = (
-    attributeOptions: Record<string, string[]>
+    attributeOptions: Record<string, string[]>,
   ): Record<string, string>[] => {
     const keys = Object.keys(attributeOptions);
     const result: Record<string, string>[] = [];
@@ -338,7 +334,7 @@ export default function ProductVariant() {
     const generateHelper = (
       keys: string[],
       currentIndex: number,
-      currentCombination: Record<string, string>
+      currentCombination: Record<string, string>,
     ) => {
       if (currentIndex === keys.length) {
         result.push({ ...currentCombination });
@@ -363,7 +359,7 @@ export default function ProductVariant() {
       keys: string[],
       currentIndex: number,
       currentCombination: Record<string, string>,
-      result: Record<string, string>[]
+      result: Record<string, string>[],
     ) => {
       if (currentIndex === keys.length) {
         result.push({ ...currentCombination });
@@ -379,7 +375,7 @@ export default function ProductVariant() {
           keys,
           currentIndex + 1,
           currentCombination,
-          result
+          result,
         );
       }
     };
@@ -397,7 +393,7 @@ export default function ProductVariant() {
           return false;
         }
         return Object.keys(combo).every(
-          (key) => existingCombo[key] === combo[key]
+          (key) => existingCombo[key] === combo[key],
         );
       });
     });
@@ -440,18 +436,18 @@ export default function ProductVariant() {
   const canGenerateVariants = hasAttributes && hasProductSku;
 
   return (
-    <Card className="mb-6">
+    <Card className='mb-6'>
       <CardHeader>
         <ProductAttributes />
       </CardHeader>
       <CardContent>
         <VariantGenerateAlert />
 
-        <div className="mb-6 flex items-center justify-between">
-          <h3 className="text-lg font-medium">Product Variants</h3>
+        <div className='mb-6 flex items-center justify-between'>
+          <h3 className='text-lg font-medium'>Product Variants</h3>
           <div>
             <Button
-              type="button"
+              type='button'
               onClick={generateAllVariants}
               disabled={!canGenerateVariants}
               title={

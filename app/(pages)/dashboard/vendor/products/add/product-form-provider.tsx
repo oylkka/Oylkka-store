@@ -130,7 +130,7 @@ export function ProductFormProvider({ children }: ProductFormProviderProps) {
         loading: 'Submitting product...',
         error: (err) =>
           err?.response?.data?.message || 'Failed to submit product',
-      }
+      },
     );
   };
 

@@ -24,12 +24,12 @@ import {
 } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
 
-import { ProductFormValues } from './product-form-type';
+import type { ProductFormValues } from './product-form-type';
 
 export default function ProductStatus() {
   const { control } = useFormContext<ProductFormValues>();
   return (
-    <Card className="mb-6">
+    <Card className='mb-6'>
       <CardHeader>
         <CardTitle>Product Status</CardTitle>
         <CardDescription>
@@ -37,10 +37,10 @@ export default function ProductStatus() {
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <div className="space-y-4">
+        <div className='space-y-4'>
           <FormField
             control={control}
-            name="status"
+            name='status'
             render={({ field }) => (
               <FormItem>
                 <FormLabel> Product Status</FormLabel>
@@ -50,13 +50,13 @@ export default function ProductStatus() {
                 >
                   <FormControl>
                     <SelectTrigger>
-                      <SelectValue placeholder="Select status" />
+                      <SelectValue placeholder='Select status' />
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
-                    <SelectItem value="DRAFT">Draft</SelectItem>
-                    <SelectItem value="PUBLISHED">Published</SelectItem>
-                    <SelectItem value="ARCHIVED">Archived</SelectItem>
+                    <SelectItem value='DRAFT'>Draft</SelectItem>
+                    <SelectItem value='PUBLISHED'>Published</SelectItem>
+                    <SelectItem value='ARCHIVED'>Archived</SelectItem>
                   </SelectContent>
                 </Select>
                 <FormMessage />
@@ -66,11 +66,11 @@ export default function ProductStatus() {
 
           <FormField
             control={control}
-            name="featured"
+            name='featured'
             render={({ field }) => (
-              <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
-                <div className="space-y-0.5">
-                  <FormLabel className="text-base">Featured Product</FormLabel>
+              <FormItem className='flex flex-row items-center justify-between rounded-lg border p-4'>
+                <div className='space-y-0.5'>
+                  <FormLabel className='text-base'>Featured Product</FormLabel>
                   <FormDescription>
                     Display this product on the featured section
                   </FormDescription>

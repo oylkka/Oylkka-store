@@ -1,7 +1,7 @@
 // services/bkash.ts
 'use server';
-import { db } from '@/lib/db';
 import axios from 'axios';
+import { db } from '@/lib/db';
 
 interface BkashConfig {
   base_url?: string;
@@ -26,7 +26,7 @@ const TOKEN_EXPIRY_BUFFER_MS = 5 * 60 * 1000; // 5 minutes buffer
 
 export async function createPayment(
   bkashConfig: BkashConfig,
-  paymentDetails: PaymentDetails
+  paymentDetails: PaymentDetails,
 ) {
   try {
     const { amount, callbackURL, orderID, reference } = paymentDetails;
@@ -55,14 +55,11 @@ export async function createPayment(
       },
       {
         headers: await authHeaders(bkashConfig),
-      }
+      },
     );
     return response?.data;
+    // biome-ignore lint: error
   } catch (e: any) {
-    console.error(
-      'Create Bkash Payment Error:',
-      e?.response?.data || e.message
-    );
     return {
       statusCode: 500,
       statusMessage: 'Failed to create payment',
@@ -73,7 +70,7 @@ export async function createPayment(
 
 export async function executePayment(
   bkashConfig: BkashConfig,
-  paymentID: string
+  paymentID: string,
 ) {
   try {
     const response = await axios.post(
@@ -81,14 +78,11 @@ export async function executePayment(
       { paymentID },
       {
         headers: await authHeaders(bkashConfig),
-      }
+      },
     );
     return response?.data;
+    // biome-ignore lint: error
   } catch (error: any) {
-    console.error(
-      'Bkash executePayment Error:',
-      error?.response?.data || error.message
-    );
     return {
       statusCode: 500,
       statusMessage: 'Failed to execute payment',
@@ -100,7 +94,7 @@ export async function executePayment(
 // Add the queryPayment function to query payment status
 export async function queryPayment(
   bkashConfig: BkashConfig,
-  paymentID: string
+  paymentID: string,
 ) {
   try {
     const response = await axios.post(
@@ -108,14 +102,11 @@ export async function queryPayment(
       { paymentID },
       {
         headers: await authHeaders(bkashConfig),
-      }
+      },
     );
     return response?.data;
+    // biome-ignore lint: error
   } catch (error: any) {
-    console.error(
-      'Bkash queryPayment Error:',
-      error?.response?.data || error.message
-    );
     return {
       statusCode: 500,
       statusMessage: 'Failed to query payment status',
@@ -129,6 +120,7 @@ const authHeaders = async (bkashConfig: BkashConfig) => {
     'Content-Type': 'application/json',
     Accept: 'application/json',
     authorization: await grantToken(bkashConfig),
+    // biome-ignore lint: error
     'x-app-key': bkashConfig?.app_key!,
   };
 };
@@ -140,8 +132,8 @@ const grantToken = async (bkashConfig: BkashConfig) => {
       return await setToken(bkashConfig);
     }
     return findToken.token;
-  } catch (e: any) {
-    console.error('Grant Token Error:', e?.response?.data || e.message);
+    // biome-ignore lint: error
+  } catch (e) {
     return null;
   }
 };
@@ -152,7 +144,7 @@ const setToken = async (bkashConfig: BkashConfig) => {
     tokenParameters(bkashConfig),
     {
       headers: tokenHeaders(bkashConfig),
-    }
+    },
   );
 
   const idToken = response?.data?.id_token;
@@ -185,7 +177,7 @@ const setToken = async (bkashConfig: BkashConfig) => {
 };
 
 const isTokenExpired = (
-  tokenRecord: { expiresAt: Date } | { updatedAt: Date }
+  tokenRecord: { expiresAt: Date } | { updatedAt: Date },
 ) => {
   // Handle both the old schema (using updatedAt) and new schema (using expiresAt)
   if ('expiresAt' in tokenRecord) {
@@ -207,6 +199,8 @@ const tokenParameters = (bkashConfig: BkashConfig) => ({
 const tokenHeaders = (bkashConfig: BkashConfig) => ({
   'Content-Type': 'application/json',
   Accept: 'application/json',
+  // biome-ignore lint: error
   username: bkashConfig?.username!,
+  // biome-ignore lint: error
   password: bkashConfig?.password!,
 });

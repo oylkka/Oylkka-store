@@ -11,11 +11,11 @@ import { MessageBubble } from './message-bubble';
 import { TypingIndicator } from './typing-indicator';
 
 interface ChatMessagesProps {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  // biome-ignore lint: error
   messages: any[];
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  // biome-ignore lint: error
   conversation: any;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  // biome-ignore lint: error
   session: any;
   isTyping: boolean;
   onRetryMessage: (messageId: string) => void;
@@ -30,6 +30,7 @@ export function ChatMessages({
 }: ChatMessagesProps) {
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
+  // biome-ignore lint: error
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages, isTyping]);
@@ -45,9 +46,9 @@ export function ChatMessages({
   };
 
   return (
-    <div className="flex-1 overflow-hidden">
-      <ScrollArea className="h-full">
-        <div className="space-y-6 p-6">
+    <div className='flex-1 overflow-hidden'>
+      <ScrollArea className='h-full'>
+        <div className='space-y-6 p-6'>
           {messages.length === 0 ? (
             <EmptyChat otherUser={conversation?.otherUser} />
           ) : (
@@ -61,10 +62,10 @@ export function ChatMessages({
               return (
                 <div key={message.id}>
                   {showDate && (
-                    <div className="my-6 flex justify-center">
+                    <div className='my-6 flex justify-center'>
                       <Badge
-                        variant="secondary"
-                        className="bg-muted/80 text-muted-foreground rounded-full px-3 py-1 text-xs backdrop-blur-sm"
+                        variant='secondary'
+                        className='bg-muted/80 text-muted-foreground rounded-full px-3 py-1 text-xs backdrop-blur-sm'
                       >
                         {formatMessageDate(message.createdAt)}
                       </Badge>

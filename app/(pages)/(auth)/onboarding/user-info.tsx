@@ -57,7 +57,7 @@ function AvatarUpload({
   const [isUploading, setIsUploading] = useState<boolean>(false);
 
   const handleFileChange = async (
-    event: React.ChangeEvent<HTMLInputElement>
+    event: React.ChangeEvent<HTMLInputElement>,
   ): Promise<void> => {
     const file = event.target.files?.[0];
     if (!file) {
@@ -88,51 +88,51 @@ function AvatarUpload({
       setValue('avatar', file);
       const previewUrl = URL.createObjectURL(file);
       setAvatarSrc(previewUrl);
+      // biome-ignore lint: error
     } catch (error) {
       toast.error('Failed to upload image');
-      console.error('Upload error:', error);
     } finally {
       setIsUploading(false);
     }
   };
 
   return (
-    <div className="mb-10 flex justify-center">
-      <div className="group relative">
-        <div className="flex h-36 w-36 items-center justify-center overflow-hidden rounded-full bg-slate-100 text-4xl text-slate-400 shadow-md transition-all duration-300 group-hover:scale-105">
+    <div className='mb-10 flex justify-center'>
+      <div className='group relative'>
+        <div className='flex h-36 w-36 items-center justify-center overflow-hidden rounded-full bg-slate-100 text-4xl text-slate-400 shadow-md transition-all duration-300 group-hover:scale-105'>
           {avatarSrc ? (
             <Image
               src={avatarSrc || '/placeholder.svg'}
-              alt="Profile"
+              alt='Profile'
               height={400}
               width={400}
-              className="h-full w-full object-cover"
+              className='h-full w-full object-cover'
             />
           ) : (
-            <span className="uppercase">{name?.substring(0, 2) || 'U'}</span>
+            <span className='uppercase'>{name?.substring(0, 2) || 'U'}</span>
           )}
         </div>
 
         <label
-          htmlFor="avatar-upload"
-          className="bg-primary hover:bg-primary/90 absolute right-10 bottom-10 cursor-pointer rounded-full p-3 text-white shadow-md transition-all duration-300 hover:-translate-y-1 hover:shadow-lg disabled:opacity-70"
+          htmlFor='avatar-upload'
+          className='bg-primary hover:bg-primary/90 absolute right-10 bottom-10 cursor-pointer rounded-full p-3 text-white shadow-md transition-all duration-300 hover:-translate-y-1 hover:shadow-lg disabled:opacity-70'
         >
           {isUploading ? (
-            <Loader2 className="h-5 w-5 animate-spin" />
+            <Loader2 className='h-5 w-5 animate-spin' />
           ) : (
-            <Camera className="h-5 w-5" />
+            <Camera className='h-5 w-5' />
           )}
           <input
-            id="avatar-upload"
-            type="file"
-            accept="image/*"
-            className="hidden"
+            id='avatar-upload'
+            type='file'
+            accept='image/*'
+            className='hidden'
             onChange={handleFileChange}
             disabled={isUploading}
           />
         </label>
 
-        <div className="mt-2 text-center text-xs text-slate-500">
+        <div className='mt-2 text-center text-xs text-slate-500'>
           <p>Max 500KB (JPEG, PNG, GIF, WebP)</p>
         </div>
       </div>
@@ -164,16 +164,16 @@ function UsernameField({
   return (
     <FormField
       control={control}
-      name="username"
+      name='username'
       render={({ field }) => (
         <FormItem>
           <FormLabel>
-            Username <span className="text-red-500">*</span>
+            Username <span className='text-red-500'>*</span>
           </FormLabel>
-          <div className="relative">
+          <div className='relative'>
             <FormControl>
               <Input
-                placeholder="Choose a unique username"
+                placeholder='Choose a unique username'
                 {...field}
                 className={
                   username && !isPending
@@ -193,13 +193,13 @@ function UsernameField({
               />
             </FormControl>
             {username && (
-              <div className="absolute top-1/2 right-3 -translate-y-1/2">
+              <div className='absolute top-1/2 right-3 -translate-y-1/2'>
                 {isPending ? (
-                  <Loader2 className="h-4 w-4 animate-spin text-slate-400" />
+                  <Loader2 className='h-4 w-4 animate-spin text-slate-400' />
                 ) : isUsernameValid ? (
-                  <Check className="h-4 w-4 text-green-500" />
+                  <Check className='h-4 w-4 text-green-500' />
                 ) : usernameErrorMessage ? (
-                  <AlertCircle className="h-4 w-4 text-red-500" />
+                  <AlertCircle className='h-4 w-4 text-red-500' />
                 ) : null}
               </div>
             )}
@@ -207,30 +207,30 @@ function UsernameField({
 
           {/* Custom error message from server action */}
           {usernameErrorMessage && !isPending && (
-            <p className="mt-1 text-sm font-medium text-red-500">
+            <p className='mt-1 text-sm font-medium text-red-500'>
               {usernameErrorMessage}
             </p>
           )}
 
           {/* Username suggestions */}
           {usernameSuggestions.length > 0 && (
-            <div className="mt-2 rounded-md border border-slate-200 bg-slate-50 p-3">
-              <p className="mb-2 text-sm font-medium text-slate-700">
+            <div className='mt-2 rounded-md border border-slate-200 bg-slate-50 p-3'>
+              <p className='mb-2 text-sm font-medium text-slate-700'>
                 Try one of these instead:
               </p>
-              <div className="flex flex-wrap gap-2">
+              <div className='flex flex-wrap gap-2'>
                 {usernameSuggestions.map((suggestion) => (
                   <Button
                     key={suggestion}
-                    type="button"
-                    variant="outline"
-                    size="sm"
+                    type='button'
+                    variant='outline'
+                    size='sm'
                     onClick={() => {
                       setValue('username', suggestion);
                       // Verify the suggestion is available
                       onCheckUsername(suggestion);
                     }}
-                    className="text-sm"
+                    className='text-sm'
                   >
                     {suggestion}
                   </Button>
@@ -270,7 +270,7 @@ export default function UserInfo(): JSX.Element {
         setIsUsernameValid(false);
         setUsernameSuggestions([]);
         setUsernameErrorMessage(
-          usernameToCheck ? 'Username must be at least 3 characters' : null
+          usernameToCheck ? 'Username must be at least 3 characters' : null,
         );
         if (usernameToCheck) {
           setError('username', {
@@ -315,15 +315,15 @@ export default function UserInfo(): JSX.Element {
               setUsernameErrorMessage(result.error);
             }
           }
+          // biome-ignore lint: error
         } catch (error) {
-          console.error('Error checking username:', error);
           setIsUsernameValid(false);
           setUsernameErrorMessage('Failed to check username availability');
           toast.error('Something went wrong. Please try again.');
         }
       });
     },
-    [clearErrors, setError, startTransition]
+    [clearErrors, setError],
   );
 
   // Auto-generate username when full name changes
@@ -352,10 +352,10 @@ export default function UserInfo(): JSX.Element {
   }, [session]);
 
   return (
-    <Card className="mx-auto max-w-3xl pt-0 shadow-md">
-      <CardHeader className="border-b pt-5">
-        <CardTitle className="text-primary flex items-center gap-2">
-          <User className="h-5 w-5" />
+    <Card className='mx-auto max-w-3xl pt-0 shadow-md'>
+      <CardHeader className='border-b pt-5'>
+        <CardTitle className='text-primary flex items-center gap-2'>
+          <User className='h-5 w-5' />
           User Information
         </CardTitle>
         <CardDescription>
@@ -363,7 +363,7 @@ export default function UserInfo(): JSX.Element {
         </CardDescription>
       </CardHeader>
 
-      <CardContent className="pt-6">
+      <CardContent className='pt-6'>
         {/* Avatar upload section */}
         <AvatarUpload
           avatarSrc={avatarSrc}
@@ -372,18 +372,18 @@ export default function UserInfo(): JSX.Element {
           setValue={setValue}
         />
 
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+        <div className='grid grid-cols-1 gap-6 md:grid-cols-2'>
           {/* Name field */}
           <FormField
             control={control}
-            name="name"
+            name='name'
             render={({ field }) => (
               <FormItem>
                 <FormLabel>
-                  Full Name <span className="text-red-500">*</span>
+                  Full Name <span className='text-red-500'>*</span>
                 </FormLabel>
                 <FormControl>
-                  <Input placeholder="Enter your full name" {...field} />
+                  <Input placeholder='Enter your full name' {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -405,16 +405,16 @@ export default function UserInfo(): JSX.Element {
           {/* Email field */}
           <FormField
             control={control}
-            name="email"
+            name='email'
             render={({ field }) => (
               <FormItem>
                 <FormLabel>
-                  Email <span className="text-red-500">*</span>
+                  Email <span className='text-red-500'>*</span>
                 </FormLabel>
                 <FormControl>
                   <Input
-                    type="email"
-                    placeholder="Your email address"
+                    type='email'
+                    placeholder='Your email address'
                     {...field}
                   />
                 </FormControl>
@@ -426,12 +426,12 @@ export default function UserInfo(): JSX.Element {
           {/* Phone field */}
           <FormField
             control={control}
-            name="phone"
+            name='phone'
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Phone Number</FormLabel>
                 <FormControl>
-                  <Input placeholder="+8801XXXXXXXXX" {...field} />
+                  <Input placeholder='+8801XXXXXXXXX' {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -441,11 +441,11 @@ export default function UserInfo(): JSX.Element {
           {/* Role selection */}
           <FormField
             control={control}
-            name="role"
+            name='role'
             render={({ field }) => (
-              <FormItem className="col-span-full md:col-span-1">
+              <FormItem className='col-span-full md:col-span-1'>
                 <FormLabel>
-                  Account Type <span className="text-red-500">*</span>
+                  Account Type <span className='text-red-500'>*</span>
                 </FormLabel>
                 <Select
                   onValueChange={(value) => {
@@ -455,12 +455,12 @@ export default function UserInfo(): JSX.Element {
                 >
                   <FormControl>
                     <SelectTrigger>
-                      <SelectValue placeholder="Select account type" />
+                      <SelectValue placeholder='Select account type' />
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
-                    <SelectItem value="CUSTOMER">Customer</SelectItem>
-                    <SelectItem value="VENDOR">Vendor</SelectItem>
+                    <SelectItem value='CUSTOMER'>Customer</SelectItem>
+                    <SelectItem value='VENDOR'>Vendor</SelectItem>
                   </SelectContent>
                 </Select>
                 <FormDescription>

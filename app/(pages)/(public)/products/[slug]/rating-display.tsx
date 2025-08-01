@@ -25,20 +25,20 @@ export const RatingDisplay: React.FC<RatingDisplayProps> = ({
       {[1, 2, 3, 4, 5].map((star) => {
         const fillPercentage = Math.min(
           Math.max((rating - (star - 1)) * 100, 0),
-          100
+          100,
         );
 
         return (
-          <div key={star} className="relative">
+          <div key={star} className='relative'>
             <Star className={cn(starSize[size], 'text-gray-300')} />
             <div
-              className="absolute inset-0 overflow-hidden"
+              className='absolute inset-0 overflow-hidden'
               style={{ width: `${fillPercentage}%` }}
             >
               <Star
                 className={cn(
                   starSize[size],
-                  'fill-yellow-400 text-yellow-400'
+                  'fill-yellow-400 text-yellow-400',
                 )}
               />
             </div>

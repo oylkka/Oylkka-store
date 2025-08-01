@@ -1,10 +1,10 @@
 'use client';
 
-import { cleanFormData } from '@/lib/utils';
-import { OnboardingFormValues } from '@/schemas';
 import { useMutation } from '@tanstack/react-query';
 import { useSession } from 'next-auth/react';
 import { toast } from 'sonner';
+import { cleanFormData } from '@/lib/utils';
+import type { OnboardingFormValues } from '@/schemas';
 
 // Function to handle file and non-file form data
 function prepareFormData(data: OnboardingFormValues): FormData {
@@ -39,6 +39,7 @@ function prepareFormData(data: OnboardingFormValues): FormData {
 }
 
 // Function to submit onboarding data to the API
+// biome-ignore lint: error
 async function submitOnboardingData(data: OnboardingFormValues): Promise<any> {
   const formData = prepareFormData(data);
 
@@ -58,6 +59,7 @@ async function submitOnboardingData(data: OnboardingFormValues): Promise<any> {
 
 // Hook to use the onboarding mutation
 export function useOnboardingMutation(options: {
+  // biome-ignore lint: error
   onSuccess?: (data: any) => Promise<void> | void;
   onError?: (error: Error) => void;
 }) {

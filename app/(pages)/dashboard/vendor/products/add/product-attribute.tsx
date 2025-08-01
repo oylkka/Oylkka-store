@@ -87,7 +87,7 @@ export function ProductAttributes() {
   const { setValue, watch } = useFormContext<ProductFormValues>();
   const [newValues, setNewValues] = useState<Record<string, string>>({});
   const [selectedColors, setSelectedColors] = useState<Record<string, string>>(
-    {}
+    {},
   );
   const [attributeTypes, setAttributeTypes] = useState<string[]>([]);
   const [attributeHierarchy, setAttributeHierarchy] =
@@ -97,11 +97,11 @@ export function ProductAttributes() {
     });
 
   const rawAttributes = watch('attributes');
-
+  // biome-ignore lint: error
   const attributesRecord = useMemo(
     () => rawAttributes ?? {},
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [JSON.stringify(rawAttributes)]
+    [JSON.stringify(rawAttributes)],
   );
 
   const addAttribute = (type: string) => {
@@ -119,7 +119,7 @@ export function ProductAttributes() {
         ...attributesRecord,
         [type]: [],
       },
-      { shouldValidate: true }
+      { shouldValidate: true },
     );
   };
 
@@ -134,7 +134,7 @@ export function ProductAttributes() {
     setValue(
       'attributes',
       Object.keys(newAttributes).length > 0 ? newAttributes : undefined,
-      { shouldValidate: true }
+      { shouldValidate: true },
     );
 
     // Clean up related state
@@ -184,7 +184,7 @@ export function ProductAttributes() {
           finalValue,
         ],
       },
-      { shouldValidate: true }
+      { shouldValidate: true },
     );
 
     // Reset input
@@ -212,7 +212,7 @@ export function ProductAttributes() {
           ...newValues,
         ],
       },
-      { shouldValidate: true }
+      { shouldValidate: true },
     );
   };
 
@@ -231,13 +231,13 @@ export function ProductAttributes() {
         ...attributesRecord,
         [attrType]: newValues.length > 0 ? newValues : [],
       },
-      { shouldValidate: true }
+      { shouldValidate: true },
     );
   };
 
   const getColorName = (hex: string) => {
     const found = Object.entries(COLOR_NAME_TO_HEX).find(
-      ([, h]) => h.toLowerCase() === hex.toLowerCase()
+      ([, h]) => h.toLowerCase() === hex.toLowerCase(),
     );
     return found ? found[0] : null;
   };
@@ -254,7 +254,7 @@ export function ProductAttributes() {
       setAttributeHierarchy({
         primary: attrType,
         secondary: attributeHierarchy.secondary.filter(
-          (attr) => attr !== attrType
+          (attr) => attr !== attrType,
         ),
       });
     }
@@ -266,7 +266,7 @@ export function ProductAttributes() {
       setAttributeHierarchy({
         ...attributeHierarchy,
         secondary: attributeHierarchy.secondary.filter(
-          (attr) => attr !== attrType
+          (attr) => attr !== attrType,
         ),
       });
     } else if (attributeHierarchy.primary !== attrType) {
@@ -281,7 +281,7 @@ export function ProductAttributes() {
   const renderAttributeValue = (
     attrType: string,
     value: string,
-    index: number
+    index: number,
   ) => {
     if (attrType.toLowerCase() === 'color' && /^#[0-9A-F]{6}$/i.test(value)) {
       const colorName = getColorName(value);
@@ -290,24 +290,24 @@ export function ProductAttributes() {
           key={index}
           className={cn(
             'bg-card flex items-center gap-2 rounded-lg border px-3 py-1.5',
-            'hover:bg-accent transition-colors'
+            'hover:bg-accent transition-colors',
           )}
         >
           <div
-            className="h-4 w-4 rounded-sm ring-1 ring-gray-200 ring-inset"
+            className='h-4 w-4 rounded-sm ring-1 ring-gray-200 ring-inset'
             style={{ backgroundColor: value }}
           />
-          <span className="text-sm font-medium">
+          <span className='text-sm font-medium'>
             {colorName ? `${colorName} (${value})` : value}
           </span>
           <Button
-            type="button"
-            variant="ghost"
-            size="sm"
-            className="ml-1 h-6 w-6 p-0 opacity-50 hover:opacity-100"
+            type='button'
+            variant='ghost'
+            size='sm'
+            className='ml-1 h-6 w-6 p-0 opacity-50 hover:opacity-100'
             onClick={() => removeAttributeValue(attrType, index)}
           >
-            <X className="h-3 w-3" />
+            <X className='h-3 w-3' />
           </Button>
         </div>
       );
@@ -317,18 +317,18 @@ export function ProductAttributes() {
         key={index}
         className={cn(
           'bg-card flex items-center gap-2 rounded-lg border px-3 py-1.5',
-          'hover:bg-accent transition-colors'
+          'hover:bg-accent transition-colors',
         )}
       >
-        <span className="text-sm font-medium">{value}</span>
+        <span className='text-sm font-medium'>{value}</span>
         <Button
-          type="button"
-          variant="ghost"
-          size="sm"
-          className="ml-1 h-6 w-6 p-0 opacity-50 hover:opacity-100"
+          type='button'
+          variant='ghost'
+          size='sm'
+          className='ml-1 h-6 w-6 p-0 opacity-50 hover:opacity-100'
           onClick={() => removeAttributeValue(attrType, index)}
         >
-          <X className="h-3 w-3" />
+          <X className='h-3 w-3' />
         </Button>
       </div>
     );
@@ -339,43 +339,44 @@ export function ProductAttributes() {
 
     if (type === 'color') {
       return (
-        <div className="mt-2 mb-3">
-          <p className="text-muted-foreground mb-2 text-xs">
+        <div className='mt-2 mb-3'>
+          <p className='text-muted-foreground mb-2 text-xs'>
             Quick add common colors:
           </p>
-          <div className="flex flex-wrap gap-2">
+          <div className='flex flex-wrap gap-2'>
             {COMMON_COLORS.map((color, idx) => {
               const colorName = getColorName(color);
               const buttonLabel = colorName || color;
 
               return (
                 <Button
+                  // biome-ignore lint: error
                   key={idx}
-                  type="button"
-                  size="sm"
-                  variant="outline"
-                  className="h-8 rounded-md px-2"
+                  type='button'
+                  size='sm'
+                  variant='outline'
+                  className='h-8 rounded-md px-2'
                   onClick={() => addAttributeValue(type, color)}
                 >
                   <div
-                    className="mr-1.5 h-4 w-4 rounded-sm ring-1 ring-gray-200 ring-inset"
+                    className='mr-1.5 h-4 w-4 rounded-sm ring-1 ring-gray-200 ring-inset'
                     style={{ backgroundColor: color }}
                   />
-                  <span className="text-xs">{buttonLabel}</span>
+                  <span className='text-xs'>{buttonLabel}</span>
                 </Button>
               );
             })}
             <Button
-              type="button"
-              size="sm"
-              variant="outline"
-              className="h-8 px-2"
+              type='button'
+              size='sm'
+              variant='outline'
+              className='h-8 px-2'
               onClick={() => {
                 const colorValues = Object.values(COLOR_NAME_TO_HEX);
                 addMultipleAttributeValues(type, colorValues);
               }}
             >
-              <span className="text-xs">Add All Colors</span>
+              <span className='text-xs'>Add All Colors</span>
             </Button>
           </div>
         </div>
@@ -386,31 +387,32 @@ export function ProductAttributes() {
       const presets = ATTRIBUTE_PRESETS[type as keyof typeof ATTRIBUTE_PRESETS];
 
       return (
-        <div className="mt-2 mb-3">
-          <p className="text-muted-foreground mb-2 text-xs">
+        <div className='mt-2 mb-3'>
+          <p className='text-muted-foreground mb-2 text-xs'>
             Quick add {type} presets:
           </p>
-          <div className="flex flex-wrap gap-2">
+          <div className='flex flex-wrap gap-2'>
             {presets.map((value, idx) => (
               <Button
+                // biome-ignore lint: error
                 key={idx}
-                type="button"
-                size="sm"
-                variant="outline"
-                className="h-8 px-2"
+                type='button'
+                size='sm'
+                variant='outline'
+                className='h-8 px-2'
                 onClick={() => addAttributeValue(type, value)}
               >
-                <span className="text-xs">{value}</span>
+                <span className='text-xs'>{value}</span>
               </Button>
             ))}
             <Button
-              type="button"
-              size="sm"
-              variant="outline"
-              className="h-8 px-2"
+              type='button'
+              size='sm'
+              variant='outline'
+              className='h-8 px-2'
               onClick={() => addMultipleAttributeValues(type, presets)}
             >
-              <span className="text-xs">
+              <span className='text-xs'>
                 Add All{' '}
                 {ATTRIBUTE_TYPES.find((t) => t.value === type)?.label || type}
               </span>
@@ -427,9 +429,9 @@ export function ProductAttributes() {
     const isColor = attrType.toLowerCase() === 'color';
 
     return (
-      <div className="mt-4 flex items-center gap-2">
+      <div className='mt-4 flex items-center gap-2'>
         <Input
-          type="text"
+          type='text'
           placeholder={`Add ${attrType} value`}
           value={newValues[attrType] || ''}
           onChange={(e) =>
@@ -444,11 +446,11 @@ export function ProductAttributes() {
         {isColor ? (
           <Popover>
             <PopoverTrigger asChild>
-              <Button type="button" variant="outline" size="sm">
+              <Button type='button' variant='outline' size='sm'>
                 Pick Color
               </Button>
             </PopoverTrigger>
-            <PopoverContent className="w-56 p-0" align="end">
+            <PopoverContent className='w-56 p-0' align='end'>
               <HexColorPicker
                 color={selectedColors[attrType] || '#000'}
                 onChange={(color) => {
@@ -459,7 +461,7 @@ export function ProductAttributes() {
             </PopoverContent>
           </Popover>
         ) : null}
-        <Button type="button" onClick={() => addAttributeValue(attrType)}>
+        <Button type='button' onClick={() => addAttributeValue(attrType)}>
           Add
         </Button>
       </div>
@@ -488,7 +490,7 @@ export function ProductAttributes() {
 
   return (
     <>
-      <div className="flex items-center justify-between">
+      <div className='flex items-center justify-between'>
         <div>
           <CardTitle>Product Attributes</CardTitle>
           <CardDescription>
@@ -498,19 +500,19 @@ export function ProductAttributes() {
         <div>
           <Popover>
             <PopoverTrigger asChild>
-              <Button type="button" variant="outline" className="gap-2">
-                <Plus className="h-4 w-4" />
+              <Button type='button' variant='outline' className='gap-2'>
+                <Plus className='h-4 w-4' />
                 Add Attribute
               </Button>
             </PopoverTrigger>
-            <PopoverContent className="w-56 p-0" align="end">
+            <PopoverContent className='w-56 p-0' align='end'>
               <Command>
-                <CommandInput placeholder="Search attribute type..." />
+                <CommandInput placeholder='Search attribute type...' />
                 <CommandList>
                   <CommandEmpty>No attribute type found.</CommandEmpty>
                   <CommandGroup>
                     {ATTRIBUTE_TYPES.filter(
-                      (type) => !attributeTypes.includes(type.value)
+                      (type) => !attributeTypes.includes(type.value),
                     ).map((type) => (
                       <CommandItem
                         key={type.value}
@@ -527,19 +529,19 @@ export function ProductAttributes() {
         </div>
       </div>
 
-      <div className="space-y-6">
-        <div className="space-y-4">
+      <div className='space-y-6'>
+        <div className='space-y-4'>
           {attributeTypes.map((attrType) => (
             <div
               key={attrType}
-              className="rounded-lg border p-5 transition-all hover:shadow-sm"
+              className='rounded-lg border p-5 transition-all hover:shadow-sm'
             >
-              <div className="flex items-start justify-between gap-4">
-                <FormItem className="flex-1">
-                  <FormLabel className="text-sm font-medium">
+              <div className='flex items-start justify-between gap-4'>
+                <FormItem className='flex-1'>
+                  <FormLabel className='text-sm font-medium'>
                     Attribute Type
                   </FormLabel>
-                  <div className="border-input bg-background flex h-10 w-full items-center rounded-md border px-3 py-2">
+                  <div className='border-input bg-background flex h-10 w-full items-center rounded-md border px-3 py-2'>
                     <span>
                       {ATTRIBUTE_TYPES.find((t) => t.value === attrType)
                         ?.label || attrType}
@@ -547,45 +549,45 @@ export function ProductAttributes() {
                   </div>
                 </FormItem>
                 <Button
-                  type="button"
-                  variant="ghost"
-                  size="sm"
-                  className="mt-6 opacity-50 hover:opacity-100"
+                  type='button'
+                  variant='ghost'
+                  size='sm'
+                  className='mt-6 opacity-50 hover:opacity-100'
                   onClick={() => removeAttribute(attrType)}
                 >
-                  <Trash2 className="h-4 w-4" />
+                  <Trash2 className='h-4 w-4' />
                 </Button>
               </div>
 
-              <div className="mt-2 flex items-center gap-2">
+              <div className='mt-2 flex items-center gap-2'>
                 <Button
-                  type="button"
-                  size="sm"
+                  type='button'
+                  size='sm'
                   variant={
                     attributeHierarchy.primary === attrType
                       ? 'default'
                       : 'outline'
                   }
-                  className="h-7 px-2"
+                  className='h-7 px-2'
                   onClick={() => setPrimaryAttribute(attrType)}
                 >
                   Primary
                 </Button>
                 <Button
-                  type="button"
-                  size="sm"
+                  type='button'
+                  size='sm'
                   variant={
                     attributeHierarchy.secondary.includes(attrType)
                       ? 'default'
                       : 'outline'
                   }
-                  className="h-7 px-2"
+                  className='h-7 px-2'
                   onClick={() => setSecondaryAttribute(attrType)}
                   disabled={attributeHierarchy.primary === attrType}
                 >
                   Secondary
                 </Button>
-                <span className="text-muted-foreground text-xs">
+                <span className='text-muted-foreground text-xs'>
                   {attributeHierarchy.primary === attrType
                     ? 'Main attribute for variant grouping'
                     : attributeHierarchy.secondary.includes(attrType)
@@ -594,17 +596,17 @@ export function ProductAttributes() {
                 </span>
               </div>
 
-              <div className="mt-6">
-                <FormLabel className="text-sm font-medium">Values</FormLabel>
+              <div className='mt-6'>
+                <FormLabel className='text-sm font-medium'>Values</FormLabel>
                 {attributesRecord[attrType]?.length > 0 ? (
-                  <div className="mt-2 flex flex-wrap gap-2">
+                  <div className='mt-2 flex flex-wrap gap-2'>
                     {(attributesRecord[attrType] as string[]).map(
                       (val: string, idx: number) =>
-                        renderAttributeValue(attrType, val, idx)
+                        renderAttributeValue(attrType, val, idx),
                     )}
                   </div>
                 ) : (
-                  <p className="text-muted-foreground mt-2 text-sm">
+                  <p className='text-muted-foreground mt-2 text-sm'>
                     No values added yet
                   </p>
                 )}

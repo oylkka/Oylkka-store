@@ -8,7 +8,7 @@ import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { FormDescription } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { ProductImage } from '@/hooks/use-product-image';
+import type { ProductImage } from '@/hooks/use-product-image';
 import { cn } from '@/lib/utils';
 
 import { ProductFormContext } from './product-form-context';
@@ -36,13 +36,13 @@ export function ProductImagesCard() {
     }
 
     const oversizedFiles = Array.from(files).filter(
-      (file) => file.size > MAX_IMAGE_SIZE
+      (file) => file.size > MAX_IMAGE_SIZE,
     );
     if (oversizedFiles.length > 0) {
       setErrorMessage(
         `Some images exceed the maximum size of 500KB: ${oversizedFiles
           .map((f) => f.name)
-          .join(', ')}`
+          .join(', ')}`,
       );
       return;
     }
@@ -79,10 +79,10 @@ export function ProductImagesCard() {
     }
 
     const draggedIndex = productImages.findIndex(
-      (img) => img.id === draggedImage.id
+      (img) => img.id === draggedImage.id,
     );
     const targetIndex = productImages.findIndex(
-      (img) => img.id === targetImage.id
+      (img) => img.id === targetImage.id,
     );
 
     if (draggedIndex === -1 || targetIndex === -1) {
@@ -105,13 +105,13 @@ export function ProductImagesCard() {
 
   return (
     <Card>
-      <CardHeader className="flex flex-row items-center gap-2 pb-4">
-        <ImageIcon className="text-muted-foreground h-5 w-5" />
-        <span className="text-lg font-semibold">Product Images</span>
+      <CardHeader className='flex flex-row items-center gap-2 pb-4'>
+        <ImageIcon className='text-muted-foreground h-5 w-5' />
+        <span className='text-lg font-semibold'>Product Images</span>
       </CardHeader>
-      <CardContent className="space-y-4">
-        <div className="flex flex-col gap-2">
-          <Label htmlFor="image-upload">Upload Images</Label>
+      <CardContent className='space-y-4'>
+        <div className='flex flex-col gap-2'>
+          <Label htmlFor='image-upload'>Upload Images</Label>
           <FormDescription>
             You can upload up to 4 images (max 500KB each). Drag images to
             reorder.
@@ -120,46 +120,47 @@ export function ProductImagesCard() {
           <div
             className={cn(
               'border-muted-foreground/25 hover:border-muted-foreground/50 relative rounded-lg border-2 border-dashed p-6 transition-colors',
-              productImages.length >= 4 && 'pointer-events-none opacity-60'
+              productImages.length >= 4 && 'pointer-events-none opacity-60',
             )}
           >
             <Input
-              type="file"
-              id="image-upload"
-              accept="image/*"
+              type='file'
+              id='image-upload'
+              accept='image/*'
               multiple
               onChange={handleImageUpload}
               disabled={productImages.length >= 4}
-              className="absolute inset-0 z-10 h-full w-full cursor-pointer opacity-0"
+              className='absolute inset-0 z-10 h-full w-full cursor-pointer opacity-0'
             />
-            <div className="flex flex-col items-center justify-center gap-2 text-center">
-              <Upload className="text-muted-foreground h-8 w-8" />
-              <p className="text-muted-foreground text-sm font-medium">
+            <div className='flex flex-col items-center justify-center gap-2 text-center'>
+              <Upload className='text-muted-foreground h-8 w-8' />
+              <p className='text-muted-foreground text-sm font-medium'>
                 Drop images here or click to upload
               </p>
-              <p className="text-muted-foreground/75 text-xs">
+              <p className='text-muted-foreground/75 text-xs'>
                 {productImages.length} of 4 images uploaded
               </p>
             </div>
           </div>
 
           {(errorMessage || imageError) && (
-            <p className="text-destructive text-sm font-medium">
+            <p className='text-destructive text-sm font-medium'>
               {errorMessage || imageError}
             </p>
           )}
         </div>
 
         {productImages.length > 0 && (
-          <div className="space-y-2">
+          <div className='space-y-2'>
             <Label>Product Images ({productImages.length}/4)</Label>
-            <div className="grid grid-cols-2 gap-4">
+            <div className='grid grid-cols-2 gap-4'>
               {productImages.map((image) => (
+                // biome-ignore lint: error
                 <div
                   key={image.id}
                   className={cn(
                     'group border-border relative rounded-lg border-2 transition-all',
-                    isDragging && draggedImage?.id === image.id && 'opacity-50'
+                    isDragging && draggedImage?.id === image.id && 'opacity-50',
                   )}
                   draggable
                   onDragStart={() => handleDragStart(image)}
@@ -167,26 +168,26 @@ export function ProductImagesCard() {
                   onDrop={() => handleDrop(image)}
                   onDragEnd={handleDragEnd}
                 >
-                  <div className="relative aspect-square overflow-hidden rounded-md">
+                  <div className='relative aspect-square overflow-hidden rounded-md'>
                     <Image
                       src={image.preview}
-                      alt="Product preview"
+                      alt='Product preview'
                       width={200}
                       height={200}
-                      className="h-full w-full object-cover transition-transform group-hover:scale-105"
+                      className='h-full w-full object-cover transition-transform group-hover:scale-105'
                     />
                     <Button
-                      type="button"
-                      variant="destructive"
-                      size="icon"
-                      className="absolute top-2 right-2 h-7 w-7 opacity-0 transition-opacity group-hover:opacity-100"
+                      type='button'
+                      variant='destructive'
+                      size='icon'
+                      className='absolute top-2 right-2 h-7 w-7 opacity-0 transition-opacity group-hover:opacity-100'
                       onClick={() => removeImage(image.id)}
                     >
-                      <X className="h-4 w-4" />
+                      <X className='h-4 w-4' />
                     </Button>
                   </div>
-                  <div className="p-2 text-center">
-                    <p className="text-muted-foreground text-xs">
+                  <div className='p-2 text-center'>
+                    <p className='text-muted-foreground text-xs'>
                       {(image.file.size / 1024).toFixed(1)} KB
                     </p>
                   </div>

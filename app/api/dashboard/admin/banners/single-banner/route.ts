@@ -1,9 +1,9 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 
 import { auth } from '@/features/auth/auth';
 import { DeleteImage, UploadImage } from '@/features/cloudinary';
 import { db } from '@/lib/db';
-import { Prisma } from '@/prisma/output';
+import type { Prisma } from '@/prisma/output';
 
 export async function GET(request: Request) {
   const url = new URL(request.url);
@@ -22,7 +22,7 @@ export async function GET(request: Request) {
       },
     });
     return NextResponse.json(banner, { status: 200 });
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    // biome-ignore lint: error
   } catch (error) {
     return NextResponse.json('Internal Server Error', { status: 500 });
   }
@@ -31,7 +31,7 @@ export async function GET(request: Request) {
 export async function PUT(req: NextRequest) {
   try {
     const formData = await req.formData();
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    // biome-ignore lint: error
     const data: Record<string, any> = {};
 
     for (const [key, value] of formData.entries()) {
@@ -49,7 +49,7 @@ export async function PUT(req: NextRequest) {
     if (!data.id || typeof data.id !== 'string') {
       return NextResponse.json(
         { error: 'Banner ID is required and must be a string' },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -85,7 +85,7 @@ export async function PUT(req: NextRequest) {
         // New image is provided, and we are not explicitly keeping the old one.
         // This implies replacement.
 
-        if (banner.image && banner.image.publicId) {
+        if (banner?.image.publicId) {
           await DeleteImage(banner.image.publicId);
         }
         try {
@@ -97,11 +97,11 @@ export async function PUT(req: NextRequest) {
             publicId: uploadedImage.public_id,
             alt: altText !== undefined ? altText : '', // Use new alt text or default to empty
           };
-          // eslint-disable-next-line @typescript-eslint/no-unused-vars
+          // biome-ignore lint: error
         } catch (uploadError) {
           return NextResponse.json(
             { error: 'Image upload failed' },
-            { status: 500 }
+            { status: 500 },
           );
         }
       } else {
@@ -120,11 +120,11 @@ export async function PUT(req: NextRequest) {
               publicId: '',
               alt: '',
             };
-            // eslint-disable-next-line @typescript-eslint/no-unused-vars
+            // biome-ignore lint: error
           } catch (deleteError) {
             return NextResponse.json(
               { error: 'Failed to remove existing image' },
-              { status: 500 }
+              { status: 500 },
             );
           }
         } else if (
@@ -167,7 +167,7 @@ export async function PUT(req: NextRequest) {
     ];
 
     for (const key of allowedFields) {
-      if (data.hasOwnProperty(key)) {
+      if (Object.hasOwn(data, key)) {
         // Ensure data[key] is not undefined before assigning
         if (data[key] !== undefined) {
           // Prisma expects dates or null for DateTime? fields
@@ -175,10 +175,10 @@ export async function PUT(req: NextRequest) {
             (key === 'startDate' || key === 'endDate') &&
             data[key] === null
           ) {
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            // biome-ignore lint: error
             (updatePayload as any)[key] = null;
           } else {
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            // biome-ignore lint: error
             (updatePayload as any)[key] = data[key];
           }
         }
@@ -188,7 +188,7 @@ export async function PUT(req: NextRequest) {
     if (Object.keys(updatePayload).length === 0) {
       return NextResponse.json(
         { message: 'No updatable fields provided.' },
-        { status: 200 }
+        { status: 200 },
       ); // Or 400 if no change is an error
     }
 
@@ -224,7 +224,7 @@ export async function DELETE(request: Request) {
           message: 'Unauthorized',
           error: 'You are not authorized to delete banners',
         },
-        { status: 401 }
+        { status: 401 },
       );
     }
 
@@ -235,7 +235,7 @@ export async function DELETE(request: Request) {
     if (!id) {
       return NextResponse.json(
         { message: 'Not Found', error: 'Banner not found' },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -256,7 +256,7 @@ export async function DELETE(request: Request) {
     if (!banner) {
       return NextResponse.json(
         { message: 'Not Found', error: 'Banner not found' },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -266,7 +266,7 @@ export async function DELETE(request: Request) {
       if (banner.image?.publicId) {
         try {
           await DeleteImage(banner.image.publicId);
-          // eslint-disable-next-line @typescript-eslint/no-unused-vars
+          // biome-ignore lint: error
         } catch (imageError) {
           throw new Error('Failed to delete associated image');
         }
@@ -280,7 +280,7 @@ export async function DELETE(request: Request) {
 
     return NextResponse.json(
       { message: 'Banner deleted successfully', data: { id } },
-      { status: 200 }
+      { status: 200 },
     );
   } catch (error) {
     // 6. Handle and log errors
@@ -295,7 +295,7 @@ export async function DELETE(request: Request) {
             ? 'Failed to delete associated image'
             : 'An unexpected error occurred',
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

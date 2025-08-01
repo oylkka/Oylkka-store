@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 
 import { auth } from '@/features/auth/auth';
 import { DeleteImage } from '@/features/cloudinary';
@@ -90,7 +90,7 @@ export async function DELETE(req: NextRequest) {
     await db.product.delete({ where: { id } });
 
     return NextResponse.json('Deleted', { status: 200 });
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    // biome-ignore lint: error
   } catch (error) {
     return NextResponse.json('Internal Server Error', { status: 500 });
   }

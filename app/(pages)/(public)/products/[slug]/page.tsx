@@ -7,7 +7,7 @@ export default async function ProductPage({
 }) {
   const { slug } = await params;
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className='container mx-auto px-4 py-8'>
       <ProductDetails slug={slug} />
     </div>
   );

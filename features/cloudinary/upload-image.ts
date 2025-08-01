@@ -1,11 +1,11 @@
 'use server';
+import { Readable } from 'node:stream';
 import cloudinary from '@/features/cloudinary/cloudinary';
-import { Readable } from 'stream';
 
 // Function to upload image to Cloudinary and return URL and public_id
 export async function UploadImage(
   image: Blob,
-  folder: string
+  folder: string,
 ): Promise<{ secure_url: string; public_id: string }> {
   const filename = `${Date.now()}_${(image as File).name.replaceAll(' ', '_')}`;
   const buffer = Buffer.from(await image.arrayBuffer());
@@ -23,12 +23,12 @@ export async function UploadImage(
               public_id: result?.public_id || '',
             });
           }
-        }
+        },
       );
 
       // Convert the buffer to a readable stream and pipe it into the Cloudinary upload stream
       Readable.from(buffer).pipe(uploadStream);
-    }
+    },
   );
 
   return result; // Returns both secure_url and public_id

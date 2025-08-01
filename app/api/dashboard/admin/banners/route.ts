@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 
 import { UploadImage } from '@/features/cloudinary';
 import { db } from '@/lib/db';
@@ -7,7 +7,7 @@ export async function POST(req: NextRequest) {
   try {
     const formData = await req.formData();
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    // biome-ignore lint: error
     const data: Record<string, any> = {};
 
     for (const [key, value] of formData.entries()) {
@@ -36,7 +36,7 @@ export async function POST(req: NextRequest) {
     if (!imageData) {
       return NextResponse.json(
         { error: 'Image upload failed or missing' },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -60,13 +60,13 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json(
       { message: 'Banner created successfully', banner },
-      { status: 200 }
+      { status: 200 },
     );
+    // biome-ignore lint: error
   } catch (error) {
-    console.error('Error handling banner submission:', error);
     return NextResponse.json(
       { error: 'Internal Server Error' },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -82,7 +82,7 @@ export async function GET() {
       },
     });
     return NextResponse.json(banners, { status: 200 });
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    // biome-ignore lint: error
   } catch (error) {
     return NextResponse.json('Internal Server Error', { status: 500 });
   }

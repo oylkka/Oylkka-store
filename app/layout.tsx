@@ -31,14 +31,14 @@ export default function RootLayout({
 }>) {
   return (
     <TanstackProvider>
-      <html lang="en" suppressHydrationWarning>
+      <html lang='en' suppressHydrationWarning>
         <body
           className={`${geistSans.variable} ${geistMono.variable} antialiased [&::-webkit-scrollbar]:w-0`}
         >
           <SessionProvider>
             <ThemeProvider
-              attribute="class"
-              defaultTheme="light"
+              attribute='class'
+              defaultTheme='light'
               enableSystem
               disableTransitionOnChange
             >
@@ -46,7 +46,7 @@ export default function RootLayout({
             </ThemeProvider>
             <ReactQueryDevtools initialIsOpen={false} />
             <Toaster
-              position="top-right"
+              position='top-right'
               richColors
               closeButton
               toastOptions={{ duration: 3000 }}

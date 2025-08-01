@@ -1,8 +1,8 @@
 'use server';
 
-import { db } from '@/lib/db';
 import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
+import { db } from '@/lib/db';
 
 // Define schema for the slug check
 const slugCheckSchema = z.object({
@@ -12,7 +12,7 @@ const slugCheckSchema = z.object({
     .max(50, 'Slug cannot exceed 50 characters')
     .regex(
       /^[a-z0-9-]+$/,
-      'Slug can only contain lowercase letters, numbers, and hyphens'
+      'Slug can only contain lowercase letters, numbers, and hyphens',
     ),
 });
 
@@ -26,8 +26,7 @@ export type SlugCheckResult = {
  * Server action to check if a shop slug is unique
  */
 export async function checkSlugUniqueness(
-  prevState: SlugCheckResult | null,
-  formData: FormData
+  formData: FormData,
 ): Promise<SlugCheckResult> {
   // Get the slug from form data
   const shopSlug = formData.get('shopSlug') as string;
@@ -70,8 +69,6 @@ export async function checkSlugUniqueness(
       };
     }
 
-    // Handle other errors
-    console.error('Slug check error:', error);
     return {
       success: false,
       message: 'An error occurred while checking the slug availability.',
@@ -84,7 +81,7 @@ export async function checkSlugUniqueness(
  */
 export async function updateShopSlug(
   shopId: string,
-  newSlug: string
+  newSlug: string,
 ): Promise<SlugCheckResult> {
   try {
     // Validate the slug format
@@ -136,8 +133,6 @@ export async function updateShopSlug(
       };
     }
 
-    // Handle other errors
-    console.error('Slug update error:', error);
     return {
       success: false,
       message: 'An error occurred while updating the shop slug.',

@@ -1,8 +1,8 @@
 // actions/chat.ts
 'use server';
+import Ably from 'ably';
 import { auth } from '@/features/auth/auth';
 import { db } from '@/lib/db';
-import Ably from 'ably';
 
 // Initialize Ably with your API Key for publishing messages server-side
 const ABLY_API_KEY = process.env.ABLY_API_KEY;
@@ -65,8 +65,8 @@ export async function createOrGetConversation(recipientId: string) {
       });
     }
     return conversation;
+    // biome-ignore lint: error
   } catch (error) {
-    console.error('Error creating/fetching conversation:', error);
     throw new Error('Failed to create or fetch conversation.');
   }
 }
@@ -80,7 +80,7 @@ export async function createOrGetConversation(recipientId: string) {
  */
 export async function sendMessage(
   conversationId: string,
-  content: string
+  content: string,
 ): Promise<MessageResponse> {
   const session = await auth();
   if (!session || !session.user || !session.user.id) {
@@ -133,8 +133,8 @@ export async function sendMessage(
     await channel.publish('message', newMessage); // Event name 'message'
 
     return newMessage as MessageResponse; // Cast to expected response type
+    // biome-ignore lint: error
   } catch (error) {
-    console.error('Error sending message:', error);
     throw new Error('Failed to send message.');
   }
 }
@@ -146,7 +146,7 @@ export async function sendMessage(
  */
 export async function markMessagesAsRead(
   conversationId: string,
-  messageIds: string[]
+  messageIds: string[],
 ) {
   const session = await auth();
   if (!session || !session.user || !session.user.id) {
@@ -176,8 +176,8 @@ export async function markMessagesAsRead(
       messageIds: messageIds,
       conversationId: conversationId,
     });
+    // biome-ignore lint: error
   } catch (error) {
-    console.error('Error marking messages as read:', error);
     throw new Error('Failed to mark messages as read.');
   }
 }

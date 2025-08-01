@@ -2,9 +2,9 @@
 
 import { createContext } from 'react';
 
-import { ProductImage } from '@/hooks/use-product-image';
+import type { ProductImage } from '@/hooks/use-product-image';
 
-import { ProductFormValues } from './product-form-type';
+import type { ProductFormValues } from './product-form-type';
 
 export interface ProductFormContextType {
   productImages: ProductImage[];

@@ -12,7 +12,7 @@ import {
 } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { Product, ProductVariant } from '@/lib/types';
+import type { Product, ProductVariant } from '@/lib/types';
 import { cn } from '@/lib/utils';
 
 import { ColorSwatch } from './color-swatch';
@@ -57,24 +57,24 @@ export default function VariantSelector({
       {/* Color Selection */}
       {availableColors.length > 0 && (
         <div>
-          <div className="flex items-center justify-between">
-            <Label className="mb-2 text-sm font-medium">
+          <div className='flex items-center justify-between'>
+            <Label className='mb-2 text-sm font-medium'>
               Color:{' '}
-              <span className="font-semibold">
+              <span className='font-semibold'>
                 {getColorName(selectedColor)}
               </span>
             </Label>
           </div>
-          <div className="mt-2 flex flex-wrap gap-4">
+          <div className='mt-2 flex flex-wrap gap-4'>
             {availableColors.map((color) => {
               // Check if this color has variants with stock
               const hasStock = product.variants.some(
                 (v: ProductVariant) =>
-                  v.attributes?.color === color && v.stock > 0
+                  v.attributes?.color === color && v.stock > 0,
               );
 
               return (
-                <div key={color} className="flex flex-col items-center">
+                <div key={color} className='flex flex-col items-center'>
                   <ColorSwatch
                     color={color}
                     isSelected={selectedColor === color}
@@ -92,13 +92,13 @@ export default function VariantSelector({
       {/* Size Selection */}
       {availableSizes.length > 0 && (
         <div>
-          <div className="flex items-center justify-between">
-            <Label className="mb-2 text-sm font-medium">
-              Size: <span className="font-semibold">{selectedSize}</span>
+          <div className='flex items-center justify-between'>
+            <Label className='mb-2 text-sm font-medium'>
+              Size: <span className='font-semibold'>{selectedSize}</span>
             </Label>
             <Dialog>
               <DialogTrigger asChild>
-                <Button variant="link" className="h-auto p-0 text-xs">
+                <Button variant='link' className='h-auto p-0 text-xs'>
                   Size Guide
                 </Button>
               </DialogTrigger>
@@ -106,11 +106,11 @@ export default function VariantSelector({
                 <DialogHeader>
                   <DialogTitle>Size Guide</DialogTitle>
                 </DialogHeader>
-                <div className="grid grid-cols-4 gap-4 py-4">
-                  <div className="font-medium">Size</div>
-                  <div className="font-medium">Chest (in)</div>
-                  <div className="font-medium">Length (in)</div>
-                  <div className="font-medium">Sleeve (in)</div>
+                <div className='grid grid-cols-4 gap-4 py-4'>
+                  <div className='font-medium'>Size</div>
+                  <div className='font-medium'>Chest (in)</div>
+                  <div className='font-medium'>Length (in)</div>
+                  <div className='font-medium'>Sleeve (in)</div>
 
                   <div>S</div>
                   <div>36-38</div>
@@ -136,7 +136,7 @@ export default function VariantSelector({
             </Dialog>
           </div>
           <RadioGroup
-            className="mt-2 flex flex-wrap gap-3"
+            className='mt-2 flex flex-wrap gap-3'
             value={selectedSize}
             onValueChange={onSizeSelect}
           >
@@ -146,15 +146,15 @@ export default function VariantSelector({
                 (v: ProductVariant) =>
                   v.attributes?.size === size &&
                   v.attributes?.color === selectedColor &&
-                  v.stock > 0
+                  v.stock > 0,
               );
 
               return (
-                <div key={size} className="flex items-center space-x-2">
+                <div key={size} className='flex items-center space-x-2'>
                   <RadioGroupItem
                     value={size}
                     id={`size-${size}`}
-                    className="peer hidden"
+                    className='peer hidden'
                     disabled={!isAvailable}
                   />
                   <Label
@@ -164,7 +164,7 @@ export default function VariantSelector({
                       selectedSize === size
                         ? 'border-primary bg-primary/10 text-primary'
                         : 'border-gray-200',
-                      !isAvailable && 'cursor-not-allowed opacity-50'
+                      !isAvailable && 'cursor-not-allowed opacity-50',
                     )}
                   >
                     {size}

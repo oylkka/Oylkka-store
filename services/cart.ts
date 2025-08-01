@@ -1,8 +1,8 @@
-import { QUERY_KEYS } from '@/lib/constants';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
 import { toast } from 'sonner';
 import { useDebouncedCallback } from 'use-debounce';
+import { QUERY_KEYS } from '@/lib/constants';
 
 // Get user cart
 export function useUserCart() {
@@ -51,7 +51,7 @@ export function useAddToCart() {
             const errorMessage = err.response?.data || 'Failed to add to cart';
             return `Error: ${errorMessage}`;
           },
-        }
+        },
       );
     },
   });
@@ -82,7 +82,7 @@ export function useRemoveFromCart() {
               err.response?.data || 'Failed to remove from cart';
             return `Error: ${errorMessage}`;
           },
-        }
+        },
       );
     },
   });
@@ -118,10 +118,10 @@ export function useUpdateCartQuantity() {
               err.response?.data || 'Failed to update quantity';
             return `Error: ${errorMessage}`;
           },
-        }
+        },
       );
     },
-    400 // debounce duration in ms
+    400, // debounce duration in ms
   );
 
   return {

@@ -20,7 +20,7 @@ const PAYMENT_STATUS_TRANSITIONS: Record<string, string[]> = {
 
 export function validateStatusTransition(
   currentStatus: string,
-  newStatus: string
+  newStatus: string,
 ): ValidationResult {
   if (currentStatus === newStatus) {
     return { isValid: true };
@@ -40,7 +40,7 @@ export function validateStatusTransition(
 
 export function validatePaymentStatusTransition(
   currentStatus: string,
-  newStatus: string
+  newStatus: string,
 ): ValidationResult {
   if (currentStatus === newStatus) {
     return { isValid: true };

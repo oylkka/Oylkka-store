@@ -20,7 +20,7 @@ import { useForm } from 'react-hook-form';
 import { useDebounce } from 'use-debounce';
 import * as z from 'zod';
 
-import { checkUsername, UsernameCheckResult } from '@/actions';
+import { checkUsername, type UsernameCheckResult } from '@/actions';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
@@ -80,7 +80,7 @@ const formSchema = z.object({
         }
         return /^\+?[\d\s\-()]+$/.test(val);
       },
-      { message: 'Please enter a valid phone number.' }
+      { message: 'Please enter a valid phone number.' },
     ),
 });
 
@@ -182,7 +182,7 @@ export default function EditProfile() {
         setIsUsernameValid(result.available);
         setUsernameErrorMessage(result.message || result.error || null);
         setUsernameSuggestions(result.suggestions || []);
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        //  biome-ignore lint: error
       } catch (error) {
         setIsUsernameValid(false);
         setUsernameErrorMessage('Failed to check username');
@@ -227,7 +227,7 @@ export default function EditProfile() {
       };
       reader.readAsDataURL(file);
     },
-    [validateImageFile]
+    [validateImageFile],
   );
 
   const handleImageClick = useCallback(() => {
@@ -267,37 +267,37 @@ export default function EditProfile() {
   const profile = data;
 
   if (!profile) {
-    return <ErrorState message="No profile data found" />;
+    return <ErrorState message='No profile data found' />;
   }
 
   return (
-    <div className="container mx-auto max-w-2xl px-4 py-8">
-      <div className="mb-8">
-        <div className="mb-4 flex items-center gap-4">
-          <Link href="/profile">
-            <Button variant="outline" size="icon">
-              <ArrowLeft className="h-4 w-4" />
+    <div className='container mx-auto max-w-2xl px-4 py-8'>
+      <div className='mb-8'>
+        <div className='mb-4 flex items-center gap-4'>
+          <Link href='/profile'>
+            <Button variant='outline' size='icon'>
+              <ArrowLeft className='h-4 w-4' />
             </Button>
           </Link>
-          <div className="flex-1">
-            <h1 className="text-3xl font-bold">Edit Profile</h1>
-            <p className="text-muted-foreground">
+          <div className='flex-1'>
+            <h1 className='text-3xl font-bold'>Edit Profile</h1>
+            <p className='text-muted-foreground'>
               Update your personal information and profile picture
             </p>
           </div>
           {hasUnsavedChanges && (
-            <Badge variant="secondary" className="flex items-center gap-1">
-              <AlertCircle className="h-3 w-3" />
+            <Badge variant='secondary' className='flex items-center gap-1'>
+              <AlertCircle className='h-3 w-3' />
               Unsaved changes
             </Badge>
           )}
         </div>
       </div>
 
-      <Card className="mb-6">
+      <Card className='mb-6'>
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Camera className="h-5 w-5" />
+          <CardTitle className='flex items-center gap-2'>
+            <Camera className='h-5 w-5' />
             Profile Picture
           </CardTitle>
           <CardDescription>
@@ -306,59 +306,59 @@ export default function EditProfile() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="flex flex-col items-start gap-6 sm:flex-row sm:items-center">
-            <div className="flex flex-col items-center gap-3">
-              <Avatar className="ring-muted h-24 w-24 ring-2">
+          <div className='flex flex-col items-start gap-6 sm:flex-row sm:items-center'>
+            <div className='flex flex-col items-center gap-3'>
+              <Avatar className='ring-muted h-24 w-24 ring-2'>
                 <AvatarImage
                   src={profileImage || '/placeholder.svg'}
                   alt={profile.name}
                 />
-                <AvatarFallback className="text-2xl">
+                <AvatarFallback className='text-2xl'>
                   {getInitials(profile.name)}
                 </AvatarFallback>
               </Avatar>
-              <div className="text-center">
-                <p className="text-sm font-medium">Current Photo</p>
-                <Badge variant="outline" className="mt-1 text-xs">
+              <div className='text-center'>
+                <p className='text-sm font-medium'>Current Photo</p>
+                <Badge variant='outline' className='mt-1 text-xs'>
                   {profile.role}
                 </Badge>
               </div>
             </div>
 
-            <div className="flex-1 space-y-4">
-              <div className="flex flex-col gap-3 sm:flex-row">
+            <div className='flex-1 space-y-4'>
+              <div className='flex flex-col gap-3 sm:flex-row'>
                 <Button
-                  type="button"
-                  variant="outline"
+                  type='button'
+                  variant='outline'
                   onClick={handleImageClick}
-                  className="flex items-center gap-2"
+                  className='flex items-center gap-2'
                 >
-                  <Upload className="h-4 w-4" />
+                  <Upload className='h-4 w-4' />
                   Choose New Photo
                 </Button>
                 {imageFile && (
                   <Button
-                    type="button"
-                    variant="ghost"
+                    type='button'
+                    variant='ghost'
                     onClick={handleRemoveImage}
-                    className="flex items-center gap-2"
+                    className='flex items-center gap-2'
                   >
-                    <X className="h-4 w-4" />
+                    <X className='h-4 w-4' />
                     Cancel
                   </Button>
                 )}
               </div>
               {imageFile && (
-                <Alert className="border-green-200 bg-green-50">
-                  <CheckCircle className="h-4 w-4 text-green-600" />
-                  <AlertDescription className="text-green-800">
+                <Alert className='border-green-200 bg-green-50'>
+                  <CheckCircle className='h-4 w-4 text-green-600' />
+                  <AlertDescription className='text-green-800'>
                     <strong>{imageFile.name}</strong> selected. Click &#34;Save
                     Changes&#34; to upload.
                   </AlertDescription>
                 </Alert>
               )}
               {!imageFile && (
-                <div className="text-muted-foreground text-sm">
+                <div className='text-muted-foreground text-sm'>
                   <p>• Maximum file size: 500KB</p>
                   <p>• Accepted formats: JPEG, PNG, WebP</p>
                   <p>• Recommended: Square images work best</p>
@@ -368,46 +368,46 @@ export default function EditProfile() {
             </div>
           </div>
           {imageError && (
-            <Alert className="mt-4" variant="destructive">
-              <AlertCircle className="h-4 w-4" />
+            <Alert className='mt-4' variant='destructive'>
+              <AlertCircle className='h-4 w-4' />
               <AlertDescription>{imageError}</AlertDescription>
             </Alert>
           )}
           <Input
             ref={fileInputRef}
-            type="file"
+            type='file'
             accept={ACCEPTED_IMAGE_TYPES.join(',')}
             onChange={handleImageChange}
-            className="hidden"
+            className='hidden'
           />
         </CardContent>
       </Card>
 
       <Card>
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <User className="h-5 w-5" />
+          <CardTitle className='flex items-center gap-2'>
+            <User className='h-5 w-5' />
             Personal Information
           </CardTitle>
           <CardDescription>Update your personal details below</CardDescription>
         </CardHeader>
         <CardContent>
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+            <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-6'>
               <FormField
                 control={form.control}
-                name="name"
+                name='name'
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="flex items-center gap-2">
-                      <User className="h-4 w-4" />
+                    <FormLabel className='flex items-center gap-2'>
+                      <User className='h-4 w-4' />
                       Full Name
                     </FormLabel>
                     <FormControl>
                       <Input
-                        placeholder="Enter your full name"
+                        placeholder='Enter your full name'
                         {...field}
-                        className="transition-colors focus:ring-2 focus:ring-blue-500/20"
+                        className='transition-colors focus:ring-2 focus:ring-blue-500/20'
                       />
                     </FormControl>
                     <FormDescription>
@@ -444,10 +444,10 @@ export default function EditProfile() {
                       await checkUsername(username);
                     setIsUsernameValid(result.available);
                     setUsernameErrorMessage(
-                      result.message || result.error || null
+                      result.message || result.error || null,
                     );
                     setUsernameSuggestions(result.suggestions || []);
-                    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+                    // biome-ignore lint: error
                   } catch (error) {
                     setIsUsernameValid(false);
                     setUsernameErrorMessage('Failed to check username');
@@ -462,24 +462,24 @@ export default function EditProfile() {
 
               <FormField
                 control={form.control}
-                name="email"
+                name='email'
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="flex items-center gap-2">
-                      <Mail className="h-4 w-4" />
+                    <FormLabel className='flex items-center gap-2'>
+                      <Mail className='h-4 w-4' />
                       Email Address
                     </FormLabel>
                     <FormControl>
                       <Input
-                        type="email"
-                        placeholder="Enter your email"
+                        type='email'
+                        placeholder='Enter your email'
                         disabled
                         {...field}
-                        className="bg-muted/50"
+                        className='bg-muted/50'
                       />
                     </FormControl>
-                    <FormDescription className="flex items-center gap-2">
-                      <AlertCircle className="h-3 w-3" />
+                    <FormDescription className='flex items-center gap-2'>
+                      <AlertCircle className='h-3 w-3' />
                       Email cannot be changed for security reasons
                     </FormDescription>
                     <FormMessage />
@@ -489,30 +489,30 @@ export default function EditProfile() {
 
               <FormField
                 control={form.control}
-                name="phone"
+                name='phone'
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="flex items-center gap-2">
-                      <Phone className="h-4 w-4" />
+                    <FormLabel className='flex items-center gap-2'>
+                      <Phone className='h-4 w-4' />
                       Phone Number
                     </FormLabel>
                     <FormControl>
                       <Input
-                        placeholder="Enter your phone number (optional)"
+                        placeholder='Enter your phone number (optional)'
                         {...field}
-                        className="transition-colors focus:ring-2 focus:ring-blue-500/20"
+                        className='transition-colors focus:ring-2 focus:ring-blue-500/20'
                       />
                     </FormControl>
-                    <FormDescription className="flex items-center gap-2">
+                    <FormDescription className='flex items-center gap-2'>
                       {profile.phone ? (
                         profile.phoneVerified ? (
                           <>
-                            <span className="h-2 w-2 rounded-full bg-green-600" />
+                            <span className='h-2 w-2 rounded-full bg-green-600' />
                             Your phone is verified
                           </>
                         ) : (
                           <>
-                            <span className="h-2 w-2 rounded-full bg-yellow-600" />
+                            <span className='h-2 w-2 rounded-full bg-yellow-600' />
                             Your phone is not verified
                           </>
                         )
@@ -529,50 +529,50 @@ export default function EditProfile() {
 
               {/* Show mutation error if any */}
               {updateProfileMutation.isError && (
-                <Alert variant="destructive">
-                  <AlertCircle className="h-4 w-4" />
+                <Alert variant='destructive'>
+                  <AlertCircle className='h-4 w-4' />
                   <AlertDescription>
                     {updateProfileMutation.error?.message ||
                       'Failed to update profile. Please try again.'}
                   </AlertDescription>
                 </Alert>
               )}
-              <p className="text-muted-foreground">
+              <p className='text-muted-foreground'>
                 To Reflect changes, you will need to re-login
               </p>
-              <div className="flex gap-4 pt-4">
+              <div className='flex gap-4 pt-4'>
                 <Button
-                  type="submit"
+                  type='submit'
                   disabled={
                     updateProfileMutation.isPending ||
                     (!form.formState.isDirty && !imageFile) ||
                     (!isUsernameValid &&
                       watchedValues.username !== data?.username)
                   }
-                  className="flex-1 transition-all duration-200"
+                  className='flex-1 transition-all duration-200'
                 >
                   {updateProfileMutation.isPending ? (
                     <>
-                      <div className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+                      <div className='mr-2 h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent' />
                       Saving Changes...
                     </>
                   ) : (
                     <>
-                      <Save className="mr-2 h-4 w-4" />
+                      <Save className='mr-2 h-4 w-4' />
                       Save Changes
                     </>
                   )}
                 </Button>
-                <Link href="/profile">
+                <Link href='/profile'>
                   <Button
-                    type="button"
-                    variant="outline"
-                    className="hover:bg-muted transition-all duration-200"
+                    type='button'
+                    variant='outline'
+                    className='hover:bg-muted transition-all duration-200'
                     onClick={(e) => {
                       if (hasUnsavedChanges) {
                         if (
                           !confirm(
-                            'You have unsaved changes. Are you sure you want to cancel?'
+                            'You have unsaved changes. Are you sure you want to cancel?',
                           )
                         ) {
                           e.preventDefault();
@@ -586,8 +586,8 @@ export default function EditProfile() {
               </div>
 
               {hasUnsavedChanges && (
-                <Alert className="mt-4">
-                  <AlertCircle className="h-4 w-4" />
+                <Alert className='mt-4'>
+                  <AlertCircle className='h-4 w-4' />
                   <AlertDescription>
                     You have unsaved changes. Don&#39;t forget to save your
                     updates!
@@ -605,33 +605,33 @@ export default function EditProfile() {
 // EditProfileSkeleton and ErrorState components remain unchanged
 function EditProfileSkeleton() {
   return (
-    <div className="container mx-auto max-w-2xl px-4 py-8">
-      <div className="mb-8">
-        <div className="mb-4 flex items-center gap-4">
-          <Skeleton className="h-10 w-10 rounded-md" />
-          <div className="flex-1">
-            <Skeleton className="mb-2 h-8 w-48" />
-            <Skeleton className="h-4 w-64" />
+    <div className='container mx-auto max-w-2xl px-4 py-8'>
+      <div className='mb-8'>
+        <div className='mb-4 flex items-center gap-4'>
+          <Skeleton className='h-10 w-10 rounded-md' />
+          <div className='flex-1'>
+            <Skeleton className='mb-2 h-8 w-48' />
+            <Skeleton className='h-4 w-64' />
           </div>
         </div>
       </div>
 
-      <Card className="mb-6">
+      <Card className='mb-6'>
         <CardHeader>
-          <Skeleton className="h-6 w-40" />
-          <Skeleton className="h-4 w-64" />
+          <Skeleton className='h-6 w-40' />
+          <Skeleton className='h-4 w-64' />
         </CardHeader>
         <CardContent>
-          <div className="flex items-center gap-6">
-            <Skeleton className="h-24 w-24 rounded-full" />
-            <div className="flex-1 space-y-3">
+          <div className='flex items-center gap-6'>
+            <Skeleton className='h-24 w-24 rounded-full' />
+            <div className='flex-1 space-y-3'>
               <div>
-                <Skeleton className="mb-2 h-4 w-24" />
-                <Skeleton className="h-6 w-20 rounded-full" />
+                <Skeleton className='mb-2 h-4 w-24' />
+                <Skeleton className='h-6 w-20 rounded-full' />
               </div>
-              <div className="flex gap-2">
-                <Skeleton className="h-8 w-32" />
-                <Skeleton className="h-8 w-20" />
+              <div className='flex gap-2'>
+                <Skeleton className='h-8 w-32' />
+                <Skeleton className='h-8 w-20' />
               </div>
             </div>
           </div>
@@ -640,21 +640,22 @@ function EditProfileSkeleton() {
 
       <Card>
         <CardHeader>
-          <Skeleton className="h-6 w-48" />
-          <Skeleton className="h-4 w-64" />
+          <Skeleton className='h-6 w-48' />
+          <Skeleton className='h-4 w-64' />
         </CardHeader>
         <CardContent>
-          <div className="space-y-6">
+          <div className='space-y-6'>
             {[...Array(4)].map((_, i) => (
-              <div key={i} className="space-y-2">
-                <Skeleton className="h-4 w-24" />
-                <Skeleton className="h-10 w-full" />
-                <Skeleton className="h-3 w-48" />
+              // biome-ignore lint: error
+              <div key={i} className='space-y-2'>
+                <Skeleton className='h-4 w-24' />
+                <Skeleton className='h-10 w-full' />
+                <Skeleton className='h-3 w-48' />
               </div>
             ))}
-            <div className="flex gap-4 pt-4">
-              <Skeleton className="h-10 flex-1" />
-              <Skeleton className="h-10 w-20" />
+            <div className='flex gap-4 pt-4'>
+              <Skeleton className='h-10 flex-1' />
+              <Skeleton className='h-10 w-20' />
             </div>
           </div>
         </CardContent>
@@ -668,33 +669,33 @@ function ErrorState({
   error,
 }: {
   message?: string;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  // biome-ignore lint: error
   error?: any;
 }) {
   return (
-    <div className="container mx-auto max-w-2xl px-4 py-8">
+    <div className='container mx-auto max-w-2xl px-4 py-8'>
       <Card>
-        <CardContent className="pt-6">
-          <div className="space-y-4 text-center">
-            <AlertCircle className="mx-auto h-12 w-12 text-red-500" />
-            <h2 className="text-xl font-semibold">Error Loading Profile</h2>
-            <p className="text-muted-foreground">{message}</p>
+        <CardContent className='pt-6'>
+          <div className='space-y-4 text-center'>
+            <AlertCircle className='mx-auto h-12 w-12 text-red-500' />
+            <h2 className='text-xl font-semibold'>Error Loading Profile</h2>
+            <p className='text-muted-foreground'>{message}</p>
             {error && (
-              <details className="mt-2 text-left">
-                <summary className="text-muted-foreground hover:text-foreground cursor-pointer text-sm">
+              <details className='mt-2 text-left'>
+                <summary className='text-muted-foreground hover:text-foreground cursor-pointer text-sm'>
                   Show error details
                 </summary>
-                <pre className="bg-muted mt-2 overflow-auto rounded-md p-2 text-xs">
+                <pre className='bg-muted mt-2 overflow-auto rounded-md p-2 text-xs'>
                   {JSON.stringify(error, null, 2)}
                 </pre>
               </details>
             )}
-            <div className="flex justify-center gap-2">
+            <div className='flex justify-center gap-2'>
               <Button onClick={() => window.location.reload()}>
                 Try Again
               </Button>
-              <Link href="/profile">
-                <Button variant="outline">Go Back to Profile</Button>
+              <Link href='/profile'>
+                <Button variant='outline'>Go Back to Profile</Button>
               </Link>
             </div>
           </div>

@@ -28,7 +28,7 @@ import { TagsInput } from '@/components/ui/tags-input';
 import { Textarea } from '@/components/ui/textarea';
 import { useProductCategories } from '@/services';
 
-import { ProductFormValues } from './product-form-type';
+import type { ProductFormValues } from './product-form-type';
 
 export function BasicInformationCard() {
   const {
@@ -74,6 +74,7 @@ export function BasicInformationCard() {
         suggestions: result.suggestions || [],
       });
     } catch (error) {
+      // biome-ignore lint: error
       console.error('Error checking slug:', error);
     } finally {
       setIsCheckingSlug(false);
@@ -93,6 +94,7 @@ export function BasicInformationCard() {
   }, [productName, setValue]);
 
   // Handle slug checking with debounce
+  // biome-ignore lint: error
   useEffect(() => {
     if (!slug || isCheckingSlug) {
       return;
@@ -125,20 +127,20 @@ export function BasicInformationCard() {
 
   return (
     <Card>
-      <CardHeader className="flex flex-row items-center gap-2">
-        <LayoutGrid className="h-5 w-5" />
-        <span className="text-lg font-semibold">Basic Information</span>
+      <CardHeader className='flex flex-row items-center gap-2'>
+        <LayoutGrid className='h-5 w-5' />
+        <span className='text-lg font-semibold'>Basic Information</span>
       </CardHeader>
-      <CardContent className="grid gap-6">
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+      <CardContent className='grid gap-6'>
+        <div className='grid grid-cols-1 gap-4 md:grid-cols-2'>
           <FormField
             control={control}
-            name="productName"
+            name='productName'
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Product Name *</FormLabel>
                 <FormControl>
-                  <Input placeholder="Product Name" {...field} />
+                  <Input placeholder='Product Name' {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -146,14 +148,14 @@ export function BasicInformationCard() {
           />
           <FormField
             control={control}
-            name="slug"
+            name='slug'
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Product Slug *</FormLabel>
                 <FormControl>
-                  <div className="relative w-full">
+                  <div className='relative w-full'>
                     <Input
-                      placeholder="product-slug"
+                      placeholder='product-slug'
                       {...field}
                       className={
                         slugStatus.isUnique === true
@@ -164,34 +166,34 @@ export function BasicInformationCard() {
                       }
                     />
                     {isCheckingSlug && (
-                      <div className="absolute top-1/2 right-2 -translate-y-1/2">
-                        <Loader2 className="h-4 w-4 animate-spin text-gray-400" />
+                      <div className='absolute top-1/2 right-2 -translate-y-1/2'>
+                        <Loader2 className='h-4 w-4 animate-spin text-gray-400' />
                       </div>
                     )}
                     {!isCheckingSlug && slugStatus.isUnique === true && (
-                      <div className="absolute top-1/2 right-2 -translate-y-1/2">
-                        <Check className="h-4 w-4 text-green-500" />
+                      <div className='absolute top-1/2 right-2 -translate-y-1/2'>
+                        <Check className='h-4 w-4 text-green-500' />
                       </div>
                     )}
                     {!isCheckingSlug && slugStatus.isUnique === false && (
-                      <div className="absolute top-1/2 right-2 -translate-y-1/2">
-                        <XCircle className="h-4 w-4 text-red-500" />
+                      <div className='absolute top-1/2 right-2 -translate-y-1/2'>
+                        <XCircle className='h-4 w-4 text-red-500' />
                       </div>
                     )}
                   </div>
                 </FormControl>
                 {!isCheckingSlug && slugStatus.isUnique === false && (
-                  <div className="text-sm">
-                    <p className="text-red-500">
+                  <div className='text-sm'>
+                    <p className='text-red-500'>
                       This slug is already taken. Try one of these:
                     </p>
-                    <div className="mt-2 flex flex-wrap gap-2">
+                    <div className='mt-2 flex flex-wrap gap-2'>
                       {slugStatus.suggestions.map((suggestion) => (
                         <Button
                           key={suggestion}
-                          type="button"
-                          variant="outline"
-                          size="sm"
+                          type='button'
+                          variant='outline'
+                          size='sm'
                           onClick={() => applySuggestion(suggestion)}
                         >
                           {suggestion}
@@ -207,13 +209,13 @@ export function BasicInformationCard() {
         </div>
         <FormField
           control={control}
-          name="description"
+          name='description'
           render={({ field }) => (
             <FormItem>
               <FormLabel>Description *</FormLabel>
               <FormControl>
                 <Textarea
-                  placeholder="Describe your product in detail"
+                  placeholder='Describe your product in detail'
                   rows={4}
                   {...field}
                 />
@@ -222,15 +224,15 @@ export function BasicInformationCard() {
             </FormItem>
           )}
         />
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-6">
+        <div className='grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-6'>
           <FormField
             control={control}
-            name="category"
+            name='category'
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Category *</FormLabel>
                 {isPending ? (
-                  <Skeleton className="h-8 w-full" />
+                  <Skeleton className='h-8 w-full' />
                 ) : isError ? (
                   <div>Error</div>
                 ) : (
@@ -240,7 +242,7 @@ export function BasicInformationCard() {
                   >
                     <FormControl>
                       <SelectTrigger>
-                        <SelectValue placeholder="Select your product category" />
+                        <SelectValue placeholder='Select your product category' />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
@@ -249,7 +251,7 @@ export function BasicInformationCard() {
                           <SelectItem key={category.slug} value={category.slug}>
                             {category.name}
                           </SelectItem>
-                        )
+                        ),
                       )}
                     </SelectContent>
                   </Select>
@@ -261,12 +263,12 @@ export function BasicInformationCard() {
           />
           <FormField
             control={control}
-            name="brand"
+            name='brand'
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Brand *</FormLabel>
                 <FormControl>
-                  <Input placeholder="Brand" {...field} />
+                  <Input placeholder='Brand' {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -275,16 +277,16 @@ export function BasicInformationCard() {
         </div>
         <FormField
           control={control}
-          name="tags"
+          name='tags'
           render={({ field }) => (
             <FormItem>
               <FormLabel>Enter your product tags.</FormLabel>
               <FormControl>
                 <TagsInput
-                  className="border"
+                  className='border'
                   value={field.value}
                   onValueChange={field.onChange}
-                  placeholder="Enter your tags"
+                  placeholder='Enter your tags'
                 />
               </FormControl>
               <FormDescription>

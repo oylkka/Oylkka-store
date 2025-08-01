@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 
 import { db } from '@/lib/db';
 
@@ -14,10 +14,10 @@ export async function GET(req: NextRequest) {
     const limit = parseInt(limitParam, 10);
 
     // Validate page and limit
-    if (isNaN(page) || isNaN(limit) || page < 1 || limit < 1) {
+    if (Number.isNaN(page) || Number.isNaN(limit) || page < 1 || limit < 1) {
       return NextResponse.json(
         { error: 'Invalid pagination parameters' },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -45,13 +45,13 @@ export async function GET(req: NextRequest) {
           limit,
         },
       },
-      { status: 200 }
+      { status: 200 },
     );
+    // biome-ignore lint: error
   } catch (error) {
-    console.error('[GET /api/shops]', error);
     return NextResponse.json(
       { error: 'Internal Server Error' },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

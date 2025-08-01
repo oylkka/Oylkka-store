@@ -1,5 +1,5 @@
 'use client';
-import { SetStateAction, useEffect, useState } from 'react';
+import { type SetStateAction, useEffect, useState } from 'react';
 import { useAbly } from './use-ably';
 
 export function useUnreadCount(userId: string) {
@@ -16,7 +16,7 @@ export function useUnreadCount(userId: string) {
       'unread-count-update',
       (message: { data: { count: SetStateAction<number> } }) => {
         setUnreadCount(message.data.count);
-      }
+      },
     );
 
     return () => {

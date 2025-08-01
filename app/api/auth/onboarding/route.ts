@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 
 import { UploadImage } from '@/features/cloudinary';
 import { db } from '@/lib/db';
@@ -76,7 +76,7 @@ export async function POST(req: NextRequest) {
       if (!data[field]) {
         return NextResponse.json(
           { message: `Missing required field: ${field}` },
-          { status: 400 }
+          { status: 400 },
         );
       }
     }
@@ -85,7 +85,7 @@ export async function POST(req: NextRequest) {
       if (!data.shopName || !data.shopSlug) {
         return NextResponse.json(
           { message: 'Vendor must provide both shopName and shopSlug' },
-          { status: 400 }
+          { status: 400 },
         );
       }
     }
@@ -119,7 +119,7 @@ export async function POST(req: NextRequest) {
     if (data.role === 'VENDOR' && data.shopBanner instanceof File) {
       shopBannerUploadResult = await UploadImage(
         data.shopBanner,
-        'shop-banners'
+        'shop-banners',
       );
     }
 
@@ -154,7 +154,9 @@ export async function POST(req: NextRequest) {
       if (!existingShop) {
         await db.shop.create({
           data: {
+            // biome-ignore lint: error
             name: data.shopName!,
+            // biome-ignore lint: error
             slug: data.shopSlug!,
             ownerId: data.id,
             logo: {
@@ -183,13 +185,13 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json(
       { message: 'Success', data: updatedUser },
-      { status: 200 }
+      { status: 200 },
     );
+    // biome-ignore lint: error
   } catch (error) {
-    console.error(error);
     return NextResponse.json(
       { message: 'Internal server error' },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

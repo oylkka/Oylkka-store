@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 
 import { auth } from '@/features/auth/auth';
 import { DeleteImage, UploadImage } from '@/features/cloudinary';
@@ -26,7 +26,7 @@ export async function POST(req: NextRequest) {
     if (!productId) {
       return NextResponse.json(
         { error: 'Product ID is required' },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -42,23 +42,23 @@ export async function POST(req: NextRequest) {
     if (!ratingStr) {
       return NextResponse.json(
         { error: 'Rating is required' },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
     if (!content) {
       return NextResponse.json(
         { error: 'Review content is required' },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
     // Convert rating to number and validate
     const rating = Number(ratingStr);
-    if (isNaN(rating) || rating < 1 || rating > 5) {
+    if (Number.isNaN(rating) || rating < 1 || rating > 5) {
       return NextResponse.json(
         { error: 'Rating must be a number between 1 and 5' },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -98,13 +98,13 @@ export async function POST(req: NextRequest) {
             });
           }
         }
+        // biome-ignore lint: error
       } catch (uploadError) {
-        console.error('Error uploading images:', uploadError);
         return NextResponse.json(
           {
             error: 'Failed to upload images',
           },
-          { status: 500 }
+          { status: 500 },
         );
       }
     }
@@ -147,15 +147,15 @@ export async function POST(req: NextRequest) {
         message: 'Review created successfully',
         review: review,
       },
-      { status: 201 }
+      { status: 201 },
     );
+    // biome-ignore lint: error
   } catch (error) {
-    console.error('Error creating review:', error);
     return NextResponse.json(
       {
         error: 'Internal Server Error',
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -173,7 +173,7 @@ export async function GET(req: NextRequest) {
     if (!productId) {
       return NextResponse.json(
         { error: 'productId is required' },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -198,7 +198,7 @@ export async function GET(req: NextRequest) {
             (
               allReviews.reduce((acc, review) => acc + review.rating, 0) /
               totalReviews
-            ).toFixed(2)
+            ).toFixed(2),
           )
         : 0;
 
@@ -231,7 +231,7 @@ export async function GET(req: NextRequest) {
     }
 
     // Build sort options
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    // biome-ignore lint: error
     const sortOptions: any = {};
     switch (sortBy) {
       case 'rating':
@@ -240,7 +240,7 @@ export async function GET(req: NextRequest) {
       case 'helpful':
         sortOptions.helpful = sortOrder;
         break;
-      case 'createdAt':
+
       default:
         sortOptions.createdAt = sortOrder;
         break;
@@ -313,15 +313,15 @@ export async function GET(req: NextRequest) {
         ratingCount: totalReviews,
         allReviewsDetails: processedReviews,
       },
-      { status: 200 }
+      { status: 200 },
     );
+    // biome-ignore lint: error
   } catch (error) {
-    console.error('Error fetching reviews:', error);
     return NextResponse.json(
       {
         error: 'Internal Server Error',
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -368,7 +368,7 @@ export async function DELETE(req: NextRequest) {
     if (!reviewId) {
       return NextResponse.json(
         { error: 'Review ID is required' },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -395,26 +395,17 @@ export async function DELETE(req: NextRequest) {
     if (!isOwner && !isAdmin) {
       return NextResponse.json(
         { error: 'Forbidden: You can only delete your own reviews' },
-        { status: 403 }
+        { status: 403 },
       );
     }
 
     // Delete images from Cloudinary if they exist
     if (existingReview.images && Array.isArray(existingReview.images)) {
-      try {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        for (const image of existingReview.images as any[]) {
-          if (image.publicId) {
-            await DeleteImage(image.publicId);
-          }
+      // biome-ignore lint: error
+      for (const image of existingReview.images as any[]) {
+        if (image.publicId) {
+          await DeleteImage(image.publicId);
         }
-      } catch (imageDeleteError) {
-        console.error(
-          'Error deleting images from Cloudinary:',
-          imageDeleteError
-        );
-        // Continue with review deletion even if image deletion fails
-        // You might want to log this for manual cleanup later
       }
     }
 
@@ -428,15 +419,15 @@ export async function DELETE(req: NextRequest) {
         success: true,
         message: 'Review deleted successfully',
       },
-      { status: 200 }
+      { status: 200 },
     );
+    // biome-ignore lint: error
   } catch (error) {
-    console.error('Error deleting review:', error);
     return NextResponse.json(
       {
         error: 'Internal Server Error',
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

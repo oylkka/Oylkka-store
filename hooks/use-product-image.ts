@@ -54,10 +54,10 @@ export function useProductImages(maxImages: number = 4) {
     }
 
     const draggedIndex = productImages.findIndex(
-      (img) => img.id === draggedImage.id
+      (img) => img.id === draggedImage.id,
     );
     const targetIndex = productImages.findIndex(
-      (img) => img.id === targetImage.id
+      (img) => img.id === targetImage.id,
     );
 
     if (draggedIndex === -1 || targetIndex === -1) {

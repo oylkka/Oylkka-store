@@ -94,16 +94,16 @@ export default function InputForm() {
   }
 
   return (
-    <div className="container mx-auto py-8">
-      <h1 className="mb-6 text-center text-3xl font-bold">
+    <div className='container mx-auto py-8'>
+      <h1 className='mb-6 text-center text-3xl font-bold'>
         Complete Your Profile
       </h1>
-      <p className="text-muted-foreground mb-8 text-center">
+      <p className='text-muted-foreground mb-8 text-center'>
         Please provide your information to get started
       </p>
 
       {isError && (
-        <Alert variant="destructive" className="mb-6">
+        <Alert variant='destructive' className='mb-6'>
           <AlertTitle>Error</AlertTitle>
           <AlertDescription>
             {error?.message ||
@@ -115,29 +115,29 @@ export default function InputForm() {
       <FormProvider {...form}>
         <form
           onSubmit={form.handleSubmit(onSubmit)}
-          className="container mx-auto max-w-5xl space-y-8"
+          className='container mx-auto max-w-5xl space-y-8'
         >
           <UserInfo />
 
           {isVendor && <ShopInfoSection />}
 
-          <div className="flex justify-end space-x-4">
+          <div className='flex justify-end space-x-4'>
             <Button
-              type="button"
-              variant="outline"
+              type='button'
+              variant='outline'
               onClick={() => form.reset()}
               disabled={isPending}
             >
               Reset
             </Button>
             <Button
-              type="submit"
+              type='submit'
               disabled={isPending}
-              className="min-w-[120px]"
+              className='min-w-[120px]'
             >
               {isPending ? (
-                <span className="flex items-center gap-2">
-                  <Loader2 className="h-4 w-4 animate-spin" />
+                <span className='flex items-center gap-2'>
+                  <Loader2 className='h-4 w-4 animate-spin' />
                   Saving...
                 </span>
               ) : (

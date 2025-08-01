@@ -1,14 +1,14 @@
 import { NextResponse } from 'next/server';
 
 import { db } from '@/lib/db';
-import { PaymentData } from '@/lib/types';
+import type { PaymentData } from '@/lib/types';
 
 const myUrl = process.env.NEXT_PUBLIC_SITE_URL;
 
 export async function handleCODOrder(
   data: PaymentData,
   userId: string,
-  orderNumber: string
+  orderNumber: string,
 ) {
   try {
     const productIds = data.cart.map((item) => item.productId);
@@ -122,7 +122,7 @@ export async function handleCODOrder(
       paymentStatus: 'PENDING',
     });
   } catch (error) {
-    console.error('COD order creation error:', error);
+    // biome-ignore lint: error
     throw error;
   }
 }

@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from 'react';
 
 export function useChatData(conversationId: string, status: string) {
+  // biome-ignore lint: error
   const [conversation, setConversation] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -20,11 +21,12 @@ export function useChatData(conversationId: string, status: string) {
       if (!response.ok) {
         const errorText = await response.text();
         throw new Error(
-          `Failed to fetch conversation: ${response.status} - ${errorText}`
+          `Failed to fetch conversation: ${response.status} - ${errorText}`,
         );
       }
       const data = await response.json();
       setConversation(data);
+      // biome-ignore lint: error
     } catch (err: any) {
       setError(err.message);
     } finally {

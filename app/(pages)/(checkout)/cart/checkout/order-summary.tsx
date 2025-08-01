@@ -114,43 +114,43 @@ export default function OrderSummary({
 
   if (isPending || isLoading) {
     return (
-      <div className="lg:col-span-1">
+      <div className='lg:col-span-1'>
         <Card>
           <CardHeader>
-            <Skeleton className="h-6 w-40" />
+            <Skeleton className='h-6 w-40' />
           </CardHeader>
           <CardContent>
-            <div className="space-y-4">
+            <div className='space-y-4'>
               {[1, 2].map((item) => (
-                <div key={item} className="flex justify-between">
-                  <Skeleton className="h-4 w-32" />
-                  <Skeleton className="h-4 w-16" />
+                <div key={item} className='flex justify-between'>
+                  <Skeleton className='h-4 w-32' />
+                  <Skeleton className='h-4 w-16' />
                 </div>
               ))}
               <Separator />
-              <div className="space-y-2">
+              <div className='space-y-2'>
                 {[1, 2, 3].map((item) => (
-                  <div key={item} className="flex justify-between">
-                    <Skeleton className="h-4 w-20" />
-                    <Skeleton className="h-4 w-16" />
+                  <div key={item} className='flex justify-between'>
+                    <Skeleton className='h-4 w-20' />
+                    <Skeleton className='h-4 w-16' />
                   </div>
                 ))}
               </div>
               <Separator />
-              <div className="flex justify-between">
-                <Skeleton className="h-5 w-12" />
-                <Skeleton className="h-5 w-20" />
+              <div className='flex justify-between'>
+                <Skeleton className='h-5 w-12' />
+                <Skeleton className='h-5 w-20' />
               </div>
             </div>
           </CardContent>
-          <CardFooter className="flex-col space-y-4">
-            <div className="bg-muted w-full rounded-md p-4">
-              <div className="mb-2 flex items-center justify-between">
-                <Skeleton className="h-4 w-24" />
-                <Skeleton className="h-4 w-12" />
+          <CardFooter className='flex-col space-y-4'>
+            <div className='bg-muted w-full rounded-md p-4'>
+              <div className='mb-2 flex items-center justify-between'>
+                <Skeleton className='h-4 w-24' />
+                <Skeleton className='h-4 w-12' />
               </div>
-              <div className="flex">
-                <Skeleton className="h-10 w-full" />
+              <div className='flex'>
+                <Skeleton className='h-10 w-full' />
               </div>
             </div>
           </CardFooter>
@@ -161,19 +161,19 @@ export default function OrderSummary({
 
   if (isError) {
     return (
-      <div className="lg:col-span-1">
-        <Card className="border-red-200">
-          <CardContent className="pt-6">
-            <div className="flex flex-col items-center justify-center space-y-2 p-4 text-center">
-              <ShoppingBag className="h-8 w-8 text-red-500" />
-              <p className="font-medium text-red-500">
+      <div className='lg:col-span-1'>
+        <Card className='border-red-200'>
+          <CardContent className='pt-6'>
+            <div className='flex flex-col items-center justify-center space-y-2 p-4 text-center'>
+              <ShoppingBag className='h-8 w-8 text-red-500' />
+              <p className='font-medium text-red-500'>
                 Error loading cart items
               </p>
-              <p className="text-muted-foreground text-sm">
+              <p className='text-muted-foreground text-sm'>
                 Please try refreshing the page
               </p>
               <Button
-                variant="outline"
+                variant='outline'
                 onClick={() => window.location.reload()}
               >
                 Refresh
@@ -187,13 +187,13 @@ export default function OrderSummary({
 
   if (!data || data.length === 0) {
     return (
-      <div className="lg:col-span-1">
+      <div className='lg:col-span-1'>
         <Card>
-          <CardContent className="pt-6">
-            <div className="flex flex-col items-center justify-center space-y-2 p-4 text-center">
-              <ShoppingBag className="text-muted-foreground h-8 w-8" />
-              <p className="font-medium">Your cart is empty</p>
-              <p className="text-muted-foreground text-sm">
+          <CardContent className='pt-6'>
+            <div className='flex flex-col items-center justify-center space-y-2 p-4 text-center'>
+              <ShoppingBag className='text-muted-foreground h-8 w-8' />
+              <p className='font-medium'>Your cart is empty</p>
+              <p className='text-muted-foreground text-sm'>
                 Add items to your cart to see them here
               </p>
             </div>
@@ -204,44 +204,44 @@ export default function OrderSummary({
   }
 
   return (
-    <div className="lg:col-span-1">
+    <div className='lg:col-span-1'>
       <Card>
         <CardHeader>
-          <CardTitle className="flex items-center">
-            <ShoppingBag className="mr-2 h-5 w-5" />
+          <CardTitle className='flex items-center'>
+            <ShoppingBag className='mr-2 h-5 w-5' />
             Order Summary
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="space-y-4">
+          <div className='space-y-4'>
             {data.map((item: CartItem) => (
               <div key={item.id}>
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-3">
+                <div className='flex items-center justify-between'>
+                  <div className='flex items-center space-x-3'>
                     {item.image.url && (
-                      <div className="h-10 w-10 overflow-hidden rounded-md">
+                      <div className='h-10 w-10 overflow-hidden rounded-md'>
                         <Image
                           src={item.image.url}
                           alt={item.name}
                           width={40}
                           height={40}
-                          className="h-full w-full object-cover"
+                          className='h-full w-full object-cover'
                         />
                       </div>
                     )}
                     <div>
-                      <div className="text-sm font-medium">{item.name}</div>
-                      <div className="text-muted-foreground text-xs">
+                      <div className='text-sm font-medium'>{item.name}</div>
+                      <div className='text-muted-foreground text-xs'>
                         Qty: {item.quantity}
                       </div>
                     </div>
                   </div>
-                  <div className="text-sm font-medium">
+                  <div className='text-sm font-medium'>
                     ৳{(item.discountPrice ?? item.price) * item.quantity}
                   </div>
                 </div>
                 {item.variantName && (
-                  <div className="text-muted-foreground text-xs">
+                  <div className='text-muted-foreground text-xs'>
                     {item.variantName}
                   </div>
                 )}
@@ -250,19 +250,19 @@ export default function OrderSummary({
 
             <Separator />
 
-            <div className="space-y-2 text-sm">
-              <div className="flex justify-between">
+            <div className='space-y-2 text-sm'>
+              <div className='flex justify-between'>
                 <span>Subtotal</span>
                 <span>৳{subtotal.toFixed(2)}</span>
               </div>
-              <div className="flex justify-between">
+              <div className='flex justify-between'>
                 <span>Shipping</span>
                 <span>
                   {finalShippingCost === 0 ? 'Free' : `৳${finalShippingCost}`}
                 </span>
               </div>
               {discount > 0 && (
-                <div className="flex justify-between text-green-600">
+                <div className='flex justify-between text-green-600'>
                   <span>Discount ({discount}%)</span>
                   <span>-৳{discountAmount.toFixed(2)}</span>
                 </div>
@@ -271,48 +271,48 @@ export default function OrderSummary({
 
             <Separator />
 
-            <div className="flex justify-between text-lg font-semibold">
+            <div className='flex justify-between text-lg font-semibold'>
               <span>Total</span>
               <span>৳{total.toFixed(2)}</span>
             </div>
           </div>
         </CardContent>
-        <CardFooter className="flex-col space-y-4">
-          <div className="bg-muted w-full rounded-md p-4">
+        <CardFooter className='flex-col space-y-4'>
+          <div className='bg-muted w-full rounded-md p-4'>
             {appliedPromoCode ? (
-              <div className="mb-4">
-                <div className="mb-2 flex items-center justify-between">
-                  <span className="text-sm font-medium">
+              <div className='mb-4'>
+                <div className='mb-2 flex items-center justify-between'>
+                  <span className='text-sm font-medium'>
                     Applied promo code:
                   </span>
                 </div>
-                <div className="flex items-center justify-between">
-                  <Badge variant="outline" className="bg-green-50 px-3 py-1">
-                    <Tag className="mr-2 h-3 w-3 text-green-600" />
-                    <span className="text-green-700">{appliedPromoCode}</span>
+                <div className='flex items-center justify-between'>
+                  <Badge variant='outline' className='bg-green-50 px-3 py-1'>
+                    <Tag className='mr-2 h-3 w-3 text-green-600' />
+                    <span className='text-green-700'>{appliedPromoCode}</span>
                   </Badge>
                   <Button
-                    variant="ghost"
-                    size="sm"
+                    variant='ghost'
+                    size='sm'
                     onClick={removePromoCode}
-                    className="text-red-500 hover:bg-red-50 hover:text-red-700"
+                    className='text-red-500 hover:bg-red-50 hover:text-red-700'
                   >
-                    <X className="h-4 w-4" />
-                    <span className="ml-1">Remove</span>
+                    <X className='h-4 w-4' />
+                    <span className='ml-1'>Remove</span>
                   </Button>
                 </div>
               </div>
             ) : (
               <>
-                <div className="mb-2 flex items-center">
-                  <Tag className="text-muted-foreground mr-2 h-4 w-4" />
-                  <span className="text-sm font-medium">
+                <div className='mb-2 flex items-center'>
+                  <Tag className='text-muted-foreground mr-2 h-4 w-4' />
+                  <span className='text-sm font-medium'>
                     Have a promo code?
                   </span>
                 </div>
-                <div className="flex space-x-2">
+                <div className='flex space-x-2'>
                   <Input
-                    placeholder="Enter code"
+                    placeholder='Enter code'
                     value={promoCode}
                     onChange={handlePromoCodeChange}
                   />

@@ -587,7 +587,7 @@ export async function NavMain() {
       .map((item) => ({
         ...item,
         items: item.items.filter(
-          (subItem) => !subItem.roles || subItem.roles.includes(userRole)
+          (subItem) => !subItem.roles || subItem.roles.includes(userRole),
         ),
       }));
   };
@@ -641,8 +641,8 @@ export async function NavMain() {
           adminNavItems.filter(
             (item) =>
               item.title === 'Customer Management' ||
-              item.title === 'Order Management'
-          )
+              item.title === 'Order Management',
+          ),
         ),
         ...filterItemsByRole(shoppingNavItems),
         accountSettingsItem,
@@ -661,14 +661,14 @@ export async function NavMain() {
             key={item.title}
             asChild
             defaultOpen={item.isActive}
-            className="group/collapsible"
+            className='group/collapsible'
           >
             <SidebarMenuItem>
               <CollapsibleTrigger asChild>
                 <SidebarMenuButton tooltip={item.title}>
                   {item.icon && <item.icon />}
                   <span>{item.title}</span>
-                  <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
+                  <ChevronRight className='ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90' />
                 </SidebarMenuButton>
               </CollapsibleTrigger>
               {item.items.length > 0 && (
