@@ -384,12 +384,8 @@ export async function NavMain() {
           url: '/dashboard/vendor/products/add',
         },
         {
-          title: 'Bulk Upload',
-          url: '/vendor/products/bulk-upload',
-        },
-        {
           title: 'Product Reviews',
-          url: '/vendor/products/reviews',
+          url: '/dashboard/vendor/products/reviews',
         },
       ],
     },

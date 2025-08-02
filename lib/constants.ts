@@ -33,4 +33,5 @@ export const QUERY_KEYS = {
   USER_ORDERS: 'user orders',
   USER_REVIEWS: 'user reviews',
   VENDOR_PRODUCTS: 'vendor products',
+  VENDOR_REVIEWS: 'vendor reviews',
 };

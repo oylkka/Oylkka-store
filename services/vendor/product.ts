@@ -85,3 +85,13 @@ export function useVendorProducts({
     },
   });
 }
+
+export function useVendorReview() {
+  return useQuery({
+    queryKey: [QUERY_KEYS.VENDOR_REVIEWS],
+    queryFn: async () => {
+      const response = await axios.get(`/api/dashboard/vendor/reviews`);
+      return response.data;
+    },
+  });
+}
