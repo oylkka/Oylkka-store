@@ -1,6 +1,6 @@
-import { QUERY_KEYS } from '@/lib/constants';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
+import { QUERY_KEYS } from '@/lib/constants';
 
 export const SkuService = {
   cleanText(text: string): string {

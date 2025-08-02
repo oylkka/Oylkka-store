@@ -1,4 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
+import axios from 'axios';
 import { QUERY_KEYS } from '@/lib/constants';
 import type { Order } from '@/lib/types';
 
@@ -40,8 +41,6 @@ export function useVendorOrders({
     },
   });
 }
-
-import axios from 'axios';
 
 export function useVendorShop() {
   return useQuery({

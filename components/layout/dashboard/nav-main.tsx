@@ -377,7 +377,7 @@ export async function NavMain() {
       items: [
         {
           title: 'All Products',
-          url: '/vendor/products/all',
+          url: '/dashboard/vendor/products/all',
         },
         {
           title: 'Add Product',
