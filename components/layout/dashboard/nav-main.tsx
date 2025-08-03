@@ -401,15 +401,15 @@ export async function NavMain() {
         },
         {
           title: 'Processing',
-          url: '/vendor/orders/processing',
+          url: '/dashboard/vendor/orders?status=PROCESSING',
         },
         {
           title: 'Shipped',
-          url: '/vendor/orders/shipped',
+          url: '/dashboard/vendor/orders?status=SHIPPED',
         },
         {
           title: 'Returns',
-          url: '/vendor/orders/returns',
+          url: '/dashboard/vendor/orders?status=REFUNDED',
         },
       ],
     },
