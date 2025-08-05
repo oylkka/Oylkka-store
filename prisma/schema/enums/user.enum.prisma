@@ -23,8 +23,14 @@ enum TicketPriority {
   URGENT
 }
 
+
 enum NotificationType {
+  INFO
+  SUCCESS
+  WARNING
+  ERROR
   ORDER
+  MESSAGE
   PAYMENT
   SHIPPING
   PROMOTION

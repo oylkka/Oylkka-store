@@ -1,8 +1,8 @@
-import { type NextRequest, NextResponse } from 'next/server';
-
 import { auth } from '@/features/auth/auth';
 import { DeleteImage, UploadImage } from '@/features/cloudinary';
 import { db } from '@/lib/db';
+import { formatDistanceToNow } from 'date-fns';
+import { type NextRequest, NextResponse } from 'next/server';
 
 export async function POST(req: NextRequest) {
   try {
@@ -141,6 +141,17 @@ export async function POST(req: NextRequest) {
       },
     });
 
+    await db.notification.create({
+      data: {
+        type: 'INFO',
+        avatar: existingProduct.images[0].url,
+        title: 'New Review',
+        recipientId: userId,
+        message: `Your product ${existingProduct.productName} has a new review!`,
+        actionUrl: `/products/${existingProduct.slug}`,
+      },
+    });
+
     return NextResponse.json(
       {
         success: true,
@@ -268,7 +279,7 @@ export async function GET(req: NextRequest) {
     const processedReviews = reviews.map((review) => ({
       ...review,
       isVerified: review.verified || false,
-      timeAgo: getTimeAgo(review.createdAt),
+      timeAgo: formatDistanceToNow(review.createdAt, { addSuffix: true }),
       canEdit: userId ? review.userId === userId : false,
       canDelete: userId ? review.userId === userId : false,
     }));
@@ -323,35 +334,6 @@ export async function GET(req: NextRequest) {
       },
       { status: 500 },
     );
-  }
-}
-
-// Helper function to calculate time ago
-function getTimeAgo(date: Date): string {
-  const now = new Date();
-  const diffInMs = now.getTime() - date.getTime();
-  const diffInSeconds = Math.floor(diffInMs / 1000);
-  const diffInMinutes = Math.floor(diffInSeconds / 60);
-  const diffInHours = Math.floor(diffInMinutes / 60);
-  const diffInDays = Math.floor(diffInHours / 24);
-  const diffInWeeks = Math.floor(diffInDays / 7);
-  const diffInMonths = Math.floor(diffInDays / 30);
-  const diffInYears = Math.floor(diffInDays / 365);
-
-  if (diffInYears > 0) {
-    return `${diffInYears} year${diffInYears > 1 ? 's' : ''} ago`;
-  } else if (diffInMonths > 0) {
-    return `${diffInMonths} month${diffInMonths > 1 ? 's' : ''} ago`;
-  } else if (diffInWeeks > 0) {
-    return `${diffInWeeks} week${diffInWeeks > 1 ? 's' : ''} ago`;
-  } else if (diffInDays > 0) {
-    return `${diffInDays} day${diffInDays > 1 ? 's' : ''} ago`;
-  } else if (diffInHours > 0) {
-    return `${diffInHours} hour${diffInHours > 1 ? 's' : ''} ago`;
-  } else if (diffInMinutes > 0) {
-    return `${diffInMinutes} minute${diffInMinutes > 1 ? 's' : ''} ago`;
-  } else {
-    return 'Just now';
   }
 }
 

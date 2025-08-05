@@ -1,17 +1,24 @@
-// Notification-related models
-
 model Notification {
-  id        String           @id @default(auto()) @map("_id") @db.ObjectId
-  userId    String           @db.ObjectId
-  user      User             @relation(fields: [userId], references: [id], onDelete: Cascade)
-  type      NotificationType
-  title     String
-  message   String
-  image     String?
-  link      String?
-  isRead    Boolean          @default(false)
-  createdAt DateTime         @default(now())
+  id          String            @id @default(auto()) @map("_id") @db.ObjectId
+  type        NotificationType @default(INFO)
+  title       String
+  message     String
+  timestamp   DateTime          @default(now())
+  isRead      Boolean           @default(false)
+  avatar      String?
+  actionUrl   String?
 
-  @@index([userId])
-  @@index([isRead])
+  // Relations
+  recipient   User              @relation(fields: [recipientId], references: [id], onDelete: Cascade)
+  recipientId String            @db.ObjectId
+
+  // Timestamps
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+
+  @@index([recipientId])
+  @@index([recipientId, isRead])
+  @@index([createdAt])
 }
+
+

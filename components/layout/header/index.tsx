@@ -1,6 +1,7 @@
 import Cart from './cart';
 import HeaderClient from './header-client';
 import Navigation from './navigation';
+import Notifications from './notifications';
 import SearchBar from './search-bar';
 import { ThemeSwitcher } from './theme-switcher';
 import UserDropDown from './user';
@@ -32,6 +33,7 @@ export default function Header({
             </div>
             <div className='flex items-center gap-1 md:gap-3'>
               <ThemeSwitcher />
+              <Notifications />
               <Cart />
               <UserDropDown />
             </div>

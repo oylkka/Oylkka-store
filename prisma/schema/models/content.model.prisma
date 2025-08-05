@@ -13,21 +13,21 @@ model Page {
 }
 
 model Banner {
-  id        String    @id @default(auto()) @map("_id") @db.ObjectId
-  title     String
-  subTitle  String?
-  description String?
-  bannerTag String?
-  alignment String @default("center")
-  primaryActionText String?
-  primaryActionLink String?
+  id                  String    @id @default(auto()) @map("_id") @db.ObjectId
+  title               String
+  subTitle            String?
+  description         String?
+  bannerTag           String?
+  alignment           String    @default("center")
+  primaryActionText   String?
+  primaryActionLink   String?
   secondaryActionText String?
   secondaryActionLink String?
-  bannerPosition String @default("home_top")
-  image     Image
-  isActive  Boolean   @default(true)
-  startDate DateTime?
-  endDate   DateTime?
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
+  bannerPosition      String    @default("home_top")
+  image               Image
+  isActive            Boolean   @default(true)
+  startDate           DateTime?
+  endDate             DateTime?
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
 }

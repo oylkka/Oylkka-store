@@ -1,11 +1,10 @@
-
 type Address {
-  name        String
+  name       String
   address    String
-  city        String
-  district    String
-  postalCode  String
-  phone       String
-  email       String
-  isDefault   Boolean      @default(false)
+  city       String
+  district   String
+  postalCode String
+  phone      String
+  email      String
+  isDefault  Boolean @default(false)
 }

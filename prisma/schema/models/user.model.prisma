@@ -35,7 +35,7 @@ model User {
   supportTickets  SupportTicket[] @relation("TicketCreator")
   assignedTickets SupportTicket[] @relation("TicketAssignee")
 
- sentMessages       Message[]
+  sentMessages         Message[]
   conversationsAsUser1 Conversation[] @relation("User1Conversations")
   conversationsAsUser2 Conversation[] @relation("User2Conversations")
 }
