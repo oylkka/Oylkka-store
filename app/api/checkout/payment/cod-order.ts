@@ -1,3 +1,4 @@
+import Ably from 'ably';
 import { NextResponse } from 'next/server';
 
 import { db } from '@/lib/db';
@@ -106,6 +107,37 @@ export async function handleCODOrder(
         },
       },
     });
+
+    const shops = await db.shop.findMany({
+      where: {
+        id: {
+          in: [
+            ...new Set(products.map((p) => p.shopId).filter(Boolean)),
+          ] as string[],
+        },
+      },
+      select: {
+        ownerId: true,
+        id: true,
+      },
+    });
+
+    // Notify each shop owner
+    for (const shop of shops) {
+      await db.notification.create({
+        data: {
+          type: 'INFO',
+          title: 'New Order',
+          recipientId: shop.ownerId,
+          message: `You have a new order! Order ID: ${order.orderNumber}`,
+          actionUrl: `/dashboard/vendor/orders?orderId=${order.orderNumber}`,
+        },
+      });
+      // biome-ignore lint: error
+      const ably = new Ably.Rest(process.env.ABLY_API_KEY!);
+      const channel = ably.channels.get(`user:${shop.ownerId}`);
+      await channel.publish('new-notification', {});
+    }
 
     await db.cartItem.deleteMany({
       where: {

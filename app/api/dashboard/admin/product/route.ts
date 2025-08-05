@@ -1,3 +1,4 @@
+import Ably from 'ably';
 import { type NextRequest, NextResponse } from 'next/server';
 
 import { auth } from '@/features/auth/auth';
@@ -20,6 +21,12 @@ export async function DELETE(req: NextRequest) {
     const product = await db.product.findUnique({
       where: { id },
       select: {
+        productName: true,
+        shop: {
+          select: {
+            ownerId: true,
+          },
+        },
         images: {
           select: { url: true, publicId: true },
         },
@@ -88,6 +95,22 @@ export async function DELETE(req: NextRequest) {
 
     // Delete the product
     await db.product.delete({ where: { id } });
+
+    // Notify the vendor
+    if (product.shop?.ownerId) {
+      await db.notification.create({
+        data: {
+          type: 'WARNING',
+          title: 'Product Deleted',
+          recipientId: product.shop.ownerId,
+          message: `Your product "${product.productName}" has been deleted by an admin.`,
+        },
+      });
+      // biome-ignore lint: error
+      const ably = new Ably.Rest(process.env.ABLY_API_KEY!);
+      const channel = ably.channels.get(`user:${product.shop.ownerId}`);
+      await channel.publish('new-notification', {});
+    }
 
     return NextResponse.json('Deleted', { status: 200 });
     // biome-ignore lint: error

@@ -1,3 +1,4 @@
+import Ably from 'ably';
 import { type NextRequest, NextResponse } from 'next/server';
 
 import { auth } from '@/features/auth/auth';
@@ -211,6 +212,28 @@ export async function POST(req: NextRequest) {
           productId: product.id,
         })),
       });
+    }
+
+    // Notify admin of new product
+    const admins = await db.user.findMany({
+      where: { role: 'ADMIN' },
+      select: { id: true },
+    });
+
+    for (const admin of admins) {
+      await db.notification.create({
+        data: {
+          type: 'INFO',
+          title: 'New Product',
+          recipientId: admin.id,
+          message: `A new product has been added: ${mappedData.productName}`,
+          actionUrl: `/admin/products?productId=${product.id}`,
+        },
+      });
+      // biome-ignore lint: error
+      const ably = new Ably.Rest(process.env.ABLY_API_KEY!);
+      const channel = ably.channels.get(`user:${admin.id}`);
+      await channel.publish('new-notification', {});
     }
 
     return NextResponse.json(

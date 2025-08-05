@@ -1,3 +1,4 @@
+import Ably from 'ably';
 import { type NextRequest, NextResponse } from 'next/server';
 
 import { UploadImage } from '@/features/cloudinary';
@@ -180,6 +181,28 @@ export async function POST(req: NextRequest) {
             },
           },
         });
+
+        // Notify admin of new vendor
+        const admins = await db.user.findMany({
+          where: { role: 'ADMIN' },
+          select: { id: true },
+        });
+
+        for (const admin of admins) {
+          await db.notification.create({
+            data: {
+              type: 'INFO',
+              title: 'New Vendor',
+              recipientId: admin.id,
+              message: `A new vendor has registered: ${data.shopName}`,
+              actionUrl: `/admin/vendors?shopSlug=${data.shopSlug}`,
+            },
+          });
+          // biome-ignore lint: error
+          const ably = new Ably.Rest(process.env.ABLY_API_KEY!);
+          const channel = ably.channels.get(`user:${admin.id}`);
+          await channel.publish('new-notification', {});
+        }
       }
     }
 

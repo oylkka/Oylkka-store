@@ -1,3 +1,4 @@
+import Ably from 'ably';
 import { type NextRequest, NextResponse } from 'next/server';
 
 import { auth } from '@/features/auth/auth';
@@ -140,10 +141,27 @@ export async function PATCH(req: NextRequest) {
     }
 
     if (Object.keys(orderUpdateData).length > 0) {
-      await db.order.update({
+      const updatedOrder = await db.order.update({
         where: { id: orderId },
         data: orderUpdateData,
       });
+
+      // Notify customer of order status change
+      if (orderStatus) {
+        await db.notification.create({
+          data: {
+            type: 'INFO',
+            title: 'Order Status Updated',
+            recipientId: updatedOrder.userId,
+            message: `Your order ${updatedOrder.orderNumber} has been updated to ${orderStatus}`,
+            actionUrl: `/dashboard/customer/orders?orderId=${updatedOrder.orderNumber}`,
+          },
+        });
+        // biome-ignore lint: error
+        const ably = new Ably.Rest(process.env.ABLY_API_KEY!);
+        const channel = ably.channels.get(`user:${updatedOrder.userId}`);
+        await channel.publish('new-notification', {});
+      }
     }
 
     return NextResponse.json(
