@@ -1,8 +1,9 @@
+import Ably from 'ably';
+import { formatDistanceToNow } from 'date-fns';
+import { type NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/features/auth/auth';
 import { DeleteImage, UploadImage } from '@/features/cloudinary';
 import { db } from '@/lib/db';
-import { formatDistanceToNow } from 'date-fns';
-import { type NextRequest, NextResponse } from 'next/server';
 
 export async function POST(req: NextRequest) {
   try {
@@ -65,6 +66,9 @@ export async function POST(req: NextRequest) {
     // Check if product exists
     const existingProduct = await db.product.findUnique({
       where: { id: productId },
+      include: {
+        shop: true,
+      },
     });
 
     if (!existingProduct) {
@@ -141,16 +145,27 @@ export async function POST(req: NextRequest) {
       },
     });
 
+    if (!existingProduct.shop) {
+      return NextResponse.json(
+        { error: 'Product has no vendor' },
+        { status: 400 },
+      );
+    }
+
     await db.notification.create({
       data: {
         type: 'INFO',
         avatar: existingProduct.images[0].url,
         title: 'New Review',
-        recipientId: userId,
+        recipientId: existingProduct.shop.ownerId,
         message: `Your product ${existingProduct.productName} has a new review!`,
         actionUrl: `/products/${existingProduct.slug}`,
       },
     });
+    // biome-ignore lint: error
+    const ably = new Ably.Rest(process.env.ABLY_API_KEY!);
+    const channel = ably.channels.get(`user:${existingProduct.shop.ownerId}`);
+    await channel.publish('new-notification', {});
 
     return NextResponse.json(
       {

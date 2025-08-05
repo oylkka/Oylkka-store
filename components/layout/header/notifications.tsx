@@ -1,5 +1,6 @@
 'use client';
 
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   AlertTriangle,
   Bell,
@@ -11,8 +12,9 @@ import {
   VolumeX,
   X,
 } from 'lucide-react';
-import { useState } from 'react';
-
+import { useRouter } from 'next/navigation';
+import { useSession } from 'next-auth/react';
+import { useEffect, useRef, useState } from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -23,6 +25,7 @@ import {
 } from '@/components/ui/popover';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
+import { useNotification } from '@/hooks/use-notification';
 import { cn } from '@/lib/utils';
 
 type NotificationType =
@@ -38,7 +41,7 @@ type Notification = {
   type: NotificationType;
   title: string;
   message: string;
-  timestamp: string;
+  createdAt: string;
   isRead: boolean;
   avatar?: string;
   actionUrl?: string;
@@ -53,54 +56,6 @@ const NOTIFICATION_ICONS = {
   order: <CheckCircle className='h-4 w-4 text-purple-500' />,
   message: <Info className='h-4 w-4 text-indigo-500' />,
 };
-
-// Static data
-const staticNotifications: Notification[] = [
-  {
-    id: '1',
-    type: 'order',
-    title: 'Order Shipped',
-    message: 'Your order #12345 has been shipped and is on its way!',
-    timestamp: '2 minutes ago',
-    isRead: false,
-    avatar: '/placeholder.svg?height=32&width=32',
-  },
-  {
-    id: '2',
-    type: 'success',
-    title: 'Payment Successful',
-    message: 'Your payment of ৳2,450 has been processed successfully.',
-    timestamp: '1 hour ago',
-    isRead: false,
-  },
-  {
-    id: '3',
-    type: 'message',
-    title: 'New Message',
-    message: 'Sarah Johnson sent you a message about your recent order.',
-    timestamp: '3 hours ago',
-    isRead: true,
-    avatar: '/placeholder.svg?height=32&width=32',
-  },
-  {
-    id: '4',
-    type: 'warning',
-    title: 'Low Stock Alert',
-    message:
-      'The item "Summer Dress" in your wishlist is running low on stock.',
-    timestamp: '5 hours ago',
-    isRead: true,
-  },
-  {
-    id: '5',
-    type: 'info',
-    title: 'New Collection Available',
-    message:
-      'Check out our latest Winter Collection with 25% off on all items.',
-    timestamp: '1 day ago',
-    isRead: true,
-  },
-];
 
 // Simple notification sound
 const playNotificationSound = (enabled: boolean) => {
@@ -168,28 +123,98 @@ const playNotificationSound = (enabled: boolean) => {
 };
 
 export default function Notifications() {
-  const [notifications, setNotifications] =
-    useState<Notification[]>(staticNotifications);
+  const { data: session } = useSession();
+  const router = useRouter();
+  const queryClient = useQueryClient();
+
+  const { data: notifications, error } = useQuery<Notification[]>({
+    queryKey: ['notifications', session?.user?.id],
+    queryFn: async () => {
+      const response = await fetch('/api/notifications');
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+      return response.json();
+    },
+    enabled: !!session?.user?.id,
+  });
+
+  const { getChannel } = useNotification(session?.user?.id ?? null);
+
+  useEffect(() => {
+    if (session?.user?.id) {
+      const channel = getChannel(`user:${session.user.id}`);
+      if (channel) {
+        channel.subscribe('new-notification', () => {
+          queryClient.invalidateQueries({
+            queryKey: ['notifications', session.user.id],
+          });
+        });
+      }
+    }
+  }, [session?.user?.id, getChannel, queryClient]);
+
   const [isOpen, setIsOpen] = useState(false);
   const [soundEnabled, setSoundEnabled] = useState(true);
 
-  const unreadCount = notifications.filter((n) => !n.isRead).length;
+  const prevNotificationCount = useRef(notifications?.length ?? 0);
 
-  const markAsRead = (id: string) => {
-    setNotifications((prev) =>
-      prev.map((n) => (n.id === id ? { ...n, isRead: true } : n)),
-    );
+  useEffect(() => {
+    if (notifications && notifications.length > prevNotificationCount.current) {
+      playNotificationSound(soundEnabled);
+    }
+    prevNotificationCount.current = notifications?.length ?? 0;
+  }, [notifications, soundEnabled]);
+
+  const unreadCount = notifications?.filter((n) => !n.isRead).length ?? 0;
+
+  const mutationOptions = {
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ['notifications', session?.user?.id],
+      });
+    },
   };
 
-  const markAllAsRead = () => {
-    setNotifications((prev) => prev.map((n) => ({ ...n, isRead: true })));
+  const { mutate: markAsRead } = useMutation<unknown, Error, string>({
+    mutationFn: (id) =>
+      fetch(`/api/notifications/${id}`, {
+        method: 'PATCH',
+      }),
+    ...mutationOptions,
+  });
+
+  const { mutate: markAllAsRead } = useMutation<unknown, Error, void>({
+    mutationFn: () =>
+      fetch('/api/notifications/read-all', {
+        method: 'PATCH',
+      }),
+    ...mutationOptions,
+  });
+
+  const { mutate: clearAll } = useMutation<unknown, Error, void>({
+    mutationFn: () =>
+      fetch('/api/notifications/delete-all', {
+        method: 'DELETE',
+      }),
+    ...mutationOptions,
+  });
+
+  const handleNotificationClick = (notification: Notification) => {
+    markAsRead(notification.id);
+    if (notification.actionUrl) {
+      router.push(notification.actionUrl);
+    }
+    setIsOpen(false);
   };
 
-  const clearAll = () => setNotifications([]);
-
-  const removeNotification = (id: string) => {
-    setNotifications((prev) => prev.filter((n) => n.id !== id));
-  };
+  const { mutate: removeNotification } = useMutation<unknown, Error, string>({
+    mutationFn: (id) =>
+      fetch(`/api/notifications/${id}`, {
+        method: 'DELETE',
+      }),
+    ...mutationOptions,
+  });
 
   const toggleSound = () => {
     setSoundEnabled(!soundEnabled);
@@ -260,13 +285,13 @@ export default function Notifications() {
               )}
             </Button>
 
-            {notifications.length > 0 && (
+            {notifications && notifications.length > 0 && (
               <>
                 {unreadCount > 0 && (
                   <Button
                     variant='ghost'
                     size='sm'
-                    onClick={markAllAsRead}
+                    onClick={() => markAllAsRead()}
                     className='h-7 w-7 p-0'
                     title='Mark all as read'
                   >
@@ -276,7 +301,7 @@ export default function Notifications() {
                 <Button
                   variant='ghost'
                   size='sm'
-                  onClick={clearAll}
+                  onClick={() => clearAll()}
                   className='h-7 w-7 p-0 text-red-500 hover:bg-red-50'
                   title='Clear all notifications'
                 >
@@ -289,7 +314,23 @@ export default function Notifications() {
 
         {/* Content */}
         <ScrollArea className='h-[400px]'>
-          {notifications.length === 0 ? (
+          {!notifications && !error ? (
+            <div className='flex flex-col items-center justify-center py-12 px-4 text-center'>
+              <div className='rounded-full bg-muted p-3 mb-3'>
+                <Bell className='h-6 w-6 text-muted-foreground' />
+              </div>
+              <h4 className='font-medium text-sm mb-1'>Loading...</h4>
+            </div>
+          ) : error ? (
+            <div className='flex flex-col items-center justify-center py-12 px-4 text-center'>
+              <div className='rounded-full bg-muted p-3 mb-3'>
+                <AlertTriangle className='h-6 w-6 text-red-500' />
+              </div>
+              <h4 className='font-medium text-sm mb-1'>
+                Error loading notifications
+              </h4>
+            </div>
+          ) : notifications && notifications.length === 0 ? (
             <div className='flex flex-col items-center justify-center py-12 px-4 text-center'>
               <div className='rounded-full bg-muted p-3 mb-3'>
                 <Bell className='h-6 w-6 text-muted-foreground' />
@@ -301,7 +342,7 @@ export default function Notifications() {
             </div>
           ) : (
             <div className='divide-y'>
-              {notifications.map((notification) => (
+              {notifications?.map((notification) => (
                 // biome-ignore lint: error
                 <div
                   key={notification.id}
@@ -309,7 +350,7 @@ export default function Notifications() {
                     'group relative p-4 hover:bg-muted/50 transition-colors cursor-pointer',
                     !notification.isRead && 'bg-primary/5',
                   )}
-                  onClick={() => markAsRead(notification.id)}
+                  onClick={() => handleNotificationClick(notification)}
                 >
                   <div className='flex items-start gap-3'>
                     {notification.avatar ? (
@@ -338,7 +379,7 @@ export default function Notifications() {
                             {notification.message}
                           </p>
                           <p className='text-xs text-muted-foreground mt-2'>
-                            {notification.timestamp}
+                            {new Date(notification.createdAt).toLocaleString()}
                           </p>
                         </div>
 
@@ -368,7 +409,7 @@ export default function Notifications() {
         </ScrollArea>
 
         {/* Footer */}
-        {notifications.length > 0 && (
+        {notifications && notifications.length > 0 && (
           <>
             <Separator />
             <div className='p-3'>
