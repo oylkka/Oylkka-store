@@ -1,11 +1,11 @@
 'use client';
 
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { Button } from '@/components/ui/button';
-import { formatDisplayName, getInitials } from '@/lib/utils';
 import { ArrowLeft, MoreVertical, Phone, Video } from 'lucide-react';
 import Image from 'next/image';
 import { useState } from 'react';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Button } from '@/components/ui/button';
+import { formatDisplayName, getInitials } from '@/lib/utils';
 
 interface ChatHeaderProps {
   // biome-ignore lint: error

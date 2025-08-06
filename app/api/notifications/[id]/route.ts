@@ -1,6 +1,6 @@
+import { type NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/features/auth/auth';
 import { db } from '@/lib/db';
-import { type NextRequest, NextResponse } from 'next/server';
 
 export async function PATCH(req: NextRequest) {
   const session = await auth();

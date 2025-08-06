@@ -146,11 +146,6 @@ export function useChatMessages(
       const { userId, isTyping: typing } = ablyMessage.data;
       if (userId !== session.user?.id) {
         setIsTyping(typing);
-        if (typing) {
-          setTimeout(() => {
-            setIsTyping(false);
-          }, 3000);
-        }
       }
     };
     // biome-ignore lint: error

@@ -1,12 +1,12 @@
 'use client';
 
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { Button } from '@/components/ui/button';
-import { cn, formatDisplayName, getInitials } from '@/lib/utils';
 import { format } from 'date-fns';
 import { AlertCircle, Check, CheckCheck } from 'lucide-react';
 import Image from 'next/image';
 import { useState } from 'react';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Button } from '@/components/ui/button';
+import { cn, formatDisplayName, getInitials } from '@/lib/utils';
 
 interface MessageBubbleProps {
   // biome-ignore lint: error
