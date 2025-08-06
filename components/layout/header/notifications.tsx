@@ -1,20 +1,5 @@
 'use client';
 
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import {
-  AlertTriangle,
-  Bell,
-  Check,
-  CheckCircle,
-  Info,
-  Trash2,
-  Volume2,
-  VolumeX,
-  X,
-} from 'lucide-react';
-import { useRouter } from 'next/navigation';
-import { useSession } from 'next-auth/react';
-import { useEffect, useRef, useState } from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -27,6 +12,22 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
 import { useNotification } from '@/hooks/use-notification';
 import { cn } from '@/lib/utils';
+import { notificationSound } from '@/utils/notification-sound';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import {
+  AlertTriangle,
+  Bell,
+  Check,
+  CheckCircle,
+  Info,
+  Trash2,
+  Volume2,
+  VolumeX,
+  X,
+} from 'lucide-react';
+import { useSession } from 'next-auth/react';
+import { useRouter } from 'next/navigation';
+import { useEffect, useRef, useState } from 'react';
 
 type NotificationType =
   | 'info'
@@ -55,71 +56,6 @@ const NOTIFICATION_ICONS = {
   info: <Info className='h-4 w-4 text-blue-500' />,
   order: <CheckCircle className='h-4 w-4 text-purple-500' />,
   message: <Info className='h-4 w-4 text-indigo-500' />,
-};
-
-// Simple notification sound
-const playNotificationSound = (enabled: boolean) => {
-  if (!enabled) return;
-
-  try {
-    const audioContext = new // biome-ignore lint: error
-    (window.AudioContext || (window as any).webkitAudioContext)();
-    const oscillator = audioContext.createOscillator();
-    const gainNode = audioContext.createGain();
-
-    oscillator.connect(gainNode);
-    gainNode.connect(audioContext.destination);
-
-    // Pleasant ascending chime (C-E-G)
-    oscillator.frequency.value = 523; // C5
-    oscillator.type = 'sine';
-
-    gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
-    gainNode.gain.exponentialRampToValueAtTime(
-      0.01,
-      audioContext.currentTime + 0.15,
-    );
-
-    oscillator.start(audioContext.currentTime);
-    oscillator.stop(audioContext.currentTime + 0.15);
-
-    // E5
-    setTimeout(() => {
-      const osc2 = audioContext.createOscillator();
-      const gain2 = audioContext.createGain();
-      osc2.connect(gain2);
-      gain2.connect(audioContext.destination);
-      osc2.frequency.value = 659;
-      osc2.type = 'sine';
-      gain2.gain.setValueAtTime(0.3, audioContext.currentTime);
-      gain2.gain.exponentialRampToValueAtTime(
-        0.01,
-        audioContext.currentTime + 0.15,
-      );
-      osc2.start(audioContext.currentTime);
-      osc2.stop(audioContext.currentTime + 0.15);
-    }, 100);
-
-    // G5
-    setTimeout(() => {
-      const osc3 = audioContext.createOscillator();
-      const gain3 = audioContext.createGain();
-      osc3.connect(gain3);
-      gain3.connect(audioContext.destination);
-      osc3.frequency.value = 784;
-      osc3.type = 'sine';
-      gain3.gain.setValueAtTime(0.3, audioContext.currentTime);
-      gain3.gain.exponentialRampToValueAtTime(
-        0.01,
-        audioContext.currentTime + 0.2,
-      );
-      osc3.start(audioContext.currentTime);
-      osc3.stop(audioContext.currentTime + 0.2);
-    }, 200);
-  } catch (error) {
-    // biome-ignore lint: error
-    console.warn('Could not play notification sound:', error);
-  }
 };
 
 export default function Notifications() {
@@ -161,7 +97,7 @@ export default function Notifications() {
 
   useEffect(() => {
     if (notifications && notifications.length > prevNotificationCount.current) {
-      playNotificationSound(soundEnabled);
+      notificationSound(soundEnabled);
     }
     prevNotificationCount.current = notifications?.length ?? 0;
   }, [notifications, soundEnabled]);
@@ -220,7 +156,7 @@ export default function Notifications() {
     setSoundEnabled(!soundEnabled);
     if (!soundEnabled) {
       // Play test sound when enabling
-      setTimeout(() => playNotificationSound(true), 100);
+      setTimeout(() => notificationSound(true), 100);
     }
   };
 
