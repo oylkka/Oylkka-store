@@ -1,11 +1,12 @@
 'use client';
 
-import { format } from 'date-fns';
-import { AlertCircle, Check, CheckCheck } from 'lucide-react';
-
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { cn, formatDisplayName, getInitials } from '@/lib/utils';
+import { format } from 'date-fns';
+import { AlertCircle, Check, CheckCheck } from 'lucide-react';
+import Image from 'next/image';
+import { useState } from 'react';
 
 interface MessageBubbleProps {
   // biome-ignore lint: error
@@ -19,6 +20,8 @@ export function MessageBubble({
   isCurrentUser,
   onRetry,
 }: MessageBubbleProps) {
+  const [imageError, setImageError] = useState(false);
+
   const formatMessageTime = (date: Date) => {
     return format(date, 'HH:mm');
   };
@@ -42,58 +45,80 @@ export function MessageBubble({
     }
   };
 
+  const renderAvatar = () => {
+    if (isCurrentUser) return null;
+    return (
+      <Avatar className='h-8 w-8 flex-shrink-0 shadow-sm'>
+        {message.sender?.image && !imageError ? (
+          <div className='relative h-full w-full overflow-hidden rounded-full'>
+            <Image
+              src={message.sender.image || '/placeholder.svg'}
+              alt={formatDisplayName(message.sender)}
+              fill
+              className='object-cover'
+              sizes='32px'
+              onError={() => setImageError(true)}
+              onLoad={() => setImageError(false)}
+            />
+          </div>
+        ) : (
+          <AvatarFallback className='text-xs'>
+            {getInitials(formatDisplayName(message.sender))}
+          </AvatarFallback>
+        )}
+      </Avatar>
+    );
+  };
+
+  const renderMessageStatus = () => {
+    if (!isCurrentUser) return null;
+    return (
+      <div className='flex items-center gap-1'>
+        {getMessageStatusIcon(message.status)}
+        {message.status === 'failed' && (
+          <Button
+            size='sm'
+            variant='ghost'
+            className='h-auto p-0 text-xs hover:bg-transparent hover:text-current'
+            onClick={() => onRetry(message.id)}
+          >
+            Retry
+          </Button>
+        )}
+      </div>
+    );
+  };
+
   return (
     <div
-      className={cn('flex', isCurrentUser ? 'justify-end' : 'justify-start')}
+      className={cn(
+        'flex mb-2', // Reduced margin-bottom
+        isCurrentUser ? 'justify-end' : 'justify-start',
+      )}
     >
       <div
         className={cn(
-          'flex max-w-[75%] items-end gap-3',
+          'flex max-w-[75%] items-end gap-2', // Reduced gap
           isCurrentUser ? 'flex-row-reverse' : '',
         )}
       >
-        {!isCurrentUser && (
-          <Avatar className='h-8 w-8 flex-shrink-0 shadow-sm'>
-            <AvatarImage
-              src={message.sender.image || undefined}
-              alt={formatDisplayName(message.sender)}
-            />
-            <AvatarFallback>
-              {getInitials(formatDisplayName(message.sender))}
-            </AvatarFallback>
-          </Avatar>
-        )}
-
+        {renderAvatar()}
         <div
           className={cn(
-            'relative max-w-full rounded-2xl px-4 py-3 shadow-lg backdrop-blur-sm transition-all duration-200 hover:shadow-xl',
+            'relative max-w-full rounded-xl px-3 py-2 shadow-lg backdrop-blur-sm transition-all duration-200 hover:shadow-xl', // Reduced padding and rounded-xl for a slightly tighter look
             isCurrentUser
-              ? 'rounded-br-none bg-black text-white'
-              : 'bg-background/80 dark:bg-secondary text-foreground rounded-bl-none border',
+              ? 'rounded-br-none bg-slate-950 text-white dark:bg-black'
+              : 'bg-background/80 dark:bg-secondary text-foreground rounded-bl-none border border-border/50',
           )}
         >
-          <p className='text-sm leading-relaxed break-words'>
+          <p className='text-sm leading-relaxed break-words whitespace-pre-wrap'>
             {message.content}
           </p>
-          <div className='text-muted-foreground mt-2 flex items-center justify-end gap-2'>
-            <span className='text-xs'>
+          <div className='text-muted-foreground dark:text-accent-foreground mt-1 flex items-center justify-end gap-2'>
+            <span className='text-xs opacity-70'>
               {formatMessageTime(message.createdAt)}
             </span>
-            {isCurrentUser && (
-              <div className='flex items-center gap-1'>
-                {getMessageStatusIcon(message.status)}
-                {message.status === 'failed' && (
-                  <Button
-                    size='sm'
-                    variant='ghost'
-                    className='h-auto p-0 text-xs hover:bg-transparent'
-                    onClick={() => onRetry(message.id)}
-                  >
-                    Retry
-                  </Button>
-                )}
-              </div>
-            )}
+            {renderMessageStatus()}
           </div>
         </div>
       </div>

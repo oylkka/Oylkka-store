@@ -1,10 +1,11 @@
 'use client';
 
-import { ArrowLeft, MoreVertical, Phone, Video } from 'lucide-react';
-
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { formatDisplayName, getInitials } from '@/lib/utils';
+import { ArrowLeft, MoreVertical, Phone, Video } from 'lucide-react';
+import Image from 'next/image';
+import { useState } from 'react';
 
 interface ChatHeaderProps {
   // biome-ignore lint: error
@@ -22,6 +23,7 @@ export function ChatHeader({
 }: ChatHeaderProps) {
   const otherUser = conversation?.otherUser;
   const isOtherUserOnline = otherUser?.id && onlineUsers.includes(otherUser.id);
+  const [imageError, setImageError] = useState(false);
 
   return (
     <div className='border-border/40 bg-background/95 supports-[backdrop-filter]:bg-background/60 flex-none border-b backdrop-blur'>
@@ -39,13 +41,23 @@ export function ChatHeader({
           <div className='flex items-center gap-3'>
             <div className='relative'>
               <Avatar className='border-background h-10 w-10 border-2 shadow-lg'>
-                <AvatarImage
-                  src={otherUser?.image || undefined}
-                  alt={formatDisplayName(otherUser)}
-                />
-                <AvatarFallback className='bg-gradient-to-br from-blue-500 to-purple-600 font-medium text-white'>
-                  {getInitials(formatDisplayName(otherUser))}
-                </AvatarFallback>
+                {otherUser?.image && !imageError ? (
+                  <div className='relative h-full w-full overflow-hidden rounded-full'>
+                    <Image
+                      src={otherUser.image}
+                      alt={formatDisplayName(otherUser)}
+                      fill
+                      className='object-cover'
+                      sizes='40px'
+                      onError={() => setImageError(true)}
+                      onLoad={() => setImageError(false)}
+                    />
+                  </div>
+                ) : (
+                  <AvatarFallback className='bg-gradient-to-br from-blue-500 to-purple-600 font-medium text-white'>
+                    {getInitials(formatDisplayName(otherUser))}
+                  </AvatarFallback>
+                )}
               </Avatar>
             </div>
 
