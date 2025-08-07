@@ -1,9 +1,10 @@
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import type { Metadata } from 'next';
-import { Geist, Geist_Mono } from 'next/font/google';
 import { SessionProvider } from 'next-auth/react';
+import { Geist, Geist_Mono } from 'next/font/google';
 
 import { Toaster } from '@/components/ui/sonner';
+import { PresenceProvider } from '@/context/presence-provider';
 import TanstackProvider from '@/context/tanstack-provider';
 import { ThemeProvider } from '@/context/theme-provider';
 import './globals.css';
@@ -36,14 +37,16 @@ export default function RootLayout({
           className={`${geistSans.variable} ${geistMono.variable} antialiased [&::-webkit-scrollbar]:w-0`}
         >
           <SessionProvider>
-            <ThemeProvider
-              attribute='class'
-              defaultTheme='light'
-              enableSystem
-              disableTransitionOnChange
-            >
-              {children}
-            </ThemeProvider>
+            <PresenceProvider>
+              <ThemeProvider
+                attribute='class'
+                defaultTheme='light'
+                enableSystem
+                disableTransitionOnChange
+              >
+                {children}
+              </ThemeProvider>
+            </PresenceProvider>
             <ReactQueryDevtools initialIsOpen={false} />
             <Toaster
               position='top-right'

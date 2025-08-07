@@ -1,3 +1,4 @@
+'use client';
 import {
   Award,
   ChevronRight,
@@ -27,7 +28,6 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from '@/components/ui/carousel';
-
 import Contact from './contact';
 
 export default function AboutPage() {

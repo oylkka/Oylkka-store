@@ -1,28 +1,23 @@
 'use client';
 
-import { ArrowLeft, MoreVertical, Phone, Video } from 'lucide-react';
-import Image from 'next/image';
-import { useState } from 'react';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { formatDisplayName, getInitials } from '@/lib/utils';
+import { usePresenceStore } from '@/store/presenceStore';
+import { ArrowLeft, MoreVertical, Phone, Video } from 'lucide-react';
+import Image from 'next/image';
+import { useState } from 'react';
 
 interface ChatHeaderProps {
   // biome-ignore lint: error
   conversation: any;
-  onlineUsers: string[];
-  isConnected: boolean;
   onBack: () => void;
 }
 
-export function ChatHeader({
-  conversation,
-  onlineUsers,
-  isConnected,
-  onBack,
-}: ChatHeaderProps) {
+export function ChatHeader({ conversation, onBack }: ChatHeaderProps) {
+  const { getUserById, isConnected } = usePresenceStore();
   const otherUser = conversation?.otherUser;
-  const isOtherUserOnline = otherUser?.id && onlineUsers.includes(otherUser.id);
+  const isOtherUserOnline = getUserById(otherUser?.id)?.status === 'online';
   const [imageError, setImageError] = useState(false);
 
   return (

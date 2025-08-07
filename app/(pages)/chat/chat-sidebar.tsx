@@ -24,6 +24,7 @@ import {
   useSidebar,
 } from '@/components/ui/sidebar';
 import { cn } from '@/lib/utils';
+import { usePresenceStore } from '@/store/presenceStore';
 
 interface User {
   id: string;
@@ -63,6 +64,7 @@ export function ChatSidebar({
   const params = useParams();
   const currentConversationId = params.conversationId as string;
   const { state } = useSidebar();
+  const { getUserById } = usePresenceStore();
 
   const getRecipient = (conv: ConversationDisplay) => {
     return conv.user1Id === currentUserId ? conv.user2 : conv.user1;
@@ -209,6 +211,10 @@ export function ChatSidebar({
                                     )}
                                   </AvatarFallback>
                                 </Avatar>
+                                {getUserById(recipient.id)?.status ===
+                                  'online' && (
+                                  <div className='absolute bottom-0 right-0 h-2.5 w-2.5 rounded-full bg-emerald-500 ring-2 ring-background' />
+                                )}
                               </div>
 
                               {state === 'expanded' && (
