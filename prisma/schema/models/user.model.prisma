@@ -35,6 +35,11 @@ model User {
   supportTickets  SupportTicket[] @relation("TicketCreator")
   assignedTickets SupportTicket[] @relation("TicketAssignee")
 
+  // Add presence fields
+  isOnline      Boolean   @default(false)
+  lastSeen      DateTime  @default(now())
+  presenceData  Json?
+
   sentMessages         Message[]
   conversationsAsUser1 Conversation[] @relation("User1Conversations")
   conversationsAsUser2 Conversation[] @relation("User2Conversations")

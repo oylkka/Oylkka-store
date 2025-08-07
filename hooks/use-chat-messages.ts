@@ -1,11 +1,11 @@
 'use client';
 
-import { useCallback, useEffect, useRef, useState } from 'react';
-import { toast } from 'sonner';
 import {
   markMessagesAsRead,
   sendMessage as sendMessageAction,
 } from '@/actions/chat';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { toast } from 'sonner';
 
 export function useChatMessages(
   conversationId: string,
