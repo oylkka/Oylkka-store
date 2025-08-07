@@ -1,8 +1,8 @@
 'use client';
 
 import { RefreshCw } from 'lucide-react';
-import { useParams, useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
+import { useParams, useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 
 import { Button } from '@/components/ui/button';
@@ -23,14 +23,8 @@ export function ChatConversation() {
   const conversationId = params.conversationId as string;
   const { data: session, status } = useSession();
 
-  const {
-    ably,
-    isConnected,
-    getChannel,
-    connectionError,
-    connectionState,
-    onlineUsers,
-  } = useAbly(conversationId);
+  const { ably, isConnected, getChannel, connectionError, connectionState } =
+    useAbly(conversationId);
 
   const {
     conversation,
@@ -100,12 +94,7 @@ export function ChatConversation() {
 
   return (
     <div className='from-background to-muted/20 flex h-full flex-col bg-gradient-to-br'>
-      <ChatHeader
-        conversation={conversation}
-        onlineUsers={onlineUsers}
-        isConnected={isConnected}
-        onBack={handleBackNavigation}
-      />
+      <ChatHeader conversation={conversation} onBack={handleBackNavigation} />
 
       <ConnectionStatus
         connectionError={connectionError}

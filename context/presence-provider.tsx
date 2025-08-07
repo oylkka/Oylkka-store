@@ -1,7 +1,7 @@
 'use client';
-import { usePresenceStore } from '@/store/presenceStore';
 import { useSession } from 'next-auth/react';
 import { useEffect, useRef } from 'react';
+import { usePresenceStore } from '@/store/presenceStore';
 
 interface PresenceProviderProps {
   children: React.ReactNode;

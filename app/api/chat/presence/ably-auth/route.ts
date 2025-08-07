@@ -1,6 +1,6 @@
-import { auth } from '@/features/auth/auth';
 import Ably from 'ably';
 import { type NextRequest, NextResponse } from 'next/server';
+import { auth } from '@/features/auth/auth';
 
 const ABLY_API_KEY = process.env.ABLY_API_KEY;
 if (!ABLY_API_KEY) {
