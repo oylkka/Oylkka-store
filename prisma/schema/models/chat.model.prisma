@@ -19,7 +19,7 @@ model Message {
   senderId       String   @db.ObjectId
   content        String
   createdAt      DateTime @default(now())
-  readBy         String[] @db.ObjectId // List of user IDs who have read the message
+ readBy         String[] @default([])
 
   conversation Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
   sender       User         @relation(fields: [senderId], references: [id], onDelete: Cascade)

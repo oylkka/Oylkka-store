@@ -149,35 +149,35 @@ export async function markMessagesAsRead(
   messageIds: string[],
 ) {
   const session = await auth();
-  if (!session || !session.user || !session.user.id) {
+  if (!session?.user?.id) {
     throw new Error('Unauthorized');
   }
   const currentUserId = session.user.id;
 
   try {
-    // Update messages in the database by pushing the current user's ID to `readBy`
+    // Update messages in the correct conversation only
     await db.message.updateMany({
       where: {
         id: { in: messageIds },
-        // Ensure user hasn't already read it to prevent duplicate entries
+        conversationId, // ✅ ensures we only touch the right chat
+        senderId: { not: currentUserId }, // ✅ avoid marking own messages
         NOT: { readBy: { has: currentUserId } },
       },
       data: {
-        readBy: {
-          push: currentUserId,
-        },
+        readBy: { push: currentUserId },
       },
     });
 
-    // Optional: Send an Ably message to notify the other user about read status
+    // Publish to Ably so sender updates instantly
     const channel = ably.channels.get(`private:chat:${conversationId}`);
     await channel.publish('read_receipt', {
       readerId: currentUserId,
-      messageIds: messageIds,
-      conversationId: conversationId,
+      messageIds,
+      conversationId,
     });
-    // biome-ignore lint: error
   } catch (error) {
+    // biome-ignore lint: error
+    console.error(error);
     throw new Error('Failed to mark messages as read.');
   }
 }

@@ -41,7 +41,12 @@ export async function GET(
     const messages = await db.message.findMany({
       where: { conversationId },
       orderBy: { createdAt: 'asc' },
-      include: {
+      select: {
+        id: true,
+        content: true,
+        createdAt: true,
+        senderId: true,
+        readBy: true, // ✅ include read receipts
         sender: {
           select: { id: true, name: true, username: true, image: true },
         },

@@ -27,6 +27,9 @@ export function useChatMessages(
   // biome-ignore lint: error
   const messageListenersRef = useRef<Set<any>>(new Set());
 
+  // Track which messages have already been marked as read to prevent duplicate calls
+  const [lastReadMessageIds, setLastReadMessageIds] = useState<string[]>([]);
+
   const fetchMessages = useCallback(async () => {
     if (!conversationId || !session?.user?.id) {
       return;
@@ -47,11 +50,21 @@ export function useChatMessages(
       }
       const data = await response.json();
       // biome-ignore lint: error
-      const processedMessages = data.map((msg: any) => ({
-        ...msg,
-        createdAt: new Date(msg.createdAt),
-        status: 'read' as const,
-      }));
+      const processedMessages = data.map((msg: any) => {
+        const isOwnMessage = msg.senderId === session?.user?.id;
+        return {
+          ...msg,
+          createdAt: new Date(msg.createdAt),
+          status: isOwnMessage
+            ? msg.readBy?.length > 0
+              ? 'read'
+              : 'delivered'
+            : msg.readBy?.includes(session?.user?.id)
+              ? 'read'
+              : 'sent',
+        };
+      });
+
       setMessages(processedMessages);
       // biome-ignore lint: error
     } catch (err: any) {
@@ -61,6 +74,20 @@ export function useChatMessages(
     }
   }, [conversationId, session?.user?.id]);
 
+  // Poll messages every 30 seconds
+  useEffect(() => {
+    fetchMessages(); // initial fetch
+
+    const interval = setInterval(fetchMessages, 30000); // every 30s
+    return () => clearInterval(interval);
+  }, [fetchMessages]);
+
+  // Reset read tracking on conversation change
+  // biome-ignore lint: error
+  useEffect(() => {
+    setLastReadMessageIds([]);
+  }, [conversationId]);
+
   // Setup Ably channel and listeners
   useEffect(() => {
     if (!ably || !isConnected || !conversationId || !session?.user?.id) {
@@ -69,7 +96,6 @@ export function useChatMessages(
 
     const channelName = `chat:${conversationId}`;
     const channel = getChannel(channelName);
-
     if (!channel) {
       return;
     }
@@ -90,7 +116,6 @@ export function useChatMessages(
     // biome-ignore lint: error
     const messageListener = (ablyMessage: any) => {
       if (ablyMessage.name !== 'message') return;
-
       const receivedMessage = ablyMessage.data;
 
       setMessages((prevMessages) => {
@@ -117,7 +142,6 @@ export function useChatMessages(
               msg.content === receivedMessage.content &&
               msg.senderId === receivedMessage.senderId,
           );
-
           if (tempMessageIndex !== -1) {
             return prevMessages.map((msg, index) =>
               index === tempMessageIndex
@@ -141,6 +165,7 @@ export function useChatMessages(
         ];
       });
     };
+
     // biome-ignore lint: error
     const typingListener = (ablyMessage: any) => {
       const { userId, isTyping: typing } = ablyMessage.data;
@@ -204,7 +229,6 @@ export function useChatMessages(
         return;
       }
 
-      // Stop typing indicator
       if (channelRef.current && isConnected) {
         channelRef.current.publish('typing', {
           userId: session.user.id,
@@ -215,9 +239,9 @@ export function useChatMessages(
       const tempId = `temp-${Date.now()}-${Math.random()}`;
       const tempMessage = {
         id: tempId,
-        conversationId: conversationId,
+        conversationId,
         senderId: session.user.id,
-        content: content,
+        content,
         createdAt: new Date(),
         sender: {
           id: session.user.id,
@@ -251,10 +275,8 @@ export function useChatMessages(
             createdAt: savedMessage.createdAt,
           });
         }
-        // biome-ignore lint: error
-      } catch (err) {
+      } catch {
         toast.error('Failed to send message');
-
         setMessages((prev) =>
           prev.map((msg) =>
             msg.id === tempId ? { ...msg, status: 'failed' as const } : msg,
@@ -268,9 +290,7 @@ export function useChatMessages(
   const retryMessage = useCallback(
     async (messageId: string) => {
       const message = messages.find((msg) => msg.id === messageId);
-      if (!message || message.status !== 'failed') {
-        return;
-      }
+      if (!message || message.status !== 'failed') return;
 
       setMessages((prev) =>
         prev.map((msg) =>
@@ -295,8 +315,7 @@ export function useChatMessages(
               : msg,
           ),
         );
-        // biome-ignore lint: error
-      } catch (err) {
+      } catch {
         toast.error('Failed to retry message');
         setMessages((prev) =>
           prev.map((msg) =>
@@ -308,25 +327,44 @@ export function useChatMessages(
     [conversationId, messages],
   );
 
-  // Auto-mark messages as read
+  // Auto-mark messages as read, but only for newly unread messages (avoid repeat calls)
   useEffect(() => {
+    if (!session?.user?.id || !channelRef.current) return;
+
     const unreadMessages = messages
       .filter(
-        (msg) => msg.senderId !== session?.user?.id && msg.status !== 'read',
+        (msg) =>
+          msg.senderId !== session.user.id &&
+          !msg.readBy?.includes(session.user.id),
       )
       .map((msg) => msg.id);
 
-    if (unreadMessages.length > 0 && session?.user?.id) {
-      markMessagesAsRead(conversationId, unreadMessages).catch((e) =>
-        // biome-ignore lint: error
-        console.error('Failed to mark messages as read:', e),
-      );
-    }
-  }, [messages, conversationId, session?.user?.id]);
+    const newUnreadMessages = unreadMessages.filter(
+      (id) => !lastReadMessageIds.includes(id),
+    );
 
-  useEffect(() => {
-    fetchMessages();
-  }, [fetchMessages]);
+    if (newUnreadMessages.length > 0) {
+      markMessagesAsRead(conversationId, newUnreadMessages)
+        .then(() => {
+          setLastReadMessageIds((prev) => [...prev, ...newUnreadMessages]);
+          if (isConnected && channelRef.current) {
+            channelRef.current.publish('read_receipt', {
+              conversationId,
+              readerId: session.user.id,
+              messageIds: newUnreadMessages,
+            });
+          }
+        })
+        // biome-ignore lint: error
+        .catch((err) => console.error('Error marking messages as read:', err));
+    }
+  }, [
+    messages,
+    conversationId,
+    session?.user?.id,
+    isConnected,
+    lastReadMessageIds,
+  ]);
 
   return {
     messages,
