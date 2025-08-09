@@ -7,7 +7,7 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import { useSession } from 'next-auth/react';
-import { useEffect, useRef } from 'react';
+import { useEffect } from 'react';
 import { toast } from 'sonner';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
@@ -20,6 +20,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { useNotification } from '@/hooks/use-notification';
 import { useUnreadMessageCount } from '@/hooks/use-unread-messages';
 import { getInitials } from '@/lib/utils';
 import { notificationSound } from '@/utils/notification-sound';
@@ -28,20 +29,29 @@ import { SignOut } from './logout';
 export default function UserDropDown() {
   const { data: session } = useSession();
   const { unreadCount } = useUnreadMessageCount();
-  const previousUnreadCount = useRef(unreadCount);
+  const { getChannel } = useNotification(session?.user?.id ?? null);
 
   useEffect(() => {
-    if (unreadCount > previousUnreadCount.current && unreadCount > 0) {
-      // Play the custom notification sound
-      notificationSound(true);
+    if (session?.user?.id) {
+      const channelName = `private:unread_count:${session.user.id}`;
+      const channel = getChannel(channelName);
 
-      // Show a toast notification for a more complete experience
-      toast('You have a new message!', {
-        icon: '✉️',
-      });
+      if (channel) {
+        const handleUpdate = () => {
+          notificationSound(true);
+          toast('You have a new message!', {
+            icon: '✉️',
+          });
+        };
+
+        channel.subscribe('unread_update', handleUpdate);
+
+        return () => {
+          channel.unsubscribe('unread_update', handleUpdate);
+        };
+      }
     }
-    previousUnreadCount.current = unreadCount;
-  }, [unreadCount]);
+  }, [session?.user?.id, getChannel]);
   return (
     <div className='pl-2'>
       {session?.user ? (
