@@ -225,6 +225,7 @@ export function ChatSidebar({
                                         recipient.username ||
                                         'Unknown User'}
                                     </h3>
+
                                     <div className='flex flex-shrink-0 items-center gap-2'>
                                       <span className='text-muted-foreground text-xs'>
                                         {formatTime(conv.lastMessageAt)}
