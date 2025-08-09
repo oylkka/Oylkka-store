@@ -1,20 +1,5 @@
 'use client';
 
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import {
-  AlertTriangle,
-  Bell,
-  Check,
-  CheckCircle,
-  Info,
-  Trash2,
-  Volume2,
-  VolumeX,
-  X,
-} from 'lucide-react';
-import { useRouter } from 'next/navigation';
-import { useSession } from 'next-auth/react';
-import { useEffect, useRef, useState } from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -28,6 +13,22 @@ import { Separator } from '@/components/ui/separator';
 import { useNotification } from '@/hooks/use-notification';
 import { cn } from '@/lib/utils';
 import { notificationSound } from '@/utils/notification-sound';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import {
+  AlertTriangle,
+  Bell,
+  Check,
+  CheckCircle,
+  Info,
+  Trash2,
+  Volume2,
+  VolumeX,
+  X,
+} from 'lucide-react';
+import { useSession } from 'next-auth/react';
+import { useRouter } from 'next/navigation';
+import { useEffect, useRef, useState } from 'react';
+import { toast } from 'sonner';
 
 type NotificationType =
   | 'info'
@@ -96,9 +97,43 @@ export default function Notifications() {
   const prevNotificationCount = useRef(notifications?.length ?? 0);
 
   useEffect(() => {
+    // Check if the number of notifications has increased
     if (notifications && notifications.length > prevNotificationCount.current) {
-      notificationSound(soundEnabled);
+      notificationSound(soundEnabled); // Play the sound
+
+      // Get the latest notification (assuming it's at the start of the array)
+      const newNotification = notifications[0];
+
+      if (newNotification) {
+        // Display a custom Sonner toast for the new notification
+        toast.custom(() => (
+          <div className='flex items-start gap-3 p-4 bg-background border rounded-md shadow-md'>
+            {newNotification.avatar ? (
+              <Avatar className='h-8 w-8 flex-shrink-0'>
+                <AvatarImage
+                  src={newNotification.avatar || '/placeholder.svg'}
+                  alt=''
+                />
+                <AvatarFallback className='text-xs'>
+                  {NOTIFICATION_ICONS[newNotification.type]}
+                </AvatarFallback>
+              </Avatar>
+            ) : (
+              <div className='flex-shrink-0 mt-1'>
+                {NOTIFICATION_ICONS[newNotification.type]}
+              </div>
+            )}
+            <div>
+              <p className='font-semibold text-sm'>{newNotification.title}</p>
+              <p className='text-xs text-muted-foreground mt-1'>
+                {newNotification.message}
+              </p>
+            </div>
+          </div>
+        ));
+      }
     }
+    // Update the previous count for the next render
     prevNotificationCount.current = notifications?.length ?? 0;
   }, [notifications, soundEnabled]);
 

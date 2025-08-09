@@ -1,5 +1,5 @@
-import { getUnreadMessageCount } from '@/actions/chat';
 import { NextResponse } from 'next/server';
+import { getUnreadMessageCount } from '@/actions/chat';
 
 export async function GET() {
   try {
