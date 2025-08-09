@@ -22,6 +22,7 @@ export async function GET(req: NextRequest) {
       capability: {
         'presence:global': ['presence', 'subscribe', 'history'],
         'presence:*': ['presence', 'subscribe'],
+        'private:unread_count:*': ['subscribe'],
         'notifications:*': ['subscribe'], // For future features
       },
       ttl: 60 * 60 * 1000, // 1 hour

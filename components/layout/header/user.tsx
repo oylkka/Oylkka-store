@@ -1,3 +1,4 @@
+'use client';
 import {
   LayoutDashboard,
   MessageSquare,
@@ -5,8 +6,9 @@ import {
   UserIcon,
 } from 'lucide-react';
 import Link from 'next/link';
-
+import { useSession } from 'next-auth/react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -16,29 +18,37 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { auth } from '@/features/auth/auth';
+import { useUnreadMessageCount } from '@/hooks/use-unread-messages';
 import { getInitials } from '@/lib/utils';
 
 import { SignOut } from './logout';
 
-export default async function UserDropDown() {
-  const session = await auth();
+export default function UserDropDown() {
+  const { data: session } = useSession();
+  const { unreadCount } = useUnreadMessageCount();
   return (
     <div className='pl-2'>
       {session?.user ? (
         <div>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Avatar className='border-primary/20 hover:border-primary/40 h-9 w-9 cursor-pointer border-2 transition-all'>
-                <AvatarImage
-                  // biome-ignore lint: error
-                  src={session.user.image! || '/placeholder.svg'}
-                  alt={session.user.name || 'User avatar'}
-                />
-                <AvatarFallback className='bg-primary/10 text-primary'>
-                  {getInitials(session.user.name)}
-                </AvatarFallback>
-              </Avatar>
+              <div className='relative'>
+                <Avatar className='border-primary/20 hover:border-primary/40 h-9 w-9 cursor-pointer border-2 transition-all'>
+                  <AvatarImage
+                    // biome-ignore lint: error
+                    src={session.user.image! || '/placeholder.svg'}
+                    alt={session.user.name || 'User avatar'}
+                  />
+                  <AvatarFallback className='bg-primary/10 text-primary'>
+                    {getInitials(session.user.name)}
+                  </AvatarFallback>
+                </Avatar>
+                {unreadCount > 0 && (
+                  <Badge className='absolute -right-2 -top-2 h-5 w-5 items-center justify-center rounded-full p-0 text-xs font-bold'>
+                    {unreadCount}
+                  </Badge>
+                )}
+              </div>
             </DropdownMenuTrigger>
             <DropdownMenuContent
               className='w-56'
@@ -75,6 +85,11 @@ export default async function UserDropDown() {
                     <MessageSquare className='text-primary/70 mr-2 h-4 w-4' />
                     Messages
                   </div>
+                  {unreadCount > 0 && (
+                    <Badge className='ml-2 px-2 py-0.5 text-xs font-bold'>
+                      {unreadCount}
+                    </Badge>
+                  )}
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>

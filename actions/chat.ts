@@ -132,6 +132,16 @@ export async function sendMessage(
     const channel = ably.channels.get(`private:chat:${conversationId}`);
     await channel.publish('message', newMessage); // Event name 'message'
 
+    // Publish an unread_update event to the recipient's unread count channel
+    const recipientId =
+      conversation.user1Id === currentUserId
+        ? conversation.user2Id
+        : conversation.user1Id;
+    const recipientChannel = ably.channels.get(
+      `private:unread_count:${recipientId}`,
+    );
+    await recipientChannel.publish('unread_update', { userId: recipientId });
+
     return newMessage as MessageResponse; // Cast to expected response type
     // biome-ignore lint: error
   } catch (error) {
@@ -175,9 +185,48 @@ export async function markMessagesAsRead(
       messageIds,
       conversationId,
     });
+
+    // Publish an unread_update event to the current user's unread count channel
+    const userChannel = ably.channels.get(
+      `private:unread_count:${currentUserId}`,
+    );
+    await userChannel.publish('unread_update', { userId: currentUserId });
   } catch (error) {
     // biome-ignore lint: error
     console.error(error);
     throw new Error('Failed to mark messages as read.');
+  }
+}
+
+/**
+ * Server Action to get the total unread message count for the current user.
+ * @returns The total number of unread messages.
+ */
+export async function getUnreadMessageCount(): Promise<number> {
+  const session = await auth();
+  if (!session?.user?.id) {
+    throw new Error('Unauthorized');
+  }
+  const currentUserId = session.user.id;
+
+  try {
+    const unreadCount = await db.message.count({
+      where: {
+        conversation: {
+          OR: [{ user1Id: currentUserId }, { user2Id: currentUserId }],
+        },
+        senderId: { not: currentUserId }, // Messages not sent by the current user
+        NOT: {
+          readBy: {
+            has: currentUserId, // Messages not read by the current user
+          },
+        },
+      },
+    });
+    return unreadCount;
+  } catch (error) {
+    // biome-ignore lint: error
+    console.error(error);
+    throw new Error('Failed to get unread message count.');
   }
 }
