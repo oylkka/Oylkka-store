@@ -1,4 +1,3 @@
-
 import { formatDisplayName } from '@/lib/utils';
 
 describe('formatDisplayName', () => {
@@ -21,7 +20,7 @@ describe('formatDisplayName', () => {
     expect(formatDisplayName(null)).toBe('Unknown User');
   });
 
-    it('should return "Unknown User" if the user object is undefined', () => {
+  it('should return "Unknown User" if the user object is undefined', () => {
     expect(formatDisplayName(undefined)).toBe('Unknown User');
-    });
+  });
 });
