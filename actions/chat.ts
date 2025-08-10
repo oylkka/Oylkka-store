@@ -142,6 +142,30 @@ export async function sendMessage(
     );
     await recipientChannel.publish('unread_update', { userId: recipientId });
 
+    // Notify the recipient to refetch their conversation list
+    const userChannel = ably.channels.get(`user:${recipientId}`);
+    const updatedConversation = await db.conversation.findUnique({
+      where: { id: conversationId },
+      include: {
+        user1: {
+          select: { id: true, name: true, username: true, image: true },
+        },
+        user2: {
+          select: { id: true, name: true, username: true, image: true },
+        },
+        messages: {
+          take: 1,
+          orderBy: { createdAt: 'desc' },
+          select: { id: true, senderId: true, content: true, createdAt: true },
+        },
+      },
+    });
+    await userChannel.publish('new-message', updatedConversation);
+
+    // Notify the sender to refetch their conversation list
+    const senderChannel = ably.channels.get(`user:${currentUserId}`);
+    await senderChannel.publish('new-message', updatedConversation);
+
     return newMessage as MessageResponse; // Cast to expected response type
     // biome-ignore lint: error
   } catch (error) {

@@ -74,12 +74,8 @@ export function useChatMessages(
     }
   }, [conversationId, session?.user?.id]);
 
-  // Poll messages every 30 seconds
   useEffect(() => {
     fetchMessages(); // initial fetch
-
-    const interval = setInterval(fetchMessages, 30000); // every 30s
-    return () => clearInterval(interval);
   }, [fetchMessages]);
 
   // Reset read tracking on conversation change

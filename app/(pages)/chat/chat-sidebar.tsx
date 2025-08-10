@@ -50,21 +50,18 @@ interface ConversationDisplay {
   messages: MessageForPreview[];
 }
 
+import { useConversations } from '@/hooks/use-conversations';
+
 interface ChatSidebarProps {
-  conversations: ConversationDisplay[];
   currentUserId: string;
-  error?: string | null;
 }
 
-export function ChatSidebar({
-  conversations,
-  currentUserId,
-  error,
-}: ChatSidebarProps) {
+export function ChatSidebar({ currentUserId }: ChatSidebarProps) {
   const params = useParams();
   const currentConversationId = params.conversationId as string;
   const { state } = useSidebar();
   const { getUserById } = usePresenceStore();
+  const { conversations, error } = useConversations();
 
   const getRecipient = (conv: ConversationDisplay) => {
     return conv.user1Id === currentUserId ? conv.user2 : conv.user1;
@@ -72,7 +69,7 @@ export function ChatSidebar({
 
   const formatTime = (date: Date) => {
     if (isToday(date)) {
-      return format(date, 'HH:mm');
+      return format(date, 'h:mm');
     } else if (isYesterday(date)) {
       return 'Yesterday';
     } else if (isThisWeek(date)) {

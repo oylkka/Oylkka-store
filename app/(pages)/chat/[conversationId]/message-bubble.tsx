@@ -23,7 +23,7 @@ export function MessageBubble({
   const [imageError, setImageError] = useState(false);
 
   const formatMessageTime = (date: Date) => {
-    return format(date, 'HH:mm');
+    return format(date, 'hh:mm:aa');
   };
 
   const getMessageStatusIcon = (status?: string) => {
