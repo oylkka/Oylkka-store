@@ -13,17 +13,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-
       - uses: pnpm/action-setup@v3
         with:
           version: 9
           run_install: false
-
       - uses: actions/setup-node@v4
         with:
           node-version: '24.x'
           cache: 'pnpm'
-
       - run: pnpm install --frozen-lockfile
       - run: pnpm run test
 
@@ -31,17 +28,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-
       - uses: pnpm/action-setup@v3
         with:
           version: 9
           run_install: false
-
       - uses: actions/setup-node@v4
         with:
           node-version: '24.x'
           cache: 'pnpm'
-
       - run: pnpm install --frozen-lockfile
       - run: pnpm run lint
-      - run: pnpm biome format . --check
+      - run: pnpm biome check . # This replaces the problematic format --check command
