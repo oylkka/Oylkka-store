@@ -1,6 +1,6 @@
 'use client';
 
-import { signOutAction } from '@/actions';
+import { signOut } from 'next-auth/react';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -15,6 +15,10 @@ import {
 import { Button } from '@/components/ui/button';
 
 export function SignOut() {
+  const handleSignOut = async () => {
+    await signOut({ redirect: false }); // Prevent default server-side redirect
+    window.location.href = '/'; // Manually redirect to homepage
+  };
   return (
     <AlertDialog>
       <AlertDialogTrigger asChild>
@@ -29,13 +33,18 @@ export function SignOut() {
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>Cancel</AlertDialogCancel>
-          <form action={signOutAction}>
+          <div>
             <AlertDialogAction asChild>
-              <Button variant='destructive' className='w-full' type='submit'>
+              <Button
+                variant='destructive'
+                onClick={handleSignOut}
+                className='w-full'
+                type='submit'
+              >
                 Sign Out
               </Button>
             </AlertDialogAction>
-          </form>
+          </div>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>
