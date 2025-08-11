@@ -11,8 +11,16 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { Label } from '@/components/ui/label';
+import { Switch } from '@/components/ui/switch';
 
-export function ThemeSwitcher({ mobile = false }: { mobile?: boolean }) {
+export function ThemeSwitcher({
+  mobile = false,
+  switch: isSwitch = false,
+}: {
+  mobile?: boolean;
+  switch?: boolean;
+}) {
   const { setTheme, theme } = useTheme();
   const [mounted, setMounted] = useState(false);
 
@@ -21,11 +29,36 @@ export function ThemeSwitcher({ mobile = false }: { mobile?: boolean }) {
     setMounted(true);
   }, []);
 
+  // Handle switch toggle
+  const handleToggle = (checked: boolean) => {
+    setTheme(checked ? 'dark' : 'light');
+  };
+
   if (!mounted) {
     return null;
   }
 
   if (mobile) {
+    if (isSwitch) {
+      return (
+        <div className='mt-6 flex items-center justify-between rounded-lg border p-3'>
+          <Label htmlFor='theme-switch' className='font-medium'>
+            Theme
+          </Label>
+          <div className='flex items-center gap-2'>
+            <Sun className='h-4 w-4' />
+            <Switch
+              id='theme-switch'
+              checked={theme === 'dark'}
+              onCheckedChange={handleToggle}
+              aria-label='Toggle theme'
+            />
+            <Moon className='h-4 w-4' />
+          </div>
+        </div>
+      );
+    }
+
     return (
       <div className='mt-6 flex items-center justify-between rounded-lg border p-3'>
         <div className='font-medium'>Theme</div>
@@ -49,6 +82,21 @@ export function ThemeSwitcher({ mobile = false }: { mobile?: boolean }) {
             <span className='sr-only'>Dark mode</span>
           </Button>
         </div>
+      </div>
+    );
+  }
+
+  if (isSwitch) {
+    return (
+      <div className='flex items-center gap-2'>
+        <Sun className='h-4 w-4' />
+        <Switch
+          id='theme-switch'
+          checked={theme === 'dark'}
+          onCheckedChange={handleToggle}
+          aria-label='Toggle theme'
+        />
+        <Moon className='h-4 w-4' />
       </div>
     );
   }

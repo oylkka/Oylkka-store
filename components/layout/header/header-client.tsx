@@ -20,8 +20,14 @@ import {
   SheetTrigger,
 } from '@/components/ui/sheet';
 
+import SearchBar from './search-bar';
+import { ThemeSwitcher } from './theme-switcher';
+
 export default function HeaderClient() {
   const [isOpen, setIsOpen] = useState(false);
+
+  // Function to close the sheet
+  const closeSheet = () => setIsOpen(false);
 
   return (
     <div className='flex items-center'>
@@ -40,7 +46,8 @@ export default function HeaderClient() {
         </SheetTrigger>
         <SheetContent
           side='left'
-          className='flex w-[300px] flex-col border-r p-0 sm:w-[400px]'
+          className='flex w-[300px] flex-col border-r p-0 sm:w-[400px] h-screen'
+          onOpenAutoFocus={(event) => event.preventDefault()}
         >
           <SheetHeader className='border-b'>
             <SheetTitle className='flex items-center gap-2 text-left'>
@@ -56,9 +63,15 @@ export default function HeaderClient() {
               </span>
             </SheetTitle>
           </SheetHeader>
-          <ScrollArea className='h-[calc(100vh-56px)] pr-2'>
-            <div>
-              <nav className='flex flex-col gap-6'>
+          {/* Added explicit overflow-y-auto and pb-4 to the inner div */}
+          <ScrollArea className='flex-1 pr-2 pb-20 overflow-y-auto'>
+            <div className='pb-4'>
+              {/* Search Bar for mobile menu */}
+              <div className='px-3 pb-3'>
+                {/* Pass the closeSheet function to SearchBar */}
+                <SearchBar className='h-9 w-full' onSearchSubmit={closeSheet} />
+              </div>
+              <nav className='flex flex-col'>
                 <Link
                   href='/'
                   className='hover:bg-muted/50 hover:text-primary flex items-center rounded-md px-3 py-2 text-lg font-medium transition-colors'
@@ -66,14 +79,13 @@ export default function HeaderClient() {
                 >
                   Home
                 </Link>
-
-                <Accordion type='multiple' className='w-full space-y-4'>
+                <Accordion type='multiple' className='w-full space-y-2'>
                   {/* Products */}
                   <AccordionItem value='products' className='border-b-0'>
                     <AccordionTrigger className='hover:bg-muted/50 rounded-md px-3 py-2 text-lg font-medium'>
                       Products
                     </AccordionTrigger>
-                    <AccordionContent className='ml-4 flex flex-col space-y-3 pt-2'>
+                    <AccordionContent className='ml-4 flex flex-col space-y-2 pt-1'>
                       <Link
                         href='/products'
                         onClick={() => setIsOpen(false)}
@@ -118,7 +130,6 @@ export default function HeaderClient() {
                       </Link>
                     </AccordionContent>
                   </AccordionItem>
-
                   {/* Collections */}
                   <AccordionItem value='collections' className='border-b-0'>
                     <AccordionTrigger className='hover:bg-muted/50 rounded-md px-3 py-2 text-lg font-medium'>
@@ -162,7 +173,6 @@ export default function HeaderClient() {
                       </Link>
                     </AccordionContent>
                   </AccordionItem>
-
                   {/* Categories */}
                   <AccordionItem value='categories' className='border-b-0'>
                     <AccordionTrigger className='hover:bg-muted/50 rounded-md px-3 py-2 text-lg font-medium'>
@@ -206,7 +216,6 @@ export default function HeaderClient() {
                       </Link>
                     </AccordionContent>
                   </AccordionItem>
-
                   {/* Support */}
                   <AccordionItem value='support' className='border-b-0'>
                     <AccordionTrigger className='hover:bg-muted/50 rounded-md px-3 py-2 text-lg font-medium'>
@@ -250,7 +259,6 @@ export default function HeaderClient() {
                       </Link>
                     </AccordionContent>
                   </AccordionItem>
-
                   {/* Account */}
                   <AccordionItem value='account' className='border-b-0'>
                     <AccordionTrigger className='hover:bg-muted/50 rounded-md px-3 py-2 text-lg font-medium'>
@@ -295,8 +303,7 @@ export default function HeaderClient() {
                     </AccordionContent>
                   </AccordionItem>
                 </Accordion>
-
-                <div className='space-y-4 pt-2'>
+                <div className='space-y-2'>
                   <Link
                     href='/new-arrivals'
                     className='hover:bg-muted/50 hover:text-primary flex items-center rounded-md px-3 py-2 text-lg font-medium transition-colors'
@@ -323,25 +330,35 @@ export default function HeaderClient() {
                   </Link>
                   <Link
                     href='/blog'
-                    className='hover:bg-muted/50 hover:text-primary flex items-center rounded-md px-3 py-2 text-lg font-medium transition-colors'
                     onClick={() => setIsOpen(false)}
+                    className='hover:bg-muted/50 hover:text-primary flex items-center rounded-md px-3 py-2 text-lg font-medium transition-colors'
+                  >
+                    Blog
+                  </Link>
+                  <Link
+                    href='/blog'
+                    onClick={() => setIsOpen(false)}
+                    className='hover:bg-muted/50 hover:text-primary flex items-center rounded-md px-3 py-2 text-lg font-medium transition-colors'
                   >
                     Blog
                   </Link>
                   <Link
                     href='/careers'
-                    className='hover:bg-muted/50 hover:text-primary flex items-center rounded-md px-3 py-2 text-lg font-medium transition-colors'
                     onClick={() => setIsOpen(false)}
+                    className='hover:bg-muted/50 hover:text-primary flex items-center rounded-md px-3 py-2 text-lg font-medium transition-colors'
                   >
                     Careers
                   </Link>
                 </div>
               </nav>
+              {/* Theme Switcher for mobile menu */}
+              <div className='px-3'>
+                <ThemeSwitcher mobile switch />
+              </div>
             </div>
           </ScrollArea>
         </SheetContent>
       </Sheet>
-
       {/* Logo */}
       <Link href='/' className='flex items-center gap-1.5'>
         <div className='relative'>

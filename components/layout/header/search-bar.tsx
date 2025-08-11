@@ -14,6 +14,7 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
+import { cn } from '@/lib/utils';
 
 const FormSchema = z.object({
   search: z.string().min(2, {
@@ -22,16 +23,15 @@ const FormSchema = z.object({
 });
 
 interface SearchBarProps {
-  isMobile?: boolean;
-  isHidden?: boolean;
+  className?: string;
+  onSearchSubmit?: () => void; // New prop to close the sheet
 }
 
 export default function SearchBar({
-  isMobile = false,
-  isHidden = false,
+  className,
+  onSearchSubmit,
 }: SearchBarProps) {
   const router = useRouter();
-
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
@@ -41,6 +41,7 @@ export default function SearchBar({
 
   const onSubmit = (data: z.infer<typeof FormSchema>) => {
     router.push(`/products?search=${encodeURIComponent(data.search)}`);
+    onSearchSubmit?.(); // Call the callback to close the sheet
   };
 
   const clearInput = () => {
@@ -48,7 +49,7 @@ export default function SearchBar({
   };
 
   return (
-    <div className={isHidden ? 'hidden' : 'relative w-full'}>
+    <div className='relative w-full'>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className='w-full'>
           <FormField
@@ -61,7 +62,10 @@ export default function SearchBar({
                     <Input
                       {...field}
                       placeholder='Search products...'
-                      className={`border-border/50 bg-background focus-visible:border-primary/50 focus-visible:ring-primary/30 h-10 rounded-full pr-10 pl-10 shadow-sm transition-all focus-visible:ring-1 focus-visible:ring-offset-0 md:min-w-max ${isMobile ? 'h-9 w-full' : ''}`}
+                      className={cn(
+                        'border-border/50 bg-background focus-visible:border-primary/50 focus-visible:ring-primary/30 h-10 rounded-full pr-10 pl-10 shadow-sm transition-all focus-visible:ring-1 focus-visible:ring-offset-0 md:min-w-max',
+                        className,
+                      )}
                       autoComplete='off'
                     />
                     <Search
