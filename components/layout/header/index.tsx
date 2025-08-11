@@ -1,3 +1,4 @@
+import { auth } from '@/features/auth/auth';
 import Cart from './cart';
 import HeaderClient from './header-client';
 import Navigation from './navigation';
@@ -11,10 +12,11 @@ type HeaderProps = {
   isHidden?: boolean;
 };
 
-export default function Header({
+export default async function Header({
   navigation = true,
   isHidden = false,
 }: HeaderProps) {
+  const session = await auth();
   return (
     <header className='bg-background sticky top-0 z-50 w-full border-b shadow-sm'>
       <div className='container py-3 md:py-4'>
@@ -33,8 +35,8 @@ export default function Header({
             </div>
             <div className='flex items-center gap-1 md:gap-3'>
               <ThemeSwitcher />
-              <Notifications />
-              <Cart />
+              {session?.user && <Notifications />}
+              {session?.user && <Cart />}
               <UserDropDown />
             </div>
           </div>
