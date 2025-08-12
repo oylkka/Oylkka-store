@@ -361,10 +361,8 @@ export default function HeaderClient() {
       </Sheet>
       {/* Logo */}
       <Link href='/' className='flex items-center gap-1.5'>
-        <div className='relative'>
-          <div className='bg-primary/20 absolute -inset-1 rounded-full blur-sm' />
-          <ShoppingBag className='text-primary relative h-6 w-6' />
-        </div>
+        <ShoppingBag className='text-primary relative h-6 w-6' />
+
         <h1 className='text-2xl font-bold tracking-tight md:text-2xl'>
           <span className='from-primary to-primary/70 bg-gradient-to-r bg-clip-text text-transparent'>
             Oyl
