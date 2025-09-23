@@ -37,7 +37,7 @@ model User {
 
   // Add presence fields
   isOnline      Boolean   @default(false)
-  lastSeen      DateTime  @default(now())
+  lastSeen      DateTime? @default(now())
   presenceData  Json?
 
   sentMessages         Message[]
