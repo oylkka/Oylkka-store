@@ -1,17 +1,16 @@
-import { NextResponse } from 'next/server';
-
-import { auth } from '@/features/auth/auth';
+import { type NextRequest, NextResponse } from 'next/server';
+import { getAuthenticatedUser } from '@/features/auth/get-user';
 import { db } from '@/lib/db';
 
-export async function GET() {
+export async function GET(req: NextRequest) {
   try {
-    const session = await auth();
+    const session = await getAuthenticatedUser(req);
 
-    if (!session || !session.user || !session.user.id) {
+    if (!session || !session.id) {
       return new NextResponse('Unauthorized', { status: 401 });
     }
 
-    const currentUserId = session.user.id;
+    const currentUserId = session.id;
 
     const conversations = await db.conversation.findMany({
       where: {
