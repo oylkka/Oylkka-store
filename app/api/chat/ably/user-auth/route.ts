@@ -1,8 +1,7 @@
 // api/chat/ably/user-auth/route.ts
+import { getAuthenticatedUser } from '@/features/auth/get-user';
 import Ably from 'ably';
 import { type NextRequest, NextResponse } from 'next/server';
-
-import { auth } from '@/features/auth/auth';
 
 // Initialize Ably with your API Key (SERVER-SIDE ONLY)
 const ABLY_API_KEY = process.env.ABLY_API_KEY;
@@ -13,16 +12,15 @@ if (!ABLY_API_KEY) {
 
 const ably = new Ably.Rest(ABLY_API_KEY);
 
-// biome-ignore lint: error
 export async function GET(req: NextRequest) {
   try {
-    const session = await auth();
+    const session = await getAuthenticatedUser(req);
 
-    if (!session || !session.user || !session.user.id) {
+    if (!session || !session.id) {
       return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
     }
 
-    const userId = session.user.id;
+    const userId = session.id;
 
     const tokenRequest = await ably.auth.createTokenRequest({
       clientId: userId,

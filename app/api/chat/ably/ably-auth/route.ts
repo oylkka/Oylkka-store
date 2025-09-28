@@ -1,9 +1,8 @@
 // api/chat/ably/ably-auth/route.ts
 import Ably from 'ably';
 import { type NextRequest, NextResponse } from 'next/server';
-
-import { auth } from '@/features/auth/auth';
 import { db } from '@/lib/db';
+import { getAuthenticatedUser } from '@/features/auth/get-user';
 
 // Initialize Ably with your API Key (SERVER-SIDE ONLY)
 const ABLY_API_KEY = process.env.ABLY_API_KEY;
@@ -16,13 +15,13 @@ const ably = new Ably.Rest(ABLY_API_KEY);
 
 export async function GET(req: NextRequest) {
   try {
-    const session = await auth();
+    const session = await getAuthenticatedUser(req);
 
-    if (!session || !session.user || !session.user.id) {
+    if (!session || !session.id) {
       return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
     }
 
-    const userId = session.user.id;
+    const userId = session.id;
     const { searchParams } = new URL(req.url);
     const conversationId = searchParams.get('conversationId');
 
