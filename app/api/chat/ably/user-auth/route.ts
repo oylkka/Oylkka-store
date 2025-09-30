@@ -1,7 +1,8 @@
 // api/chat/ably/user-auth/route.ts
-import { getAuthenticatedUser } from '@/features/auth/get-user';
+
 import Ably from 'ably';
 import { type NextRequest, NextResponse } from 'next/server';
+import { getAuthenticatedUser } from '@/features/auth/get-user';
 
 // Initialize Ably with your API Key (SERVER-SIDE ONLY)
 const ABLY_API_KEY = process.env.ABLY_API_KEY;

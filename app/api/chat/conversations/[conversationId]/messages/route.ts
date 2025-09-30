@@ -1,24 +1,21 @@
-// api/chat/conversations/[conversationId]/messages/route.ts
 import { type NextRequest, NextResponse } from 'next/server';
-
-import { auth } from '@/features/auth/auth';
+import { getAuthenticatedUser } from '@/features/auth/get-user';
 import { db } from '@/lib/db';
 
 export async function GET(
-  // biome-ignore lint: error
   req: NextRequest,
   context: {
     params: Promise<{ conversationId: string }>;
   },
 ) {
-  const session = await auth();
+  const session = await getAuthenticatedUser(req);
 
-  if (!session || !session.user?.id) {
+  if (!session || !session.id) {
     return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
   }
 
   const { conversationId } = await context.params;
-  const currentUserId = session.user.id;
+  const currentUserId = session.id;
 
   // Verify the current user is part of the conversation
   const conversation = await db.conversation.findUnique({

@@ -17,14 +17,14 @@ interface MessageResponse {
   conversationId: string;
   senderId: string;
   content: string;
-  createdAt: Date; // Server-side, it's a Date object
+  createdAt: Date;
   sender: {
     id: string;
     name?: string | null;
     username?: string | null;
     image?: string | null;
   };
-  readBy?: string[]; // Include readBy for client-side representation if needed
+  readBy?: string[];
 }
 
 /**
