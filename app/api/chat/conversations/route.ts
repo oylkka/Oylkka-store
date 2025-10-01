@@ -1,7 +1,6 @@
 import { type NextRequest, NextResponse } from 'next/server';
-
-import { db } from '@/lib/db';
 import { getAuthenticatedUser } from '@/features/auth/get-user';
+import { db } from '@/lib/db';
 
 /**
  * Create a new conversation or get existing one
