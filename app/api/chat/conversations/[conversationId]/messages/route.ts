@@ -37,13 +37,13 @@ export async function GET(
   try {
     const messages = await db.message.findMany({
       where: { conversationId },
-      orderBy: { createdAt: 'asc' },
+      orderBy: { createdAt: 'desc' },
       select: {
         id: true,
         content: true,
         createdAt: true,
         senderId: true,
-        readBy: true, // ✅ include read receipts
+        readBy: true,
         sender: {
           select: { id: true, name: true, username: true, image: true },
         },
