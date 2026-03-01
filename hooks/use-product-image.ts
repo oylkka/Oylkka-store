@@ -2,8 +2,9 @@ import { useState } from 'react';
 
 export interface ProductImage {
   id: string;
-  file: File;
+  file: File | null;
   preview: string;
+  alt?: string | null;
 }
 
 export function useProductImages(maxImages: number = 4) {

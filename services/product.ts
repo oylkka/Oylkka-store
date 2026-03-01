@@ -71,6 +71,36 @@ export function useCreateProduct() {
   });
 }
 
+export function useUpdateProduct({ productId }: { productId: string }) {
+  return useMutation({
+    mutationFn: async (formData: FormData) => {
+      const res = await axios.patch(
+        `/api/dashboard/vendor/product?id=${productId}`,
+        formData,
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        },
+      );
+      return res.data;
+    },
+  });
+}
+
+export function useProductById({ productId }: { productId: string }) {
+  return useQuery({
+    queryKey: [QUERY_KEYS.SINGLE_PRODUCT, productId],
+    queryFn: async () => {
+      const response = await axios.get(
+        `/api/dashboard/vendor/product?id=${productId}`,
+      );
+      return response.data;
+    },
+    enabled: !!productId,
+  });
+}
+
 export function useAdminProductCategories() {
   return useQuery({
     queryKey: [QUERY_KEYS.ADMIN_PRODUCT_CATEGORIES],
@@ -187,15 +217,21 @@ export function useDeleteProduct() {
       return res.data;
     },
     onSuccess: () => {
-      // Invalidate product reviews queries to refetch data
       queryClient.invalidateQueries({
-        queryKey: [
-          QUERY_KEYS.PRODUCT_LIST,
-          QUERY_KEYS.FEATURED_PRODUCTS,
-          QUERY_KEYS.SINGLE_PRODUCT,
-          QUERY_KEYS.USER_CART,
-          QUERY_KEYS.USER_WISHLIST,
-        ],
+        queryKey: [QUERY_KEYS.PRODUCT_LIST],
+      });
+      queryClient.invalidateQueries({
+        queryKey: [QUERY_KEYS.FEATURED_PRODUCTS],
+      });
+      queryClient.invalidateQueries({
+        queryKey: [QUERY_KEYS.SINGLE_PRODUCT],
+      });
+
+      queryClient.invalidateQueries({
+        queryKey: [QUERY_KEYS.USER_CART],
+      });
+      queryClient.invalidateQueries({
+        queryKey: [QUERY_KEYS.USER_WISHLIST],
       });
     },
   });
@@ -293,6 +329,46 @@ export function useProductReview({
         `/api/public/single-product/review?${params.toString()}`,
       );
       return response.data;
+    },
+  });
+}
+
+export function useAdminProductById({ productId }: { productId: string }) {
+  return useQuery({
+    queryKey: [QUERY_KEYS.SINGLE_PRODUCT, productId],
+    queryFn: async () => {
+      const response = await axios.get(
+        `/api/dashboard/admin/product?id=${productId}`,
+      );
+      return response.data;
+    },
+    enabled: !!productId,
+  });
+}
+
+export function useAdminUpdateProduct({ productId }: { productId: string }) {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (formData: FormData) => {
+      const res = await axios.patch(
+        `/api/dashboard/admin/product?id=${productId}`,
+        formData,
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        },
+      );
+      return res.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: [QUERY_KEYS.SINGLE_PRODUCT, productId],
+      });
+      queryClient.invalidateQueries({
+        queryKey: [QUERY_KEYS.PRODUCT_LIST],
+      });
     },
   });
 }

@@ -30,7 +30,11 @@ import { useProductCategories } from '@/services';
 
 import type { ProductFormValues } from './product-form-type';
 
-export function BasicInformationCard() {
+interface BasicInformationCardProps {
+  productId?: string;
+}
+
+export function BasicInformationCard({ productId }: BasicInformationCardProps) {
   const {
     isPending,
     data: productCategories,
@@ -69,7 +73,7 @@ export function BasicInformationCard() {
     setIsCheckingSlug(true);
 
     try {
-      const result = await checkSlugUnique(slugToCheck);
+      const result = await checkSlugUnique(slugToCheck, productId);
       setSlugStatus({
         isUnique: result.isUnique,
         suggestions: result.suggestions || [],

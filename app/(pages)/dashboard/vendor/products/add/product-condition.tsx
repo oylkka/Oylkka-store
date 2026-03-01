@@ -40,7 +40,10 @@ import { SkuService } from '@/services';
 
 import type { ProductFormValues } from './product-form-type';
 
-// Product condition options - same as before
+interface ProductConditionProps {
+  productId?: string;
+}
+
 const PRODUCT_CONDITIONS = [
   { value: 'NEW', label: 'New' },
   { value: 'USED', label: 'Used' },
@@ -52,10 +55,11 @@ const PRODUCT_CONDITIONS = [
   { value: 'FOR_PARTS', label: 'For Parts or Not Working' },
 ];
 
-export function ProductCondition() {
+export function ProductCondition({ productId }: ProductConditionProps) {
   const { control, setValue } = useFormContext<ProductFormValues>();
-  const { isChecking, isAvailable, error, checkSkuAvailability } =
-    useSkuCheck();
+  const { isChecking, isAvailable, error, checkSkuAvailability } = useSkuCheck({
+    productId,
+  });
 
   // Watch relevant fields
   const productName = useWatch({ control, name: 'productName' });

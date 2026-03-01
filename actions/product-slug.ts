@@ -6,15 +6,21 @@ type SlugCheckResult = {
   suggestions: string[];
 };
 
-export async function checkSlugUnique(slug: string): Promise<SlugCheckResult> {
-  // Enhanced logging
-
+export async function checkSlugUnique(
+  slug: string,
+  excludeProductId?: string,
+): Promise<SlugCheckResult> {
   if (!slug) {
     return { isUnique: false, suggestions: [] };
   }
 
   try {
-    const existing = await db.product.findUnique({ where: { slug } });
+    const existing = await db.product.findFirst({
+      where: {
+        slug,
+        ...(excludeProductId ? { id: { not: excludeProductId } } : {}),
+      },
+    });
 
     if (!existing) {
       return { isUnique: true, suggestions: [] };

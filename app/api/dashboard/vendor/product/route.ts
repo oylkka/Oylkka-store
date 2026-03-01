@@ -1,21 +1,30 @@
-import Ably from 'ably';
 import { type NextRequest, NextResponse } from 'next/server';
 
 import { auth } from '@/features/auth/auth';
-import { DeleteImage, UploadImage } from '@/features/cloudinary';
 import { db } from '@/lib/db';
 
 export async function GET(req: NextRequest) {
   try {
-    const url = new URL(req.url);
-    const id = url.searchParams.get('id');
-
     const session = await auth();
-    if (!session || session.user.role !== 'ADMIN') {
+    if (!session || session.user.role !== 'VENDOR') {
       return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
     }
 
-    if (!id) {
+    const shop = await db.shop.findUnique({
+      where: { ownerId: session.user.id },
+      select: { id: true },
+    });
+
+    if (!shop) {
+      return NextResponse.json(
+        { message: 'Create a shop first' },
+        { status: 404 },
+      );
+    }
+
+    const productId = req.nextUrl.searchParams.get('id');
+
+    if (!productId) {
       return NextResponse.json(
         { message: 'Product ID is required' },
         { status: 400 },
@@ -23,7 +32,7 @@ export async function GET(req: NextRequest) {
     }
 
     const product = await db.product.findUnique({
-      where: { id },
+      where: { id: productId, shopId: shop.id },
       include: {
         variants: true,
         category: {
@@ -37,14 +46,13 @@ export async function GET(req: NextRequest) {
 
     if (!product) {
       return NextResponse.json(
-        { message: 'Product not found' },
+        { message: 'Product not found or not owned by this shop' },
         { status: 404 },
       );
     }
 
     return NextResponse.json(product, { status: 200 });
-    // biome-ignore lint: error
-  } catch (error) {
+  } catch (_error) {
     return NextResponse.json(
       { message: 'Something went wrong' },
       { status: 500 },
@@ -54,15 +62,25 @@ export async function GET(req: NextRequest) {
 
 export async function PATCH(req: NextRequest) {
   try {
-    const url = new URL(req.url);
-    const id = url.searchParams.get('id');
-
     const session = await auth();
-    if (!session || session.user.role !== 'ADMIN') {
+    if (!session || session.user.role !== 'VENDOR') {
       return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
     }
 
-    if (!id) {
+    const shop = await db.shop.findUnique({
+      where: { ownerId: session.user.id },
+      select: { id: true },
+    });
+
+    if (!shop) {
+      return NextResponse.json(
+        { message: 'Create a shop first' },
+        { status: 404 },
+      );
+    }
+
+    const productId = req.nextUrl.searchParams.get('id');
+    if (!productId) {
       return NextResponse.json(
         { message: 'Product ID is required' },
         { status: 400 },
@@ -70,12 +88,12 @@ export async function PATCH(req: NextRequest) {
     }
 
     const product = await db.product.findUnique({
-      where: { id },
+      where: { id: productId },
     });
 
-    if (!product) {
+    if (!product || product.shopId !== shop.id) {
       return NextResponse.json(
-        { message: 'Product not found' },
+        { message: 'Product not found or not owned by this shop' },
         { status: 404 },
       );
     }
@@ -119,6 +137,8 @@ export async function PATCH(req: NextRequest) {
       mappedData.variants = [];
     }
 
+    const { UploadImage } = await import('@/features/cloudinary');
+
     const productImageUploads: { url: string; publicId: string }[] = [];
     if (mappedData.productImages && Array.isArray(mappedData.productImages)) {
       const uploadPromises = (mappedData.productImages as File[]).map(
@@ -156,15 +176,16 @@ export async function PATCH(req: NextRequest) {
     const freeShipping = mappedData.freeShipping === 'true';
     const featured = mappedData.featured === 'true';
 
-    let categoryId = product.categoryId;
-    if (mappedData.category) {
-      const category = await db.category.findUnique({
-        where: { slug: mappedData.category as string },
-        select: { id: true },
-      });
-      if (category) {
-        categoryId = category.id;
-      }
+    const categoryId = await db.category.findUnique({
+      where: { slug: mappedData.category as string },
+      select: { id: true },
+    });
+
+    if (!categoryId) {
+      return NextResponse.json(
+        { message: 'Category not found' },
+        { status: 404 },
+      );
     }
 
     const existingImages = product.images || [];
@@ -175,12 +196,12 @@ export async function PATCH(req: NextRequest) {
     const allImages = [...existingImages, ...newImages];
 
     await db.product.update({
-      where: { id },
+      where: { id: productId },
       data: {
         productName: mappedData.productName as string,
         slug: mappedData.slug as string,
         description: mappedData.description as string,
-        categoryId,
+        categoryId: categoryId.id,
         tags: (mappedData.tags as string[]) || [],
         sku: mappedData.sku as string,
         price,
@@ -207,7 +228,7 @@ export async function PATCH(req: NextRequest) {
 
     if (mappedData.variants && Array.isArray(mappedData.variants)) {
       await db.productVariant.deleteMany({
-        where: { productId: id },
+        where: { productId },
       });
 
       const variantsData = (
@@ -224,7 +245,7 @@ export async function PATCH(req: NextRequest) {
           : null,
         stock: parseInt(variant.stock as string) || 0,
         attributes: (variant.attributes as Record<string, string>) || {},
-        productId: id,
+        productId,
       }));
 
       if (variantsData.length > 0) {
@@ -238,8 +259,9 @@ export async function PATCH(req: NextRequest) {
       { message: 'Product updated successfully' },
       { status: 200 },
     );
-    // biome-ignore lint: error
   } catch (error) {
+    // biome-ignore lint: error
+    console.error('Error updating product:', error);
     return NextResponse.json(
       { message: 'Something went wrong' },
       { status: 500 },
@@ -249,114 +271,56 @@ export async function PATCH(req: NextRequest) {
 
 export async function DELETE(req: NextRequest) {
   try {
-    const url = new URL(req.url);
-    const id = url.searchParams.get('id');
-    if (!id) {
-      return NextResponse.json('Not Found', { status: 404 });
+    const session = await auth();
+    if (!session || session.user.role !== 'VENDOR') {
+      return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
     }
 
-    const session = await auth();
-    if (!session || session.user.role !== 'ADMIN') {
-      return NextResponse.json('Unauthorized', { status: 401 });
+    const shop = await db.shop.findUnique({
+      where: { ownerId: session.user.id },
+      select: { id: true },
+    });
+
+    if (!shop) {
+      return NextResponse.json(
+        { message: 'Create a shop first' },
+        { status: 404 },
+      );
+    }
+
+    const productId = req.nextUrl.searchParams.get('id');
+    if (!productId) {
+      return NextResponse.json(
+        { message: 'Product ID is required' },
+        { status: 400 },
+      );
     }
 
     const product = await db.product.findUnique({
-      where: { id },
-      select: {
-        productName: true,
-        shop: {
-          select: {
-            ownerId: true,
-          },
-        },
-        images: {
-          select: { url: true, publicId: true },
-        },
-        variants: {
-          select: {
-            image: {
-              select: { url: true, publicId: true },
-            },
-          },
-        },
-        sku: true,
-        slug: true,
-      },
+      where: { id: productId },
     });
 
-    if (!product) {
-      return NextResponse.json('Not Found', { status: 404 });
+    if (!product || product.shopId !== shop.id) {
+      return NextResponse.json(
+        { message: 'Product not found or not owned by this shop' },
+        { status: 404 },
+      );
     }
 
-    // Prevent deletion if product is in a pending order
-    const pendingOrder = await db.orderItem.findFirst({
-      where: {
-        productSku: product.sku,
-        order: { status: 'PENDING' },
-      },
+    await db.product.delete({
+      where: { id: productId },
     });
-    if (pendingOrder) {
-      return NextResponse.json('Cannot delete product in a pending order', {
-        status: 400,
-      });
-    }
 
-    // Remove from cart and wishlist
-    await db.cartItem.deleteMany({ where: { productId: id } });
-    await db.wishlistItem.deleteMany({ where: { productId: id } });
-
-    // Delete review images from Cloudinary
-    const reviews = await db.review.findMany({
-      where: { productId: id },
-      select: { images: { select: { publicId: true } } },
-    });
-    for (const review of reviews) {
-      for (const image of review.images) {
-        if (image.publicId) {
-          await DeleteImage(image.publicId);
-        }
-      }
-    }
-
-    // Delete product images
-    for (const image of product.images) {
-      if (image.publicId) {
-        await DeleteImage(image.publicId);
-      }
-    }
-
-    // Delete variant images
-    for (const variant of product.variants) {
-      if (variant.image?.publicId) {
-        await DeleteImage(variant.image.publicId);
-      }
-    }
-
-    // Delete reviews
-    await db.review.deleteMany({ where: { productId: id } });
-
-    // Delete the product
-    await db.product.delete({ where: { id } });
-
-    // Notify the vendor
-    if (product.shop?.ownerId) {
-      await db.notification.create({
-        data: {
-          type: 'WARNING',
-          title: 'Product Deleted',
-          recipientId: product.shop.ownerId,
-          message: `Your product "${product.productName}" has been deleted by an admin.`,
-        },
-      });
-      // biome-ignore lint: error
-      const ably = new Ably.Rest(process.env.ABLY_API_KEY!);
-      const channel = ably.channels.get(`user:${product.shop.ownerId}`);
-      await channel.publish('new-notification', {});
-    }
-
-    return NextResponse.json('Deleted', { status: 200 });
-    // biome-ignore lint: error
+    return NextResponse.json(
+      { message: 'Product deleted successfully' },
+      { status: 200 },
+    );
   } catch (error) {
-    return NextResponse.json('Internal Server Error', { status: 500 });
+    // biome-ignore lint: error
+    console.error('Error deleting product:', error);
+    return NextResponse.json(
+      { message: 'Something went wrong' },
+      { status: 500 },
+    );
   }
 }

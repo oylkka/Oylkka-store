@@ -3,14 +3,12 @@ import { Package } from 'lucide-react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Suspense } from 'react';
 import ProductListPagination from '@/app/(pages)/(public)/products/pagination';
-import {
-  ProductCard,
-  ProductCardSkeleton,
-} from '@/app/(pages)/(public)/products/product-card';
+import { ProductCardSkeleton } from '@/app/(pages)/(public)/products/product-card';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import type { ProductCardType } from '@/lib/types';
 import { useVendorProducts } from '@/services/vendor/product';
+import { ProductCard } from './product-card-with-edit';
 import ProductHeader, { ProductHeaderSkeleton } from './product-header';
 
 const LoadingState = () => (

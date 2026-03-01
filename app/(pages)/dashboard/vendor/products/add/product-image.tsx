@@ -188,7 +188,9 @@ export function ProductImagesCard() {
                   </div>
                   <div className='p-2 text-center'>
                     <p className='text-muted-foreground text-xs'>
-                      {(image.file.size / 1024).toFixed(1)} KB
+                      {image.file
+                        ? `${(image.file.size / 1024).toFixed(1)} KB`
+                        : 'Existing image'}
                     </p>
                   </div>
                 </div>

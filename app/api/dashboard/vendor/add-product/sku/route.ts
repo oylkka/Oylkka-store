@@ -4,15 +4,18 @@ import { db } from '@/lib/db';
 
 export async function POST(request: NextRequest) {
   try {
-    const { sku } = await request.json();
+    const { sku, productId } = await request.json();
 
     if (!sku) {
       return NextResponse.json({ error: 'SKU is required' }, { status: 400 });
     }
 
-    // Check if SKU exists in database
-    const existingSku = await db.product.findUnique({
-      where: { sku },
+    // Check if SKU exists in database, excluding the current product if provided
+    const existingSku = await db.product.findFirst({
+      where: {
+        sku,
+        ...(productId ? { id: { not: productId } } : {}),
+      },
       select: { id: true },
     });
 

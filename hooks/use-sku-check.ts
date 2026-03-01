@@ -8,7 +8,11 @@ interface SkuCheckResponse {
   message?: string;
 }
 
-export function useSkuCheck() {
+interface UseSkuCheckOptions {
+  productId?: string;
+}
+
+export function useSkuCheck({ productId }: UseSkuCheckOptions = {}) {
   const {
     mutate: checkSku,
     isPending: isChecking,
@@ -24,7 +28,7 @@ export function useSkuCheck() {
 
       const response = await axios.post<SkuCheckResponse>(
         '/api/dashboard/vendor/add-product/sku',
-        { sku: trimmedSku },
+        { sku: trimmedSku, productId },
       );
       return response.data;
     },

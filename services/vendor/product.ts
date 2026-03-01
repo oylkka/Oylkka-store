@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
 import { useDebounce } from 'use-debounce';
 import { QUERY_KEYS } from '@/lib/constants';
@@ -92,6 +92,24 @@ export function useVendorReview() {
     queryFn: async () => {
       const response = await axios.get(`/api/dashboard/vendor/reviews`);
       return response.data;
+    },
+  });
+}
+
+export function useVendorDeleteProduct() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (productId: string) => {
+      const res = await axios.delete(
+        `/api/dashboard/vendor/product?id=${productId}`,
+      );
+      return res.data;
+    },
+    onSuccess: () => {
+      // Invalidate product reviews queries to refetch data
+      queryClient.invalidateQueries({
+        queryKey: [QUERY_KEYS.VENDOR_PRODUCTS],
+      });
     },
   });
 }

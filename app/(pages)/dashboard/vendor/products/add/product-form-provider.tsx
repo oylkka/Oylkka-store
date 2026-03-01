@@ -1,13 +1,17 @@
 'use client';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { type ReactNode, useState } from 'react';
+import { type ReactNode, useEffect, useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 
 import type { ProductImage } from '@/hooks/use-product-image';
 import { cleanFormData } from '@/lib/utils';
-import { useCreateProduct } from '@/services';
+import {
+  useAdminUpdateProduct,
+  useCreateProduct,
+  useUpdateProduct,
+} from '@/services';
 
 import { ProductFormContext } from './product-form-context';
 import {
@@ -18,13 +22,25 @@ import {
 
 interface ProductFormProviderProps {
   children: ReactNode;
+  defaultValues?: Partial<ProductFormInput>;
+  productId?: string;
+  initialImages?: ProductImage[];
+  isAdmin?: boolean;
 }
 
-export function ProductFormProvider({ children }: ProductFormProviderProps) {
-  const [productImages, setProductImages] = useState<ProductImage[]>([]);
+export function ProductFormProvider({
+  children,
+  defaultValues,
+  productId,
+  initialImages,
+  isAdmin = false,
+}: ProductFormProviderProps) {
+  const [productImages, setProductImages] = useState<ProductImage[]>(
+    initialImages || [],
+  );
   const methods = useForm<ProductFormInput>({
     resolver: zodResolver(ProductFormSchema),
-    defaultValues: {
+    defaultValues: defaultValues || {
       productName: '',
       description: '',
       slug: '',
@@ -55,10 +71,40 @@ export function ProductFormProvider({ children }: ProductFormProviderProps) {
     },
   });
 
-  const { mutate } = useCreateProduct();
+  useEffect(() => {
+    if (defaultValues && Object.keys(defaultValues).length > 0) {
+      methods.reset(defaultValues);
+    }
+  }, [defaultValues, methods]);
+
+  const { mutate: createMutate, isPending: createIsPending } =
+    useCreateProduct();
+  const { mutate: vendorUpdateMutate, isPending: vendorUpdateIsPending } =
+    useUpdateProduct({
+      productId: productId || '',
+    });
+  const { mutate: adminUpdateMutate, isPending: adminUpdateIsPending } =
+    useAdminUpdateProduct({
+      productId: productId || '',
+    });
+
+  let mutate = createMutate;
+  let isPending = createIsPending;
+
+  if (productId) {
+    if (isAdmin) {
+      mutate = adminUpdateMutate;
+      isPending = adminUpdateIsPending;
+    } else {
+      mutate = vendorUpdateMutate;
+      isPending = vendorUpdateIsPending;
+    }
+  }
 
   const onSubmit = (data: ProductFormValues) => {
-    if (productImages.length === 0) {
+    const hasNewImages = productImages.some((img) => img.file !== null);
+    const hasExistingImages = productImages.length > 0;
+    if (!hasNewImages && !hasExistingImages) {
       methods.setError('root.images', {
         type: 'manual',
         message: 'At least one product image is required',
@@ -95,9 +141,11 @@ export function ProductFormProvider({ children }: ProductFormProviderProps) {
       }
     }
 
-    // Append product images
+    // Append product images (only new files, not existing images from server)
     productImages.forEach((img) => {
-      formData.append('productImages', img.file);
+      if (img.file) {
+        formData.append('productImages', img.file);
+      }
     });
 
     // Handle variant images separately
@@ -112,13 +160,18 @@ export function ProductFormProvider({ children }: ProductFormProviderProps) {
     }
 
     // Submit
+    const isUpdateMode = !!productId;
     toast.promise(
       new Promise((resolve, reject) => {
         mutate(formData, {
           onSuccess: (response) => {
-            toast.success('Product submitted successfully!');
-            setProductImages([]);
-            methods.reset();
+            if (isUpdateMode) {
+              toast.success('Product updated successfully!');
+            } else {
+              toast.success('Product submitted successfully!');
+              setProductImages([]);
+              methods.reset();
+            }
             resolve(response);
           },
           onError: (err) => {
@@ -127,9 +180,12 @@ export function ProductFormProvider({ children }: ProductFormProviderProps) {
         });
       }),
       {
-        loading: 'Submitting product...',
+        loading: isUpdateMode ? 'Updating product...' : 'Submitting product...',
         error: (err) =>
-          err?.response?.data?.message || 'Failed to submit product',
+          err?.response?.data?.message ||
+          (isUpdateMode
+            ? 'Failed to update product'
+            : 'Failed to submit product'),
       },
     );
   };
@@ -140,6 +196,7 @@ export function ProductFormProvider({ children }: ProductFormProviderProps) {
         productImages,
         setProductImages,
         onSubmit,
+        isPending,
       }}
     >
       <FormProvider {...methods}>{children}</FormProvider>
