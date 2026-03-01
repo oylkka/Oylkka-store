@@ -1,17 +1,5 @@
 'use client';
 import {
-  Edit,
-  Eye,
-  MoreHorizontal,
-  Package,
-  Star,
-  Trash2,
-  Truck,
-} from 'lucide-react';
-import { useState } from 'react';
-import { toast } from 'sonner';
-
-import {
   AlertDialog,
   AlertDialogAction,
   AlertDialogCancel,
@@ -50,6 +38,18 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { useDeleteProduct } from '@/services';
+import {
+  Edit,
+  Eye,
+  MoreHorizontal,
+  Package,
+  Star,
+  Trash2,
+  Truck,
+} from 'lucide-react';
+import Link from 'next/link';
+import { useState } from 'react';
+import { toast } from 'sonner';
 
 interface Product {
   id: string;
@@ -264,9 +264,14 @@ export function ProductsTable({
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align='end'>
                           <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                          <DropdownMenuItem>
-                            <Eye className='mr-2 h-4 w-4' />
-                            View Details
+                          <DropdownMenuItem asChild>
+                            <Link
+                              className='flex'
+                              href={`/products/${product.slug}`}
+                            >
+                              <Eye className='mr-2 h-4 w-4' />
+                              View Details
+                            </Link>
                           </DropdownMenuItem>
                           <DropdownMenuItem>
                             <Edit className='mr-2 h-4 w-4' />

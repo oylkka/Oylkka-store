@@ -42,6 +42,7 @@ export function BasicInformationCard() {
     isUnique: boolean | null;
     suggestions: string[];
   }>({ isUnique: null, suggestions: [] });
+  const [tagInput, setTagInput] = useState('');
 
   // For debouncing slug check
   const slugCheckTimeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -256,7 +257,6 @@ export function BasicInformationCard() {
                     </SelectContent>
                   </Select>
                 )}
-
                 <FormMessage />
               </FormItem>
             )}
@@ -278,23 +278,50 @@ export function BasicInformationCard() {
         <FormField
           control={control}
           name='tags'
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Enter your product tags.</FormLabel>
-              <FormControl>
-                <TagsInput
-                  className='border'
-                  value={field.value}
-                  onValueChange={field.onChange}
-                  placeholder='Enter your tags'
-                />
-              </FormControl>
-              <FormDescription>
-                Write your product tag then press enter
-              </FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
+          render={({ field }) => {
+            const addTag = () => {
+              const trimmed = tagInput.trim();
+              if (!trimmed || field.value?.includes(trimmed)) return;
+              field.onChange([...(field.value ?? []), trimmed]);
+              setTagInput('');
+            };
+
+            return (
+              <FormItem>
+                <FormLabel>Enter your product tags.</FormLabel>
+                <FormControl>
+                  <div className='flex flex-col gap-2'>
+                    <div className='flex gap-2'>
+                      <Input
+                        placeholder='Enter a tag'
+                        value={tagInput}
+                        onChange={(e) => setTagInput(e.target.value)}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter') {
+                            e.preventDefault();
+                            addTag();
+                          }
+                        }}
+                      />
+                      <Button type='button' onClick={addTag} variant='outline'>
+                        Add Tag
+                      </Button>
+                    </div>
+                    <TagsInput
+                      className='border'
+                      value={field.value}
+                      onValueChange={field.onChange}
+                      placeholder='Tags appear here...'
+                    />
+                  </div>
+                </FormControl>
+                <FormDescription>
+                  Type a tag and press Enter or click "Add Tag"
+                </FormDescription>
+                <FormMessage />
+              </FormItem>
+            );
+          }}
         />
       </CardContent>
     </Card>
