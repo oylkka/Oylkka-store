@@ -1,0 +1,459 @@
+import { Link } from '@tanstack/react-router';
+import { motion, useInView } from 'framer-motion';
+import {
+  ChevronRight,
+  Clock,
+  Gift,
+  Headphones,
+  Heart,
+  Mail,
+  MapPin,
+  PhoneCall,
+  Send,
+  ShieldCheck,
+  ShoppingBag,
+  Truck,
+} from 'lucide-react';
+import { useRef } from 'react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+
+const EASE: [number, number, number, number] = [0.22, 1, 0.36, 1];
+
+const fadeUp = {
+  hidden: { opacity: 0, y: 20 },
+  show: (delay: number = 0) => ({
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.45, ease: EASE, delay },
+  }),
+};
+
+const stagger = {
+  hidden: {},
+  show: { transition: { staggerChildren: 0.06 } },
+};
+
+const features = [
+  {
+    icon: Truck,
+    title: 'Free Shipping',
+    desc: 'On orders over ৳2000',
+  },
+  {
+    icon: ShieldCheck,
+    title: 'Secure Payment',
+    desc: '100% protected',
+  },
+  {
+    icon: Headphones,
+    title: '24/7 Support',
+    desc: 'Dedicated assistance',
+  },
+  {
+    icon: Gift,
+    title: 'Special Offers',
+    desc: 'Save up to 25%',
+  },
+];
+
+const shopLinks = [
+  { label: 'All Products', to: '/products' },
+  { label: 'Categories', to: '/categories' },
+  { label: 'Special Offers', to: '/offers' },
+  { label: 'New Arrivals', to: '/new-arrivals' },
+  { label: 'Bestsellers', to: '/bestsellers' },
+  { label: 'FAQs', to: '/faq' },
+];
+
+const companyLinks = [
+  { label: 'About Us', to: '/about' },
+  { label: 'Contact', to: '/contact' },
+  { label: 'Blog', to: '/blog' },
+  { label: 'Careers', to: '/careers' },
+  { label: 'Privacy Policy', to: '/privacy-policy' },
+  { label: 'Terms & Conditions', to: '/terms' },
+];
+
+const supportLinks = [
+  { label: 'Help Center', to: '/help' },
+  { label: 'Shipping Info', to: '/shipping' },
+  { label: 'Returns & Exchanges', to: '/returns' },
+  { label: 'Order Tracking', to: '/tracking' },
+  { label: 'Size Guide', to: '/size-guide' },
+];
+
+const contacts = [
+  { icon: MapPin, text: '123 Commerce St, Shopping City' },
+  { icon: PhoneCall, text: '+1 (234) 567-8900' },
+  { icon: Mail, text: 'support@oylkka.com' },
+  { icon: Clock, text: 'Mon-Fri: 9AM - 6PM' },
+];
+
+const NavLinks = ({ links }: { links: { label: string; to: string }[] }) => (
+  <ul className='space-y-4'>
+    {links.map((link) => (
+      <li key={link.label}>
+        <Link
+          to={link.to}
+          className='relative flex group text-sm text-muted-foreground transition-colors duration-200 hover:text-primary'
+        >
+          <ChevronRight className='mr-2 h-4 w-0 opacity-0 transition-all group-hover:w-4 group-hover:opacity-100' />{' '}
+          <span className='relative'>
+            {link.label}
+            <span className='absolute bottom-0 left-0 h-px w-0 bg-primary transition-all duration-300 group-hover:w-full' />
+          </span>
+        </Link>
+      </li>
+    ))}
+  </ul>
+);
+
+const EyebrowHeader = ({
+  label,
+  ruleWidth = 'w-4',
+}: {
+  label: string;
+  ruleWidth?: string;
+}) => (
+  <div className='mb-4 flex items-center gap-2'>
+    <div className={`h-px ${ruleWidth} bg-primary`} />
+    <span className='text-[10px] font-semibold tracking-[0.18em] uppercase text-primary'>
+      {label}
+    </span>
+  </div>
+);
+
+function NewsletterSection({ inView }: { inView: boolean }) {
+  return (
+    <div className='relative border-b border-border'>
+      <div className='container py-10'>
+        <motion.div
+          initial='hidden'
+          animate={inView ? 'show' : 'hidden'}
+          variants={stagger}
+          className='grid items-center gap-8 md:grid-cols-2'
+        >
+          <motion.div className='space-y-3' variants={fadeUp} custom={0}>
+            <div className='flex items-center gap-3'>
+              <div className='h-px w-8 bg-primary' />
+              <span className='text-xs font-semibold tracking-[0.18em] uppercase text-primary'>
+                Newsletter
+              </span>
+            </div>
+            <h3 className='text-2xl font-bold leading-tight tracking-tight md:text-3xl'>
+              Get the best{' '}
+              <span className='italic font-bold text-primary'>deals</span>
+              <span className='text-primary'>.</span>
+            </h3>
+            <p className='max-w-sm text-sm leading-relaxed text-muted-foreground'>
+              Flash sales, new vendor arrivals, and exclusive offers — straight
+              to your inbox.
+            </p>
+          </motion.div>
+          <motion.div variants={fadeUp} custom={0.08}>
+            <div className='flex flex-col gap-3 sm:flex-row'>
+              <div className='group relative flex-1'>
+                <Input
+                  type='email'
+                  placeholder='your@email.com'
+                  className='h-11 rounded-xl transition-all duration-200 focus:ring-2 focus:ring-primary/30 focus:border-primary/50'
+                />
+              </div>
+              <Button
+                type='submit'
+                className='h-11 gap-2 whitespace-nowrap px-6 transition-transform duration-200 hover:scale-[1.02]'
+              >
+                <Send className='h-4 w-4' />
+                Subscribe
+              </Button>
+            </div>
+          </motion.div>
+        </motion.div>
+      </div>
+    </div>
+  );
+}
+
+function FeaturesSection({ inView }: { inView: boolean }) {
+  return (
+    <div className='relative border-b border-border'>
+      <div className='container py-6'>
+        <motion.div
+          initial='hidden'
+          animate={inView ? 'show' : 'hidden'}
+          variants={stagger}
+          className='grid grid-cols-2 gap-6 md:grid-cols-4'
+        >
+          {features.map((feature) => (
+            <motion.div
+              key={feature.title}
+              variants={fadeUp}
+              custom={0}
+              whileHover={{ y: -2 }}
+              transition={{ type: 'spring', stiffness: 320, damping: 24 }}
+              className='flex items-center gap-3 rounded-xl bg-muted/20 p-3 transition-colors duration-200 hover:bg-muted/30'
+            >
+              <div className='flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10 text-primary'>
+                <feature.icon className='h-5 w-5' />
+              </div>
+              <div>
+                <p className='text-sm font-medium'>{feature.title}</p>
+                <p className='text-xs text-muted-foreground'>{feature.desc}</p>
+              </div>
+            </motion.div>
+          ))}
+        </motion.div>
+      </div>
+    </div>
+  );
+}
+
+function SocialIcon({
+  href,
+  label,
+  children,
+}: {
+  href: string;
+  label: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <motion.a
+      href={href}
+      target='_blank'
+      rel='noopener noreferrer'
+      aria-label={label}
+      whileHover={{ rotate: 8, scale: 1.1 }}
+      transition={{ type: 'spring', stiffness: 320, damping: 18 }}
+      className='flex h-10 w-10 items-center justify-center rounded-full bg-muted text-muted-foreground transition-colors duration-200 hover:bg-primary hover:text-white'
+    >
+      {children}
+    </motion.a>
+  );
+}
+
+export default function Footer() {
+  const sectionRef = useRef<HTMLDivElement>(null);
+  const inView = useInView(sectionRef, { once: true, margin: '-80px' });
+
+  return (
+    <footer className='relative overflow-hidden bg-background text-foreground'>
+      <div ref={sectionRef} className='relative'>
+        <NewsletterSection inView={inView} />
+        <FeaturesSection inView={inView} />
+      </div>
+
+      <div className='relative container py-16'>
+        <motion.div
+          initial='hidden'
+          animate={inView ? 'show' : 'hidden'}
+          variants={stagger}
+          className='grid grid-cols-2 gap-8 md:gap-12 lg:grid-cols-5'
+        >
+          <motion.div
+            variants={fadeUp}
+            custom={0}
+            className='col-span-2 lg:col-span-2'
+          >
+            <Link to='/' className='mb-6 flex items-center gap-2.5'>
+              <div className='flex h-10 w-10 items-center justify-center rounded-xl bg-primary text-white'>
+                <ShoppingBag className='h-5 w-5' />
+              </div>
+              <span className='text-2xl font-extrabold tracking-tight md:text-3xl'>
+                <span className='text-primary'>Oyl</span>kka
+              </span>
+            </Link>
+            <p className='mb-6 max-w-xs text-sm leading-relaxed text-muted-foreground'>
+              Discover quality products at unbeatable prices. We&apos;re
+              committed to providing exceptional shopping experiences with fast
+              shipping, secure checkout, and premium customer support.
+            </p>
+            <div className='mb-8 space-y-1'>
+              {contacts.map((contact) => (
+                <div
+                  key={contact.text}
+                  className='flex items-center gap-3 text-sm text-muted-foreground transition-colors duration-200 hover:text-foreground'
+                >
+                  <div className='flex h-8 w-8 items-center justify-center rounded-full bg-muted'>
+                    <contact.icon className='h-4 w-4 text-primary' />
+                  </div>
+                  <span>{contact.text}</span>
+                </div>
+              ))}
+            </div>
+            <div>
+              <p className='mb-3 text-sm font-medium'>Follow Us</p>
+              <div className='flex items-center gap-3'>
+                <SocialIcon
+                  href='https://facebook.com/mookkly'
+                  label='Facebook'
+                >
+                  <svg
+                    width='18'
+                    height='18'
+                    viewBox='0 0 24 24'
+                    fill='none'
+                    stroke='currentColor'
+                    strokeWidth='2'
+                    strokeLinecap='round'
+                    strokeLinejoin='round'
+                    aria-hidden='true'
+                  >
+                    <path d='M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z' />
+                  </svg>
+                </SocialIcon>
+                <SocialIcon
+                  href='https://instagram.com/mookkly'
+                  label='Instagram'
+                >
+                  <svg
+                    width='18'
+                    height='18'
+                    viewBox='0 0 24 24'
+                    fill='none'
+                    stroke='currentColor'
+                    strokeWidth='2'
+                    strokeLinecap='round'
+                    strokeLinejoin='round'
+                    aria-hidden='true'
+                  >
+                    <rect width='20' height='20' x='2' y='2' rx='5' ry='5' />
+                    <path d='M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z' />
+                    <line x1='17.5' x2='17.51' y1='6.5' y2='6.5' />
+                  </svg>
+                </SocialIcon>
+                <SocialIcon
+                  href='https://twitter.com/mookkly'
+                  label='Twitter (X)'
+                >
+                  <svg
+                    width='18'
+                    height='18'
+                    viewBox='0 0 24 24'
+                    fill='none'
+                    stroke='currentColor'
+                    strokeWidth='2'
+                    strokeLinecap='round'
+                    strokeLinejoin='round'
+                    aria-hidden='true'
+                  >
+                    <path d='M22 4s-.7 2.1-2 3.4c1.6 10-9.4 17.3-18 11.6 2.2.1 4.4-.6 6-2C3 15.5.5 9.6 3 5c2.2 2.6 5.6 4.1 9 4-.9-4.2 4-6.6 7-3.8 1.1 0 3-1.2 3-1.2z' />
+                  </svg>
+                </SocialIcon>
+              </div>
+            </div>
+          </motion.div>
+
+          <motion.div variants={fadeUp} custom={0.06}>
+            <EyebrowHeader label='Shop' />
+            <NavLinks links={shopLinks} />
+          </motion.div>
+
+          <motion.div variants={fadeUp} custom={0.1}>
+            <EyebrowHeader label='Company' />
+            <NavLinks links={companyLinks} />
+          </motion.div>
+
+          <motion.div
+            variants={fadeUp}
+            custom={0.14}
+            className='col-span-2 lg:col-span-1'
+          >
+            <EyebrowHeader label='Support' />
+            <NavLinks links={supportLinks} />
+            <div className='mt-6 rounded-xl bg-muted/30 p-4'>
+              <h5 className='mb-3 text-sm font-medium'>Download Our App</h5>
+              <p className='mb-4 text-xs text-muted-foreground'>
+                Shop on the go with our mobile app
+              </p>
+              <div className='flex flex-wrap w-full gap-2'>
+                <Button
+                  variant='outline'
+                  size='sm'
+                  className='h-10 border-border md:w-full bg-muted/50 text-xs text-muted-foreground transition-all duration-200 hover:bg-muted hover:text-foreground hover:scale-[1.02]'
+                >
+                  <svg
+                    className='mr-2 h-4 w-4'
+                    viewBox='0 0 24 24'
+                    fill='none'
+                    xmlns='http://www.w3.org/2000/svg'
+                    aria-hidden='true'
+                  >
+                    <path
+                      d='M12.954 11.616L15.911 8.659L6.36 3.29C5.727 2.923 5.176 2.93 4.759 3.233L12.954 11.616Z'
+                      fill='currentColor'
+                    />
+                    <path
+                      d='M16.415 15.045L19.489 13.247C20.029 12.931 20.029 12.069 19.489 11.753L16.415 9.955L13.211 13.159L16.415 15.045Z'
+                      fill='currentColor'
+                    />
+                    <path
+                      d='M4.759 20.767C5.176 21.07 5.727 21.077 6.36 20.71L15.911 15.341L12.954 12.384L4.759 20.767Z'
+                      fill='currentColor'
+                    />
+                    <path
+                      d='M4.447 3.525C4.264 3.845 4.167 4.286 4.167 4.833V19.167C4.167 19.714 4.264 20.155 4.447 20.475L12.642 12.092L4.447 3.525Z'
+                      fill='currentColor'
+                    />
+                  </svg>
+                  Play Store
+                </Button>
+                <Button
+                  variant='outline'
+                  size='sm'
+                  className='h-10 border-border md:w-full bg-muted/50 text-xs text-muted-foreground transition-all duration-200 hover:bg-muted hover:text-foreground hover:scale-[1.02]'
+                >
+                  <svg
+                    className='mr-2 h-4 w-4'
+                    viewBox='0 0 24 24'
+                    fill='none'
+                    xmlns='http://www.w3.org/2000/svg'
+                    aria-hidden='true'
+                  >
+                    <path
+                      d='M16.741 19.356C16.082 20.0374 15.3137 19.9917 14.5714 19.7088C13.7943 19.4202 13.0743 19.4087 12.2514 19.7088C11.1943 20.0946 10.6514 19.9145 10.0629 19.356C6.97717 16.1231 7.56003 11.0802 11.1943 10.8831C12.1657 10.9345 12.8343 11.3774 13.3886 11.4231C14.2114 11.2373 14.9943 10.7831 15.8971 10.8545C17.0057 10.9545 17.8229 11.4288 18.3429 12.2802C15.5314 13.8802 16.1657 17.4574 18.7429 18.3888C18.3429 18.7545 17.9029 19.1088 17.4171 19.4659L16.741 19.356ZM12.9714 10.7717C12.8114 8.83452 14.3771 7.28595 16.1943 7.14309C16.4343 9.37167 14.1829 11.0002 12.9714 10.7717Z'
+                      fill='currentColor'
+                    />
+                  </svg>
+                  App Store
+                </Button>
+              </div>
+            </div>
+          </motion.div>
+        </motion.div>
+      </div>
+
+      <div className='relative border-t border-border'>
+        <div className='container py-6'>
+          <div className='flex flex-col items-center justify-between gap-4 sm:flex-row'>
+            <motion.p
+              initial={{ opacity: 0 }}
+              animate={inView ? { opacity: 1 } : { opacity: 0 }}
+              transition={{ duration: 0.45, ease: EASE, delay: 0.3 }}
+              className='flex items-center gap-2 text-xs text-muted-foreground'
+            >
+              <Heart className='h-3.5 w-3.5 text-primary' />
+              &copy; {new Date().getFullYear()} Oylkka. All rights reserved.
+            </motion.p>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={inView ? { opacity: 1 } : { opacity: 0 }}
+              transition={{ duration: 0.45, ease: EASE, delay: 0.36 }}
+              className='flex flex-wrap items-center justify-center gap-1.5 text-xs text-muted-foreground'
+            >
+              <span className='h-1 w-1 rounded-full bg-primary/50' />
+              <span>Secure Checkout</span>
+              <span className='ml-1 h-1 w-1 rounded-full bg-primary/50' />
+              <span>Verified Vendors</span>
+              <span className='ml-1 h-1 w-1 rounded-full bg-primary/50' />
+              <span>7-Day Returns</span>
+              <span className='ml-1 h-1 w-1 rounded-full bg-primary/50' />
+              <span>Nationwide Delivery</span>
+            </motion.div>
+          </div>
+        </div>
+      </div>
+    </footer>
+  );
+}

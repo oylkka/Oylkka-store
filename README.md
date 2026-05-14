@@ -1,124 +1,207 @@
-# Oylkka - E-commerce Platform
+Welcome to your new TanStack Start app! 
 
-![CI](https://github.com/parvez/oylkka/actions/workflows/ci.yml/badge.svg)
-[![code style: prettier](https://img.shields.io/badge/code_style-prettier-ff69b4.svg?style=flat-square)](https://github.com/prettier/prettier)
-[![linting: eslint](https://img.shields.io/badge/linting-eslint-4B32C3.svg?style=flat-square)](https://eslint.org/)
+# Getting Started
 
-Welcome to the Oylkka project! This is a private, modern, full-stack e-commerce platform built with a powerful and scalable tech stack.
+To run this application:
 
-## 🖼️ Visuals
+```bash
+bun install
+bun --bun run dev
+```
 
-_(It is highly recommended to add a few screenshots or a GIF of the application here to give developers a quick visual overview of the UI and key features.)_
+# Building For Production
 
-## ✨ Features
+To build this application for production:
 
-- **Secure User Authentication:** Powered by NextAuth.js for robust and secure user management.
-- **Complete Product Management:** A full suite of tools for adding, editing, and managing products.
-- **Seamless Shopping Cart:** A persistent and user-friendly shopping cart experience.
-- **Efficient Checkout Process:** A streamlined checkout flow with integrated payment solutions.
-- **Comprehensive Admin Dashboard:** An intuitive dashboard for managing orders, customers, and store settings.
-- **Fully Responsive Design:** A mobile-first approach ensuring a great experience on all devices.
+```bash
+bun --bun run build
+```
 
-## 🚀 Tech Stack
+## Testing
 
-- **Framework:** [Next.js](https://nextjs.org/)
-- **ORM:** [Prisma](https://www.prisma.io/)
-- **Database:** [MongoDB](https://www.mongodb.com/)
-- **Authentication:** [NextAuth.js](https://next-auth.js.org/)
-- **Styling:** [Tailwind CSS](https://tailwindcss.com/) with [shadcn/ui](https://ui.shadcn.com/)
-- **State Management:** [TanStack Query](https://tanstack.com/query/v5)
-- **Validation:** [Zod](https://zod.dev/)
-- **Testing:** [Jest](https://jestjs.io/) & [React Testing Library](https://testing-library.com/)
+This project uses [Vitest](https://vitest.dev/) for testing. You can run the tests with:
 
-## 📦 Getting Started
+```bash
+bun --bun run test
+```
 
-### 1. Prerequisites
+## Styling
 
-- [Node.js](https://nodejs.org/en/) (v20 or higher recommended)
-- [pnpm](https://pnpm.io/)
-- A [MongoDB](https://www.mongodb.com/try/download/community) instance (local or cloud-hosted)
+This project uses [Tailwind CSS](https://tailwindcss.com/) for styling.
 
-### 2. Installation & Setup
+### Removing Tailwind CSS
 
-1.  **Clone the repository:**
+If you prefer not to use Tailwind CSS:
 
-    ```bash
-    git clone <repository-url>
-    cd Oylkka
-    ```
+1. Remove the demo pages in `src/routes/demo/`
+2. Replace the Tailwind import in `src/styles.css` with your own styles
+3. Remove `tailwindcss()` from the plugins array in `vite.config.ts`
+4. Uninstall the packages: `bun install @tailwindcss/vite tailwindcss -D`
 
-2.  **Install dependencies:**
 
-    ```bash
-    pnpm install
-    ```
+## Deploy with Nitro
 
-3.  **Set up environment variables:**
-    Create a `.env.local` file by copying the example file:
+This project uses Nitro as a generic server adapter, so it can run on any Node-compatible host.
 
-    ```bash
-    cp .env.example .env.local
-    ```
+```bash
+npm run build
+node dist/server/index.mjs
+```
 
-    Now, fill in the variables in `.env.local`.
+The build output is a self-contained Node server. To deploy, push the `dist/` directory to your host (Render, Fly.io, your own VPS, etc.) and run the server command above.
 
-4.  **Apply the database schema:**
+For host-specific presets (Vercel, Netlify, Cloudflare, AWS Lambda, etc.) and tuning, see https://v3.nitro.build/deploy.
 
-    ```bash
-    pnpm prisma db push
-    ```
 
-    _Note: `prisma migrate` is not typically used with MongoDB in Prisma. `db push` syncs the schema to the database._
 
-5.  **Run the development server:**
-    ```bash
-    pnpm dev
-    ```
+## Routing
 
-The application should now be running at [http://localhost:3000](http://localhost:3000).
+This project uses [TanStack Router](https://tanstack.com/router) with file-based routing. Routes are managed as files in `src/routes`.
 
-### 3. Environment Variables
+### Adding A Route
 
-A `.env.example` file should be created to show all required environment variables.
+To add a new route to your application just add a new file in the `./src/routes` directory.
 
-| Variable          | Description                                    |
-| ----------------- | ---------------------------------------------- |
-| `MONGODB_URI`     | Your MongoDB connection string.                |
-| `NEXTAUTH_URL`    | The canonical URL of your app.                 |
-| `NEXTAUTH_SECRET` | A secret key for NextAuth.js.                  |
-| `CLOUDINARY_URL`  | API environment variable for Cloudinary.       |
-| `BKASH_...`       | Credentials for the Bkash payment gateway.     |
-| `GOOGLE_...`      | Credentials for Google APIs (e.g., for OAuth). |
+TanStack will automatically generate the content of the route file for you.
 
-## 📜 Available Scripts
+Now that you have two routes you can use a `Link` component to navigate between them.
 
-- `pnpm dev`: Starts the development server with Turbopack.
-- `pnpm build`: Creates a production-ready build.
-- `pnpm start`: Starts the production server.
-- `pnpm lint`: Lints the codebase for errors and style issues.
-- `pnpm fix`: Automatically fixes linting issues.
-- `pnpm format`: Formats the code using Prettier.
-- `pnpm test`: Runs the test suite using Jest.
-- `pnpm test:watch`: Runs tests in watch mode.
+### Adding Links
 
-## 🚀 Deployment
+To use SPA (Single Page Application) navigation you will need to import the `Link` component from `@tanstack/react-router`.
 
-This project is optimized for deployment on [Vercel](https://vercel.com/).
+```tsx
+import { Link } from "@tanstack/react-router";
+```
 
-1.  Push your code to your Git repository (GitHub, GitLab, etc.).
-2.  Import the project into Vercel.
-3.  Set the environment variables in the Vercel project settings.
-4.  Vercel will automatically build and deploy the application upon each push to the main branch.
+Then anywhere in your JSX you can use it like so:
 
-## 🤝 Contributing
+```tsx
+<Link to="/about">About</Link>
+```
 
-As this is a private repository, contributions are managed internally. Please follow these guidelines:
+This will create a link that will navigate to the `/about` route.
 
-1.  Create a new branch for each feature or bug fix (`feature/new-thing` or `fix/broken-thing`).
-2.  Follow the established code style and conventions.
-3.  Ensure all tests pass before submitting a pull request.
-4.  Provide a clear and descriptive pull request message.
+More information on the `Link` component can be found in the [Link documentation](https://tanstack.com/router/v1/docs/framework/react/api/router/linkComponent).
 
----
+### Using A Layout
 
-_This is a private repository. Please do not distribute._
+In the File Based Routing setup the layout is located in `src/routes/__root.tsx`. Anything you add to the root route will appear in all the routes. The route content will appear in the JSX where you render `{children}` in the `shellComponent`.
+
+Here is an example layout that includes a header:
+
+```tsx
+import { HeadContent, Scripts, createRootRoute } from '@tanstack/react-router'
+
+export const Route = createRootRoute({
+  head: () => ({
+    meta: [
+      { charSet: 'utf-8' },
+      { name: 'viewport', content: 'width=device-width, initial-scale=1' },
+      { title: 'My App' },
+    ],
+  }),
+  shellComponent: ({ children }) => (
+    <html lang="en">
+      <head>
+        <HeadContent />
+      </head>
+      <body>
+        <header>
+          <nav>
+            <Link to="/">Home</Link>
+            <Link to="/about">About</Link>
+          </nav>
+        </header>
+        {children}
+        <Scripts />
+      </body>
+    </html>
+  ),
+})
+```
+
+More information on layouts can be found in the [Layouts documentation](https://tanstack.com/router/latest/docs/framework/react/guide/routing-concepts#layouts).
+
+## Server Functions
+
+TanStack Start provides server functions that allow you to write server-side code that seamlessly integrates with your client components.
+
+```tsx
+import { createServerFn } from '@tanstack/react-start'
+
+const getServerTime = createServerFn({
+  method: 'GET',
+}).handler(async () => {
+  return new Date().toISOString()
+})
+
+// Use in a component
+function MyComponent() {
+  const [time, setTime] = useState('')
+  
+  useEffect(() => {
+    getServerTime().then(setTime)
+  }, [])
+  
+  return <div>Server time: {time}</div>
+}
+```
+
+## API Routes
+
+You can create API routes by using the `server` property in your route definitions:
+
+```tsx
+import { createFileRoute } from '@tanstack/react-router'
+import { json } from '@tanstack/react-start'
+
+export const Route = createFileRoute('/api/hello')({
+  server: {
+    handlers: {
+      GET: () => json({ message: 'Hello, World!' }),
+    },
+  },
+})
+```
+
+## Data Fetching
+
+There are multiple ways to fetch data in your application. You can use TanStack Query to fetch data from a server. But you can also use the `loader` functionality built into TanStack Router to load the data for a route before it's rendered.
+
+For example:
+
+```tsx
+import { createFileRoute } from '@tanstack/react-router'
+
+export const Route = createFileRoute('/people')({
+  loader: async () => {
+    const response = await fetch('https://swapi.dev/api/people')
+    return response.json()
+  },
+  component: PeopleComponent,
+})
+
+function PeopleComponent() {
+  const data = Route.useLoaderData()
+  return (
+    <ul>
+      {data.results.map((person) => (
+        <li key={person.name}>{person.name}</li>
+      ))}
+    </ul>
+  )
+}
+```
+
+Loaders simplify your data fetching logic dramatically. Check out more information in the [Loader documentation](https://tanstack.com/router/latest/docs/framework/react/guide/data-loading#loader-parameters).
+
+# Demo files
+
+Files prefixed with `demo` can be safely deleted. They are there to provide a starting point for you to play around with the features you've installed.
+
+# Learn More
+
+You can learn more about all of the offerings from TanStack in the [TanStack documentation](https://tanstack.com).
+
+For TanStack Start specific documentation, visit [TanStack Start](https://tanstack.com/start).

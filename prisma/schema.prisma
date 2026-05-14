@@ -1,0 +1,151 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id            String    @id
+  name          String
+  email         String
+  emailVerified Boolean   @default(false)
+  imageId       String?   @unique
+  image         String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  role          UserRole  @default(USER)
+  banned        Boolean?  @default(false)
+  banReason     String?
+  banExpires    DateTime?
+  sessions      Session[]
+  accounts      Account[]
+
+  @@unique([email])
+  @@map("user")
+}
+
+model Session {
+  id             String   @id
+  expiresAt      DateTime
+  token          String
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  ipAddress      String?
+  userAgent      String?
+  userId         String
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  impersonatedBy String?
+
+  @@unique([token])
+  @@index([userId])
+  @@map("session")
+}
+
+model Account {
+  id                    String    @id
+  accountId             String
+  providerId            String
+  userId                String
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accessToken           String?
+  refreshToken          String?
+  idToken               String?
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  password              String?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  @@index([userId])
+  @@map("account")
+}
+
+model Subscriber {
+  id        String   @id @default(cuid())
+  email     String
+  name      String?
+  status    String   @default("ACTIVE")
+  source    String   @default("google_signup")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([email])
+  @@map("subscriber")
+}
+
+model Verification {
+  id         String   @id
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([identifier])
+  @@map("verification")
+}
+
+enum BannerPosition {
+  home_top
+  home_bottom
+  sidebar
+}
+
+enum BannerTag {
+  promo
+  info
+  announcement
+}
+
+enum UserRole {
+  ADMIN
+  MANAGER
+  VENDOR
+  CUSTOMER_SERVICE
+  USER
+}
+
+model Banner {
+  id                  String         @id @default(cuid())
+  title               String
+  subTitle            String?
+  description         String?
+  bannerTag           BannerTag?
+  alignment           String         @default("center")
+  primaryActionText   String?
+  primaryActionLink   String?
+  secondaryActionText String?
+  secondaryActionLink String?
+  bannerPosition      BannerPosition @default(home_top)
+  imageId             String
+  image               Image          @relation(fields: [imageId], references: [id], onDelete: Cascade)
+  isActive            Boolean        @default(true)
+  startDate           DateTime?
+  endDate             DateTime?
+  createdAt           DateTime       @default(now())
+  updatedAt           DateTime       @updatedAt
+
+  @@index([bannerPosition, isActive])
+  @@map("banner")
+}
+
+model Image {
+  id        String   @id @default(cuid())
+  url       String
+  publicId  String
+  altText   String?
+  banner    Banner[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("image")
+}
