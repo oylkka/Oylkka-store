@@ -12,7 +12,6 @@ export const Route = createFileRoute('/api/banners/hero')({
           const banners = await prisma.banner.findMany({
             where: { isActive: true },
             orderBy: { createdAt: 'desc' },
-            include: { image: true },
           });
 
           const filteredBanners = banners.filter((banner) => {

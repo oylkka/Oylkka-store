@@ -86,16 +86,16 @@ export default function HeroSection() {
           >
             <div className='absolute inset-0 overflow-hidden'>
               <img
-                src={slide.image.url || '/placeholder.svg'}
+                src={slide.imageUrl || '/placeholder.svg'}
                 alt={slide.title}
                 className='h-full w-full object-cover object-center'
               />
               <div
                 className={cn(
                   'absolute inset-0 bg-black/40',
-                  slide.alignment === 'left'
+                  slide.alignment === 'LEFT'
                     ? 'bg-linear-to-r from-black/80 via-black/50 to-black/20'
-                    : slide.alignment === 'center'
+                    : slide.alignment === 'CENTER'
                       ? 'bg-linear-to-r from-black/60 via-black/20 to-black/60'
                       : 'bg-linear-to-l from-black/80 via-black/50 to-black/20',
                 )}
@@ -107,9 +107,9 @@ export default function HeroSection() {
               <div
                 className={cn(
                   'container mx-auto flex px-2 md:px-0',
-                  slide.alignment === 'left'
+                  slide.alignment === 'LEFT'
                     ? 'justify-start'
-                    : slide.alignment === 'center'
+                    : slide.alignment === 'CENTER'
                       ? 'justify-center text-center'
                       : 'justify-end',
                 )}
@@ -135,7 +135,7 @@ export default function HeroSection() {
                   <div
                     className={cn(
                       'flex flex-wrap gap-3 pt-2',
-                      slide.alignment === 'center' && 'justify-center',
+                      slide.alignment === 'CENTER' && 'justify-center',
                     )}
                   >
                     {slide.primaryActionText && slide.primaryActionLink && (

@@ -92,13 +92,13 @@ function RouteComponent() {
       title: '',
       subtitle: '',
       description: '',
-      bannerTag: '',
+      bannerTag: undefined,
       primaryActionText: '',
       primaryActionLink: '',
       secondaryActionText: '',
       secondaryActionLink: '',
-      alignment: 'left',
-      bannerPosition: 'home_top',
+      alignment: 'LEFT',
+      bannerPosition: 'HOME_TOP',
       startDate: undefined,
       endDate: undefined,
       image: undefined,
@@ -207,12 +207,28 @@ function RouteComponent() {
 
                     <Field data-invalid={!!errors.bannerTag}>
                       <FieldLabel htmlFor='bannerTag'>Banner Tag</FieldLabel>
-                      <Input
-                        id='bannerTag'
-                        placeholder='E.g. New, Featured, Limited Time'
-                        aria-invalid={!!errors.bannerTag}
-                        {...register('bannerTag')}
-                      />
+                      <Select
+                        onValueChange={(val) =>
+                          setValue(
+                            'bannerTag',
+                            val as 'PROMO' | 'INFO' | 'ANNOUNCEMENT',
+                          )
+                        }
+                      >
+                        <SelectTrigger
+                          id='bannerTag'
+                          aria-invalid={!!errors.bannerTag}
+                        >
+                          <SelectValue placeholder='Select a tag (optional)' />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value='PROMO'>Promo</SelectItem>
+                          <SelectItem value='INFO'>Info</SelectItem>
+                          <SelectItem value='ANNOUNCEMENT'>
+                            Announcement
+                          </SelectItem>
+                        </SelectContent>
+                      </Select>
                       <FieldDescription>
                         A highlighted tag to draw attention
                       </FieldDescription>
@@ -238,10 +254,10 @@ function RouteComponent() {
                         onValueChange={(val) =>
                           setValue(
                             'alignment',
-                            val as 'left' | 'center' | 'right',
+                            val as 'LEFT' | 'CENTER' | 'RIGHT',
                           )
                         }
-                        defaultValue='left'
+                        defaultValue='LEFT'
                       >
                         <SelectTrigger
                           id='alignment'
@@ -250,9 +266,9 @@ function RouteComponent() {
                           <SelectValue placeholder='Choose alignment' />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value='left'>Left</SelectItem>
-                          <SelectItem value='center'>Center</SelectItem>
-                          <SelectItem value='right'>Right</SelectItem>
+                          <SelectItem value='LEFT'>Left</SelectItem>
+                          <SelectItem value='CENTER'>Center</SelectItem>
+                          <SelectItem value='RIGHT'>Right</SelectItem>
                         </SelectContent>
                       </Select>
                       <FieldDescription>
@@ -276,7 +292,7 @@ function RouteComponent() {
                             >['bannerPosition'],
                           )
                         }
-                        defaultValue='home_top'
+                        defaultValue='HOME_TOP'
                       >
                         <SelectTrigger
                           id='bannerPosition'
@@ -285,14 +301,13 @@ function RouteComponent() {
                           <SelectValue placeholder='Select position' />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value='home_top'>
+                          <SelectItem value='HOME_TOP'>
                             Home Page (Top)
                           </SelectItem>
-                          <SelectItem value='home_bottom'>
+                          <SelectItem value='HOME_BOTTOM'>
                             Home Page (Bottom)
                           </SelectItem>
-                          <SelectItem value='sidebar'>Sidebar</SelectItem>
-                          <SelectItem value='footer'>Footer</SelectItem>
+                          <SelectItem value='SIDEBAR'>Sidebar</SelectItem>
                         </SelectContent>
                       </Select>
                       <FieldDescription>

@@ -11,7 +11,21 @@ export const auth = betterAuth({
     provider: 'postgresql',
   }),
 
-  // Merge Social Providers
+  user: {
+    // Remap better-auth's internal `image` field to your `imageUrl` column
+    fields: {
+      image: 'imageUrl',
+    },
+    additionalFields: {
+      imagePublicId: {
+        type: 'string',
+        required: false,
+        defaultValue: null,
+        input: false,
+      },
+    },
+  },
+
   socialProviders: {
     google: {
       prompt: 'select_account',
@@ -24,29 +38,34 @@ export const auth = betterAuth({
     process.env.BETTER_AUTH_URL || process.env.NEXT_PUBLIC_API_URL || '',
   ],
 
-  // Combined Database Hooks
   databaseHooks: {
     user: {
-      // 1. Logic for handling image cleanup and parsing before an update
       update: {
         before: async (data, ctx) => {
-          if (typeof data.image === 'string' && data.image.includes('|')) {
-            const [imageUrl, imageId] = data.image.split('|');
-            data.image = imageUrl;
-            data.imageId = imageId;
+          // Cloudinary upload sends "imageUrl|imagePublicId" as a pipe-separated string
+          // We split it here into the two separate fields
+          if (
+            typeof data.imageUrl === 'string' &&
+            data.imageUrl.includes('|')
+          ) {
+            const [imageUrl, imagePublicId] = data.imageUrl.split('|');
+            data.imageUrl = imageUrl;
+            data.imagePublicId = imagePublicId;
           }
 
-          if (data.image || data.imageId) {
+          // If the user is swapping their image, delete the old Cloudinary asset first
+          if (data.imageUrl || data.imagePublicId) {
             if (ctx?.context?.session) {
               const session = ctx.context.session;
               if (session?.user?.userId) {
                 const user = await prisma.user.findUnique({
                   where: { id: session.user.userId },
-                  select: { imageId: true },
+                  select: { imagePublicId: true },
                 });
 
-                if (user?.imageId) {
-                  DeleteImage(user.imageId).catch((err) => {
+                // Only delete if previous image was a Cloudinary asset (has a publicId)
+                if (user?.imagePublicId) {
+                  DeleteImage(user.imagePublicId).catch((err) => {
                     // biome-ignore lint/suspicious/noConsole: this is fine
                     console.error('Failed to delete old profile image', err);
                   });
@@ -54,10 +73,11 @@ export const auth = betterAuth({
               }
             }
           }
+
           return { data };
         },
       },
-      // 2. Logic for subscriber backfilling after a new user creation
+
       create: {
         after: async (user) => {
           await prisma.subscriber.upsert({
@@ -100,7 +120,7 @@ export const auth = betterAuth({
   emailVerification: {
     autoSignInAfterVerification: true,
     sendOnSignUp: true,
-    expiresIn: 3600, // 1 hour
+    expiresIn: 3600,
     sendVerificationEmail: async ({ user, url }) => {
       const link = new URL(url);
       link.searchParams.set('callbackURL', '/auth/verify');
@@ -124,6 +144,7 @@ export const auth = betterAuth({
     admin({
       defaultRole: 'USER',
       adminRoles: ['ADMIN'],
+      defaultAdminEmail: process.env.ADMIN_EMAIL,
     }),
     tanstackStartCookies(),
   ],

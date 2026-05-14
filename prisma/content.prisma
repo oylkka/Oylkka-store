@@ -1,0 +1,26 @@
+model Subscriber {
+  id     String           @id @default(cuid())
+  email  String           @unique
+  name   String?
+  status SubscriberStatus @default(ACTIVE)
+  source String           @default("google_signup")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([source])
+  @@map("subscriber")
+}
+
+model Verification {
+  id         String   @id @default(cuid())
+  identifier String
+  value      String
+  expiresAt  DateTime
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([identifier])
+  @@map("verification")
+}

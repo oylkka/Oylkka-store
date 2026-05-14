@@ -1,0 +1,33 @@
+// --- Enums ---
+
+enum UserRole {
+  ADMIN
+  MANAGER
+  VENDOR
+  CUSTOMER_SERVICE
+  USER
+}
+
+enum SubscriberStatus {
+  ACTIVE
+  UNSUBSCRIBED
+  BOUNCED
+}
+
+enum BannerPosition {
+  HOME_TOP
+  HOME_BOTTOM
+  SIDEBAR
+}
+
+enum BannerTag {
+  PROMO
+  INFO
+  ANNOUNCEMENT
+}
+
+enum Alignment {
+  LEFT
+  CENTER
+  RIGHT
+}

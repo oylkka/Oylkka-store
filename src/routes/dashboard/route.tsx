@@ -1,9 +1,9 @@
+import { createFileRoute, Outlet, redirect } from '@tanstack/react-router';
 import { AppSidebar } from '#/components/layout/dashboard/app-sidebar';
 import BreadCrumb from '#/components/layout/dashboard/breadcrumb';
 import Footer from '#/components/layout/footer';
 import Header from '#/components/layout/header';
 import { SidebarInset, SidebarProvider } from '#/components/ui/sidebar';
-import { createFileRoute, Outlet, redirect } from '@tanstack/react-router';
 
 export const Route = createFileRoute('/dashboard')({
   beforeLoad: ({ context }) => {

@@ -1,38 +1,62 @@
 import * as z from 'zod';
 
-// Base schema with common fields
+// ─── Shared validation functions ─────────────────────────────────────────────
+
+function endDateAfterStart(data: { endDate?: Date; startDate?: Date }) {
+  return (
+    !data.endDate ||
+    !data.startDate ||
+    new Date(data.endDate) > new Date(data.startDate)
+  );
+}
+
+function secondaryLinkRequired(data: {
+  secondaryActionText?: string;
+  secondaryActionLink?: string;
+}) {
+  return !data.secondaryActionText || data.secondaryActionLink;
+}
+
+function primaryLinkRequired(data: {
+  primaryActionText?: string;
+  primaryActionLink?: string;
+}) {
+  return !data.primaryActionText || data.primaryActionLink;
+}
+
+// ─── URL must start with http ───────────────────────────────────────────────
+
+const httpUrl = (val: string | undefined) => !val || val.startsWith('http');
+
+// ─── Base schema ────────────────────────────────────────────────────────────
+
 const BaseBannerSchema = z.object({
   title: z.string().min(5, 'Title is required'),
   subtitle: z.string().optional(),
   description: z.string().optional(),
-  bannerTag: z.string().optional(),
-  alignment: z.enum(['left', 'center', 'right'], {
+  bannerTag: z.enum(['PROMO', 'INFO', 'ANNOUNCEMENT']).optional(),
+  alignment: z.enum(['LEFT', 'CENTER', 'RIGHT'], {
     required_error: 'Please select an alignment',
   }),
   primaryActionText: z.string().optional(),
   primaryActionLink: z
     .string()
     .optional()
-    .refine(
-      (val) => !val || val.startsWith('http'),
-      'URL must start with http:// or https://',
-    ),
+    .refine(httpUrl, 'URL must start with http:// or https://'),
   secondaryActionText: z.string().optional(),
   secondaryActionLink: z
     .string()
     .optional()
-    .refine(
-      (val) => !val || val.startsWith('http'),
-      'URL must start with http:// or https://',
-    ),
-  bannerPosition: z.enum(['home_top', 'home_bottom', 'sidebar', 'footer'], {
+    .refine(httpUrl, 'URL must start with http:// or https://'),
+  bannerPosition: z.enum(['HOME_TOP', 'HOME_BOTTOM', 'SIDEBAR'], {
     required_error: 'Please select a position',
   }),
   startDate: z.coerce.date().optional(),
   endDate: z.coerce.date().optional(),
 });
 
-// Schema for creating new banners (image required)
+// ─── Form schema (client-side, image = FileList) ────────────────────────────
+
 export const BannerFormSchema = BaseBannerSchema.extend({
   image: z
     .any()
@@ -42,60 +66,44 @@ export const BannerFormSchema = BaseBannerSchema.extend({
         files.length > 0 &&
         files instanceof FileList &&
         ['image/jpeg', 'image/png', 'image/webp'].includes(files[0]?.type),
-      {
-        message: 'An image file (JPEG, PNG, or WEBP) is required',
-      },
+      { message: 'An image file (JPEG, PNG, or WEBP) is required' },
     )
     .refine(
       (files) =>
         !files ||
         files.length === 0 ||
-        (files instanceof FileList && files[0]?.size <= 512000), // 500KB = 512000 bytes
-      {
-        message: 'Image size must not exceed 500KB',
-      },
+        (files instanceof FileList && files[0]?.size <= 512000),
+      { message: 'Image size must not exceed 500KB' },
     ),
 })
-  .refine(
-    (data) =>
-      !data.endDate ||
-      !data.startDate ||
-      new Date(data.endDate) > new Date(data.startDate),
-    {
-      message: 'End date must be after start date',
-      path: ['endDate'],
-    },
-  )
-  .refine((data) => !data.secondaryActionText || data.secondaryActionLink, {
+  .refine(endDateAfterStart, {
+    message: 'End date must be after start date',
+    path: ['endDate'],
+  })
+  .refine(secondaryLinkRequired, {
     message: 'Secondary action link is required when text is provided',
     path: ['secondaryActionLink'],
   })
-  .refine((data) => !data.primaryActionText || data.primaryActionLink, {
+  .refine(primaryLinkRequired, {
     message: 'Primary action link is required when text is provided',
     path: ['primaryActionLink'],
   });
 
-// Schema for editing existing banners (image optional but required if current image is removed)
+// ─── Edit schema (client-side, image optional) ──────────────────────────────
+
 export const EditBannerFormSchema = BaseBannerSchema.extend({
   image: z.any().optional(),
-  hasExistingImage: z.boolean().optional(), // Track if there's an existing image
-  keepExistingImage: z.boolean().optional(), // Track if user wants to keep existing image
+  hasExistingImage: z.boolean().optional(),
+  keepExistingImage: z.boolean().optional(),
 })
   .refine(
     (data) => {
-      // If there's no existing image, new image is required
       if (!data.hasExistingImage) {
         return (
           data.image && data.image.length > 0 && data.image instanceof FileList
         );
       }
-
-      // If existing image is being kept, no new image needed
-      if (data.keepExistingImage) {
-        return true;
-      }
-
-      // If existing image is removed, new image is required
+      if (data.keepExistingImage) return true;
       return (
         data.image && data.image.length > 0 && data.image instanceof FileList
       );
@@ -108,51 +116,39 @@ export const EditBannerFormSchema = BaseBannerSchema.extend({
   )
   .refine(
     (data) => {
-      // If no files selected, it's valid (keeping existing or no validation needed)
       if (!data.image || data.image.length === 0) return true;
-
-      // If files are selected, validate them
       return (
         data.image instanceof FileList &&
         ['image/jpeg', 'image/png', 'image/webp'].includes(data.image[0]?.type)
       );
     },
-    {
-      message: 'Image must be JPEG, PNG, or WEBP format',
-      path: ['image'],
-    },
+    { message: 'Image must be JPEG, PNG, or WEBP format', path: ['image'] },
   )
   .refine(
     (data) => {
-      // If no files selected, it's valid
       if (!data.image || data.image.length === 0) return true;
+      return data.image instanceof FileList && data.image[0]?.size <= 512000;
+    },
+    { message: 'Image size must not exceed 500KB', path: ['image'] },
+  );
 
-      // If files are selected, check size
-      return data.image instanceof FileList && data.image[0]?.size <= 512000; // 500KB
-    },
-    {
-      message: 'Image size must not exceed 500KB',
-      path: ['image'],
-    },
-  )
-  .refine(
-    (data) =>
-      !data.endDate ||
-      !data.startDate ||
-      new Date(data.endDate) > new Date(data.startDate),
-    {
-      message: 'End date must be after start date',
-      path: ['endDate'],
-    },
-  )
-  .refine((data) => !data.secondaryActionText || data.secondaryActionLink, {
+// ─── API schema (server-side, no image — validated separately) ──────────────
+
+export const BannerApiSchema = BaseBannerSchema.refine(endDateAfterStart, {
+  message: 'End date must be after start date',
+  path: ['endDate'],
+})
+  .refine(secondaryLinkRequired, {
     message: 'Secondary action link is required when text is provided',
     path: ['secondaryActionLink'],
   })
-  .refine((data) => !data.primaryActionText || data.primaryActionLink, {
+  .refine(primaryLinkRequired, {
     message: 'Primary action link is required when text is provided',
     path: ['primaryActionLink'],
   });
 
+// ─── Types ──────────────────────────────────────────────────────────────────
+
 export type BannerFormType = z.infer<typeof BannerFormSchema>;
 export type EditBannerFormType = z.infer<typeof EditBannerFormSchema>;
+export type BannerApiType = z.infer<typeof BannerApiSchema>;

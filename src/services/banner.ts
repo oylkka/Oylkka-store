@@ -1,21 +1,27 @@
-import { QUERY_KEYS } from '@/lib/constants';
-import type { BannerFormType } from '@/schemas/banner-schema';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
 import { toast } from 'sonner';
+import { QUERY_KEYS } from '@/lib/constants';
+import type { BannerFormType } from '@/schemas/banner-schema';
 
 type HeroBanner = {
   id: string;
   title: string;
   subTitle: string;
   description: string;
-  image: { url: string };
+  imageUrl: string;
+  imagePublicId: string;
   bannerTag?: string;
   primaryActionText?: string;
   primaryActionLink?: string;
   secondaryActionText?: string;
   secondaryActionLink?: string;
-  alignment?: 'left' | 'center' | 'right';
+  alignment?: string;
+};
+
+type CreateBannerResponse = {
+  message: string;
+  banner: HeroBanner;
 };
 
 export function useHeroBanner() {
@@ -57,7 +63,7 @@ export function useBannerMutation() {
         formData.append('image', values.image[0]);
       }
 
-      const response = await axios.post<HeroBanner>(
+      const response = await axios.post<CreateBannerResponse>(
         '/api/banners/add',
         formData,
         {

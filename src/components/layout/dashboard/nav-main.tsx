@@ -32,8 +32,8 @@ import {
   SidebarMenuSubButton,
   SidebarMenuSubItem,
 } from '@/components/ui/sidebar';
-import type { User } from './types';
 import type { UserRole } from '@/generated/prisma/client';
+import type { User } from './types';
 
 interface SubItem {
   title: string;
@@ -525,13 +525,7 @@ export function NavMain({ user }: { user: User }) {
     title: 'Account',
     url: '/dashboard/profile',
     icon: Settings,
-    roles: [
-      'ADMIN',
-      'MANAGER',
-      'VENDOR',
-      'CUSTOMER_SERVICE',
-      'USER',
-    ],
+    roles: ['ADMIN', 'MANAGER', 'VENDOR', 'CUSTOMER_SERVICE', 'USER'],
     items: [
       {
         title: 'Profile',
