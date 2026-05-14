@@ -15,8 +15,15 @@ model User {
   banReason  String?
   banExpires DateTime?
 
-  sessions Session[]
-  accounts Account[]
+  sessions           Session[]
+  accounts           Account[]
+  products           Product[]
+  reviews            Review[]
+  reviewHelpfulVotes ReviewHelpfulVote[]
+  wishlistItems      WishlistItem[]
+  cart               Cart?
+  shop               Shop?
+  orders             Order[]
 
   @@map("user")
 }

@@ -1,0 +1,154 @@
+// -----------------------------------------------
+// review.prisma
+// -----------------------------------------------
+
+model Review {
+  id        String  @id @default(cuid())
+  productId String
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Link to the specific order item — lets you verify purchase of this exact product
+  // and prevents reviewing the same purchase twice
+  orderItemId String?    @unique // unique = one review per order item
+  orderItem   OrderItem? @relation(fields: [orderItemId], references: [id], onDelete: SetNull)
+
+  rating  Int // enforce 1-5 in app layer
+  title   String?
+  content String
+
+  // Review images — flat table instead of embedded
+  images ReviewImage[]
+
+  // Verified = customer actually purchased this product
+  verified Boolean @default(false)
+
+  // Helpful votes — separate table so one user = one vote
+  helpfulVotes ReviewHelpfulVote[]
+  helpfulCount Int                 @default(0) // cached count, updated via trigger/job
+
+  // Moderation
+  reported        Boolean @default(false)
+  reportReason    String?
+  reviewedByAdmin Boolean @default(false)
+
+  // Vendor reply
+  vendorReply     String?
+  vendorRepliedAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([productId])
+  @@index([userId])
+  @@index([verified])
+  @@index([reported])
+  @@map("review")
+}
+
+model ReviewImage {
+  id       String @id @default(cuid())
+  reviewId String
+  review   Review @relation(fields: [reviewId], references: [id], onDelete: Cascade)
+
+  imageUrl      String
+  imagePublicId String
+  order         Int    @default(0)
+
+  createdAt DateTime @default(now())
+
+  @@index([reviewId])
+  @@map("review_image")
+}
+
+// Tracks who voted helpful — prevents duplicate votes
+model ReviewHelpfulVote {
+  id       String @id @default(cuid())
+  reviewId String
+  review   Review @relation(fields: [reviewId], references: [id], onDelete: Cascade)
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@unique([reviewId, userId]) // one vote per user per review
+  @@index([reviewId])
+  @@map("review_helpful_vote")
+}
+
+// -----------------------------------------------
+// wishlist.prisma
+// -----------------------------------------------
+
+model WishlistItem {
+  id     String @id @default(cuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  productId String
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  // Optional variant — customer may want a specific Size/Color in their wishlist
+  variantId String?
+  variant   ProductVariant? @relation(fields: [variantId], references: [id], onDelete: SetNull)
+
+  createdAt DateTime @default(now())
+
+  // Unique per user + product + variant combination
+  // Use separate indexes instead of @@unique to handle nullable variantId correctly
+  @@unique([userId, productId, variantId])
+  @@index([userId])
+  @@index([productId])
+  @@map("wishlist_item")
+}
+
+// -----------------------------------------------
+// cart.prisma
+// -----------------------------------------------
+
+model Cart {
+  id     String @id @default(cuid())
+  userId String @unique // one active cart per user
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  items     CartItem[]
+  expiresAt DateTime? // null = never expires (logged-in users)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("cart")
+}
+
+model CartItem {
+  id     String @id @default(cuid())
+  cartId String
+  cart   Cart   @relation(fields: [cartId], references: [id], onDelete: Cascade)
+
+  productId String
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  // Declared relation for variantId — was missing before
+  variantId String?
+  variant   ProductVariant? @relation(fields: [variantId], references: [id], onDelete: SetNull)
+
+  quantity Int @default(1)
+
+  // Snapshot price at time of adding to cart
+  // If product price changes, cart shows original price until user refreshes
+  savedPrice Float?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Fix for nullable variantId uniqueness issue in PostgreSQL:
+  // Use a partial unique index via raw migration instead of @@unique
+  // For simple products (variantId IS NULL): one entry per product per cart
+  // For variant products: one entry per variant per cart
+  @@index([cartId])
+  @@index([productId])
+  @@map("cart_item")
+}
