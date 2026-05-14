@@ -14,6 +14,13 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as DashboardIndexRouteImport } from './routes/dashboard/index'
 import { Route as AuthSigninRouteImport } from './routes/auth/signin'
 import { Route as DashboardAdminRouteRouteImport } from './routes/dashboard/admin/route'
+import { Route as ShopCategorySlugRouteImport } from './routes/shop/category.$slug'
+import { Route as ApiCategoriesPublicListRouteImport } from './routes/api/categories/public-list'
+import { Route as ApiCategoriesListRouteImport } from './routes/api/categories/list'
+import { Route as ApiCategoriesGetSingleRouteImport } from './routes/api/categories/get-single'
+import { Route as ApiCategoriesEditRouteImport } from './routes/api/categories/edit'
+import { Route as ApiCategoriesDeleteRouteImport } from './routes/api/categories/delete'
+import { Route as ApiCategoriesAddRouteImport } from './routes/api/categories/add'
 import { Route as ApiBannersHeroRouteImport } from './routes/api/banners/hero'
 import { Route as ApiBannersGetSingleRouteImport } from './routes/api/banners/get-single'
 import { Route as ApiBannersEditRouteImport } from './routes/api/banners/edit'
@@ -21,6 +28,9 @@ import { Route as ApiBannersDeleteRouteImport } from './routes/api/banners/delet
 import { Route as ApiBannersAdminListRouteImport } from './routes/api/banners/admin-list'
 import { Route as ApiBannersAddRouteImport } from './routes/api/banners/add'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
+import { Route as DashboardAdminCategoryEditRouteImport } from './routes/dashboard/admin/category/edit'
+import { Route as DashboardAdminCategoryAllRouteImport } from './routes/dashboard/admin/category/all'
+import { Route as DashboardAdminCategoryAddRouteImport } from './routes/dashboard/admin/category/add'
 import { Route as DashboardAdminBannerListRouteImport } from './routes/dashboard/admin/banner/list'
 import { Route as DashboardAdminBannerEditRouteImport } from './routes/dashboard/admin/banner/edit'
 import { Route as DashboardAdminBannerAddRouteImport } from './routes/dashboard/admin/banner/add'
@@ -49,6 +59,41 @@ const DashboardAdminRouteRoute = DashboardAdminRouteRouteImport.update({
   id: '/admin',
   path: '/admin',
   getParentRoute: () => DashboardRouteRoute,
+} as any)
+const ShopCategorySlugRoute = ShopCategorySlugRouteImport.update({
+  id: '/shop/category/$slug',
+  path: '/shop/category/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiCategoriesPublicListRoute = ApiCategoriesPublicListRouteImport.update({
+  id: '/api/categories/public-list',
+  path: '/api/categories/public-list',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiCategoriesListRoute = ApiCategoriesListRouteImport.update({
+  id: '/api/categories/list',
+  path: '/api/categories/list',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiCategoriesGetSingleRoute = ApiCategoriesGetSingleRouteImport.update({
+  id: '/api/categories/get-single',
+  path: '/api/categories/get-single',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiCategoriesEditRoute = ApiCategoriesEditRouteImport.update({
+  id: '/api/categories/edit',
+  path: '/api/categories/edit',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiCategoriesDeleteRoute = ApiCategoriesDeleteRouteImport.update({
+  id: '/api/categories/delete',
+  path: '/api/categories/delete',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiCategoriesAddRoute = ApiCategoriesAddRouteImport.update({
+  id: '/api/categories/add',
+  path: '/api/categories/add',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const ApiBannersHeroRoute = ApiBannersHeroRouteImport.update({
   id: '/api/banners/hero',
@@ -85,6 +130,24 @@ const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
   path: '/api/auth/$',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DashboardAdminCategoryEditRoute =
+  DashboardAdminCategoryEditRouteImport.update({
+    id: '/category/edit',
+    path: '/category/edit',
+    getParentRoute: () => DashboardAdminRouteRoute,
+  } as any)
+const DashboardAdminCategoryAllRoute =
+  DashboardAdminCategoryAllRouteImport.update({
+    id: '/category/all',
+    path: '/category/all',
+    getParentRoute: () => DashboardAdminRouteRoute,
+  } as any)
+const DashboardAdminCategoryAddRoute =
+  DashboardAdminCategoryAddRouteImport.update({
+    id: '/category/add',
+    path: '/category/add',
+    getParentRoute: () => DashboardAdminRouteRoute,
+  } as any)
 const DashboardAdminBannerListRoute =
   DashboardAdminBannerListRouteImport.update({
     id: '/banner/list',
@@ -116,9 +179,19 @@ export interface FileRoutesByFullPath {
   '/api/banners/edit': typeof ApiBannersEditRoute
   '/api/banners/get-single': typeof ApiBannersGetSingleRoute
   '/api/banners/hero': typeof ApiBannersHeroRoute
+  '/api/categories/add': typeof ApiCategoriesAddRoute
+  '/api/categories/delete': typeof ApiCategoriesDeleteRoute
+  '/api/categories/edit': typeof ApiCategoriesEditRoute
+  '/api/categories/get-single': typeof ApiCategoriesGetSingleRoute
+  '/api/categories/list': typeof ApiCategoriesListRoute
+  '/api/categories/public-list': typeof ApiCategoriesPublicListRoute
+  '/shop/category/$slug': typeof ShopCategorySlugRoute
   '/dashboard/admin/banner/add': typeof DashboardAdminBannerAddRoute
   '/dashboard/admin/banner/edit': typeof DashboardAdminBannerEditRoute
   '/dashboard/admin/banner/list': typeof DashboardAdminBannerListRoute
+  '/dashboard/admin/category/add': typeof DashboardAdminCategoryAddRoute
+  '/dashboard/admin/category/all': typeof DashboardAdminCategoryAllRoute
+  '/dashboard/admin/category/edit': typeof DashboardAdminCategoryEditRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -132,9 +205,19 @@ export interface FileRoutesByTo {
   '/api/banners/edit': typeof ApiBannersEditRoute
   '/api/banners/get-single': typeof ApiBannersGetSingleRoute
   '/api/banners/hero': typeof ApiBannersHeroRoute
+  '/api/categories/add': typeof ApiCategoriesAddRoute
+  '/api/categories/delete': typeof ApiCategoriesDeleteRoute
+  '/api/categories/edit': typeof ApiCategoriesEditRoute
+  '/api/categories/get-single': typeof ApiCategoriesGetSingleRoute
+  '/api/categories/list': typeof ApiCategoriesListRoute
+  '/api/categories/public-list': typeof ApiCategoriesPublicListRoute
+  '/shop/category/$slug': typeof ShopCategorySlugRoute
   '/dashboard/admin/banner/add': typeof DashboardAdminBannerAddRoute
   '/dashboard/admin/banner/edit': typeof DashboardAdminBannerEditRoute
   '/dashboard/admin/banner/list': typeof DashboardAdminBannerListRoute
+  '/dashboard/admin/category/add': typeof DashboardAdminCategoryAddRoute
+  '/dashboard/admin/category/all': typeof DashboardAdminCategoryAllRoute
+  '/dashboard/admin/category/edit': typeof DashboardAdminCategoryEditRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -150,9 +233,19 @@ export interface FileRoutesById {
   '/api/banners/edit': typeof ApiBannersEditRoute
   '/api/banners/get-single': typeof ApiBannersGetSingleRoute
   '/api/banners/hero': typeof ApiBannersHeroRoute
+  '/api/categories/add': typeof ApiCategoriesAddRoute
+  '/api/categories/delete': typeof ApiCategoriesDeleteRoute
+  '/api/categories/edit': typeof ApiCategoriesEditRoute
+  '/api/categories/get-single': typeof ApiCategoriesGetSingleRoute
+  '/api/categories/list': typeof ApiCategoriesListRoute
+  '/api/categories/public-list': typeof ApiCategoriesPublicListRoute
+  '/shop/category/$slug': typeof ShopCategorySlugRoute
   '/dashboard/admin/banner/add': typeof DashboardAdminBannerAddRoute
   '/dashboard/admin/banner/edit': typeof DashboardAdminBannerEditRoute
   '/dashboard/admin/banner/list': typeof DashboardAdminBannerListRoute
+  '/dashboard/admin/category/add': typeof DashboardAdminCategoryAddRoute
+  '/dashboard/admin/category/all': typeof DashboardAdminCategoryAllRoute
+  '/dashboard/admin/category/edit': typeof DashboardAdminCategoryEditRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -169,9 +262,19 @@ export interface FileRouteTypes {
     | '/api/banners/edit'
     | '/api/banners/get-single'
     | '/api/banners/hero'
+    | '/api/categories/add'
+    | '/api/categories/delete'
+    | '/api/categories/edit'
+    | '/api/categories/get-single'
+    | '/api/categories/list'
+    | '/api/categories/public-list'
+    | '/shop/category/$slug'
     | '/dashboard/admin/banner/add'
     | '/dashboard/admin/banner/edit'
     | '/dashboard/admin/banner/list'
+    | '/dashboard/admin/category/add'
+    | '/dashboard/admin/category/all'
+    | '/dashboard/admin/category/edit'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -185,9 +288,19 @@ export interface FileRouteTypes {
     | '/api/banners/edit'
     | '/api/banners/get-single'
     | '/api/banners/hero'
+    | '/api/categories/add'
+    | '/api/categories/delete'
+    | '/api/categories/edit'
+    | '/api/categories/get-single'
+    | '/api/categories/list'
+    | '/api/categories/public-list'
+    | '/shop/category/$slug'
     | '/dashboard/admin/banner/add'
     | '/dashboard/admin/banner/edit'
     | '/dashboard/admin/banner/list'
+    | '/dashboard/admin/category/add'
+    | '/dashboard/admin/category/all'
+    | '/dashboard/admin/category/edit'
   id:
     | '__root__'
     | '/'
@@ -202,9 +315,19 @@ export interface FileRouteTypes {
     | '/api/banners/edit'
     | '/api/banners/get-single'
     | '/api/banners/hero'
+    | '/api/categories/add'
+    | '/api/categories/delete'
+    | '/api/categories/edit'
+    | '/api/categories/get-single'
+    | '/api/categories/list'
+    | '/api/categories/public-list'
+    | '/shop/category/$slug'
     | '/dashboard/admin/banner/add'
     | '/dashboard/admin/banner/edit'
     | '/dashboard/admin/banner/list'
+    | '/dashboard/admin/category/add'
+    | '/dashboard/admin/category/all'
+    | '/dashboard/admin/category/edit'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -218,6 +341,13 @@ export interface RootRouteChildren {
   ApiBannersEditRoute: typeof ApiBannersEditRoute
   ApiBannersGetSingleRoute: typeof ApiBannersGetSingleRoute
   ApiBannersHeroRoute: typeof ApiBannersHeroRoute
+  ApiCategoriesAddRoute: typeof ApiCategoriesAddRoute
+  ApiCategoriesDeleteRoute: typeof ApiCategoriesDeleteRoute
+  ApiCategoriesEditRoute: typeof ApiCategoriesEditRoute
+  ApiCategoriesGetSingleRoute: typeof ApiCategoriesGetSingleRoute
+  ApiCategoriesListRoute: typeof ApiCategoriesListRoute
+  ApiCategoriesPublicListRoute: typeof ApiCategoriesPublicListRoute
+  ShopCategorySlugRoute: typeof ShopCategorySlugRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -256,6 +386,55 @@ declare module '@tanstack/react-router' {
       fullPath: '/dashboard/admin'
       preLoaderRoute: typeof DashboardAdminRouteRouteImport
       parentRoute: typeof DashboardRouteRoute
+    }
+    '/shop/category/$slug': {
+      id: '/shop/category/$slug'
+      path: '/shop/category/$slug'
+      fullPath: '/shop/category/$slug'
+      preLoaderRoute: typeof ShopCategorySlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/categories/public-list': {
+      id: '/api/categories/public-list'
+      path: '/api/categories/public-list'
+      fullPath: '/api/categories/public-list'
+      preLoaderRoute: typeof ApiCategoriesPublicListRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/categories/list': {
+      id: '/api/categories/list'
+      path: '/api/categories/list'
+      fullPath: '/api/categories/list'
+      preLoaderRoute: typeof ApiCategoriesListRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/categories/get-single': {
+      id: '/api/categories/get-single'
+      path: '/api/categories/get-single'
+      fullPath: '/api/categories/get-single'
+      preLoaderRoute: typeof ApiCategoriesGetSingleRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/categories/edit': {
+      id: '/api/categories/edit'
+      path: '/api/categories/edit'
+      fullPath: '/api/categories/edit'
+      preLoaderRoute: typeof ApiCategoriesEditRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/categories/delete': {
+      id: '/api/categories/delete'
+      path: '/api/categories/delete'
+      fullPath: '/api/categories/delete'
+      preLoaderRoute: typeof ApiCategoriesDeleteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/categories/add': {
+      id: '/api/categories/add'
+      path: '/api/categories/add'
+      fullPath: '/api/categories/add'
+      preLoaderRoute: typeof ApiCategoriesAddRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/api/banners/hero': {
       id: '/api/banners/hero'
@@ -306,6 +485,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiAuthSplatRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/dashboard/admin/category/edit': {
+      id: '/dashboard/admin/category/edit'
+      path: '/category/edit'
+      fullPath: '/dashboard/admin/category/edit'
+      preLoaderRoute: typeof DashboardAdminCategoryEditRouteImport
+      parentRoute: typeof DashboardAdminRouteRoute
+    }
+    '/dashboard/admin/category/all': {
+      id: '/dashboard/admin/category/all'
+      path: '/category/all'
+      fullPath: '/dashboard/admin/category/all'
+      preLoaderRoute: typeof DashboardAdminCategoryAllRouteImport
+      parentRoute: typeof DashboardAdminRouteRoute
+    }
+    '/dashboard/admin/category/add': {
+      id: '/dashboard/admin/category/add'
+      path: '/category/add'
+      fullPath: '/dashboard/admin/category/add'
+      preLoaderRoute: typeof DashboardAdminCategoryAddRouteImport
+      parentRoute: typeof DashboardAdminRouteRoute
+    }
     '/dashboard/admin/banner/list': {
       id: '/dashboard/admin/banner/list'
       path: '/banner/list'
@@ -334,12 +534,18 @@ interface DashboardAdminRouteRouteChildren {
   DashboardAdminBannerAddRoute: typeof DashboardAdminBannerAddRoute
   DashboardAdminBannerEditRoute: typeof DashboardAdminBannerEditRoute
   DashboardAdminBannerListRoute: typeof DashboardAdminBannerListRoute
+  DashboardAdminCategoryAddRoute: typeof DashboardAdminCategoryAddRoute
+  DashboardAdminCategoryAllRoute: typeof DashboardAdminCategoryAllRoute
+  DashboardAdminCategoryEditRoute: typeof DashboardAdminCategoryEditRoute
 }
 
 const DashboardAdminRouteRouteChildren: DashboardAdminRouteRouteChildren = {
   DashboardAdminBannerAddRoute: DashboardAdminBannerAddRoute,
   DashboardAdminBannerEditRoute: DashboardAdminBannerEditRoute,
   DashboardAdminBannerListRoute: DashboardAdminBannerListRoute,
+  DashboardAdminCategoryAddRoute: DashboardAdminCategoryAddRoute,
+  DashboardAdminCategoryAllRoute: DashboardAdminCategoryAllRoute,
+  DashboardAdminCategoryEditRoute: DashboardAdminCategoryEditRoute,
 }
 
 const DashboardAdminRouteRouteWithChildren =
@@ -370,6 +576,13 @@ const rootRouteChildren: RootRouteChildren = {
   ApiBannersEditRoute: ApiBannersEditRoute,
   ApiBannersGetSingleRoute: ApiBannersGetSingleRoute,
   ApiBannersHeroRoute: ApiBannersHeroRoute,
+  ApiCategoriesAddRoute: ApiCategoriesAddRoute,
+  ApiCategoriesDeleteRoute: ApiCategoriesDeleteRoute,
+  ApiCategoriesEditRoute: ApiCategoriesEditRoute,
+  ApiCategoriesGetSingleRoute: ApiCategoriesGetSingleRoute,
+  ApiCategoriesListRoute: ApiCategoriesListRoute,
+  ApiCategoriesPublicListRoute: ApiCategoriesPublicListRoute,
+  ShopCategorySlugRoute: ShopCategorySlugRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
