@@ -1,6 +1,13 @@
 import { createFileRoute, Link, redirect } from '@tanstack/react-router';
 import { format } from 'date-fns';
-import { Loader2, CalendarDays, PanelRightOpen, Pencil, Plus, Trash2 } from 'lucide-react';
+import {
+  CalendarDays,
+  Loader2,
+  PanelRightOpen,
+  Pencil,
+  Plus,
+  Trash2,
+} from 'lucide-react';
 import { useState } from 'react';
 
 import {
@@ -19,9 +26,9 @@ import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';
 import {
+  type AdminBanner,
   useAdminBanners,
   useDeleteBannerMutation,
-  type AdminBanner,
 } from '@/services/banner';
 
 export const Route = createFileRoute('/dashboard/admin/banner/list')({
@@ -61,6 +68,7 @@ function RouteComponent() {
       {isLoading && (
         <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4'>
           {Array.from({ length: 6 }).map((_, i) => (
+            // biome-ignore lint/suspicious/noArrayIndexKey: skeleton loading has no stable id
             <BannerCardSkeleton key={i} />
           ))}
         </div>
@@ -125,13 +133,58 @@ function BannerCard({
           alt={banner.title}
           className='object-cover w-full h-full group-hover:scale-105 transition-transform duration-500'
         />
-        {/* Status dot */}
-        <span
-          className={cn(
-            'absolute top-2 right-2 w-2 h-2 rounded-full ring-2 ring-background',
-            banner.isActive ? 'bg-green-500' : 'bg-muted-foreground',
-          )}
-        />
+        {/* Actions — overlay top-right */}
+        <div className='absolute top-2 right-2 flex items-center gap-1 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity duration-200'>
+          <Button
+            variant='ghost'
+            size='icon'
+            className='w-8 h-8 bg-background/80 backdrop-blur-sm hover:bg-background rounded-lg'
+            asChild
+          >
+            <Link
+              to='/dashboard/admin/banner/edit'
+              search={{ bannerId: banner.id }}
+            >
+              <Pencil className='w-3.5 h-3.5' />
+            </Link>
+          </Button>
+          <AlertDialog open={open} onOpenChange={setOpen}>
+            <AlertDialogTrigger asChild>
+              <Button
+                variant='ghost'
+                size='icon'
+                className='w-8 h-8 bg-background/80 backdrop-blur-sm hover:bg-background hover:text-destructive rounded-lg'
+              >
+                <Trash2 className='w-3.5 h-3.5' />
+              </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent size='sm'>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Delete banner?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  This will permanently delete &ldquo;{banner.title}&rdquo; and
+                  its image. This action cannot be undone.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <AlertDialogAction
+                  variant='destructive'
+                  disabled={isDeleting}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    deleteBanner(banner.id);
+                  }}
+                >
+                  {isDeleting && (
+                    <Loader2 className='w-3.5 h-3.5 animate-spin' />
+                  )}
+                  Delete
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+        </div>
       </div>
 
       {/* Body */}
@@ -139,7 +192,10 @@ function BannerCard({
         {/* Tag + Position badges */}
         <div className='flex items-center gap-2'>
           {banner.bannerTag && (
-            <Badge variant='secondary' className='text-[10px] uppercase tracking-wider'>
+            <Badge
+              variant='secondary'
+              className='text-[10px] uppercase tracking-wider'
+            >
               {banner.bannerTag}
             </Badge>
           )}
@@ -181,53 +237,6 @@ function BannerCard({
             )}
           </div>
         )}
-
-        {/* Actions */}
-        <div className='flex items-center justify-end gap-1 pt-2 border-t border-border'>
-          <Button
-            variant='ghost'
-            size='icon'
-            className='w-8 h-8 text-muted-foreground hover:text-foreground'
-          >
-            <Pencil className='w-3.5 h-3.5' />
-          </Button>
-          <AlertDialog open={open} onOpenChange={setOpen}>
-            <AlertDialogTrigger asChild>
-              <Button
-                variant='ghost'
-                size='icon'
-                className='w-8 h-8 text-muted-foreground hover:text-destructive'
-              >
-                <Trash2 className='w-3.5 h-3.5' />
-              </Button>
-            </AlertDialogTrigger>
-            <AlertDialogContent size='sm'>
-              <AlertDialogHeader>
-                <AlertDialogTitle>Delete banner?</AlertDialogTitle>
-                <AlertDialogDescription>
-                  This will permanently delete &ldquo;{banner.title}&rdquo; and
-                  its image. This action cannot be undone.
-                </AlertDialogDescription>
-              </AlertDialogHeader>
-              <AlertDialogFooter>
-                <AlertDialogCancel>Cancel</AlertDialogCancel>
-                <AlertDialogAction
-                  variant='destructive'
-                  disabled={isDeleting}
-                  onClick={(e) => {
-                    e.preventDefault();
-                    deleteBanner(banner.id);
-                  }}
-                >
-                  {isDeleting && (
-                    <Loader2 className='w-3.5 h-3.5 animate-spin' />
-                  )}
-                  Delete
-                </AlertDialogAction>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialog>
-        </div>
       </div>
     </div>
   );

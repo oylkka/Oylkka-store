@@ -15,11 +15,14 @@ import { Route as DashboardIndexRouteImport } from './routes/dashboard/index'
 import { Route as AuthSigninRouteImport } from './routes/auth/signin'
 import { Route as DashboardAdminRouteRouteImport } from './routes/dashboard/admin/route'
 import { Route as ApiBannersHeroRouteImport } from './routes/api/banners/hero'
+import { Route as ApiBannersGetSingleRouteImport } from './routes/api/banners/get-single'
+import { Route as ApiBannersEditRouteImport } from './routes/api/banners/edit'
 import { Route as ApiBannersDeleteRouteImport } from './routes/api/banners/delete'
 import { Route as ApiBannersAdminListRouteImport } from './routes/api/banners/admin-list'
 import { Route as ApiBannersAddRouteImport } from './routes/api/banners/add'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 import { Route as DashboardAdminBannerListRouteImport } from './routes/dashboard/admin/banner/list'
+import { Route as DashboardAdminBannerEditRouteImport } from './routes/dashboard/admin/banner/edit'
 import { Route as DashboardAdminBannerAddRouteImport } from './routes/dashboard/admin/banner/add'
 
 const DashboardRouteRoute = DashboardRouteRouteImport.update({
@@ -52,6 +55,16 @@ const ApiBannersHeroRoute = ApiBannersHeroRouteImport.update({
   path: '/api/banners/hero',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiBannersGetSingleRoute = ApiBannersGetSingleRouteImport.update({
+  id: '/api/banners/get-single',
+  path: '/api/banners/get-single',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiBannersEditRoute = ApiBannersEditRouteImport.update({
+  id: '/api/banners/edit',
+  path: '/api/banners/edit',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiBannersDeleteRoute = ApiBannersDeleteRouteImport.update({
   id: '/api/banners/delete',
   path: '/api/banners/delete',
@@ -78,6 +91,12 @@ const DashboardAdminBannerListRoute =
     path: '/banner/list',
     getParentRoute: () => DashboardAdminRouteRoute,
   } as any)
+const DashboardAdminBannerEditRoute =
+  DashboardAdminBannerEditRouteImport.update({
+    id: '/banner/edit',
+    path: '/banner/edit',
+    getParentRoute: () => DashboardAdminRouteRoute,
+  } as any)
 const DashboardAdminBannerAddRoute = DashboardAdminBannerAddRouteImport.update({
   id: '/banner/add',
   path: '/banner/add',
@@ -94,8 +113,11 @@ export interface FileRoutesByFullPath {
   '/api/banners/add': typeof ApiBannersAddRoute
   '/api/banners/admin-list': typeof ApiBannersAdminListRoute
   '/api/banners/delete': typeof ApiBannersDeleteRoute
+  '/api/banners/edit': typeof ApiBannersEditRoute
+  '/api/banners/get-single': typeof ApiBannersGetSingleRoute
   '/api/banners/hero': typeof ApiBannersHeroRoute
   '/dashboard/admin/banner/add': typeof DashboardAdminBannerAddRoute
+  '/dashboard/admin/banner/edit': typeof DashboardAdminBannerEditRoute
   '/dashboard/admin/banner/list': typeof DashboardAdminBannerListRoute
 }
 export interface FileRoutesByTo {
@@ -107,8 +129,11 @@ export interface FileRoutesByTo {
   '/api/banners/add': typeof ApiBannersAddRoute
   '/api/banners/admin-list': typeof ApiBannersAdminListRoute
   '/api/banners/delete': typeof ApiBannersDeleteRoute
+  '/api/banners/edit': typeof ApiBannersEditRoute
+  '/api/banners/get-single': typeof ApiBannersGetSingleRoute
   '/api/banners/hero': typeof ApiBannersHeroRoute
   '/dashboard/admin/banner/add': typeof DashboardAdminBannerAddRoute
+  '/dashboard/admin/banner/edit': typeof DashboardAdminBannerEditRoute
   '/dashboard/admin/banner/list': typeof DashboardAdminBannerListRoute
 }
 export interface FileRoutesById {
@@ -122,8 +147,11 @@ export interface FileRoutesById {
   '/api/banners/add': typeof ApiBannersAddRoute
   '/api/banners/admin-list': typeof ApiBannersAdminListRoute
   '/api/banners/delete': typeof ApiBannersDeleteRoute
+  '/api/banners/edit': typeof ApiBannersEditRoute
+  '/api/banners/get-single': typeof ApiBannersGetSingleRoute
   '/api/banners/hero': typeof ApiBannersHeroRoute
   '/dashboard/admin/banner/add': typeof DashboardAdminBannerAddRoute
+  '/dashboard/admin/banner/edit': typeof DashboardAdminBannerEditRoute
   '/dashboard/admin/banner/list': typeof DashboardAdminBannerListRoute
 }
 export interface FileRouteTypes {
@@ -138,8 +166,11 @@ export interface FileRouteTypes {
     | '/api/banners/add'
     | '/api/banners/admin-list'
     | '/api/banners/delete'
+    | '/api/banners/edit'
+    | '/api/banners/get-single'
     | '/api/banners/hero'
     | '/dashboard/admin/banner/add'
+    | '/dashboard/admin/banner/edit'
     | '/dashboard/admin/banner/list'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -151,8 +182,11 @@ export interface FileRouteTypes {
     | '/api/banners/add'
     | '/api/banners/admin-list'
     | '/api/banners/delete'
+    | '/api/banners/edit'
+    | '/api/banners/get-single'
     | '/api/banners/hero'
     | '/dashboard/admin/banner/add'
+    | '/dashboard/admin/banner/edit'
     | '/dashboard/admin/banner/list'
   id:
     | '__root__'
@@ -165,8 +199,11 @@ export interface FileRouteTypes {
     | '/api/banners/add'
     | '/api/banners/admin-list'
     | '/api/banners/delete'
+    | '/api/banners/edit'
+    | '/api/banners/get-single'
     | '/api/banners/hero'
     | '/dashboard/admin/banner/add'
+    | '/dashboard/admin/banner/edit'
     | '/dashboard/admin/banner/list'
   fileRoutesById: FileRoutesById
 }
@@ -178,6 +215,8 @@ export interface RootRouteChildren {
   ApiBannersAddRoute: typeof ApiBannersAddRoute
   ApiBannersAdminListRoute: typeof ApiBannersAdminListRoute
   ApiBannersDeleteRoute: typeof ApiBannersDeleteRoute
+  ApiBannersEditRoute: typeof ApiBannersEditRoute
+  ApiBannersGetSingleRoute: typeof ApiBannersGetSingleRoute
   ApiBannersHeroRoute: typeof ApiBannersHeroRoute
 }
 
@@ -225,6 +264,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiBannersHeroRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/banners/get-single': {
+      id: '/api/banners/get-single'
+      path: '/api/banners/get-single'
+      fullPath: '/api/banners/get-single'
+      preLoaderRoute: typeof ApiBannersGetSingleRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/banners/edit': {
+      id: '/api/banners/edit'
+      path: '/api/banners/edit'
+      fullPath: '/api/banners/edit'
+      preLoaderRoute: typeof ApiBannersEditRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/banners/delete': {
       id: '/api/banners/delete'
       path: '/api/banners/delete'
@@ -260,6 +313,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardAdminBannerListRouteImport
       parentRoute: typeof DashboardAdminRouteRoute
     }
+    '/dashboard/admin/banner/edit': {
+      id: '/dashboard/admin/banner/edit'
+      path: '/banner/edit'
+      fullPath: '/dashboard/admin/banner/edit'
+      preLoaderRoute: typeof DashboardAdminBannerEditRouteImport
+      parentRoute: typeof DashboardAdminRouteRoute
+    }
     '/dashboard/admin/banner/add': {
       id: '/dashboard/admin/banner/add'
       path: '/banner/add'
@@ -272,11 +332,13 @@ declare module '@tanstack/react-router' {
 
 interface DashboardAdminRouteRouteChildren {
   DashboardAdminBannerAddRoute: typeof DashboardAdminBannerAddRoute
+  DashboardAdminBannerEditRoute: typeof DashboardAdminBannerEditRoute
   DashboardAdminBannerListRoute: typeof DashboardAdminBannerListRoute
 }
 
 const DashboardAdminRouteRouteChildren: DashboardAdminRouteRouteChildren = {
   DashboardAdminBannerAddRoute: DashboardAdminBannerAddRoute,
+  DashboardAdminBannerEditRoute: DashboardAdminBannerEditRoute,
   DashboardAdminBannerListRoute: DashboardAdminBannerListRoute,
 }
 
@@ -305,6 +367,8 @@ const rootRouteChildren: RootRouteChildren = {
   ApiBannersAddRoute: ApiBannersAddRoute,
   ApiBannersAdminListRoute: ApiBannersAdminListRoute,
   ApiBannersDeleteRoute: ApiBannersDeleteRoute,
+  ApiBannersEditRoute: ApiBannersEditRoute,
+  ApiBannersGetSingleRoute: ApiBannersGetSingleRoute,
   ApiBannersHeroRoute: ApiBannersHeroRoute,
 }
 export const routeTree = rootRouteImport

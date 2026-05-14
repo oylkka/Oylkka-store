@@ -2,7 +2,10 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
 import { toast } from 'sonner';
 import { QUERY_KEYS } from '@/lib/constants';
-import type { BannerFormType } from '@/schemas/banner-schema';
+import type {
+  BannerFormType,
+  EditBannerFormType,
+} from '@/schemas/banner-schema';
 
 type HeroBanner = {
   id: string;
@@ -64,6 +67,22 @@ export function useAdminBanners() {
       );
       return response.data;
     },
+  });
+}
+
+export function useBanner(id: string | undefined) {
+  return useQuery<AdminBanner>({
+    queryKey: ['banner', id],
+    queryFn: async () => {
+      const response = await axios.post<AdminBanner>(
+        '/api/banners/get-single',
+        {
+          id,
+        },
+      );
+      return response.data;
+    },
+    enabled: !!id,
   });
 }
 
@@ -144,6 +163,64 @@ export function useDeleteBannerMutation() {
         ? (error.response?.data?.error ?? error.message)
         : 'Failed to delete banner';
       toast.error(`Error: ${message}`, { id: 'delete-banner' });
+    },
+  });
+}
+
+export function useEditBannerMutation() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (values: EditBannerFormType & { id: string }) => {
+      const formData = new FormData();
+
+      formData.append('id', values.id);
+      formData.append('title', values.title);
+      formData.append('subtitle', values.subtitle ?? '');
+      formData.append('description', values.description ?? '');
+      formData.append('bannerTag', values.bannerTag ?? '');
+      formData.append('alignment', values.alignment);
+      formData.append('bannerPosition', values.bannerPosition);
+      formData.append('primaryActionText', values.primaryActionText ?? '');
+      formData.append('primaryActionLink', values.primaryActionLink ?? '');
+      formData.append('secondaryActionText', values.secondaryActionText ?? '');
+      formData.append('secondaryActionLink', values.secondaryActionLink ?? '');
+
+      if (values.startDate) {
+        formData.append('startDate', values.startDate.toISOString());
+      }
+      if (values.endDate) {
+        formData.append('endDate', values.endDate.toISOString());
+      }
+
+      if (values.image instanceof FileList && values.image.length > 0) {
+        formData.append('image', values.image[0]);
+      }
+
+      formData.append(
+        'keepExistingImage',
+        String(values.keepExistingImage ?? false),
+      );
+
+      const response = await axios.post('/api/banners/edit', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      });
+
+      return response.data;
+    },
+    onMutate: () => {
+      toast.loading('Updating banner...', { id: 'edit-banner' });
+    },
+    onSuccess: () => {
+      toast.success('Banner updated successfully!', { id: 'edit-banner' });
+      queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.ADMIN_BANNERS] });
+      queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.HERO_BANNER] });
+    },
+    onError: (error: unknown) => {
+      const message = axios.isAxiosError(error)
+        ? (error.response?.data?.error ?? error.message)
+        : 'Failed to update banner';
+      toast.error(`Error: ${message}`, { id: 'edit-banner' });
     },
   });
 }

@@ -1,23 +1,22 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { getRequestHeaders } from '@tanstack/react-start/server';
-import { UploadImage } from '@/cloudinary';
+import { DeleteImage, UploadImage } from '@/cloudinary';
 import { auth } from '@/lib/auth';
 import { prisma } from '@/lib/db';
 import { BannerApiSchema } from '@/schemas/banner-schema';
 
-export const Route = createFileRoute('/api/banners/add')({
+export const Route = createFileRoute('/api/banners/edit')({
   server: {
     handlers: {
       POST: async ({ request }) => {
         try {
-          // 1. Auth
           const headers = getRequestHeaders();
           const session = await auth.api.getSession({ headers });
+
           if (!session?.user || session.user.role !== 'ADMIN') {
             return Response.json({ error: 'Unauthorized' }, { status: 401 });
           }
 
-          // 2. Parse form data
           const formData = await request.formData();
 
           // biome-ignore lint: error
@@ -32,11 +31,29 @@ export const Route = createFileRoute('/api/banners/add')({
             }
           }
 
-          // 3. Validate text fields
+          const id = data.id as string;
+          if (!id) {
+            return Response.json(
+              { error: 'Banner ID is required' },
+              { status: 400 },
+            );
+          }
+
+          const existingBanner = await prisma.banner.findUnique({
+            where: { id },
+          });
+          if (!existingBanner) {
+            return Response.json(
+              { error: 'Banner not found' },
+              { status: 404 },
+            );
+          }
+
           const textFields = { ...data };
           delete textFields.image;
+          delete textFields.id;
+          delete textFields.keepExistingImage;
 
-          // Normalize empty strings to undefined for optional fields
           for (const key of Object.keys(textFields)) {
             if (textFields[key] === '') textFields[key] = undefined;
           }
@@ -44,44 +61,47 @@ export const Route = createFileRoute('/api/banners/add')({
           const parsed = BannerApiSchema.safeParse(textFields);
           if (!parsed.success) {
             return Response.json(
-              {
-                error: 'Validation failed',
-                details: parsed.error.flatten(),
-              },
+              { error: 'Validation failed', details: parsed.error.flatten() },
               { status: 400 },
             );
           }
 
-          // 4. Validate image file
+          let imageUrl = existingBanner.imageUrl;
+          let imagePublicId = existingBanner.imagePublicId;
+
           const imageFile = data.image;
-          if (!(imageFile instanceof File) || imageFile.size === 0) {
-            return Response.json(
-              { error: 'Image file is required' },
-              { status: 400 },
-            );
+          const keepExisting = data.keepExistingImage === 'true';
+
+          if (
+            imageFile instanceof File &&
+            imageFile.size > 0 &&
+            !keepExisting
+          ) {
+            const allowedTypes = ['image/jpeg', 'image/png', 'image/webp'];
+            if (!allowedTypes.includes(imageFile.type)) {
+              return Response.json(
+                { error: 'Image must be JPEG, PNG, or WEBP' },
+                { status: 400 },
+              );
+            }
+
+            const maxSize = 512000;
+            if (imageFile.size > maxSize) {
+              return Response.json(
+                { error: 'Image size must not exceed 500KB' },
+                { status: 400 },
+              );
+            }
+
+            await DeleteImage(existingBanner.imagePublicId);
+
+            const result = await UploadImage(imageFile, 'banners');
+            imageUrl = result.secure_url;
+            imagePublicId = result.public_id;
           }
 
-          const allowedTypes = ['image/jpeg', 'image/png', 'image/webp'];
-          if (!allowedTypes.includes(imageFile.type)) {
-            return Response.json(
-              { error: 'Image must be JPEG, PNG, or WEBP' },
-              { status: 400 },
-            );
-          }
-
-          const maxSize = 512000;
-          if (imageFile.size > maxSize) {
-            return Response.json(
-              { error: 'Image size must not exceed 500KB' },
-              { status: 400 },
-            );
-          }
-
-          // 5. Upload to Cloudinary
-          const result = await UploadImage(imageFile, 'banners');
-
-          // 6. Create banner
-          const banner = await prisma.banner.create({
+          const banner = await prisma.banner.update({
+            where: { id },
             data: {
               title: parsed.data.title,
               subTitle: parsed.data.subtitle || null,
@@ -95,13 +115,13 @@ export const Route = createFileRoute('/api/banners/add')({
               bannerPosition: parsed.data.bannerPosition,
               startDate: parsed.data.startDate,
               endDate: parsed.data.endDate,
-              imageUrl: result.secure_url,
-              imagePublicId: result.public_id,
+              imageUrl,
+              imagePublicId,
             },
           });
 
           return Response.json(
-            { message: 'Banner created successfully', banner },
+            { message: 'Banner updated successfully', banner },
             { status: 200 },
           );
         } catch (error) {

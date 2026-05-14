@@ -1,10 +1,9 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { getRequestHeaders } from '@tanstack/react-start/server';
-import { DeleteImage } from '@/cloudinary';
 import { auth } from '@/lib/auth';
 import { prisma } from '@/lib/db';
 
-export const Route = createFileRoute('/api/banners/delete')({
+export const Route = createFileRoute('/api/banners/get-single')({
   server: {
     handlers: {
       POST: async ({ request }) => {
@@ -34,11 +33,7 @@ export const Route = createFileRoute('/api/banners/delete')({
             );
           }
 
-          await DeleteImage(banner.imagePublicId);
-
-          await prisma.banner.delete({ where: { id } });
-
-          return Response.json({ success: true }, { status: 200 });
+          return Response.json(banner, { status: 200 });
         } catch {
           return Response.json(
             { error: 'Internal Server Error' },

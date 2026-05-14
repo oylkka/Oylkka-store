@@ -62,7 +62,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
       <body>
         <ThemeProvider defaultTheme='system' storageKey='theme'>
           <TooltipProvider>{children}</TooltipProvider>
-          <Toaster />
+          <Toaster richColors />
         </ThemeProvider>
         <TanStackDevtools
           config={{ position: 'bottom-right' }}
