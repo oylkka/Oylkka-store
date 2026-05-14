@@ -19,6 +19,27 @@ type HeroBanner = {
   alignment?: string;
 };
 
+export type AdminBanner = {
+  id: string;
+  title: string;
+  subTitle: string | null;
+  description: string | null;
+  imageUrl: string;
+  imagePublicId: string;
+  bannerTag: string | null;
+  alignment: string;
+  bannerPosition: string;
+  primaryActionText: string | null;
+  primaryActionLink: string | null;
+  secondaryActionText: string | null;
+  secondaryActionLink: string | null;
+  isActive: boolean;
+  startDate: string | null;
+  endDate: string | null;
+  createdAt: string;
+  updatedAt: string;
+};
+
 type CreateBannerResponse = {
   message: string;
   banner: HeroBanner;
@@ -29,6 +50,18 @@ export function useHeroBanner() {
     queryKey: [QUERY_KEYS.HERO_BANNER],
     queryFn: async () => {
       const response = await axios.get<HeroBanner[]>('/api/banners/hero');
+      return response.data;
+    },
+  });
+}
+
+export function useAdminBanners() {
+  return useQuery<AdminBanner[]>({
+    queryKey: [QUERY_KEYS.ADMIN_BANNERS],
+    queryFn: async () => {
+      const response = await axios.get<AdminBanner[]>(
+        '/api/banners/admin-list',
+      );
       return response.data;
     },
   });
@@ -79,12 +112,38 @@ export function useBannerMutation() {
     onSuccess: () => {
       toast.success('Banner created successfully!', { id: 'banner-mutation' });
       queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.HERO_BANNER] });
+      queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.ADMIN_BANNERS] });
     },
     onError: (error: unknown) => {
       const message = axios.isAxiosError(error)
         ? (error.response?.data?.message ?? error.message)
         : 'Failed to create banner';
       toast.error(`Error: ${message}`, { id: 'banner-mutation' });
+    },
+  });
+}
+
+export function useDeleteBannerMutation() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const response = await axios.post('/api/banners/delete', { id });
+      return response.data;
+    },
+    onMutate: () => {
+      toast.loading('Deleting banner...', { id: 'delete-banner' });
+    },
+    onSuccess: () => {
+      toast.success('Banner deleted successfully!', { id: 'delete-banner' });
+      queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.ADMIN_BANNERS] });
+      queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.HERO_BANNER] });
+    },
+    onError: (error: unknown) => {
+      const message = axios.isAxiosError(error)
+        ? (error.response?.data?.error ?? error.message)
+        : 'Failed to delete banner';
+      toast.error(`Error: ${message}`, { id: 'delete-banner' });
     },
   });
 }
