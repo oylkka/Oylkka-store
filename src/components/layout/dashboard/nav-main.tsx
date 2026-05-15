@@ -4,15 +4,13 @@ import {
   ChevronRight,
   ClipboardList,
   FileText,
-  HelpCircle,
-  Image,
+  LayoutDashboard,
   MessageSquare,
   Package,
   Settings,
   ShoppingBag,
   ShoppingCart,
   Store,
-  Tag,
   Truck,
   Users,
 } from 'lucide-react';
@@ -38,7 +36,7 @@ import type { User } from './types';
 interface SubItem {
   title: string;
   url: string;
-  roles?: UserRole[]; // Roles that can see this item
+  roles?: UserRole[];
 }
 
 interface NavItem {
@@ -46,344 +44,109 @@ interface NavItem {
   url: string;
   icon: React.ComponentType;
   isActive?: boolean;
-  roles?: UserRole[]; // Roles that can see this item
+  roles?: UserRole[];
   items: SubItem[];
 }
 
 export function NavMain({ user }: { user: User }) {
   const userRole = user.role as UserRole;
 
-  // Shopping navigation items (mainly for customers)
-  const shoppingNavItems: NavItem[] = [
+  const userNavItems: NavItem[] = [
     {
-      title: 'Shop',
+      title: 'Shopping',
       url: '/shop',
       icon: ShoppingCart,
-
-      roles: ['ADMIN', 'MANAGER', 'VENDOR', 'CUSTOMER_SERVICE'],
-      items: [
-        {
-          title: 'My Shop',
-          url: '/dashboard/vendor/my-shop',
-          roles: ['VENDOR'],
-        },
-        {
-          title: 'All Products',
-          url: '/shop/all',
-        },
-        {
-          title: 'New Arrivals',
-          url: '/shop/new',
-        },
-        {
-          title: 'Featured',
-          url: '/shop/featured',
-        },
-        {
-          title: 'Best Sellers',
-          url: '/shop/best-sellers',
-        },
-      ],
-    },
-    {
-      title: 'Categories Management',
-      url: '/categories',
-      icon: Tag,
-      roles: ['ADMIN', 'MANAGER', 'CUSTOMER_SERVICE'],
-      items: [
-        {
-          title: 'Category list',
-          url: '/dashboard/admin/category/all',
-          roles: ['ADMIN', 'MANAGER', 'CUSTOMER_SERVICE'],
-        },
-        {
-          title: 'Add Category',
-          url: '/dashboard/admin/category/add',
-          roles: ['ADMIN', 'MANAGER', 'CUSTOMER_SERVICE'],
-        },
-      ],
-    },
-    {
-      title: 'My Orders',
-      url: '/orders',
-      icon: Package,
-      isActive: userRole === 'USER',
       roles: ['USER'],
       items: [
         {
-          title: 'Pending Orders',
-          url: '/dashboard/customer/orders?status=PENDING',
+          title: 'Browse Products',
+          url: '/shop',
         },
         {
-          title: 'Processing Orders',
-          url: '/dashboard/customer/orders?status=PROCESSING',
+          title: 'My Cart',
+          url: '/cart',
         },
         {
-          title: 'Shipped Orders',
-          url: '/dashboard/customer/orders?status=SHIPPED',
+          title: 'My Orders',
+          url: '/dashboard/orders',
         },
         {
-          title: 'Order History',
-          url: '/dashboard/customer/orders',
+          title: 'My Wishlist',
+          url: '/dashboard/wishlist',
+        },
+        {
+          title: 'My Reviews',
+          url: '/dashboard/reviews',
+        },
+        {
+          title: 'Recently Viewed',
+          url: '/shop/recently-viewed',
         },
       ],
     },
     {
-      title: 'Promotions',
-      url: '/promotions',
-      icon: BadgePercent,
-      roles: ['ADMIN', 'MANAGER', 'VENDOR', 'CUSTOMER_SERVICE'],
-      items: [
-        {
-          title: 'Current Deals',
-          url: '/promotions/deals',
-        },
-        {
-          title: 'Clearance',
-          url: '/promotions/clearance',
-        },
-        {
-          title: 'Seasonal',
-          url: '/promotions/seasonal',
-        },
-        {
-          title: 'Loyalty Rewards',
-          url: '/promotions/loyalty',
-        },
-      ],
-    },
-    {
-      title: 'Support',
-      url: '/support',
-      icon: HelpCircle,
-      roles: ['USER'],
-      items: [
-        {
-          title: 'Help Center',
-          url: '/support/help',
-        },
-        {
-          title: 'Contact Us',
-          url: '/support/contact',
-        },
-        {
-          title: 'Submit Ticket',
-          url: '/support/ticket',
-        },
-        {
-          title: 'FAQs',
-          url: '/support/faq',
-        },
-      ],
-    },
-  ];
-
-  // Admin-specific navigation items
-  const adminNavItems: NavItem[] = [
-    {
-      title: 'Dashboard',
-      url: '/admin/dashboard',
-      icon: BarChart2,
-      isActive: userRole === 'ADMIN',
-      roles: ['ADMIN', 'MANAGER'],
-      items: [
-        {
-          title: 'Sales Overview',
-          url: '/admin/dashboard/sales',
-        },
-        {
-          title: 'Inventory',
-          url: '/admin/dashboard/inventory',
-        },
-        {
-          title: 'Analytics',
-          url: '/admin/dashboard/analytics',
-        },
-        {
-          title: 'Financial Reports',
-          url: '/admin/dashboard/financial',
-          roles: ['ADMIN', 'MANAGER'],
-        },
-      ],
-    },
-    {
-      title: 'Product Management',
-      url: '/admin/products',
-      icon: Package,
-      roles: ['ADMIN', 'MANAGER', 'VENDOR'],
-      items: [
-        {
-          title: 'Product List',
-          url: '/dashboard/admin/products/list',
-        },
-        {
-          title: 'Edit Products',
-          url: '/admin/products/edit',
-        },
-        {
-          title: 'Categories',
-          url: '/admin/products/categories',
-          roles: ['ADMIN', 'MANAGER'],
-        },
-        {
-          title: 'Inventory',
-          url: '/admin/products/inventory',
-        },
-        {
-          title: 'Bulk Upload',
-          url: '/admin/products/bulk-upload',
-          roles: ['ADMIN', 'MANAGER', 'VENDOR'],
-        },
-      ],
-    },
-    {
-      title: 'Customer Management',
-      url: '/admin/customers',
-      icon: Users,
-      roles: ['ADMIN', 'MANAGER', 'CUSTOMER_SERVICE'],
-      items: [
-        {
-          title: 'Customer List',
-          url: '/dashboard/admin/customers/list',
-        },
-        {
-          title: 'Customer Reports',
-          url: '/admin/customers/reports',
-          roles: ['ADMIN', 'MANAGER'],
-        },
-        {
-          title: 'Support Tickets',
-          url: '/admin/customers/tickets',
-          roles: ['ADMIN', 'MANAGER', 'CUSTOMER_SERVICE'],
-        },
-        {
-          title: 'Customer Insights',
-          url: '/admin/customers/insights',
-          roles: ['ADMIN', 'MANAGER'],
-        },
-      ],
-    },
-    {
-      title: 'Order Management',
-      url: '/dashboard/admin/orders',
-      icon: ShoppingCart,
-      roles: ['ADMIN', 'MANAGER', 'CUSTOMER_SERVICE'],
-      items: [
-        {
-          title: 'All Orders',
-          url: '/dashboard/admin/orders',
-        },
-        {
-          title: 'Pending Orders',
-          url: '/admin/orders/pending',
-        },
-        {
-          title: 'Processing Orders',
-          url: '/admin/orders/processing',
-        },
-        {
-          title: 'Shipped Orders',
-          url: '/admin/orders/shipped',
-        },
-        {
-          title: 'Returns & Refunds',
-          url: '/admin/orders/returns',
-        },
-      ],
-    },
-    {
-      title: 'Vendor Management',
-      url: '/admin/vendors',
+      title: 'Sell',
+      url: '/dashboard/become-vendor/apply',
       icon: Store,
-      roles: ['ADMIN', 'MANAGER'],
+      roles: ['USER'],
       items: [
         {
-          title: 'Vendor List',
-          url: '/dashboard/admin/vendors/list',
-        },
-        {
-          title: 'Vendor Applications',
-          url: '/admin/vendors/applications',
-        },
-        {
-          title: 'Performance Metrics',
-          url: '/admin/vendors/performance',
-        },
-        {
-          title: 'Payouts',
-          url: '/admin/vendors/payouts',
-          roles: ['ADMIN'],
-        },
-      ],
-    },
-    {
-      title: 'Banner Management',
-      url: '/dashboard/admin/banner',
-      icon: Image,
-      roles: ['ADMIN', 'MANAGER'],
-      items: [
-        {
-          title: 'Add Banner',
-          url: '/dashboard/admin/banner/add',
-        },
-        {
-          title: 'Banner List',
-          url: '/dashboard/admin/banner/list',
+          title: 'Become a Vendor',
+          url: '/dashboard/become-vendor/apply',
         },
       ],
     },
   ];
 
-  // Vendor-specific navigation items
   const vendorNavItems: NavItem[] = [
     {
-      title: 'Vendor Dashboard',
-      url: '/vendor/dashboard',
+      title: 'Dashboard',
+      url: '/dashboard/vendor',
       icon: BarChart2,
       isActive: userRole === 'VENDOR',
       roles: ['VENDOR'],
       items: [
         {
-          title: 'Performance Overview',
-          url: '/vendor/dashboard/overview',
+          title: 'Overview',
+          url: '/dashboard/vendor',
         },
         {
           title: 'Sales Analytics',
-          url: '/vendor/dashboard/sales',
+          url: '/dashboard/vendor/sales',
         },
         {
           title: 'Inventory',
-          url: '/vendor/dashboard/inventory',
+          url: '/dashboard/vendor/inventory',
         },
         {
           title: 'Earnings',
-          url: '/vendor/dashboard/earnings',
+          url: '/dashboard/vendor/earnings',
         },
       ],
     },
     {
-      title: 'My Products',
-      url: '/vendor/products',
+      title: 'Products',
+      url: '/dashboard/vendor/products',
       icon: ShoppingBag,
       roles: ['VENDOR'],
       items: [
         {
           title: 'All Products',
-          url: '/dashboard/vendor/products/all',
+          url: '/dashboard/vendor/products',
         },
         {
           title: 'Add Product',
           url: '/dashboard/vendor/products/add',
         },
         {
-          title: 'Product Reviews',
+          title: 'Reviews',
           url: '/dashboard/vendor/products/reviews',
         },
       ],
     },
     {
       title: 'Orders',
-      url: 'dashboard/vendor/orders/all',
+      url: '/dashboard/vendor/orders',
       icon: ClipboardList,
       roles: ['VENDOR'],
       items: [
@@ -407,161 +170,345 @@ export function NavMain({ user }: { user: User }) {
     },
     {
       title: 'Shipping',
-      url: '/vendor/shipping',
+      url: '/dashboard/vendor/shipping',
       icon: Truck,
       roles: ['VENDOR'],
       items: [
         {
-          title: 'Shipping Settings',
-          url: '/vendor/shipping/settings',
+          title: 'Settings',
+          url: '/dashboard/vendor/shipping',
         },
         {
           title: 'Print Labels',
-          url: '/vendor/shipping/labels',
+          url: '/dashboard/vendor/shipping/labels',
         },
         {
           title: 'Track Shipments',
-          url: '/vendor/shipping/track',
+          url: '/dashboard/vendor/shipping/tracking',
+        },
+      ],
+    },
+    {
+      title: 'My Shop',
+      url: '/dashboard/vendor/shop',
+      icon: Store,
+      roles: ['VENDOR'],
+      items: [
+        {
+          title: 'Shop Profile',
+          url: '/dashboard/vendor/shop',
+        },
+        {
+          title: 'Branding',
+          url: '/dashboard/vendor/shop/branding',
         },
       ],
     },
   ];
 
-  // Customer Service specific navigation items
+  const adminNavItems: NavItem[] = [
+    {
+      title: 'Dashboard',
+      url: '/dashboard/admin',
+      icon: LayoutDashboard,
+      isActive: userRole === 'ADMIN' || userRole === 'MANAGER',
+      roles: ['ADMIN', 'MANAGER'],
+      items: [
+        {
+          title: 'Overview',
+          url: '/dashboard/admin',
+        },
+        {
+          title: 'Sales',
+          url: '/dashboard/admin/sales',
+        },
+        {
+          title: 'Inventory',
+          url: '/dashboard/admin/inventory',
+        },
+        {
+          title: 'Reports',
+          url: '/dashboard/admin/financial',
+          roles: ['ADMIN'],
+        },
+      ],
+    },
+    {
+      title: 'Catalog',
+      url: '/dashboard/admin/products',
+      icon: Package,
+      roles: ['ADMIN', 'MANAGER'],
+      items: [
+        {
+          title: 'All Products',
+          url: '/dashboard/admin/products',
+        },
+        {
+          title: 'Categories',
+          url: '/dashboard/admin/category/all',
+        },
+        {
+          title: 'Reviews',
+          url: '/dashboard/admin/reviews',
+        },
+        {
+          title: 'Bulk Upload',
+          url: '/dashboard/admin/products/bulk',
+          roles: ['ADMIN'],
+        },
+      ],
+    },
+    {
+      title: 'Orders',
+      url: '/dashboard/admin/orders',
+      icon: ShoppingCart,
+      roles: ['ADMIN', 'MANAGER'],
+      items: [
+        {
+          title: 'All Orders',
+          url: '/dashboard/admin/orders',
+        },
+        {
+          title: 'Pending',
+          url: '/dashboard/admin/orders?status=PENDING',
+        },
+        {
+          title: 'Processing',
+          url: '/dashboard/admin/orders?status=PROCESSING',
+        },
+        {
+          title: 'Shipped',
+          url: '/dashboard/admin/orders?status=SHIPPED',
+        },
+        {
+          title: 'Returns',
+          url: '/dashboard/admin/orders?status=RETURNED',
+        },
+      ],
+    },
+    {
+      title: 'Customers',
+      url: '/dashboard/admin/customers',
+      icon: Users,
+      roles: ['ADMIN', 'MANAGER'],
+      items: [
+        {
+          title: 'All Customers',
+          url: '/dashboard/admin/customers',
+        },
+        {
+          title: 'Support Tickets',
+          url: '/dashboard/admin/tickets',
+        },
+      ],
+    },
+    {
+      title: 'Vendors',
+      url: '/dashboard/admin/vendors',
+      icon: Store,
+      roles: ['ADMIN', 'MANAGER'],
+      items: [
+        {
+          title: 'Vendor List',
+          url: '/dashboard/admin/vendors',
+        },
+        {
+          title: 'Applications',
+          url: '/dashboard/admin/vendors?status=PENDING',
+        },
+        {
+          title: 'Performance',
+          url: '/dashboard/admin/vendors/performance',
+        },
+        {
+          title: 'Payouts',
+          url: '/dashboard/admin/vendors/payouts',
+          roles: ['ADMIN'],
+        },
+      ],
+    },
+    {
+      title: 'Marketing',
+      url: '/dashboard/admin/banner/list',
+      icon: BadgePercent,
+      roles: ['ADMIN', 'MANAGER'],
+      items: [
+        {
+          title: 'Banners',
+          url: '/dashboard/admin/banner/list',
+        },
+        {
+          title: 'Coupons & Discounts',
+          url: '/dashboard/admin/coupons',
+          roles: ['ADMIN'],
+        },
+        {
+          title: 'SEO',
+          url: '/dashboard/admin/seo',
+          roles: ['ADMIN'],
+        },
+      ],
+    },
+    {
+      title: 'Sell',
+      url: '/dashboard/become-vendor/apply',
+      icon: Store,
+      roles: ['ADMIN', 'MANAGER'],
+      items: [
+        {
+          title: 'Open a Shop',
+          url: '/dashboard/become-vendor/apply',
+        },
+      ],
+    },
+  ];
+
   const customerServiceNavItems: NavItem[] = [
     {
-      title: 'Service Dashboard',
-      url: '/service/dashboard',
+      title: 'Dashboard',
+      url: '/dashboard/customer-service',
       icon: BarChart2,
       isActive: userRole === 'CUSTOMER_SERVICE',
       roles: ['CUSTOMER_SERVICE'],
       items: [
         {
           title: 'Overview',
-          url: '/service/dashboard/overview',
+          url: '/dashboard/customer-service',
         },
         {
-          title: 'Active Tickets',
-          url: '/service/dashboard/tickets',
-        },
-        {
-          title: 'Performance Metrics',
-          url: '/service/dashboard/metrics',
+          title: 'My Metrics',
+          url: '/dashboard/customer-service/metrics',
         },
       ],
     },
     {
-      title: 'Customer Support',
-      url: '/service/support',
+      title: 'Tickets',
+      url: '/dashboard/customer-service/tickets',
       icon: MessageSquare,
       roles: ['CUSTOMER_SERVICE'],
       items: [
         {
           title: 'Open Tickets',
-          url: '/service/support/open',
+          url: '/dashboard/customer-service/tickets?status=OPEN',
         },
         {
           title: 'Pending Tickets',
-          url: '/service/support/pending',
+          url: '/dashboard/customer-service/tickets?status=PENDING',
         },
         {
           title: 'Resolved Tickets',
-          url: '/service/support/resolved',
+          url: '/dashboard/customer-service/tickets?status=RESOLVED',
         },
         {
           title: 'Create Ticket',
-          url: '/service/support/create',
+          url: '/dashboard/customer-service/tickets/create',
         },
       ],
     },
     {
-      title: 'Order Assistance',
-      url: '/service/orders',
+      title: 'Orders',
+      url: '/dashboard/customer-service/orders',
       icon: ClipboardList,
       roles: ['CUSTOMER_SERVICE'],
       items: [
         {
-          title: 'Track Orders',
-          url: '/service/orders/track',
+          title: 'Order Lookup',
+          url: '/dashboard/customer-service/orders',
         },
         {
-          title: 'Process Returns',
-          url: '/service/orders/returns',
+          title: 'Process Return',
+          url: '/dashboard/customer-service/orders/returns',
         },
         {
-          title: 'Modify Orders',
-          url: '/service/orders/modify',
+          title: 'Modify Order',
+          url: '/dashboard/customer-service/orders/modify',
         },
       ],
     },
     {
       title: 'Knowledge Base',
-      url: '/service/knowledgebase',
+      url: '/dashboard/customer-service/kb',
       icon: FileText,
       roles: ['CUSTOMER_SERVICE'],
       items: [
         {
           title: 'Product Info',
-          url: '/service/knowledgebase/products',
+          url: '/dashboard/customer-service/kb/products',
         },
         {
           title: 'Policies',
-          url: '/service/knowledgebase/policies',
+          url: '/dashboard/customer-service/kb/policies',
         },
         {
           title: 'Common Issues',
-          url: '/service/knowledgebase/issues',
+          url: '/dashboard/customer-service/kb/issues',
         },
         {
           title: 'FAQ Templates',
-          url: '/service/knowledgebase/faq',
+          url: '/dashboard/customer-service/kb/faq',
         },
       ],
     },
   ];
 
-  // Account settings for all users with role-specific options
-  const accountSettingsItem: NavItem = {
-    title: 'Account',
-    url: '/dashboard/profile',
-    icon: Settings,
-    roles: ['ADMIN', 'MANAGER', 'VENDOR', 'CUSTOMER_SERVICE', 'USER'],
-    items: [
-      {
-        title: 'Profile',
-        url: '/dashboard/profile',
-      },
-      {
-        title: 'Addresses',
-        url: '/dashboard/profile/addresses',
-        roles: ['USER', 'VENDOR'],
-      },
+  const accountNavItems: NavItem[] = [
+    {
+      title: 'Account',
+      url: '/dashboard/profile',
+      icon: Settings,
+      roles: ['ADMIN', 'MANAGER', 'VENDOR', 'CUSTOMER_SERVICE', 'USER'],
+      items: [
+        {
+          title: 'Profile',
+          url: '/dashboard/profile',
+        },
+        {
+          title: 'Notifications',
+          url: '/dashboard/notifications',
+        },
+        {
+          title: 'Messages',
+          url: '/dashboard/messages',
+        },
+      ],
+    },
+  ];
 
-      {
-        title: 'Wishlist',
-        url: '/dashboard/customer/wishlist',
-        roles: ['USER'],
-      },
-      {
-        title: 'Notifications',
-        url: '/account/notifications',
-      },
-      {
-        title: 'Message',
-        url: '/message',
-      },
-      {
-        title: 'Vouchers',
-        url: '/account/vouchers',
-      },
-      {
-        title: 'My Review',
-        url: '/dashboard/customer/reviews',
-      },
-    ],
-  };
+  const userAccountNavItems: NavItem[] = [
+    {
+      title: 'Account',
+      url: '/dashboard/profile',
+      icon: Settings,
+      roles: ['USER'],
+      items: [
+        {
+          title: 'My Profile',
+          url: '/dashboard/profile',
+        },
+        {
+          title: 'Payment Methods',
+          url: '/dashboard/payment-methods',
+        },
+        {
+          title: 'Vouchers & Coupons',
+          url: '/dashboard/vouchers',
+        },
+        {
+          title: 'Notifications',
+          url: '/dashboard/notifications',
+        },
+        {
+          title: 'Messages',
+          url: '/dashboard/messages',
+        },
+        {
+          title: 'Help & Support',
+          url: '/support',
+        },
+      ],
+    },
+  ];
 
-  // Filter all nav items based on the user's role
   const filterItemsByRole = (items: NavItem[]): NavItem[] => {
     return items
       .filter((item) => !item.roles || item.roles.includes(userRole))
@@ -573,7 +520,6 @@ export function NavMain({ user }: { user: User }) {
       }));
   };
 
-  // Determine which sidebar label to show based on user role
   const getSidebarLabel = () => {
     switch (userRole) {
       case 'ADMIN':
@@ -585,52 +531,42 @@ export function NavMain({ user }: { user: User }) {
       case 'CUSTOMER_SERVICE':
         return 'Customer Service';
       default:
-        return 'Shopping';
+        return 'My Account';
     }
   };
 
-  // Combine the navigation items based on user role
   let navItems: NavItem[] = [];
 
-  // Add appropriate sections based on user role
   switch (userRole) {
     case 'ADMIN':
       navItems = [
         ...filterItemsByRole(adminNavItems),
-        ...filterItemsByRole(shoppingNavItems),
-        accountSettingsItem,
+        ...filterItemsByRole(accountNavItems),
       ];
       break;
     case 'MANAGER':
       navItems = [
         ...filterItemsByRole(adminNavItems),
-        ...filterItemsByRole(shoppingNavItems),
-        accountSettingsItem,
+        ...filterItemsByRole(accountNavItems),
       ];
       break;
     case 'VENDOR':
       navItems = [
         ...filterItemsByRole(vendorNavItems),
-        ...filterItemsByRole(shoppingNavItems),
-        accountSettingsItem,
+        ...filterItemsByRole(accountNavItems),
       ];
       break;
     case 'CUSTOMER_SERVICE':
       navItems = [
         ...filterItemsByRole(customerServiceNavItems),
-        ...filterItemsByRole(
-          adminNavItems.filter(
-            (item) =>
-              item.title === 'Customer Management' ||
-              item.title === 'Order Management',
-          ),
-        ),
-        ...filterItemsByRole(shoppingNavItems),
-        accountSettingsItem,
+        ...filterItemsByRole(accountNavItems),
       ];
       break;
     default:
-      navItems = [...filterItemsByRole(shoppingNavItems), accountSettingsItem];
+      navItems = [
+        ...filterItemsByRole(userNavItems),
+        ...filterItemsByRole(userAccountNavItems),
+      ];
   }
 
   return (

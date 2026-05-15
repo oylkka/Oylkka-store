@@ -16,6 +16,19 @@ export function cn(...inputs: ClassValue[]) {
  * that word. If the name consists of multiple words, it returns the uppercase initials of the first
  * and last words.
  */
+export function cleanFormData<T extends Record<string, unknown>>(
+  data: T,
+): Partial<T> {
+  const cleaned: Partial<T> = {};
+  for (const key in data) {
+    const value = data[key];
+    if (value === undefined || value === null) continue;
+    if (typeof value === 'string' && value === '') continue;
+    cleaned[key] = value;
+  }
+  return cleaned;
+}
+
 export function getInitials(name?: string | null): string {
   if (!name) {
     return '';

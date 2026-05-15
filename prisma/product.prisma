@@ -217,5 +217,10 @@ enum ProductStatus {
 enum ProductCondition {
   NEW
   USED
-  REFURBISHED
+  LIKE_NEW
+  EXCELLENT
+  GOOD
+  FAIR
+  POOR
+  FOR_PARTS
 }
