@@ -19,6 +19,7 @@ import { Route as DashboardAdminRouteRouteImport } from './routes/dashboard/admi
 import { Route as ShopCategorySlugRouteImport } from './routes/shop/category.$slug'
 import { Route as DashboardBecomeVendorPendingRouteImport } from './routes/dashboard/become-vendor/pending'
 import { Route as DashboardBecomeVendorApplyRouteImport } from './routes/dashboard/become-vendor/apply'
+import { Route as ApiShopUpdateRouteImport } from './routes/api/shop/update'
 import { Route as ApiShopRejectRouteImport } from './routes/api/shop/reject'
 import { Route as ApiShopPendingListRouteImport } from './routes/api/shop/pending-list'
 import { Route as ApiShopMyShopRouteImport } from './routes/api/shop/my-shop'
@@ -46,8 +47,12 @@ import { Route as ApiBannersDeleteRouteImport } from './routes/api/banners/delet
 import { Route as ApiBannersAdminListRouteImport } from './routes/api/banners/admin-list'
 import { Route as ApiBannersAddRouteImport } from './routes/api/banners/add'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
+import { Route as DashboardVendorShopIndexRouteImport } from './routes/dashboard/vendor/shop/index'
 import { Route as DashboardVendorProductsIndexRouteImport } from './routes/dashboard/vendor/products/index'
 import { Route as DashboardAdminVendorsIndexRouteImport } from './routes/dashboard/admin/vendors/index'
+import { Route as DashboardVendorShopPoliciesRouteImport } from './routes/dashboard/vendor/shop/policies'
+import { Route as DashboardVendorShopMessagesRouteImport } from './routes/dashboard/vendor/shop/messages'
+import { Route as DashboardVendorShopBrandingRouteImport } from './routes/dashboard/vendor/shop/branding'
 import { Route as DashboardVendorProductsEditRouteImport } from './routes/dashboard/vendor/products/edit'
 import { Route as DashboardVendorProductsAddRouteImport } from './routes/dashboard/vendor/products/add'
 import { Route as DashboardAdminVendorsDetailRouteImport } from './routes/dashboard/admin/vendors/detail'
@@ -111,6 +116,11 @@ const DashboardBecomeVendorApplyRoute =
     path: '/apply',
     getParentRoute: () => DashboardBecomeVendorRouteRoute,
   } as any)
+const ApiShopUpdateRoute = ApiShopUpdateRouteImport.update({
+  id: '/api/shop/update',
+  path: '/api/shop/update',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiShopRejectRoute = ApiShopRejectRouteImport.update({
   id: '/api/shop/reject',
   path: '/api/shop/reject',
@@ -247,6 +257,12 @@ const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
   path: '/api/auth/$',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DashboardVendorShopIndexRoute =
+  DashboardVendorShopIndexRouteImport.update({
+    id: '/shop/',
+    path: '/shop/',
+    getParentRoute: () => DashboardVendorRouteRoute,
+  } as any)
 const DashboardVendorProductsIndexRoute =
   DashboardVendorProductsIndexRouteImport.update({
     id: '/products/',
@@ -258,6 +274,24 @@ const DashboardAdminVendorsIndexRoute =
     id: '/vendors/',
     path: '/vendors/',
     getParentRoute: () => DashboardAdminRouteRoute,
+  } as any)
+const DashboardVendorShopPoliciesRoute =
+  DashboardVendorShopPoliciesRouteImport.update({
+    id: '/shop/policies',
+    path: '/shop/policies',
+    getParentRoute: () => DashboardVendorRouteRoute,
+  } as any)
+const DashboardVendorShopMessagesRoute =
+  DashboardVendorShopMessagesRouteImport.update({
+    id: '/shop/messages',
+    path: '/shop/messages',
+    getParentRoute: () => DashboardVendorRouteRoute,
+  } as any)
+const DashboardVendorShopBrandingRoute =
+  DashboardVendorShopBrandingRouteImport.update({
+    id: '/shop/branding',
+    path: '/shop/branding',
+    getParentRoute: () => DashboardVendorRouteRoute,
   } as any)
 const DashboardVendorProductsEditRoute =
   DashboardVendorProductsEditRouteImport.update({
@@ -348,6 +382,7 @@ export interface FileRoutesByFullPath {
   '/api/shop/my-shop': typeof ApiShopMyShopRoute
   '/api/shop/pending-list': typeof ApiShopPendingListRoute
   '/api/shop/reject': typeof ApiShopRejectRoute
+  '/api/shop/update': typeof ApiShopUpdateRoute
   '/dashboard/become-vendor/apply': typeof DashboardBecomeVendorApplyRoute
   '/dashboard/become-vendor/pending': typeof DashboardBecomeVendorPendingRoute
   '/shop/category/$slug': typeof ShopCategorySlugRoute
@@ -360,8 +395,12 @@ export interface FileRoutesByFullPath {
   '/dashboard/admin/vendors/detail': typeof DashboardAdminVendorsDetailRoute
   '/dashboard/vendor/products/add': typeof DashboardVendorProductsAddRoute
   '/dashboard/vendor/products/edit': typeof DashboardVendorProductsEditRoute
+  '/dashboard/vendor/shop/branding': typeof DashboardVendorShopBrandingRoute
+  '/dashboard/vendor/shop/messages': typeof DashboardVendorShopMessagesRoute
+  '/dashboard/vendor/shop/policies': typeof DashboardVendorShopPoliciesRoute
   '/dashboard/admin/vendors/': typeof DashboardAdminVendorsIndexRoute
   '/dashboard/vendor/products/': typeof DashboardVendorProductsIndexRoute
+  '/dashboard/vendor/shop/': typeof DashboardVendorShopIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -397,6 +436,7 @@ export interface FileRoutesByTo {
   '/api/shop/my-shop': typeof ApiShopMyShopRoute
   '/api/shop/pending-list': typeof ApiShopPendingListRoute
   '/api/shop/reject': typeof ApiShopRejectRoute
+  '/api/shop/update': typeof ApiShopUpdateRoute
   '/dashboard/become-vendor/apply': typeof DashboardBecomeVendorApplyRoute
   '/dashboard/become-vendor/pending': typeof DashboardBecomeVendorPendingRoute
   '/shop/category/$slug': typeof ShopCategorySlugRoute
@@ -409,8 +449,12 @@ export interface FileRoutesByTo {
   '/dashboard/admin/vendors/detail': typeof DashboardAdminVendorsDetailRoute
   '/dashboard/vendor/products/add': typeof DashboardVendorProductsAddRoute
   '/dashboard/vendor/products/edit': typeof DashboardVendorProductsEditRoute
+  '/dashboard/vendor/shop/branding': typeof DashboardVendorShopBrandingRoute
+  '/dashboard/vendor/shop/messages': typeof DashboardVendorShopMessagesRoute
+  '/dashboard/vendor/shop/policies': typeof DashboardVendorShopPoliciesRoute
   '/dashboard/admin/vendors': typeof DashboardAdminVendorsIndexRoute
   '/dashboard/vendor/products': typeof DashboardVendorProductsIndexRoute
+  '/dashboard/vendor/shop': typeof DashboardVendorShopIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -448,6 +492,7 @@ export interface FileRoutesById {
   '/api/shop/my-shop': typeof ApiShopMyShopRoute
   '/api/shop/pending-list': typeof ApiShopPendingListRoute
   '/api/shop/reject': typeof ApiShopRejectRoute
+  '/api/shop/update': typeof ApiShopUpdateRoute
   '/dashboard/become-vendor/apply': typeof DashboardBecomeVendorApplyRoute
   '/dashboard/become-vendor/pending': typeof DashboardBecomeVendorPendingRoute
   '/shop/category/$slug': typeof ShopCategorySlugRoute
@@ -460,8 +505,12 @@ export interface FileRoutesById {
   '/dashboard/admin/vendors/detail': typeof DashboardAdminVendorsDetailRoute
   '/dashboard/vendor/products/add': typeof DashboardVendorProductsAddRoute
   '/dashboard/vendor/products/edit': typeof DashboardVendorProductsEditRoute
+  '/dashboard/vendor/shop/branding': typeof DashboardVendorShopBrandingRoute
+  '/dashboard/vendor/shop/messages': typeof DashboardVendorShopMessagesRoute
+  '/dashboard/vendor/shop/policies': typeof DashboardVendorShopPoliciesRoute
   '/dashboard/admin/vendors/': typeof DashboardAdminVendorsIndexRoute
   '/dashboard/vendor/products/': typeof DashboardVendorProductsIndexRoute
+  '/dashboard/vendor/shop/': typeof DashboardVendorShopIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -500,6 +549,7 @@ export interface FileRouteTypes {
     | '/api/shop/my-shop'
     | '/api/shop/pending-list'
     | '/api/shop/reject'
+    | '/api/shop/update'
     | '/dashboard/become-vendor/apply'
     | '/dashboard/become-vendor/pending'
     | '/shop/category/$slug'
@@ -512,8 +562,12 @@ export interface FileRouteTypes {
     | '/dashboard/admin/vendors/detail'
     | '/dashboard/vendor/products/add'
     | '/dashboard/vendor/products/edit'
+    | '/dashboard/vendor/shop/branding'
+    | '/dashboard/vendor/shop/messages'
+    | '/dashboard/vendor/shop/policies'
     | '/dashboard/admin/vendors/'
     | '/dashboard/vendor/products/'
+    | '/dashboard/vendor/shop/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -549,6 +603,7 @@ export interface FileRouteTypes {
     | '/api/shop/my-shop'
     | '/api/shop/pending-list'
     | '/api/shop/reject'
+    | '/api/shop/update'
     | '/dashboard/become-vendor/apply'
     | '/dashboard/become-vendor/pending'
     | '/shop/category/$slug'
@@ -561,8 +616,12 @@ export interface FileRouteTypes {
     | '/dashboard/admin/vendors/detail'
     | '/dashboard/vendor/products/add'
     | '/dashboard/vendor/products/edit'
+    | '/dashboard/vendor/shop/branding'
+    | '/dashboard/vendor/shop/messages'
+    | '/dashboard/vendor/shop/policies'
     | '/dashboard/admin/vendors'
     | '/dashboard/vendor/products'
+    | '/dashboard/vendor/shop'
   id:
     | '__root__'
     | '/'
@@ -599,6 +658,7 @@ export interface FileRouteTypes {
     | '/api/shop/my-shop'
     | '/api/shop/pending-list'
     | '/api/shop/reject'
+    | '/api/shop/update'
     | '/dashboard/become-vendor/apply'
     | '/dashboard/become-vendor/pending'
     | '/shop/category/$slug'
@@ -611,8 +671,12 @@ export interface FileRouteTypes {
     | '/dashboard/admin/vendors/detail'
     | '/dashboard/vendor/products/add'
     | '/dashboard/vendor/products/edit'
+    | '/dashboard/vendor/shop/branding'
+    | '/dashboard/vendor/shop/messages'
+    | '/dashboard/vendor/shop/policies'
     | '/dashboard/admin/vendors/'
     | '/dashboard/vendor/products/'
+    | '/dashboard/vendor/shop/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -646,6 +710,7 @@ export interface RootRouteChildren {
   ApiShopMyShopRoute: typeof ApiShopMyShopRoute
   ApiShopPendingListRoute: typeof ApiShopPendingListRoute
   ApiShopRejectRoute: typeof ApiShopRejectRoute
+  ApiShopUpdateRoute: typeof ApiShopUpdateRoute
   ShopCategorySlugRoute: typeof ShopCategorySlugRoute
 }
 
@@ -720,6 +785,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/dashboard/become-vendor/apply'
       preLoaderRoute: typeof DashboardBecomeVendorApplyRouteImport
       parentRoute: typeof DashboardBecomeVendorRouteRoute
+    }
+    '/api/shop/update': {
+      id: '/api/shop/update'
+      path: '/api/shop/update'
+      fullPath: '/api/shop/update'
+      preLoaderRoute: typeof ApiShopUpdateRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/api/shop/reject': {
       id: '/api/shop/reject'
@@ -910,6 +982,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiAuthSplatRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/dashboard/vendor/shop/': {
+      id: '/dashboard/vendor/shop/'
+      path: '/shop'
+      fullPath: '/dashboard/vendor/shop/'
+      preLoaderRoute: typeof DashboardVendorShopIndexRouteImport
+      parentRoute: typeof DashboardVendorRouteRoute
+    }
     '/dashboard/vendor/products/': {
       id: '/dashboard/vendor/products/'
       path: '/products'
@@ -923,6 +1002,27 @@ declare module '@tanstack/react-router' {
       fullPath: '/dashboard/admin/vendors/'
       preLoaderRoute: typeof DashboardAdminVendorsIndexRouteImport
       parentRoute: typeof DashboardAdminRouteRoute
+    }
+    '/dashboard/vendor/shop/policies': {
+      id: '/dashboard/vendor/shop/policies'
+      path: '/shop/policies'
+      fullPath: '/dashboard/vendor/shop/policies'
+      preLoaderRoute: typeof DashboardVendorShopPoliciesRouteImport
+      parentRoute: typeof DashboardVendorRouteRoute
+    }
+    '/dashboard/vendor/shop/messages': {
+      id: '/dashboard/vendor/shop/messages'
+      path: '/shop/messages'
+      fullPath: '/dashboard/vendor/shop/messages'
+      preLoaderRoute: typeof DashboardVendorShopMessagesRouteImport
+      parentRoute: typeof DashboardVendorRouteRoute
+    }
+    '/dashboard/vendor/shop/branding': {
+      id: '/dashboard/vendor/shop/branding'
+      path: '/shop/branding'
+      fullPath: '/dashboard/vendor/shop/branding'
+      preLoaderRoute: typeof DashboardVendorShopBrandingRouteImport
+      parentRoute: typeof DashboardVendorRouteRoute
     }
     '/dashboard/vendor/products/edit': {
       id: '/dashboard/vendor/products/edit'
@@ -1034,13 +1134,21 @@ const DashboardBecomeVendorRouteRouteWithChildren =
 interface DashboardVendorRouteRouteChildren {
   DashboardVendorProductsAddRoute: typeof DashboardVendorProductsAddRoute
   DashboardVendorProductsEditRoute: typeof DashboardVendorProductsEditRoute
+  DashboardVendorShopBrandingRoute: typeof DashboardVendorShopBrandingRoute
+  DashboardVendorShopMessagesRoute: typeof DashboardVendorShopMessagesRoute
+  DashboardVendorShopPoliciesRoute: typeof DashboardVendorShopPoliciesRoute
   DashboardVendorProductsIndexRoute: typeof DashboardVendorProductsIndexRoute
+  DashboardVendorShopIndexRoute: typeof DashboardVendorShopIndexRoute
 }
 
 const DashboardVendorRouteRouteChildren: DashboardVendorRouteRouteChildren = {
   DashboardVendorProductsAddRoute: DashboardVendorProductsAddRoute,
   DashboardVendorProductsEditRoute: DashboardVendorProductsEditRoute,
+  DashboardVendorShopBrandingRoute: DashboardVendorShopBrandingRoute,
+  DashboardVendorShopMessagesRoute: DashboardVendorShopMessagesRoute,
+  DashboardVendorShopPoliciesRoute: DashboardVendorShopPoliciesRoute,
   DashboardVendorProductsIndexRoute: DashboardVendorProductsIndexRoute,
+  DashboardVendorShopIndexRoute: DashboardVendorShopIndexRoute,
 }
 
 const DashboardVendorRouteRouteWithChildren =
@@ -1095,6 +1203,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiShopMyShopRoute: ApiShopMyShopRoute,
   ApiShopPendingListRoute: ApiShopPendingListRoute,
   ApiShopRejectRoute: ApiShopRejectRoute,
+  ApiShopUpdateRoute: ApiShopUpdateRoute,
   ShopCategorySlugRoute: ShopCategorySlugRoute,
 }
 export const routeTree = rootRouteImport

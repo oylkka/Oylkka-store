@@ -341,7 +341,12 @@ export function BannerForm(props: BannerFormProps) {
                         Banner Position
                       </FieldLabel>
                       <Select
-                        onValueChange={(val) => setValue('bannerPosition', val)}
+                        onValueChange={(val) =>
+                          setValue(
+                            'bannerPosition',
+                            val as 'HOME_TOP' | 'HOME_BOTTOM' | 'SIDEBAR',
+                          )
+                        }
                         defaultValue='HOME_TOP'
                       >
                         <SelectTrigger
