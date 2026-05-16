@@ -20,8 +20,9 @@ export function ProductImagesCard() {
   const [draggedImage, setDraggedImage] = useState<ProductImage | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const formMethods = useFormContext();
+  const { register: registerForm } = formMethods;
   const formErrors = formMethods.formState.errors;
-  const imageError = formErrors.root?.images?.message as string | undefined;
+  const imageError = formErrors.images?.message as string | undefined;
 
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
@@ -101,6 +102,7 @@ export function ProductImagesCard() {
         <span className='text-lg font-semibold'>Product Images</span>
       </CardHeader>
       <CardContent className='space-y-4'>
+        <input type='hidden' {...registerForm('images')} />
         <div className='flex flex-col gap-2'>
           <Label htmlFor='image-upload'>Upload Images</Label>
           <FieldDescription>

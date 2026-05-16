@@ -5,7 +5,12 @@ import { useFormContext, useWatch } from 'react-hook-form';
 import { checkSlugUnique } from '@/actions/check-slug';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
-import { Field, FieldDescription, FieldLabel } from '@/components/ui/field';
+import {
+  Field,
+  FieldDescription,
+  FieldError,
+  FieldLabel,
+} from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
 import {
   Select,
@@ -28,7 +33,12 @@ interface BasicInformationCardProps {
 
 export function BasicInformationCard({ productId }: BasicInformationCardProps) {
   const { data: productCategories, isPending, isError } = useVendorCategories();
-  const { control, setValue } = useFormContext<ProductFormValues>();
+  const {
+    control,
+    register,
+    setValue,
+    formState: { errors },
+  } = useFormContext<ProductFormValues>();
   const [isCheckingSlug, setIsCheckingSlug] = useState(false);
   const [slugStatus, setSlugStatus] = useState<{
     isUnique: boolean | null;
@@ -112,15 +122,18 @@ export function BasicInformationCard({ productId }: BasicInformationCardProps) {
       </CardHeader>
       <CardContent className='grid gap-6'>
         <div className='grid grid-cols-1 gap-4 md:grid-cols-2'>
-          <Field>
+          <Field data-invalid={!!errors.productName}>
             <FieldLabel htmlFor='productName'>Product Name *</FieldLabel>
             <Input
               id='productName'
               placeholder='Product Name'
-              onChange={(e) => setValue('productName', e.target.value)}
+              {...register('productName')}
             />
+            {errors.productName && (
+              <FieldError>{errors.productName.message}</FieldError>
+            )}
           </Field>
-          <Field>
+          <Field data-invalid={!!errors.slug}>
             <FieldLabel htmlFor='slug'>Product Slug *</FieldLabel>
             <div className='relative w-full'>
               <Input
@@ -174,21 +187,25 @@ export function BasicInformationCard({ productId }: BasicInformationCardProps) {
                 </div>
               </div>
             )}
+            {errors.slug && <FieldError>{errors.slug.message}</FieldError>}
           </Field>
         </div>
 
-        <Field>
+        <Field data-invalid={!!errors.description}>
           <FieldLabel htmlFor='description'>Description *</FieldLabel>
           <Textarea
             id='description'
             placeholder='Describe your product in detail'
             rows={4}
-            onChange={(e) => setValue('description', e.target.value)}
+            {...register('description')}
           />
+          {errors.description && (
+            <FieldError>{errors.description.message}</FieldError>
+          )}
         </Field>
 
         <div className='grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-6'>
-          <Field>
+          <Field data-invalid={!!errors.category}>
             <FieldLabel>Category *</FieldLabel>
             {isPending ? (
               <Skeleton className='h-8 w-full' />
@@ -223,18 +240,22 @@ export function BasicInformationCard({ productId }: BasicInformationCardProps) {
                 </SelectContent>
               </Select>
             )}
+            {errors.category && (
+              <FieldError>{errors.category.message}</FieldError>
+            )}
           </Field>
-          <Field>
+          <Field data-invalid={!!errors.brand}>
             <FieldLabel htmlFor='brand'>Brand</FieldLabel>
             <Input
               id='brand'
               placeholder='Brand name (optional)'
-              onChange={(e) => setValue('brand', e.target.value)}
+              {...register('brand')}
             />
+            {errors.brand && <FieldError>{errors.brand.message}</FieldError>}
           </Field>
         </div>
 
-        <Field>
+        <Field data-invalid={!!errors.tags}>
           <FieldLabel>Enter your product tags.</FieldLabel>
           <TagsInput
             value={tags}
@@ -246,6 +267,7 @@ export function BasicInformationCard({ productId }: BasicInformationCardProps) {
           <FieldDescription>
             Type a tag and press Enter to add it
           </FieldDescription>
+          {errors.tags && <FieldError>{errors.tags.message}</FieldError>}
         </Field>
       </CardContent>
     </Card>

@@ -62,6 +62,7 @@ export function ProductFormProvider({
       status: 'DRAFT',
       featured: false,
       variants: [],
+      images: [],
     },
   });
 
@@ -70,6 +71,10 @@ export function ProductFormProvider({
       methods.reset(defaultValues);
     }
   }, [defaultValues, methods]);
+
+  useEffect(() => {
+    methods.setValue('images', productImages);
+  }, [productImages, methods]);
 
   const { mutate: createMutate, isPending: createIsPending } =
     useCreateProduct();
@@ -92,16 +97,6 @@ export function ProductFormProvider({
   }
 
   const onSubmit = (data: ProductFormValues) => {
-    const hasNewImages = productImages.some((img) => img.file !== null);
-    const hasExistingImages = productImages.length > 0;
-    if (!hasNewImages && !hasExistingImages) {
-      methods.setError('root.images', {
-        type: 'manual',
-        message: 'At least one product image is required',
-      });
-      return;
-    }
-
     const cleaned = cleanFormData(data);
     const formData = new FormData();
 
@@ -112,6 +107,7 @@ export function ProductFormProvider({
         (value as string[]).forEach((tag) => {
           formData.append('tags', tag);
         });
+      } else if (key === 'images') {
       } else if (
         key === 'variants' ||
         key === 'attributes' ||

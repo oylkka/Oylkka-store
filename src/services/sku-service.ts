@@ -1,4 +1,4 @@
-const SKU_PATTERN = /^[A-Z]{2,4}-\d{3,6}$/;
+const SKU_PATTERN = /^[A-Z]{1,4}-[A-Z0-9]{1,4}\d{3,6}$/;
 
 const isValidSku = (sku: string): boolean => {
   return SKU_PATTERN.test(sku);

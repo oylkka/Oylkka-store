@@ -141,10 +141,17 @@ export const ProductFormSchema = z
       }),
 
     price: z.number().min(0.01, { message: 'Price must be greater than 0' }),
-    discountPrice: z
+    discountPrice: z.preprocess((val) => {
+      if (val === '' || val === undefined || val === null) return undefined;
+      if (typeof val === 'number' && Number.isNaN(val)) return undefined;
+      const parsed = typeof val === 'string' ? Number.parseFloat(val) : val;
+      return typeof parsed === 'number' && Number.isNaN(parsed)
+        ? undefined
+        : parsed;
+    }, z
       .number()
       .min(0, { message: 'Discount price must be non-negative' })
-      .optional(),
+      .optional()),
     discountPercent: z
       .number()
       .min(0, { message: 'Discount percent must be at least 0' })
@@ -178,6 +185,11 @@ export const ProductFormSchema = z
     dimensions: DimensionsSchema.optional(),
     freeShipping: z.boolean().default(false),
 
+    images: z
+      .array(z.any())
+      .min(1, { message: 'At least one product image is required' })
+      .optional()
+      .default([]),
     attributes: AttributesSchema.optional(),
     variants: z.array(ProductVariantSchema).optional().default([]),
 

@@ -53,7 +53,7 @@ export default function PricingAndInventory() {
               id='discountPrice'
               type='number'
               placeholder='Discount price'
-              {...register('discountPrice', { valueAsNumber: true })}
+              {...register('discountPrice')}
             />
             {errors.discountPrice && (
               <FieldError>{errors.discountPrice.message}</FieldError>

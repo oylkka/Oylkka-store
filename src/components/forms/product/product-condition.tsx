@@ -10,7 +10,12 @@ import { useFormContext, useWatch } from 'react-hook-form';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
-import { Field, FieldDescription, FieldLabel } from '@/components/ui/field';
+import {
+  Field,
+  FieldDescription,
+  FieldError,
+  FieldLabel,
+} from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
 import {
   Select,
@@ -47,7 +52,11 @@ const PRODUCT_CONDITIONS = [
 ];
 
 export function ProductCondition({ productId }: ProductConditionProps) {
-  const { control, setValue } = useFormContext<ProductFormValues>();
+  const {
+    control,
+    setValue,
+    formState: { errors },
+  } = useFormContext<ProductFormValues>();
   const { isChecking, isAvailable, error, checkSkuAvailability } = useSkuCheck({
     productId,
   });
@@ -95,7 +104,7 @@ export function ProductCondition({ productId }: ProductConditionProps) {
         <span className='text-lg font-semibold'>Product Details</span>
       </CardHeader>
       <CardContent className='space-y-4'>
-        <Field>
+        <Field data-invalid={!!errors.sku}>
           <FieldLabel>SKU (Stock Keeping Unit)</FieldLabel>
           <div className='flex space-x-2'>
             <div className='relative flex-1'>
@@ -150,6 +159,7 @@ export function ProductCondition({ productId }: ProductConditionProps) {
               <span>A unique identifier for inventory tracking</span>
             )}
           </FieldDescription>
+          {errors.sku && <FieldError>{errors.sku.message}</FieldError>}
         </Field>
 
         <Field>

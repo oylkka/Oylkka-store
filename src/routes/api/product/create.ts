@@ -252,7 +252,7 @@ export const Route = createFileRoute('/api/product/create')({
               metaDescription: textFields.metaDescription as string | null,
               status: textFields.status as
                 | 'DRAFT'
-                | 'ACTIVE'
+                | 'PUBLISHED'
                 | 'ARCHIVED'
                 | 'OUT_OF_STOCK',
               featured: textFields.featured as boolean,

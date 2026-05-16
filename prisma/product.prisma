@@ -209,7 +209,8 @@ model ProductQuestion {
 
 enum ProductStatus {
   DRAFT
-  ACTIVE
+  PUBLISHED
+  REJECTED
   ARCHIVED
   OUT_OF_STOCK
 }
