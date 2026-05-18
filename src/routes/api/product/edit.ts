@@ -161,53 +161,16 @@ export const Route = createFileRoute('/api/product/edit')({
             }
           }
 
-          // Handle main image
-          let imageUrl = existing.imageUrl;
-          let imagePublicId = existing.imagePublicId;
+          // Handle image updates (all images stored in ProductImage[])
           const keepExistingImage = data.keepExistingImage === true;
           const productImages = data.productImages as File[] | undefined;
-
-          if (!keepExistingImage && productImages && productImages.length > 0) {
-            const firstImage = productImages[0];
-            if (firstImage instanceof File && firstImage.size > 0) {
-              if (existing.imagePublicId) {
-                await DeleteImage(existing.imagePublicId).catch(() => {});
-              }
-
-              const allowedTypes = ['image/jpeg', 'image/png', 'image/webp'];
-              if (!allowedTypes.includes(firstImage.type)) {
-                return Response.json(
-                  { error: 'Image must be JPEG, PNG, or WEBP' },
-                  { status: 400 },
-                );
-              }
-
-              const maxSize = 2_097_152;
-              if (firstImage.size > maxSize) {
-                return Response.json(
-                  { error: 'Image size must not exceed 2MB' },
-                  { status: 400 },
-                );
-              }
-
-              const result = await UploadImage(firstImage, 'products');
-              imageUrl = result.secure_url;
-              imagePublicId = result.public_id;
-            }
-          } else if (!keepExistingImage && !productImages) {
-            if (existing.imagePublicId) {
-              await DeleteImage(existing.imagePublicId).catch(() => {});
-            }
-            imageUrl = null;
-            imagePublicId = null;
-          }
-
-          // Handle gallery images
-          const removedGalleryIds: string[] =
+          const removedImageIds: string[] =
             (data.removedGalleryIds as string[]) || [];
-          if (removedGalleryIds.length > 0) {
+
+          // Delete removed images
+          if (removedImageIds.length > 0) {
             const removedImages = existing.images.filter((img) =>
-              removedGalleryIds.includes(img.id),
+              removedImageIds.includes(img.id),
             );
             for (const img of removedImages) {
               if (img.imagePublicId) {
@@ -215,51 +178,56 @@ export const Route = createFileRoute('/api/product/edit')({
               }
             }
             await prisma.productImage.deleteMany({
-              where: { id: { in: removedGalleryIds }, productId },
+              where: { id: { in: removedImageIds }, productId },
             });
           }
 
-          // Upload new gallery images from productImages (skip the first one if it replaced the main image)
-          const newGalleryFiles = productImages ? productImages.slice(1) : [];
-          const galleryData: Array<{
+          // Upload new product images
+          const newImageData: Array<{
             imageUrl: string;
             imagePublicId: string;
             order: number;
           }> = [];
 
-          const existingImages = await prisma.productImage.findMany({
-            where: { productId },
-            orderBy: { order: 'asc' },
-          });
-          const nextOrder = existingImages.length;
+          if (productImages && productImages.length > 0) {
+            for (let i = 0; i < productImages.length; i++) {
+              const file = productImages[i];
+              if (file instanceof File && file.size > 0) {
+                const allowedTypes = ['image/jpeg', 'image/png', 'image/webp'];
+                if (!allowedTypes.includes(file.type)) {
+                  return Response.json(
+                    { error: `Image ${i + 1} must be JPEG, PNG, or WEBP` },
+                    { status: 400 },
+                  );
+                }
 
-          for (let i = 0; i < newGalleryFiles.length; i++) {
-            const file = newGalleryFiles[i];
-            if (file instanceof File && file.size > 0) {
-              const allowedTypes = ['image/jpeg', 'image/png', 'image/webp'];
-              if (!allowedTypes.includes(file.type)) {
-                return Response.json(
-                  {
-                    error: `Gallery image ${i + 1} must be JPEG, PNG, or WEBP`,
-                  },
-                  { status: 400 },
-                );
+                const maxSize = 2_097_152;
+                if (file.size > maxSize) {
+                  return Response.json(
+                    { error: `Image ${i + 1} size must not exceed 2MB` },
+                    { status: 400 },
+                  );
+                }
+
+                const result = await UploadImage(file, 'products');
+                newImageData.push({
+                  imageUrl: result.secure_url,
+                  imagePublicId: result.public_id,
+                  order: i,
+                });
               }
+            }
 
-              const maxSize = 2_097_152;
-              if (file.size > maxSize) {
-                return Response.json(
-                  { error: `Gallery image ${i + 1} size must not exceed 2MB` },
-                  { status: 400 },
-                );
+            // If not keeping existing, delete old Cloudinary images before Prisma update
+            if (!keepExistingImage) {
+              const imagesToKeep = existing.images.filter(
+                (img) => !removedImageIds.includes(img.id),
+              );
+              for (const img of imagesToKeep) {
+                if (img.imagePublicId) {
+                  await DeleteImage(img.imagePublicId).catch(() => {});
+                }
               }
-
-              const result = await UploadImage(file, 'products/gallery');
-              galleryData.push({
-                imageUrl: result.secure_url,
-                imagePublicId: result.public_id,
-                order: nextOrder + i,
-              });
             }
           }
 
@@ -361,10 +329,22 @@ export const Route = createFileRoute('/api/product/edit')({
               dimensionWidth,
               dimensionHeight,
               dimensionUnit,
-              imageUrl,
-              imagePublicId,
-              images:
-                galleryData.length > 0 ? { create: galleryData } : undefined,
+              ...(newImageData.length > 0
+                ? {
+                    images: {
+                      ...(!keepExistingImage ? { deleteMany: {} } : {}),
+                      create: !keepExistingImage
+                        ? newImageData
+                        : newImageData.map((img, i) => ({
+                            ...img,
+                            order:
+                              existing.images.filter(
+                                (e) => !removedImageIds.includes(e.id),
+                              ).length + i,
+                          })),
+                    },
+                  }
+                : {}),
               metaTitle: (data.metaTitle as string) ?? existing.metaTitle,
               metaDescription:
                 (data.metaDescription as string) ?? existing.metaDescription,

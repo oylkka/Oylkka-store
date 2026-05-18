@@ -4,4 +4,5 @@ export const QUERY_KEYS = {
   CATEGORIES: 'categories',
   SHOPS: 'shops',
   PRODUCTS: 'products',
+  PUBLIC_PRODUCTS: 'public-products',
 };

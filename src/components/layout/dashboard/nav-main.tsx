@@ -86,7 +86,7 @@ export function NavMain({ user }: { user: User }) {
       items: [
         // This route should check if user already has a shop
         // and show status (pending/rejected) or the apply form
-        { title: 'Open a Shop', url: '/dashboard/sell' },
+        { title: 'Open a Shop', url: '/dashboard/become-vendor/apply' },
       ],
     },
   ];

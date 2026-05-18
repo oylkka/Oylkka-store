@@ -598,9 +598,9 @@ function ProductCard({ product }: { product: VendorProduct }) {
       className='group rounded-2xl border border-border bg-card overflow-hidden hover:border-primary/30 hover:shadow-lg hover:shadow-black/5 transition-shadow duration-300'
     >
       <div className='relative aspect-square overflow-hidden bg-muted'>
-        {product.imageUrl ? (
+        {product.images?.[0]?.imageUrl ? (
           <img
-            src={product.imageUrl}
+            src={product.images[0].imageUrl}
             alt={product.productName}
             className='w-full h-full object-cover group-hover:scale-105 transition-transform duration-500'
           />

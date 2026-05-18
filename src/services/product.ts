@@ -35,8 +35,6 @@ export type VendorProduct = {
   dimensionWidth: number | null;
   dimensionHeight: number | null;
   dimensionUnit: string;
-  imageUrl: string | null;
-  imagePublicId: string | null;
   images: ProductImage[];
   status: string;
   featured: boolean;
@@ -58,6 +56,179 @@ type CreateProductResponse = {
   message: string;
   product: VendorProduct;
 };
+
+export type CategoryProduct = {
+  id: string;
+  productName: string;
+  slug: string;
+  price: number;
+  discountPrice: number | null;
+  stock: number;
+  hasVariants: boolean;
+  images: { imageUrl: string }[];
+  category: { id: string; name: string; slug: string };
+  shop: { id: string; name: string; slug: string } | null;
+  _count: { reviews: number };
+  createdAt: string;
+};
+
+export type ProductListResponse = {
+  products: CategoryProduct[];
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+};
+
+export type PublicProduct = {
+  id: string;
+  productName: string;
+  slug: string;
+  description: string;
+  price: number;
+  discountPrice: number | null;
+  discountPercent: number | null;
+  stock: number;
+  hasVariants: boolean;
+  sku: string;
+  brand: string | null;
+  condition: string;
+  conditionDescription: string | null;
+  weight: number | null;
+  weightUnit: string;
+  freeShipping: boolean;
+  dimensionLength: number | null;
+  dimensionWidth: number | null;
+  dimensionHeight: number | null;
+  dimensionUnit: string;
+  tags: string[];
+  images: {
+    id: string;
+    imageUrl: string;
+    altText: string | null;
+    order: number;
+  }[];
+  variants: {
+    id: string;
+    name: string;
+    sku: string;
+    price: number;
+    discountPrice: number | null;
+    stock: number;
+    attributes: Record<string, string>;
+    imageUrl: string | null;
+  }[];
+  attributeOptions: { id: string; name: string; values: string[] }[];
+  category: { id: string; name: string; slug: string };
+  shop: {
+    id: string;
+    name: string;
+    slug: string;
+    logoUrl: string | null;
+    rating: number;
+    totalReviews: number;
+    totalSales: number;
+    createdAt: string;
+  } | null;
+  _count: { reviews: number };
+  ratingBreakdown: Record<number, number>;
+  createdAt: string;
+};
+
+export type ProductSortOption = 'newest' | 'price_asc' | 'price_desc';
+
+export function useCategoryProducts(slug: string | undefined) {
+  return useQuery<CategoryProduct[]>({
+    queryKey: [QUERY_KEYS.PUBLIC_PRODUCTS, 'category', slug],
+    queryFn: async () => {
+      const response = await axios.get<CategoryProduct[]>(
+        '/api/product/public-by-category',
+        { params: { slug } },
+      );
+      return response.data;
+    },
+    enabled: !!slug,
+  });
+}
+
+export function useAllProducts(params: {
+  sort?: ProductSortOption;
+  page?: number;
+  limit?: number;
+  category?: string;
+}) {
+  return useQuery<ProductListResponse>({
+    queryKey: [QUERY_KEYS.PUBLIC_PRODUCTS, 'list', params],
+    queryFn: async () => {
+      const response = await axios.get<ProductListResponse>(
+        '/api/product/public-list',
+        { params },
+      );
+      return response.data;
+    },
+  });
+}
+
+export function usePublicCategories() {
+  return useQuery<{ id: string; name: string; slug: string }[]>({
+    queryKey: [QUERY_KEYS.CATEGORIES, 'public'],
+    queryFn: async () => {
+      const response = await axios.get('/api/categories/public-list');
+      return response.data;
+    },
+  });
+}
+
+export type PublicReview = {
+  id: string;
+  rating: number;
+  title: string | null;
+  content: string;
+  verified: boolean;
+  helpfulCount: number;
+  vendorReply: string | null;
+  vendorRepliedAt: string | null;
+  createdAt: string;
+  user: { id: string; name: string; image: string | null };
+  images: { id: string; imageUrl: string; order: number }[];
+};
+
+export type ProductReviewsResponse = {
+  reviews: PublicReview[];
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+  ratingBreakdown: Record<number, number>;
+};
+
+export function usePublicProductReviews(productId: string, page: number = 1) {
+  return useQuery<ProductReviewsResponse>({
+    queryKey: [QUERY_KEYS.PUBLIC_PRODUCTS, 'reviews', productId, page],
+    queryFn: async () => {
+      const response = await axios.get<ProductReviewsResponse>(
+        '/api/product/public-reviews',
+        { params: { productId, page, limit: 10 } },
+      );
+      return response.data;
+    },
+    enabled: !!productId,
+  });
+}
+
+export function usePublicProduct(slug: string) {
+  return useQuery<PublicProduct>({
+    queryKey: [QUERY_KEYS.PUBLIC_PRODUCTS, 'single', slug],
+    queryFn: async () => {
+      const response = await axios.get<PublicProduct>(
+        '/api/product/public-single',
+        { params: { slug } },
+      );
+      return response.data;
+    },
+    enabled: !!slug,
+  });
+}
 
 export function useVendorProducts() {
   return useQuery<VendorProduct[]>({

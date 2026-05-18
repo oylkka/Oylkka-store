@@ -9,9 +9,11 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as ProductsRouteImport } from './routes/products'
 import { Route as DashboardRouteRouteImport } from './routes/dashboard/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as DashboardIndexRouteImport } from './routes/dashboard/index'
+import { Route as ProductSlugRouteImport } from './routes/product.$slug'
 import { Route as AuthSigninRouteImport } from './routes/auth/signin'
 import { Route as DashboardVendorRouteRouteImport } from './routes/dashboard/vendor/route'
 import { Route as DashboardBecomeVendorRouteRouteImport } from './routes/dashboard/become-vendor/route'
@@ -29,6 +31,10 @@ import { Route as ApiShopApplyRouteImport } from './routes/api/shop/apply'
 import { Route as ApiShopAdminListRouteImport } from './routes/api/shop/admin-list'
 import { Route as ApiProductVendorListRouteImport } from './routes/api/product/vendor-list'
 import { Route as ApiProductVendorCategoriesRouteImport } from './routes/api/product/vendor-categories'
+import { Route as ApiProductPublicSingleRouteImport } from './routes/api/product/public-single'
+import { Route as ApiProductPublicReviewsRouteImport } from './routes/api/product/public-reviews'
+import { Route as ApiProductPublicListRouteImport } from './routes/api/product/public-list'
+import { Route as ApiProductPublicByCategoryRouteImport } from './routes/api/product/public-by-category'
 import { Route as ApiProductGetSingleRouteImport } from './routes/api/product/get-single'
 import { Route as ApiProductEditRouteImport } from './routes/api/product/edit'
 import { Route as ApiProductDeleteRouteImport } from './routes/api/product/delete'
@@ -63,6 +69,11 @@ import { Route as DashboardAdminBannerListRouteImport } from './routes/dashboard
 import { Route as DashboardAdminBannerEditRouteImport } from './routes/dashboard/admin/banner/edit'
 import { Route as DashboardAdminBannerAddRouteImport } from './routes/dashboard/admin/banner/add'
 
+const ProductsRoute = ProductsRouteImport.update({
+  id: '/products',
+  path: '/products',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const DashboardRouteRoute = DashboardRouteRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
@@ -77,6 +88,11 @@ const DashboardIndexRoute = DashboardIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => DashboardRouteRoute,
+} as any)
+const ProductSlugRoute = ProductSlugRouteImport.update({
+  id: '/product/$slug',
+  path: '/product/$slug',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const AuthSigninRoute = AuthSigninRouteImport.update({
   id: '/auth/signin',
@@ -165,6 +181,27 @@ const ApiProductVendorCategoriesRoute =
   ApiProductVendorCategoriesRouteImport.update({
     id: '/api/product/vendor-categories',
     path: '/api/product/vendor-categories',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiProductPublicSingleRoute = ApiProductPublicSingleRouteImport.update({
+  id: '/api/product/public-single',
+  path: '/api/product/public-single',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiProductPublicReviewsRoute = ApiProductPublicReviewsRouteImport.update({
+  id: '/api/product/public-reviews',
+  path: '/api/product/public-reviews',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiProductPublicListRoute = ApiProductPublicListRouteImport.update({
+  id: '/api/product/public-list',
+  path: '/api/product/public-list',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiProductPublicByCategoryRoute =
+  ApiProductPublicByCategoryRouteImport.update({
+    id: '/api/product/public-by-category',
+    path: '/api/product/public-by-category',
     getParentRoute: () => rootRouteImport,
   } as any)
 const ApiProductGetSingleRoute = ApiProductGetSingleRouteImport.update({
@@ -350,10 +387,12 @@ const DashboardAdminBannerAddRoute = DashboardAdminBannerAddRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/dashboard': typeof DashboardRouteRouteWithChildren
+  '/products': typeof ProductsRoute
   '/dashboard/admin': typeof DashboardAdminRouteRouteWithChildren
   '/dashboard/become-vendor': typeof DashboardBecomeVendorRouteRouteWithChildren
   '/dashboard/vendor': typeof DashboardVendorRouteRouteWithChildren
   '/auth/signin': typeof AuthSigninRoute
+  '/product/$slug': typeof ProductSlugRoute
   '/dashboard/': typeof DashboardIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/banners/add': typeof ApiBannersAddRoute
@@ -373,6 +412,10 @@ export interface FileRoutesByFullPath {
   '/api/product/delete': typeof ApiProductDeleteRoute
   '/api/product/edit': typeof ApiProductEditRoute
   '/api/product/get-single': typeof ApiProductGetSingleRoute
+  '/api/product/public-by-category': typeof ApiProductPublicByCategoryRoute
+  '/api/product/public-list': typeof ApiProductPublicListRoute
+  '/api/product/public-reviews': typeof ApiProductPublicReviewsRoute
+  '/api/product/public-single': typeof ApiProductPublicSingleRoute
   '/api/product/vendor-categories': typeof ApiProductVendorCategoriesRoute
   '/api/product/vendor-list': typeof ApiProductVendorListRoute
   '/api/shop/admin-list': typeof ApiShopAdminListRoute
@@ -404,10 +447,12 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/products': typeof ProductsRoute
   '/dashboard/admin': typeof DashboardAdminRouteRouteWithChildren
   '/dashboard/become-vendor': typeof DashboardBecomeVendorRouteRouteWithChildren
   '/dashboard/vendor': typeof DashboardVendorRouteRouteWithChildren
   '/auth/signin': typeof AuthSigninRoute
+  '/product/$slug': typeof ProductSlugRoute
   '/dashboard': typeof DashboardIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/banners/add': typeof ApiBannersAddRoute
@@ -427,6 +472,10 @@ export interface FileRoutesByTo {
   '/api/product/delete': typeof ApiProductDeleteRoute
   '/api/product/edit': typeof ApiProductEditRoute
   '/api/product/get-single': typeof ApiProductGetSingleRoute
+  '/api/product/public-by-category': typeof ApiProductPublicByCategoryRoute
+  '/api/product/public-list': typeof ApiProductPublicListRoute
+  '/api/product/public-reviews': typeof ApiProductPublicReviewsRoute
+  '/api/product/public-single': typeof ApiProductPublicSingleRoute
   '/api/product/vendor-categories': typeof ApiProductVendorCategoriesRoute
   '/api/product/vendor-list': typeof ApiProductVendorListRoute
   '/api/shop/admin-list': typeof ApiShopAdminListRoute
@@ -460,10 +509,12 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/dashboard': typeof DashboardRouteRouteWithChildren
+  '/products': typeof ProductsRoute
   '/dashboard/admin': typeof DashboardAdminRouteRouteWithChildren
   '/dashboard/become-vendor': typeof DashboardBecomeVendorRouteRouteWithChildren
   '/dashboard/vendor': typeof DashboardVendorRouteRouteWithChildren
   '/auth/signin': typeof AuthSigninRoute
+  '/product/$slug': typeof ProductSlugRoute
   '/dashboard/': typeof DashboardIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/banners/add': typeof ApiBannersAddRoute
@@ -483,6 +534,10 @@ export interface FileRoutesById {
   '/api/product/delete': typeof ApiProductDeleteRoute
   '/api/product/edit': typeof ApiProductEditRoute
   '/api/product/get-single': typeof ApiProductGetSingleRoute
+  '/api/product/public-by-category': typeof ApiProductPublicByCategoryRoute
+  '/api/product/public-list': typeof ApiProductPublicListRoute
+  '/api/product/public-reviews': typeof ApiProductPublicReviewsRoute
+  '/api/product/public-single': typeof ApiProductPublicSingleRoute
   '/api/product/vendor-categories': typeof ApiProductVendorCategoriesRoute
   '/api/product/vendor-list': typeof ApiProductVendorListRoute
   '/api/shop/admin-list': typeof ApiShopAdminListRoute
@@ -517,10 +572,12 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/dashboard'
+    | '/products'
     | '/dashboard/admin'
     | '/dashboard/become-vendor'
     | '/dashboard/vendor'
     | '/auth/signin'
+    | '/product/$slug'
     | '/dashboard/'
     | '/api/auth/$'
     | '/api/banners/add'
@@ -540,6 +597,10 @@ export interface FileRouteTypes {
     | '/api/product/delete'
     | '/api/product/edit'
     | '/api/product/get-single'
+    | '/api/product/public-by-category'
+    | '/api/product/public-list'
+    | '/api/product/public-reviews'
+    | '/api/product/public-single'
     | '/api/product/vendor-categories'
     | '/api/product/vendor-list'
     | '/api/shop/admin-list'
@@ -571,10 +632,12 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/products'
     | '/dashboard/admin'
     | '/dashboard/become-vendor'
     | '/dashboard/vendor'
     | '/auth/signin'
+    | '/product/$slug'
     | '/dashboard'
     | '/api/auth/$'
     | '/api/banners/add'
@@ -594,6 +657,10 @@ export interface FileRouteTypes {
     | '/api/product/delete'
     | '/api/product/edit'
     | '/api/product/get-single'
+    | '/api/product/public-by-category'
+    | '/api/product/public-list'
+    | '/api/product/public-reviews'
+    | '/api/product/public-single'
     | '/api/product/vendor-categories'
     | '/api/product/vendor-list'
     | '/api/shop/admin-list'
@@ -626,10 +693,12 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/dashboard'
+    | '/products'
     | '/dashboard/admin'
     | '/dashboard/become-vendor'
     | '/dashboard/vendor'
     | '/auth/signin'
+    | '/product/$slug'
     | '/dashboard/'
     | '/api/auth/$'
     | '/api/banners/add'
@@ -649,6 +718,10 @@ export interface FileRouteTypes {
     | '/api/product/delete'
     | '/api/product/edit'
     | '/api/product/get-single'
+    | '/api/product/public-by-category'
+    | '/api/product/public-list'
+    | '/api/product/public-reviews'
+    | '/api/product/public-single'
     | '/api/product/vendor-categories'
     | '/api/product/vendor-list'
     | '/api/shop/admin-list'
@@ -682,7 +755,9 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   DashboardRouteRoute: typeof DashboardRouteRouteWithChildren
+  ProductsRoute: typeof ProductsRoute
   AuthSigninRoute: typeof AuthSigninRoute
+  ProductSlugRoute: typeof ProductSlugRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
   ApiBannersAddRoute: typeof ApiBannersAddRoute
   ApiBannersAdminListRoute: typeof ApiBannersAdminListRoute
@@ -701,6 +776,10 @@ export interface RootRouteChildren {
   ApiProductDeleteRoute: typeof ApiProductDeleteRoute
   ApiProductEditRoute: typeof ApiProductEditRoute
   ApiProductGetSingleRoute: typeof ApiProductGetSingleRoute
+  ApiProductPublicByCategoryRoute: typeof ApiProductPublicByCategoryRoute
+  ApiProductPublicListRoute: typeof ApiProductPublicListRoute
+  ApiProductPublicReviewsRoute: typeof ApiProductPublicReviewsRoute
+  ApiProductPublicSingleRoute: typeof ApiProductPublicSingleRoute
   ApiProductVendorCategoriesRoute: typeof ApiProductVendorCategoriesRoute
   ApiProductVendorListRoute: typeof ApiProductVendorListRoute
   ApiShopAdminListRoute: typeof ApiShopAdminListRoute
@@ -716,6 +795,13 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/products': {
+      id: '/products'
+      path: '/products'
+      fullPath: '/products'
+      preLoaderRoute: typeof ProductsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/dashboard': {
       id: '/dashboard'
       path: '/dashboard'
@@ -736,6 +822,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/dashboard/'
       preLoaderRoute: typeof DashboardIndexRouteImport
       parentRoute: typeof DashboardRouteRoute
+    }
+    '/product/$slug': {
+      id: '/product/$slug'
+      path: '/product/$slug'
+      fullPath: '/product/$slug'
+      preLoaderRoute: typeof ProductSlugRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/auth/signin': {
       id: '/auth/signin'
@@ -854,6 +947,34 @@ declare module '@tanstack/react-router' {
       path: '/api/product/vendor-categories'
       fullPath: '/api/product/vendor-categories'
       preLoaderRoute: typeof ApiProductVendorCategoriesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/product/public-single': {
+      id: '/api/product/public-single'
+      path: '/api/product/public-single'
+      fullPath: '/api/product/public-single'
+      preLoaderRoute: typeof ApiProductPublicSingleRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/product/public-reviews': {
+      id: '/api/product/public-reviews'
+      path: '/api/product/public-reviews'
+      fullPath: '/api/product/public-reviews'
+      preLoaderRoute: typeof ApiProductPublicReviewsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/product/public-list': {
+      id: '/api/product/public-list'
+      path: '/api/product/public-list'
+      fullPath: '/api/product/public-list'
+      preLoaderRoute: typeof ApiProductPublicListRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/product/public-by-category': {
+      id: '/api/product/public-by-category'
+      path: '/api/product/public-by-category'
+      fullPath: '/api/product/public-by-category'
+      preLoaderRoute: typeof ApiProductPublicByCategoryRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/product/get-single': {
@@ -1175,7 +1296,9 @@ const DashboardRouteRouteWithChildren = DashboardRouteRoute._addFileChildren(
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   DashboardRouteRoute: DashboardRouteRouteWithChildren,
+  ProductsRoute: ProductsRoute,
   AuthSigninRoute: AuthSigninRoute,
+  ProductSlugRoute: ProductSlugRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
   ApiBannersAddRoute: ApiBannersAddRoute,
   ApiBannersAdminListRoute: ApiBannersAdminListRoute,
@@ -1194,6 +1317,10 @@ const rootRouteChildren: RootRouteChildren = {
   ApiProductDeleteRoute: ApiProductDeleteRoute,
   ApiProductEditRoute: ApiProductEditRoute,
   ApiProductGetSingleRoute: ApiProductGetSingleRoute,
+  ApiProductPublicByCategoryRoute: ApiProductPublicByCategoryRoute,
+  ApiProductPublicListRoute: ApiProductPublicListRoute,
+  ApiProductPublicReviewsRoute: ApiProductPublicReviewsRoute,
+  ApiProductPublicSingleRoute: ApiProductPublicSingleRoute,
   ApiProductVendorCategoriesRoute: ApiProductVendorCategoriesRoute,
   ApiProductVendorListRoute: ApiProductVendorListRoute,
   ApiShopAdminListRoute: ApiShopAdminListRoute,

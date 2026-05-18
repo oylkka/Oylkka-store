@@ -49,10 +49,6 @@ export const Route = createFileRoute('/api/product/delete')({
             return Response.json({ error: 'Unauthorized' }, { status: 401 });
           }
 
-          if (product.imagePublicId) {
-            await DeleteImage(product.imagePublicId).catch(() => {});
-          }
-
           for (const img of product.images) {
             if (img.imagePublicId) {
               await DeleteImage(img.imagePublicId).catch(() => {});

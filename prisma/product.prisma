@@ -69,11 +69,7 @@ model Product {
   dimensionHeight Float?
   dimensionUnit   String @default("cm")
 
-  // Main image (required once published)
-  imageUrl      String?
-  imagePublicId String?
-
-  // Gallery images
+  // All images stored in ProductImage[] (order: 0 = hero)
   images ProductImage[]
 
   // Variants and their defining attributes
@@ -118,7 +114,7 @@ model Product {
 }
 
 // Separate table for gallery images
-// Main image lives as flat fields on Product itself
+// order: 0 is the hero image
 model ProductImage {
   id        String  @id @default(cuid())
   productId String

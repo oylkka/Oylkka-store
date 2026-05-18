@@ -236,15 +236,13 @@ export const Route = createFileRoute('/api/product/create')({
               dimensionWidth: textFields.dimensionWidth as number | null,
               dimensionHeight: textFields.dimensionHeight as number | null,
               dimensionUnit: textFields.dimensionUnit as string,
-              imageUrl: imageData[0]?.imageUrl || null,
-              imagePublicId: imageData[0]?.imagePublicId || null,
               images:
-                imageData.length > 1
+                imageData.length > 0
                   ? {
-                      create: imageData.slice(1).map((img) => ({
+                      create: imageData.map((img) => ({
                         imageUrl: img.imageUrl,
                         imagePublicId: img.imagePublicId,
-                        order: img.order - 1,
+                        order: img.order,
                       })),
                     }
                   : undefined,

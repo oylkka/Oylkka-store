@@ -1,0 +1,103 @@
+import { createFileRoute } from '@tanstack/react-router';
+import { prisma } from '@/lib/db';
+
+export const Route = createFileRoute('/api/product/public-single')({
+  server: {
+    handlers: {
+      GET: async ({ request }) => {
+        try {
+          const url = new URL(request.url);
+          const slug = url.searchParams.get('slug');
+
+          if (!slug) {
+            return Response.json(
+              { error: 'Product slug is required' },
+              { status: 400 },
+            );
+          }
+
+          const product = await prisma.product.findUnique({
+            where: { slug, status: 'PUBLISHED' },
+            include: {
+              category: { select: { id: true, name: true, slug: true } },
+              images: { orderBy: { order: 'asc' } },
+              variants: {
+                select: {
+                  id: true,
+                  name: true,
+                  sku: true,
+                  price: true,
+                  discountPrice: true,
+                  stock: true,
+                  attributes: true,
+                  imageUrl: true,
+                },
+              },
+              attributeOptions: {
+                select: { id: true, name: true, values: true },
+              },
+              shop: {
+                select: {
+                  id: true,
+                  name: true,
+                  slug: true,
+                  logoUrl: true,
+                  rating: true,
+                  totalReviews: true,
+                  totalSales: true,
+                  createdAt: true,
+                },
+              },
+              _count: { select: { reviews: true } },
+            },
+          });
+
+          if (!product) {
+            return Response.json(
+              { error: 'Product not found' },
+              { status: 404 },
+            );
+          }
+
+          const reviewAgg = await prisma.review.groupBy({
+            by: ['rating'],
+            where: { productId: product.id },
+            _count: true,
+          });
+
+          const ratingBreakdown: Record<number, number> = {
+            1: 0,
+            2: 0,
+            3: 0,
+            4: 0,
+            5: 0,
+          };
+          for (const r of reviewAgg) {
+            ratingBreakdown[r.rating] = r._count;
+          }
+
+          const discountPercent = product.discountPrice
+            ? Math.round(
+                ((product.price - product.discountPrice) / product.price) * 100,
+              )
+            : null;
+
+          return Response.json(
+            { ...product, discountPercent, ratingBreakdown },
+            { status: 200 },
+          );
+        } catch (error) {
+          return Response.json(
+            {
+              error:
+                error instanceof Error
+                  ? error.message
+                  : 'Internal Server Error',
+            },
+            { status: 500 },
+          );
+        }
+      },
+    },
+  },
+});

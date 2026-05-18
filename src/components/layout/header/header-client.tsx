@@ -90,35 +90,35 @@ export default function HeaderClient() {
                         All
                       </Link>
                       <Link
-                        to='/products/clothing'
+                        to='/shop/category/clothing'
                         onClick={() => setIsOpen(false)}
                         className='hover:bg-muted/50 rounded-md px-3 py-2 transition-colors'
                       >
                         Clothing
                       </Link>
                       <Link
-                        to='/products/accessories'
+                        to='/shop/category/accessories'
                         onClick={() => setIsOpen(false)}
                         className='hover:bg-muted/50 rounded-md px-3 py-2 transition-colors'
                       >
                         Accessories
                       </Link>
                       <Link
-                        to='/products/footwear'
+                        to='/shop/category/footwear'
                         onClick={() => setIsOpen(false)}
                         className='hover:bg-muted/50 rounded-md px-3 py-2 transition-colors'
                       >
                         Footwear
                       </Link>
                       <Link
-                        to='/products/jewelry'
+                        to='/shop/category/jewelry'
                         onClick={() => setIsOpen(false)}
                         className='hover:bg-muted/50 rounded-md px-3 py-2 transition-colors'
                       >
                         Jewelry
                       </Link>
                       <Link
-                        to='/products/watches'
+                        to='/shop/category/watches'
                         onClick={() => setIsOpen(false)}
                         className='hover:bg-muted/50 rounded-md px-3 py-2 transition-colors'
                       >

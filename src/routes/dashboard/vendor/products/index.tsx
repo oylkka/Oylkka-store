@@ -216,9 +216,9 @@ function ProductRow({
   return (
     <div className='rounded-2xl border border-border bg-card p-4 flex items-center gap-4 hover:border-primary/30 transition-colors duration-200'>
       <div className='w-14 h-14 rounded-xl bg-muted overflow-hidden shrink-0'>
-        {product.imageUrl ? (
+        {product.images?.[0]?.imageUrl ? (
           <img
-            src={product.imageUrl}
+            src={product.images[0].imageUrl}
             alt={product.productName}
             className='w-full h-full object-cover'
           />

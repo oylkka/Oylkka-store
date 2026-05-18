@@ -79,16 +79,11 @@ function RouteComponent() {
     slug: product.slug,
   };
 
-  const initialImages = [
-    ...(product.imageUrl
-      ? [{ id: 'main-image', file: null as null, preview: product.imageUrl }]
-      : []),
-    ...product.images.map((img) => ({
-      id: img.id,
-      file: null as null,
-      preview: img.imageUrl,
-    })),
-  ];
+  const initialImages = product.images.map((img) => ({
+    id: img.id,
+    file: null as null,
+    preview: img.imageUrl,
+  }));
 
   return (
     <NewProductPage
