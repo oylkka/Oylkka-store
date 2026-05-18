@@ -18,17 +18,17 @@ export const Route = createFileRoute('/api/shop/get-single')({
             return Response.json({ error: 'Unauthorized' }, { status: 401 });
           }
 
-          const { id } = (await request.json()) as { id: string };
+          const { slug } = (await request.json()) as { slug: string };
 
-          if (!id) {
+          if (!slug) {
             return Response.json(
-              { error: 'Shop ID is required' },
+              { error: 'Shop slug is required' },
               { status: 400 },
             );
           }
 
           const shop = await prisma.shop.findUnique({
-            where: { id },
+            where: { slug },
             include: {
               owner: { select: { name: true, email: true } },
             },

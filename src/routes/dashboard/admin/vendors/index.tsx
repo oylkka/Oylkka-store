@@ -288,7 +288,7 @@ function VendorRow({
           className='w-8 h-8 rounded-lg'
           onClick={(_e) =>
             navigate({
-              to: `/dashboard/admin/vendors/detail?vendorId=${shop.id}`,
+              to: `/dashboard/admin/vendors/detail?vendorId=${shop.slug}`,
               // biome-ignore lint/suspicious/noExplicitAny: navigate type limitations
             } as any)
           }

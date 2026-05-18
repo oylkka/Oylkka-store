@@ -89,17 +89,17 @@ export function useAdminShops(status?: string, search?: string) {
   });
 }
 
-export function useShopDetail(id: string | undefined) {
+export function useShopDetail(slug: string | undefined) {
   return useQuery<AdminShopResponse>({
-    queryKey: ['shop', id],
+    queryKey: ['shop', slug],
     queryFn: async () => {
       const response = await axios.post<AdminShopResponse>(
         '/api/shop/get-single',
-        { id },
+        { slug },
       );
       return response.data;
     },
-    enabled: !!id,
+    enabled: !!slug,
   });
 }
 
@@ -279,5 +279,126 @@ export function useApplyShopMutation() {
         : 'Failed to submit shop application';
       toast.error(`Error: ${message}`, { id: 'shop-apply' });
     },
+  });
+}
+
+export type PublicShopListShop = {
+  id: string;
+  name: string;
+  slug: string;
+  logoUrl: string | null;
+  description: string | null;
+  bannerUrl: string | null;
+  rating: number;
+  totalSales: number;
+  totalReviews: number;
+  city: string | null;
+  country: string | null;
+  createdAt: string;
+  _count: { products: number };
+};
+
+export type PublicShopListResponse = {
+  shops: PublicShopListShop[];
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+};
+
+export function usePublicShops(params: { page?: number; search?: string }) {
+  return useQuery<PublicShopListResponse>({
+    queryKey: [QUERY_KEYS.SHOPS, 'public-list', params],
+    queryFn: async () => {
+      const response = await axios.get<PublicShopListResponse>(
+        '/api/shop/public-list',
+        { params },
+      );
+      return response.data;
+    },
+  });
+}
+
+export type PublicShopProduct = {
+  id: string;
+  productName: string;
+  slug: string;
+  price: number;
+  discountPrice: number | null;
+  stock: number;
+  hasVariants: boolean;
+  images: { imageUrl: string }[];
+  category: { id: string; name: string; slug: string };
+  _count: { reviews: number };
+  createdAt: string;
+};
+
+export type PublicShopDetail = {
+  id: string;
+  name: string;
+  slug: string;
+  logoUrl: string | null;
+  bannerUrl: string | null;
+  description: string | null;
+  email: string;
+  phone: string | null;
+  website: string | null;
+  addressLine1: string | null;
+  addressLine2: string | null;
+  city: string | null;
+  state: string | null;
+  country: string | null;
+  postalCode: string | null;
+  rating: number;
+  totalSales: number;
+  totalReviews: number;
+  createdAt: string;
+  _count: { products: number };
+  products: PublicShopProduct[];
+  ratingBreakdown: Record<number, number>;
+  recentReviews: {
+    id: string;
+    rating: number;
+    title: string | null;
+    content: string;
+    createdAt: string;
+    user: { id: string; name: string; image: string | null };
+    product: { id: string; productName: string; slug: string };
+  }[];
+};
+
+export function usePublicShop(slug: string) {
+  return useQuery<PublicShopDetail>({
+    queryKey: [QUERY_KEYS.SHOPS, 'public-single', slug],
+    queryFn: async () => {
+      const response = await axios.get<PublicShopDetail>(
+        '/api/shop/public-single',
+        { params: { slug } },
+      );
+      return response.data;
+    },
+    enabled: !!slug,
+  });
+}
+
+export type PublicShopProductsResponse = {
+  products: PublicShopProduct[];
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+};
+
+export function usePublicShopProducts(shopSlug: string, page: number = 1) {
+  return useQuery<PublicShopProductsResponse>({
+    queryKey: [QUERY_KEYS.SHOPS, 'public-products', shopSlug, page],
+    queryFn: async () => {
+      const response = await axios.get<PublicShopProductsResponse>(
+        '/api/shop/public-products',
+        { params: { shopSlug, page, limit: 20 } },
+      );
+      return response.data;
+    },
+    enabled: !!shopSlug,
   });
 }

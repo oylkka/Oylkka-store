@@ -63,8 +63,8 @@ export const Route = createFileRoute('/dashboard/admin/vendors/detail')({
 
 function RouteComponent() {
   const navigate = useNavigate();
-  const { vendorId } = Route.useSearch();
-  const { data: shop, isLoading, isError } = useShopDetail(vendorId);
+  const { vendorId: vendorSlug } = Route.useSearch();
+  const { data: shop, isLoading, isError } = useShopDetail(vendorSlug);
   const { mutate: approveShop, isPending: isApproving } =
     useApproveShopMutation();
   const { mutate: rejectShop, isPending: isRejecting } =
@@ -77,7 +77,7 @@ function RouteComponent() {
       // biome-ignore lint/suspicious/noExplicitAny: navigate type limitations with index routes
     } as any);
 
-  if (!vendorId) {
+  if (!vendorSlug) {
     return (
       <div className='flex flex-col items-center justify-center py-20 gap-4 text-center'>
         <p className='text-sm text-muted-foreground'>No vendor selected.</p>

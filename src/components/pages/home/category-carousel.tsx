@@ -98,7 +98,7 @@ export default function CategoryCarousel() {
                   className='basis-[45%] pl-2 md:basis-1/3 md:pl-4 lg:basis-1/4'
                 >
                   <Link
-                    to='/shop/category/$slug'
+                    to='/products/category/$slug'
                     params={{ slug: category.slug }}
                     className='group block'
                   >

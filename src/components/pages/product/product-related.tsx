@@ -51,7 +51,7 @@ export function ProductRelated({
           asChild
           className='text-primary gap-1 self-start sm:self-auto'
         >
-          <Link to='/shop/category/$slug' params={{ slug: categorySlug }}>
+          <Link to='/products/category/$slug' params={{ slug: categorySlug }}>
             View all <ArrowRight className='w-3.5 h-3.5' />
           </Link>
         </Button>

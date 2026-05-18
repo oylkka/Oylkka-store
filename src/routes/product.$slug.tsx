@@ -3,7 +3,9 @@ import {
   BadgeCheck,
   Clock,
   Heart,
+  HelpCircle,
   MapPin,
+  MessageSquare,
   Minus,
   PackageX,
   Plus,
@@ -21,6 +23,7 @@ import Header from '@/components/layout/header';
 import { ProductDescription } from '@/components/pages/product/product-description';
 import { ProductGallery } from '@/components/pages/product/product-gallery';
 import { ProductInfo } from '@/components/pages/product/product-info';
+import { ProductQuestions } from '@/components/pages/product/product-questions';
 import { ProductRelated } from '@/components/pages/product/product-related';
 import { ProductVariantPicker } from '@/components/pages/product/product-variant-picker';
 import { ProductVendorCard } from '@/components/pages/product/product-vendor-card';
@@ -129,7 +132,7 @@ function RouteComponent() {
               <BreadcrumbItem>
                 <BreadcrumbLink asChild>
                   <Link
-                    to='/shop/category/$slug'
+                    to='/products/category/$slug'
                     params={{ slug: product.category.slug }}
                     className='hover:text-primary transition-colors'
                   >
@@ -286,175 +289,202 @@ function RouteComponent() {
           </motion.div>
         </div>
 
-        <motion.div
-          initial='hidden'
-          whileInView='show'
-          viewport={{ once: true, margin: '-60px' }}
-          variants={fadeUp}
-          custom={0}
-          className='mt-14 mb-16'
-        >
-          <div className='grid grid-cols-2 sm:grid-cols-4 gap-3'>
-            {trustItems.map((item) => (
-              <div
-                key={item.title}
-                className='group relative flex flex-col items-center text-center gap-3 p-5 rounded-2xl border border-border bg-card hover:border-primary/20 hover:bg-primary/[0.02] transition-all duration-300'
-              >
-                <div className='w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center group-hover:bg-primary/15 transition-colors'>
-                  <item.icon className='w-5 h-5 text-primary' />
-                </div>
-                <div>
-                  <p className='text-sm font-semibold'>{item.title}</p>
-                  <p className='text-xs text-muted-foreground mt-0.5'>
-                    {item.desc}
-                  </p>
-                </div>
+        <div className='grid grid-cols-1 lg:grid-cols-3 gap-8 my-16'>
+          <div className='lg:col-span-2 space-y-16'>
+            <motion.div
+              initial='hidden'
+              whileInView='show'
+              viewport={{ once: true, margin: '-60px' }}
+              variants={fadeUp}
+              custom={0}
+            >
+              <SectionHeader label='Description' icon={Sparkles} />
+              <div className='bg-card border border-border rounded-2xl p-6 md:p-8'>
+                <ProductDescription product={product} />
               </div>
-            ))}
-          </div>
-        </motion.div>
+            </motion.div>
 
-        {product.shop && (
-          <motion.div
-            initial='hidden'
-            whileInView='show'
-            viewport={{ once: true, margin: '-60px' }}
-            variants={fadeUp}
-            custom={0}
-            className='mb-16'
-          >
-            <SectionHeader label='Seller' icon={BadgeCheck} />
-            <ProductVendorCard shop={product.shop} />
-          </motion.div>
-        )}
+            <motion.div
+              initial='hidden'
+              whileInView='show'
+              viewport={{ once: true, margin: '-60px' }}
+              variants={fadeUp}
+              custom={0}
+              className='scroll-mt-24'
+              id='reviews'
+            >
+              <SectionHeader label={`Reviews (${product._count.reviews})`} />
+              <div className='bg-card border border-border rounded-2xl p-6 md:p-8'>
+                <ProductReviews
+                  productId={product.id}
+                  totalReviewCount={product._count.reviews}
+                  ratingBreakdown={product.ratingBreakdown}
+                />
+              </div>
+            </motion.div>
 
-        <motion.div
-          initial='hidden'
-          whileInView='show'
-          viewport={{ once: true, margin: '-60px' }}
-          variants={fadeUp}
-          custom={0}
-          className='mb-16'
-        >
-          <SectionHeader label='Description' icon={Sparkles} />
-          <div className='bg-card border border-border rounded-2xl p-6 md:p-8'>
-            <ProductDescription product={product} />
-          </div>
-        </motion.div>
-
-        <motion.div
-          initial='hidden'
-          whileInView='show'
-          viewport={{ once: true, margin: '-60px' }}
-          variants={fadeUp}
-          custom={0}
-          className='mb-16 scroll-mt-24'
-          id='reviews'
-        >
-          <SectionHeader label={`Reviews (${product._count.reviews})`} />
-          <div className='bg-card border border-border rounded-2xl p-6 md:p-8'>
-            <ProductReviews
-              productId={product.id}
-              totalReviewCount={product._count.reviews}
-              ratingBreakdown={product.ratingBreakdown}
-            />
-          </div>
-        </motion.div>
-
-        <motion.div
-          initial='hidden'
-          whileInView='show'
-          viewport={{ once: true, margin: '-60px' }}
-          variants={fadeUp}
-          custom={0}
-          className='mb-16'
-        >
-          <SectionHeader label='Shipping & Returns' />
-          <div className='bg-card border border-border rounded-2xl p-6 md:p-8'>
-            <div className='grid md:grid-cols-2 gap-8'>
-              <div className='space-y-4'>
-                <div className='flex items-center gap-3'>
-                  <div className='w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center'>
-                    <Truck className='w-5 h-5 text-primary' />
-                  </div>
-                  <div>
-                    <p className='text-sm font-semibold'>
-                      Shipping Information
-                    </p>
-                    {product.freeShipping && (
-                      <p className='text-xs font-medium text-emerald-600 dark:text-emerald-400'>
-                        Free shipping available
+            <motion.div
+              initial='hidden'
+              whileInView='show'
+              viewport={{ once: true, margin: '-60px' }}
+              variants={fadeUp}
+              custom={0}
+            >
+              <SectionHeader label='Shipping & Returns' />
+              <div className='bg-card border border-border rounded-2xl p-6 md:p-8'>
+                <div className='grid md:grid-cols-2 gap-8'>
+                  <div className='space-y-4'>
+                    <div className='flex items-center gap-3'>
+                      <div className='w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center'>
+                        <Truck className='w-5 h-5 text-primary' />
+                      </div>
+                      <div>
+                        <p className='text-sm font-semibold'>
+                          Shipping Information
+                        </p>
+                        {product.freeShipping && (
+                          <p className='text-xs font-medium text-emerald-600 dark:text-emerald-400'>
+                            Free shipping available
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                    <div className='space-y-3 text-sm text-muted-foreground leading-relaxed ml-[52px]'>
+                      <p>
+                        Orders are processed within 1-2 business days. Standard
+                        shipping takes 5-7 business days. Express shipping is
+                        available at checkout for an additional fee.
                       </p>
-                    )}
-                  </div>
-                </div>
-                <div className='space-y-3 text-sm text-muted-foreground leading-relaxed ml-[52px]'>
-                  <p>
-                    Orders are processed within 1-2 business days. Standard
-                    shipping takes 5-7 business days. Express shipping is
-                    available at checkout for an additional fee.
-                  </p>
-                  <ul className='space-y-2'>
-                    {product.weight && (
-                      <li className='flex items-center gap-2'>
-                        <span className='w-1.5 h-1.5 rounded-full bg-primary/60 shrink-0' />
-                        Package weight: {product.weight} {product.weightUnit}
-                      </li>
-                    )}
-                    {product.dimensionLength &&
-                      product.dimensionWidth &&
-                      product.dimensionHeight && (
+                      <ul className='space-y-2'>
+                        {product.weight && (
+                          <li className='flex items-center gap-2'>
+                            <span className='w-1.5 h-1.5 rounded-full bg-primary/60 shrink-0' />
+                            Package weight: {product.weight}{' '}
+                            {product.weightUnit}
+                          </li>
+                        )}
+                        {product.dimensionLength &&
+                          product.dimensionWidth &&
+                          product.dimensionHeight && (
+                            <li className='flex items-center gap-2'>
+                              <span className='w-1.5 h-1.5 rounded-full bg-primary/60 shrink-0' />
+                              Package dimensions: {product.dimensionLength} ×{' '}
+                              {product.dimensionWidth} ×{' '}
+                              {product.dimensionHeight} {product.dimensionUnit}
+                            </li>
+                          )}
                         <li className='flex items-center gap-2'>
                           <span className='w-1.5 h-1.5 rounded-full bg-primary/60 shrink-0' />
-                          Package dimensions: {product.dimensionLength} ×{' '}
-                          {product.dimensionWidth} × {product.dimensionHeight}{' '}
-                          {product.dimensionUnit}
+                          Tracking information sent via email
                         </li>
-                      )}
-                    <li className='flex items-center gap-2'>
-                      <span className='w-1.5 h-1.5 rounded-full bg-primary/60 shrink-0' />
-                      Tracking information sent via email
-                    </li>
-                  </ul>
-                </div>
-              </div>
+                      </ul>
+                    </div>
+                  </div>
 
-              <div className='space-y-4'>
-                <div className='flex items-center gap-3'>
-                  <div className='w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center'>
-                    <RefreshCw className='w-5 h-5 text-primary' />
+                  <div className='space-y-4'>
+                    <div className='flex items-center gap-3'>
+                      <div className='w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center'>
+                        <RefreshCw className='w-5 h-5 text-primary' />
+                      </div>
+                      <div>
+                        <p className='text-sm font-semibold'>Return Policy</p>
+                        <p className='text-xs font-medium text-emerald-600 dark:text-emerald-400'>
+                          30-day money-back guarantee
+                        </p>
+                      </div>
+                    </div>
+                    <div className='space-y-3 text-sm text-muted-foreground leading-relaxed ml-[52px]'>
+                      <p>
+                        We accept returns within 30 days of delivery. Items must
+                        be unused and in their original packaging.
+                      </p>
+                      <ul className='space-y-2'>
+                        <li className='flex items-center gap-2'>
+                          <span className='w-1.5 h-1.5 rounded-full bg-primary/60 shrink-0' />
+                          Free return shipping on defective items
+                        </li>
+                        <li className='flex items-center gap-2'>
+                          <span className='w-1.5 h-1.5 rounded-full bg-primary/60 shrink-0' />
+                          Refunds processed within 5-7 business days
+                        </li>
+                        <li className='flex items-center gap-2'>
+                          <span className='w-1.5 h-1.5 rounded-full bg-primary/60 shrink-0' />
+                          Contact support to initiate a return
+                        </li>
+                      </ul>
+                    </div>
                   </div>
-                  <div>
-                    <p className='text-sm font-semibold'>Return Policy</p>
-                    <p className='text-xs font-medium text-emerald-600 dark:text-emerald-400'>
-                      30-day money-back guarantee
-                    </p>
-                  </div>
-                </div>
-                <div className='space-y-3 text-sm text-muted-foreground leading-relaxed ml-[52px]'>
-                  <p>
-                    We accept returns within 30 days of delivery. Items must be
-                    unused and in their original packaging.
-                  </p>
-                  <ul className='space-y-2'>
-                    <li className='flex items-center gap-2'>
-                      <span className='w-1.5 h-1.5 rounded-full bg-primary/60 shrink-0' />
-                      Free return shipping on defective items
-                    </li>
-                    <li className='flex items-center gap-2'>
-                      <span className='w-1.5 h-1.5 rounded-full bg-primary/60 shrink-0' />
-                      Refunds processed within 5-7 business days
-                    </li>
-                    <li className='flex items-center gap-2'>
-                      <span className='w-1.5 h-1.5 rounded-full bg-primary/60 shrink-0' />
-                      Contact support to initiate a return
-                    </li>
-                  </ul>
                 </div>
               </div>
-            </div>
+            </motion.div>
           </div>
-        </motion.div>
+
+          <div className='lg:sticky lg:top-24 lg:self-start space-y-8'>
+            {product.shop && (
+              <motion.div
+                initial='hidden'
+                whileInView='show'
+                viewport={{ once: true, margin: '-60px' }}
+                variants={fadeUp}
+                custom={0}
+              >
+                <SectionHeader label='Seller' icon={BadgeCheck} />
+                <div className='space-y-3'>
+                  <ProductVendorCard shop={product.shop} />
+                  <Button
+                    variant='outline'
+                    className='w-full gap-2 rounded-xl'
+                    onClick={() => toast.success('Messaging coming soon!')}
+                  >
+                    <MessageSquare className='w-4 h-4' />
+                    Message Seller
+                  </Button>
+                </div>
+              </motion.div>
+            )}
+
+            <motion.div
+              initial='hidden'
+              whileInView='show'
+              viewport={{ once: true, margin: '-60px' }}
+              variants={fadeUp}
+              custom={0.05}
+            >
+              <SectionHeader label='Ask a Question' icon={HelpCircle} />
+              <div className='bg-card border border-border rounded-2xl p-4'>
+                <ProductQuestions productId={product.id} />
+              </div>
+            </motion.div>
+
+            <motion.div
+              initial='hidden'
+              whileInView='show'
+              viewport={{ once: true, margin: '-60px' }}
+              variants={fadeUp}
+              custom={0.1}
+            >
+              <SectionHeader label='Why Shop With Us' />
+              <div className='space-y-3'>
+                {trustItems.map((item) => (
+                  <div
+                    key={item.title}
+                    className='flex items-center gap-3 p-3 rounded-xl border border-border bg-card'
+                  >
+                    <div className='w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center shrink-0'>
+                      <item.icon className='w-4 h-4 text-primary' />
+                    </div>
+                    <div className='min-w-0'>
+                      <p className='text-sm font-semibold'>{item.title}</p>
+                      <p className='text-xs text-muted-foreground'>
+                        {item.desc}
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </motion.div>
+          </div>
+        </div>
 
         <motion.div
           initial='hidden'

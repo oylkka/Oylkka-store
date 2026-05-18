@@ -9,7 +9,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { useCategoryProducts } from '@/services/product';
 
-export const Route = createFileRoute('/shop/category/$slug')({
+export const Route = createFileRoute('/products/category/$slug')({
   component: RouteComponent,
 });
 

@@ -216,6 +216,69 @@ export function usePublicProductReviews(productId: string, page: number = 1) {
   });
 }
 
+export type PublicQuestion = {
+  id: string;
+  question: string;
+  answer: string | null;
+  answeredAt: string | null;
+  createdAt: string;
+  user: { id: string; name: string };
+};
+
+export type ProductQuestionsResponse = {
+  questions: PublicQuestion[];
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+};
+
+export function useProductQuestions(productId: string, page: number = 1) {
+  return useQuery<ProductQuestionsResponse>({
+    queryKey: [QUERY_KEYS.PRODUCT_QUESTIONS, productId, page],
+    queryFn: async () => {
+      const response = await axios.get<ProductQuestionsResponse>(
+        '/api/product/public-questions',
+        { params: { productId, page, limit: 10 } },
+      );
+      return response.data;
+    },
+    enabled: !!productId,
+  });
+}
+
+export function useAskQuestionMutation() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({
+      productId,
+      question,
+    }: {
+      productId: string;
+      question: string;
+    }) => {
+      const response = await axios.post<PublicQuestion>(
+        '/api/product/public-questions',
+        { productId, question },
+      );
+      return response.data;
+    },
+    onSuccess: (_data, variables) => {
+      queryClient.invalidateQueries({
+        queryKey: [QUERY_KEYS.PRODUCT_QUESTIONS, variables.productId],
+      });
+      toast.success('Question submitted successfully!');
+    },
+    onError: (error: unknown) => {
+      const message = axios.isAxiosError(error)
+        ? (error.response?.data?.error ?? error.message)
+        : 'Failed to submit question';
+      toast.error(`Error: ${message}`);
+    },
+  });
+}
+
 export function usePublicProduct(slug: string) {
   return useQuery<PublicProduct>({
     queryKey: [QUERY_KEYS.PUBLIC_PRODUCTS, 'single', slug],
