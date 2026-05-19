@@ -1,0 +1,28 @@
+model Banner {
+  id          String  @id @default(cuid())
+  title       String
+  subTitle    String?
+  description String?
+
+  bannerTag      BannerTag?
+  alignment      Alignment      @default(CENTER)
+  bannerPosition BannerPosition @default(HOME_TOP)
+
+  primaryActionText   String?
+  primaryActionLink   String?
+  secondaryActionText String?
+  secondaryActionLink String?
+
+  imageUrl      String
+  imagePublicId String
+
+  isActive  Boolean   @default(true)
+  startDate DateTime?
+  endDate   DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([bannerPosition, isActive])
+  @@map("banner")
+}

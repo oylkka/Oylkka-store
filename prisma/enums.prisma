@@ -1,4 +1,4 @@
-// --- Enums ---
+// --- User ---
 
 enum UserRole {
   ADMIN
@@ -8,11 +8,95 @@ enum UserRole {
   USER
 }
 
+// --- Shop ---
+
+enum ShopStatus {
+  PENDING
+  APPROVED
+  ACTIVE
+  SUSPENDED
+  REJECTED
+}
+
+// --- Order ---
+
+enum OrderStatus {
+  PENDING
+  CONFIRMED
+  PROCESSING
+  SHIPPED
+  DELIVERED
+  CANCELLED
+  REFUNDED
+  PARTIALLY_REFUNDED
+}
+
+enum FulfillmentStatus {
+  PENDING
+  PROCESSING
+  SHIPPED
+  DELIVERED
+  CANCELLED
+  REFUNDED
+}
+
+enum PaymentStatus {
+  PENDING
+  PAID
+  FAILED
+  REFUNDED
+  PARTIALLY_REFUNDED
+}
+
+enum PaymentMethod {
+  CREDIT_CARD
+  PAYPAL
+  STRIPE
+  BANK_TRANSFER
+  CASH_ON_DELIVERY
+  BKASH
+  WALLET
+}
+
+// --- Payout ---
+
+enum PayoutStatus {
+  PENDING
+  PROCESSING
+  COMPLETED
+  FAILED
+}
+
+// --- Product ---
+
+enum ProductStatus {
+  DRAFT
+  PUBLISHED
+  REJECTED
+  ARCHIVED
+  OUT_OF_STOCK
+}
+
+enum ProductCondition {
+  NEW
+  USED
+  LIKE_NEW
+  EXCELLENT
+  GOOD
+  FAIR
+  POOR
+  FOR_PARTS
+}
+
+// --- Content ---
+
 enum SubscriberStatus {
   ACTIVE
   UNSUBSCRIBED
   BOUNCED
 }
+
+// --- Banner ---
 
 enum BannerPosition {
   HOME_TOP
@@ -30,4 +114,18 @@ enum Alignment {
   LEFT
   CENTER
   RIGHT
+}
+
+// --- Marketing ---
+
+enum DiscountType {
+  PERCENTAGE
+  FIXED
+}
+
+enum CouponScope {
+  ALL
+  CATEGORY
+  PRODUCT
+  SHOP
 }

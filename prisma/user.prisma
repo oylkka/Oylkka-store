@@ -54,7 +54,6 @@ model Account {
   userId String
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  // @db.Text because tokens can exceed 255 characters
   accessToken  String? @db.Text
   refreshToken String? @db.Text
   idToken      String? @db.Text

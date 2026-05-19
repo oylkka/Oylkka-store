@@ -1,0 +1,123 @@
+model Order {
+  id          String @id @default(cuid())
+  orderNumber String @unique @default(cuid())
+
+  customerId String
+  customer   User   @relation(fields: [customerId], references: [id], onDelete: Restrict)
+
+  shippingName         String
+  shippingEmail        String
+  shippingPhone        String?
+  shippingAddressLine1 String
+  shippingAddressLine2 String?
+  shippingCity         String
+  shippingState        String?
+  shippingCountry      String
+  shippingPostalCode   String
+
+  subtotal       Float
+  discountAmount Float @default(0)
+  shippingCost   Float @default(0)
+  tax            Float @default(0)
+  total          Float
+  currency       String @default("BDT")
+
+  paymentStatus PaymentStatus @default(PENDING)
+  paymentMethod PaymentMethod?
+  paymentRef    String?
+
+  status OrderStatus @default(PENDING)
+
+  couponCode     String?
+  couponDiscount Float?
+
+  refundAmount Float?
+  refundReason String?
+  refundedAt   DateTime?
+
+  giftMessage String?
+  notes       String?
+  metadata    Json?
+
+  items   OrderItem[]
+  invoice Invoice?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([customerId])
+  @@index([status])
+  @@index([paymentStatus])
+  @@map("order")
+}
+
+model OrderItem {
+  id      String @id @default(cuid())
+  orderId String
+  order   Order  @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  shopId String
+  shop   Shop   @relation(fields: [shopId], references: [id], onDelete: Restrict)
+
+  productId String
+  product   Product @relation(fields: [productId], references: [id], onDelete: Restrict)
+
+  variantId String?
+  variant   ProductVariant? @relation(fields: [variantId], references: [id], onDelete: Restrict)
+
+  productName   String
+  variantName   String?
+  imageUrl      String?
+  quantity      Int
+  unitPrice     Float
+  discountPrice Float?
+  total         Float
+
+  commissionRate   Float
+  commissionAmount Float
+  vendorAmount     Float
+
+  fulfillmentStatus FulfillmentStatus @default(PENDING)
+  trackingNumber    String?
+  trackingUrl       String?
+  shippedAt         DateTime?
+  deliveredAt       DateTime?
+
+  payoutItem PayoutItem?
+  review     Review?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([orderId])
+  @@index([shopId])
+  @@index([productId])
+  @@index([fulfillmentStatus])
+  @@map("order_item")
+}
+
+model Invoice {
+  id            String   @id @default(cuid())
+  orderId       String   @unique
+  order         Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  invoiceNumber String   @unique
+  pdfUrl        String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([orderId])
+  @@map("invoice")
+}
+
+model BkashToken {
+  id        String   @id @default(cuid())
+  token     String
+  expiresAt DateTime
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([expiresAt])
+  @@map("bkash_token")
+}

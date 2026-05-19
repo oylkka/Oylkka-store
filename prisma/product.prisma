@@ -1,18 +1,12 @@
-// -----------------------------------------------
-// category.prisma
-// -----------------------------------------------
-
 model Category {
   id          String  @id @default(cuid())
   name        String
   slug        String  @unique
   description String?
 
-  // Cloudinary image
   imageUrl      String?
   imagePublicId String?
 
-  // Self-referential for subcategories
   parentId String?
   parent   Category?  @relation("SubCategories", fields: [parentId], references: [id], onDelete: NoAction, onUpdate: NoAction)
   children Category[] @relation("SubCategories")
@@ -29,10 +23,6 @@ model Category {
   @@map("category")
 }
 
-// -----------------------------------------------
-// product.prisma
-// -----------------------------------------------
-
 model Product {
   id          String @id @default(cuid())
   productName String
@@ -46,59 +36,46 @@ model Product {
   sku   String   @unique
   brand String?
 
-  // Pricing
   price         Float
-  discountPrice Float? // Store discounted price; derive percent in app
+  discountPrice Float?
 
-  // Stock — only used when hasVariants is false
-  // When hasVariants is true, stock is managed per variant
   hasVariants Boolean @default(false)
   stock       Int     @default(0)
 
   condition            ProductCondition
   conditionDescription String?
 
-  // Shipping
   weight       Float?
   weightUnit   String  @default("kg")
   freeShipping Boolean @default(false)
 
-  // Dimensions — flat fields instead of composite type
   dimensionLength Float?
   dimensionWidth  Float?
   dimensionHeight Float?
   dimensionUnit   String @default("cm")
 
-  // All images stored in ProductImage[] (order: 0 = hero)
   images ProductImage[]
 
-  // Variants and their defining attributes
   variants         ProductVariant[]
   attributeOptions ProductAttributeOption[]
 
-  // SEO
   metaTitle       String?
   metaDescription String?
 
-  // Status and visibility
   status   ProductStatus @default(DRAFT)
   featured Boolean       @default(false)
 
-  // Multi-vendor
   shopId String?
   shop   Shop?   @relation("ShopProducts", fields: [shopId], references: [id], onUpdate: NoAction)
 
-  // Ownership
   createdBy String
-  user      User   @relation(fields: [createdBy], references: [id], onUpdate: NoAction)
+  user      User   @relation(fields: [createdBy], references: [id], onDelete: Restrict, onUpdate: NoAction)
 
-  // Relationships
   reviews       Review[]
   wishlistItems WishlistItem[]
   cartItems     CartItem[]
   questions     ProductQuestion[]
 
-  // Analytics
   views Int @default(0)
 
   createdAt  DateTime    @default(now())
@@ -113,8 +90,6 @@ model Product {
   @@map("product")
 }
 
-// Separate table for gallery images
-// order: 0 is the hero image
 model ProductImage {
   id        String  @id @default(cuid())
   productId String
@@ -123,7 +98,7 @@ model ProductImage {
   imageUrl      String
   imagePublicId String
   altText       String?
-  order         Int     @default(0) // for controlling display order
+  order         Int     @default(0)
 
   createdAt DateTime @default(now())
 
@@ -131,14 +106,13 @@ model ProductImage {
   @@map("product_image")
 }
 
-// Attribute types defined per product e.g. "Color", "Size"
 model ProductAttributeOption {
   id        String  @id @default(cuid())
   productId String
   product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
 
-  name   String // e.g. "Color", "Size"
-  values String[] // e.g. ["Red", "Blue"], ["S", "M", "L", "XL"]
+  name   String
+  values String[]
 
   @@unique([productId, name])
   @@index([productId])
@@ -150,21 +124,16 @@ model ProductVariant {
   productId String
   product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
 
-  name String // e.g. "Red / M"
+  name String
   sku  String @unique
 
-  // Pricing — can override parent product price
   price         Float
   discountPrice Float?
 
-  // Stock always lives here when product hasVariants = true
   stock Int @default(0)
 
-  // Which attribute values this variant represents
-  // e.g. { "Color": "Red", "Size": "M" }
   attributes Json
 
-  // Variant-specific image (optional)
   imageUrl      String?
   imagePublicId String?
 
@@ -197,27 +166,4 @@ model ProductQuestion {
   @@index([productId])
   @@index([userId])
   @@map("product_question")
-}
-
-// -----------------------------------------------
-// enums.prisma (add these to your existing enums file)
-// -----------------------------------------------
-
-enum ProductStatus {
-  DRAFT
-  PUBLISHED
-  REJECTED
-  ARCHIVED
-  OUT_OF_STOCK
-}
-
-enum ProductCondition {
-  NEW
-  USED
-  LIKE_NEW
-  EXCELLENT
-  GOOD
-  FAIR
-  POOR
-  FOR_PARTS
 }

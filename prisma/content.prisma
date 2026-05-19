@@ -3,7 +3,7 @@ model Subscriber {
   email  String           @unique
   name   String?
   status SubscriberStatus @default(ACTIVE)
-  source String           @default("google_signup")
+  source String           @default("manual")
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

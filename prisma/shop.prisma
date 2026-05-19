@@ -1,25 +1,18 @@
-// -----------------------------------------------
-// shop.prisma
-// -----------------------------------------------
-
 model Shop {
   id          String  @id @default(cuid())
   name        String
   slug        String  @unique
   description String?
 
-  // Logo and banner
   logoUrl        String?
   logoPublicId   String?
   bannerUrl      String?
   bannerPublicId String?
 
-  // Contact
   email   String
   phone   String?
   website String?
 
-  // Address
   addressLine1 String?
   addressLine2 String?
   city         String?
@@ -27,34 +20,30 @@ model Shop {
   country      String?
   postalCode   String?
 
-  // Approval
   status          ShopStatus @default(PENDING)
   rejectionReason String?
   approvedAt      DateTime?
-  approvedBy      String? // userId of the admin who approved
+  approvedBy      String?
   suspendedAt     DateTime?
   suspendedReason String?
+  suspendedBy     String?
 
-  // Payout info — optional until vendor configures
   bankName          String?
   bankAccountName   String?
   bankAccountNumber String?
-  commissionRate    Float   @default(10) // platform % cut per sale
+  commissionRate    Float   @default(10)
 
-  // Cached metrics — update these via background job, not on every request
   totalSales   Int   @default(0)
   totalOrders  Int   @default(0)
   rating       Float @default(0)
   totalReviews Int   @default(0)
 
-  // One vendor = one shop (one-to-one)
   ownerId String @unique
   owner   User   @relation(fields: [ownerId], references: [id], onDelete: Restrict)
 
-  // Relationships
-  products Product[]   @relation("ShopProducts")
-  orders   OrderItem[] // shop sees only their items, not the full order
-  payouts  Payout[]
+  products   Product[]   @relation("ShopProducts")
+  orderItems OrderItem[]
+  payouts    Payout[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -64,10 +53,6 @@ model Shop {
   @@map("shop")
 }
 
-// -----------------------------------------------
-// payout.prisma
-// -----------------------------------------------
-
 model Payout {
   id     String @id @default(cuid())
   shopId String
@@ -76,14 +61,13 @@ model Payout {
   amount    Float
   currency  String       @default("USD")
   status    PayoutStatus @default(PENDING)
-  reference String? // bank transfer reference or payment gateway ID
-  note      String? // admin note
+  reference String?
+  note      String?
 
-  // Which orders are included in this payout
   items PayoutItem[]
 
   processedAt DateTime?
-  processedBy String? // userId of admin who processed it
+  processedBy String?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -93,173 +77,17 @@ model Payout {
   @@map("payout")
 }
 
-// Links a payout to specific order items
 model PayoutItem {
   id       String @id @default(cuid())
   payoutId String
   payout   Payout @relation(fields: [payoutId], references: [id], onDelete: Cascade)
 
-  orderItemId String    @unique // one order item can only be in one payout
+  orderItemId String    @unique
   orderItem   OrderItem @relation(fields: [orderItemId], references: [id], onDelete: Restrict)
 
-  amount     Float // vendor's cut for this item after commission
-  commission Float // platform's cut for this item
+  amount     Float
+  commission Float
 
   @@index([payoutId])
   @@map("payout_item")
-}
-
-// -----------------------------------------------
-// order.prisma
-// -----------------------------------------------
-
-model Order {
-  id          String @id @default(cuid())
-  orderNumber String @unique @default(cuid()) // human-readable e.g. "ORD-2024-XXXX"
-
-  // Who placed the order
-  customerId String
-  customer   User   @relation(fields: [customerId], references: [id], onDelete: Restrict)
-
-  // Snapshot of shipping address at time of order
-  // (don't FK to address — it may change later)
-  shippingName         String
-  shippingEmail        String
-  shippingPhone        String?
-  shippingAddressLine1 String
-  shippingAddressLine2 String?
-  shippingCity         String
-  shippingState        String?
-  shippingCountry      String
-  shippingPostalCode   String
-
-  // Pricing
-  subtotal       Float // sum of all item prices before discounts
-  discountAmount Float @default(0)
-  shippingCost   Float @default(0)
-  tax            Float @default(0)
-  total          Float // final amount charged
-
-  // Payment
-  paymentStatus PaymentStatus @default(PENDING)
-  paymentMethod String? // "stripe", "paypal", etc.
-  paymentRef    String? // gateway transaction ID
-
-  // Overall order status
-  // Each shop's fulfillment is tracked on OrderItem level
-  status OrderStatus @default(PENDING)
-
-  // Coupon applied
-  couponCode     String?
-  couponDiscount Float?
-
-  items OrderItem[]
-  notes String? // customer note at checkout
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@index([customerId])
-  @@index([status])
-  @@index([paymentStatus])
-  @@map("order")
-}
-
-// Each item in an order belongs to exactly one shop
-model OrderItem {
-  id      String @id @default(cuid())
-  orderId String
-  order   Order  @relation(fields: [orderId], references: [id], onDelete: Cascade)
-
-  // Shop that fulfills this item
-  shopId String
-  shop   Shop   @relation(fields: [shopId], references: [id], onDelete: Restrict)
-
-  productId String
-  product   Product @relation(fields: [productId], references: [id], onDelete: Restrict)
-
-  // Optional — only set if customer chose a variant
-  variantId String?
-  variant   ProductVariant? @relation(fields: [variantId], references: [id], onDelete: Restrict)
-
-  // Snapshot of product details at time of order
-  // (product name/price may change later — we store what was actually charged)
-  productName   String
-  variantName   String?
-  imageUrl      String?
-  quantity      Int
-  unitPrice     Float // price per item at time of purchase
-  discountPrice Float? // discounted price if applicable
-  total         Float // unitPrice (or discountPrice) * quantity
-
-  // Commission snapshot
-  commissionRate   Float // copied from Shop.commissionRate at time of order
-  commissionAmount Float // calculated: total * commissionRate / 100
-  vendorAmount     Float // total - commissionAmount
-
-  // Per-shop fulfillment status
-  fulfillmentStatus FulfillmentStatus @default(PENDING)
-  trackingNumber    String?
-  trackingUrl       String?
-  shippedAt         DateTime?
-  deliveredAt       DateTime?
-
-  // Payout
-  payoutItem PayoutItem?
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  review    Review?
-
-  @@index([orderId])
-  @@index([shopId])
-  @@index([productId])
-  @@index([fulfillmentStatus])
-  @@map("order_item")
-}
-
-// -----------------------------------------------
-// Add to enums.prisma
-// -----------------------------------------------
-
-enum ShopStatus {
-  PENDING // just registered, awaiting admin review
-  APPROVED // admin approved, vendor can now set up shop
-  ACTIVE // shop is live and selling
-  SUSPENDED // temporarily disabled by admin
-  REJECTED // admin rejected the application
-}
-
-enum OrderStatus {
-  PENDING // order placed, payment not yet confirmed
-  CONFIRMED // payment confirmed
-  PROCESSING // being prepared by vendors
-  SHIPPED // all items shipped
-  DELIVERED // all items delivered
-  CANCELLED // order cancelled
-  REFUNDED // order refunded
-}
-
-enum FulfillmentStatus {
-  PENDING // shop hasn't acted yet
-  PROCESSING // shop is preparing the item
-  SHIPPED // item is on the way
-  DELIVERED // item received by customer
-  CANCELLED // this item was cancelled
-  REFUNDED // this item was refunded
-}
-
-enum PaymentStatus {
-  PENDING
-  PAID
-  FAILED
-  REFUNDED
-  PARTIALLY_REFUNDED
-}
-
-enum PayoutStatus {
-  PENDING // created, not yet processed
-  PROCESSING // being transferred
-  COMPLETED // vendor received payment
-  FAILED // transfer failed
 }
