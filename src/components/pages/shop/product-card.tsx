@@ -4,6 +4,7 @@ import { motion } from 'motion/react';
 
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
+import { useAddToCartMutation } from '@/services/cart';
 import type { CategoryProduct } from '@/services/product';
 
 type ProductCardProps = {
@@ -11,6 +12,8 @@ type ProductCardProps = {
 };
 
 export function ProductCard({ product }: ProductCardProps) {
+  const addToCart = useAddToCartMutation();
+
   const discountPct = product.discountPrice
     ? Math.round(
         ((product.price - product.discountPrice) / product.price) * 100,
@@ -119,13 +122,19 @@ export function ProductCard({ product }: ProductCardProps) {
           <Button
             size='sm'
             className='w-full mt-1 gap-1.5 h-8 text-xs'
+            disabled={product.stock <= 0}
             onClick={(e) => {
+              if (product.hasVariants) return;
               e.preventDefault();
               e.stopPropagation();
+              addToCart.mutate({
+                productId: product.id,
+                quantity: 1,
+              });
             }}
           >
             <ShoppingCart className='w-3.5 h-3.5' />
-            Add to Cart
+            {product.hasVariants ? 'Select Options' : 'Add to Cart'}
           </Button>
         </div>
       </motion.div>

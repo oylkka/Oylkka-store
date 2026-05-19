@@ -41,7 +41,7 @@ export function ProductGallery({
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [magnify, setMagnify] = useState(false);
   const [magnifyPos, setMagnifyPos] = useState({ x: 0, y: 0 });
-  const imageContainerRef = useRef<HTMLButtonElement>(null);
+  const imageContainerRef = useRef<HTMLDivElement>(null);
 
   const hasImages = images.length > 0;
   const activeImage = hasImages ? images[active] : null;
@@ -89,8 +89,8 @@ export function ProductGallery({
   return (
     <div className='space-y-4'>
       <Dialog>
-        <button
-          type='button'
+        {/** biome-ignore lint/a11y/noStaticElementInteractions: this is fine */}
+        <div
           ref={imageContainerRef}
           className='relative block aspect-square w-full rounded-2xl overflow-hidden bg-muted cursor-zoom-in text-left'
           onMouseMove={handleMouseMove}
@@ -133,7 +133,7 @@ export function ProductGallery({
               <Maximize2 className='w-4 h-4' />
             </Button>
           </DialogTrigger>
-        </button>
+        </div>
 
         <DialogContent className='max-w-4xl'>
           <DialogTitle className='sr-only'>{productName}</DialogTitle>

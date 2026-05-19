@@ -40,6 +40,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { Skeleton } from '@/components/ui/skeleton';
+import { useAddToCartMutation } from '@/services/cart';
 import { usePublicProduct } from '@/services/product';
 
 export const Route = createFileRoute('/product/$slug')({
@@ -91,11 +92,17 @@ function RouteComponent() {
   const { slug } = Route.useParams();
   const { data: product, isLoading, isError } = usePublicProduct(slug);
   const [quantity, setQuantity] = useState(1);
+  const [selectedVariant, setSelectedVariant] = useState<{
+    id: string;
+    price: number;
+    stock: number;
+  } | null>(null);
+  const addToCart = useAddToCartMutation();
 
   if (isLoading) return <PdpSkeleton />;
   if (isError || !product) return <PdpNotFound />;
 
-  const currentStock = product.stock;
+  const currentStock = selectedVariant?.stock ?? product.stock;
 
   const trustItems = [
     { icon: Truck, title: 'Free Shipping', desc: 'On orders over ৳500' },
@@ -183,6 +190,7 @@ function RouteComponent() {
                   variants={product.variants}
                   basePrice={product.price}
                   baseDiscountPrice={product.discountPrice}
+                  onVariantChange={setSelectedVariant}
                 />
               </div>
             )}
@@ -253,11 +261,24 @@ function RouteComponent() {
                 <Button
                   size='lg'
                   className='flex-1 gap-2.5 h-12 text-base rounded-xl'
-                  disabled={currentStock <= 0}
-                  onClick={() => toast.success('Added to cart! (placeholder)')}
+                  disabled={
+                    currentStock <= 0 ||
+                    (product.hasVariants && !selectedVariant)
+                  }
+                  onClick={() =>
+                    addToCart.mutate({
+                      productId: product.id,
+                      variantId: selectedVariant?.id,
+                      quantity,
+                    })
+                  }
                 >
                   <ShoppingCart className='w-5 h-5' />
-                  {currentStock <= 0 ? 'Out of Stock' : 'Add to Cart'}
+                  {currentStock <= 0
+                    ? 'Out of Stock'
+                    : product.hasVariants && !selectedVariant
+                      ? 'Select Options'
+                      : 'Add to Cart'}
                 </Button>
                 <Button
                   variant='outline'

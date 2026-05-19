@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as ProductsRouteImport } from './routes/products'
+import { Route as CartRouteImport } from './routes/cart'
 import { Route as DashboardRouteRouteImport } from './routes/dashboard/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ShopsIndexRouteImport } from './routes/shops/index'
@@ -53,6 +54,10 @@ import { Route as ApiCategoriesGetSingleRouteImport } from './routes/api/categor
 import { Route as ApiCategoriesEditRouteImport } from './routes/api/categories/edit'
 import { Route as ApiCategoriesDeleteRouteImport } from './routes/api/categories/delete'
 import { Route as ApiCategoriesAddRouteImport } from './routes/api/categories/add'
+import { Route as ApiCartUpdateRouteImport } from './routes/api/cart/update'
+import { Route as ApiCartRemoveRouteImport } from './routes/api/cart/remove'
+import { Route as ApiCartGetRouteImport } from './routes/api/cart/get'
+import { Route as ApiCartAddRouteImport } from './routes/api/cart/add'
 import { Route as ApiBannersHeroRouteImport } from './routes/api/banners/hero'
 import { Route as ApiBannersGetSingleRouteImport } from './routes/api/banners/get-single'
 import { Route as ApiBannersEditRouteImport } from './routes/api/banners/edit'
@@ -79,6 +84,11 @@ import { Route as DashboardAdminBannerAddRouteImport } from './routes/dashboard/
 const ProductsRoute = ProductsRouteImport.update({
   id: '/products',
   path: '/products',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CartRoute = CartRouteImport.update({
+  id: '/cart',
+  path: '/cart',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DashboardRouteRoute = DashboardRouteRouteImport.update({
@@ -303,6 +313,26 @@ const ApiCategoriesAddRoute = ApiCategoriesAddRouteImport.update({
   path: '/api/categories/add',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiCartUpdateRoute = ApiCartUpdateRouteImport.update({
+  id: '/api/cart/update',
+  path: '/api/cart/update',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiCartRemoveRoute = ApiCartRemoveRouteImport.update({
+  id: '/api/cart/remove',
+  path: '/api/cart/remove',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiCartGetRoute = ApiCartGetRouteImport.update({
+  id: '/api/cart/get',
+  path: '/api/cart/get',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiCartAddRoute = ApiCartAddRouteImport.update({
+  id: '/api/cart/add',
+  path: '/api/cart/add',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiBannersHeroRoute = ApiBannersHeroRouteImport.update({
   id: '/api/banners/hero',
   path: '/api/banners/hero',
@@ -431,6 +461,7 @@ const DashboardAdminBannerAddRoute = DashboardAdminBannerAddRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/dashboard': typeof DashboardRouteRouteWithChildren
+  '/cart': typeof CartRoute
   '/products': typeof ProductsRouteWithChildren
   '/dashboard/admin': typeof DashboardAdminRouteRouteWithChildren
   '/dashboard/become-vendor': typeof DashboardBecomeVendorRouteRouteWithChildren
@@ -447,6 +478,10 @@ export interface FileRoutesByFullPath {
   '/api/banners/edit': typeof ApiBannersEditRoute
   '/api/banners/get-single': typeof ApiBannersGetSingleRoute
   '/api/banners/hero': typeof ApiBannersHeroRoute
+  '/api/cart/add': typeof ApiCartAddRoute
+  '/api/cart/get': typeof ApiCartGetRoute
+  '/api/cart/remove': typeof ApiCartRemoveRoute
+  '/api/cart/update': typeof ApiCartUpdateRoute
   '/api/categories/add': typeof ApiCategoriesAddRoute
   '/api/categories/delete': typeof ApiCategoriesDeleteRoute
   '/api/categories/edit': typeof ApiCategoriesEditRoute
@@ -498,6 +533,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/cart': typeof CartRoute
   '/products': typeof ProductsRouteWithChildren
   '/dashboard/admin': typeof DashboardAdminRouteRouteWithChildren
   '/dashboard/become-vendor': typeof DashboardBecomeVendorRouteRouteWithChildren
@@ -514,6 +550,10 @@ export interface FileRoutesByTo {
   '/api/banners/edit': typeof ApiBannersEditRoute
   '/api/banners/get-single': typeof ApiBannersGetSingleRoute
   '/api/banners/hero': typeof ApiBannersHeroRoute
+  '/api/cart/add': typeof ApiCartAddRoute
+  '/api/cart/get': typeof ApiCartGetRoute
+  '/api/cart/remove': typeof ApiCartRemoveRoute
+  '/api/cart/update': typeof ApiCartUpdateRoute
   '/api/categories/add': typeof ApiCategoriesAddRoute
   '/api/categories/delete': typeof ApiCategoriesDeleteRoute
   '/api/categories/edit': typeof ApiCategoriesEditRoute
@@ -567,6 +607,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/dashboard': typeof DashboardRouteRouteWithChildren
+  '/cart': typeof CartRoute
   '/products': typeof ProductsRouteWithChildren
   '/dashboard/admin': typeof DashboardAdminRouteRouteWithChildren
   '/dashboard/become-vendor': typeof DashboardBecomeVendorRouteRouteWithChildren
@@ -583,6 +624,10 @@ export interface FileRoutesById {
   '/api/banners/edit': typeof ApiBannersEditRoute
   '/api/banners/get-single': typeof ApiBannersGetSingleRoute
   '/api/banners/hero': typeof ApiBannersHeroRoute
+  '/api/cart/add': typeof ApiCartAddRoute
+  '/api/cart/get': typeof ApiCartGetRoute
+  '/api/cart/remove': typeof ApiCartRemoveRoute
+  '/api/cart/update': typeof ApiCartUpdateRoute
   '/api/categories/add': typeof ApiCategoriesAddRoute
   '/api/categories/delete': typeof ApiCategoriesDeleteRoute
   '/api/categories/edit': typeof ApiCategoriesEditRoute
@@ -637,6 +682,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/dashboard'
+    | '/cart'
     | '/products'
     | '/dashboard/admin'
     | '/dashboard/become-vendor'
@@ -653,6 +699,10 @@ export interface FileRouteTypes {
     | '/api/banners/edit'
     | '/api/banners/get-single'
     | '/api/banners/hero'
+    | '/api/cart/add'
+    | '/api/cart/get'
+    | '/api/cart/remove'
+    | '/api/cart/update'
     | '/api/categories/add'
     | '/api/categories/delete'
     | '/api/categories/edit'
@@ -704,6 +754,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/cart'
     | '/products'
     | '/dashboard/admin'
     | '/dashboard/become-vendor'
@@ -720,6 +771,10 @@ export interface FileRouteTypes {
     | '/api/banners/edit'
     | '/api/banners/get-single'
     | '/api/banners/hero'
+    | '/api/cart/add'
+    | '/api/cart/get'
+    | '/api/cart/remove'
+    | '/api/cart/update'
     | '/api/categories/add'
     | '/api/categories/delete'
     | '/api/categories/edit'
@@ -772,6 +827,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/dashboard'
+    | '/cart'
     | '/products'
     | '/dashboard/admin'
     | '/dashboard/become-vendor'
@@ -788,6 +844,10 @@ export interface FileRouteTypes {
     | '/api/banners/edit'
     | '/api/banners/get-single'
     | '/api/banners/hero'
+    | '/api/cart/add'
+    | '/api/cart/get'
+    | '/api/cart/remove'
+    | '/api/cart/update'
     | '/api/categories/add'
     | '/api/categories/delete'
     | '/api/categories/edit'
@@ -841,6 +901,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   DashboardRouteRoute: typeof DashboardRouteRouteWithChildren
+  CartRoute: typeof CartRoute
   ProductsRoute: typeof ProductsRouteWithChildren
   AuthSigninRoute: typeof AuthSigninRoute
   ProductSlugRoute: typeof ProductSlugRoute
@@ -853,6 +914,10 @@ export interface RootRouteChildren {
   ApiBannersEditRoute: typeof ApiBannersEditRoute
   ApiBannersGetSingleRoute: typeof ApiBannersGetSingleRoute
   ApiBannersHeroRoute: typeof ApiBannersHeroRoute
+  ApiCartAddRoute: typeof ApiCartAddRoute
+  ApiCartGetRoute: typeof ApiCartGetRoute
+  ApiCartRemoveRoute: typeof ApiCartRemoveRoute
+  ApiCartUpdateRoute: typeof ApiCartUpdateRoute
   ApiCategoriesAddRoute: typeof ApiCategoriesAddRoute
   ApiCategoriesDeleteRoute: typeof ApiCategoriesDeleteRoute
   ApiCategoriesEditRoute: typeof ApiCategoriesEditRoute
@@ -892,6 +957,13 @@ declare module '@tanstack/react-router' {
       path: '/products'
       fullPath: '/products'
       preLoaderRoute: typeof ProductsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/cart': {
+      id: '/cart'
+      path: '/cart'
+      fullPath: '/cart'
+      preLoaderRoute: typeof CartRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/dashboard': {
@@ -1195,6 +1267,34 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiCategoriesAddRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/cart/update': {
+      id: '/api/cart/update'
+      path: '/api/cart/update'
+      fullPath: '/api/cart/update'
+      preLoaderRoute: typeof ApiCartUpdateRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/cart/remove': {
+      id: '/api/cart/remove'
+      path: '/api/cart/remove'
+      fullPath: '/api/cart/remove'
+      preLoaderRoute: typeof ApiCartRemoveRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/cart/get': {
+      id: '/api/cart/get'
+      path: '/api/cart/get'
+      fullPath: '/api/cart/get'
+      preLoaderRoute: typeof ApiCartGetRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/cart/add': {
+      id: '/api/cart/add'
+      path: '/api/cart/add'
+      fullPath: '/api/cart/add'
+      preLoaderRoute: typeof ApiCartAddRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/banners/hero': {
       id: '/api/banners/hero'
       path: '/api/banners/hero'
@@ -1449,6 +1549,7 @@ const ProductsRouteWithChildren = ProductsRoute._addFileChildren(
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   DashboardRouteRoute: DashboardRouteRouteWithChildren,
+  CartRoute: CartRoute,
   ProductsRoute: ProductsRouteWithChildren,
   AuthSigninRoute: AuthSigninRoute,
   ProductSlugRoute: ProductSlugRoute,
@@ -1461,6 +1562,10 @@ const rootRouteChildren: RootRouteChildren = {
   ApiBannersEditRoute: ApiBannersEditRoute,
   ApiBannersGetSingleRoute: ApiBannersGetSingleRoute,
   ApiBannersHeroRoute: ApiBannersHeroRoute,
+  ApiCartAddRoute: ApiCartAddRoute,
+  ApiCartGetRoute: ApiCartGetRoute,
+  ApiCartRemoveRoute: ApiCartRemoveRoute,
+  ApiCartUpdateRoute: ApiCartUpdateRoute,
   ApiCategoriesAddRoute: ApiCategoriesAddRoute,
   ApiCategoriesDeleteRoute: ApiCategoriesDeleteRoute,
   ApiCategoriesEditRoute: ApiCategoriesEditRoute,

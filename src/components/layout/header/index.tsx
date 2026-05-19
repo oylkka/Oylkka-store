@@ -1,6 +1,6 @@
 import { cn } from '@/lib/utils';
 import { Route as RootRoute } from '@/routes/__root';
-// import Cart from './cart';
+import Cart from './cart';
 import HeaderClient from './header-client';
 import Navigation from './navigation';
 import SearchBar from './searchbar';
@@ -51,9 +51,7 @@ export default function Header({
               <div className='hidden md:block'>
                 <ModeToggle />
               </div>
-              {/* {user && <Notifications />}
               {user && <Cart />}
-              */}
               <UserDropDown user={user} />
             </div>
           </div>
