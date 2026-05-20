@@ -16,9 +16,12 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as ShopsIndexRouteImport } from './routes/shops/index'
 import { Route as DashboardIndexRouteImport } from './routes/dashboard/index'
 import { Route as ShopSlugRouteImport } from './routes/shop.$slug'
+import { Route as ResetPasswordTokenRouteImport } from './routes/reset-password.$token'
 import { Route as ProductSlugRouteImport } from './routes/product.$slug'
+import { Route as AuthVerifyRouteImport } from './routes/auth/verify'
 import { Route as AuthSignupRouteImport } from './routes/auth/signup'
 import { Route as AuthSigninRouteImport } from './routes/auth/signin'
+import { Route as AuthForgotPasswordRouteImport } from './routes/auth/forgot-password'
 import { Route as DashboardVendorRouteRouteImport } from './routes/dashboard/vendor/route'
 import { Route as DashboardBecomeVendorRouteRouteImport } from './routes/dashboard/become-vendor/route'
 import { Route as DashboardAdminRouteRouteImport } from './routes/dashboard/admin/route'
@@ -117,9 +120,19 @@ const ShopSlugRoute = ShopSlugRouteImport.update({
   path: '/shop/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ResetPasswordTokenRoute = ResetPasswordTokenRouteImport.update({
+  id: '/reset-password/$token',
+  path: '/reset-password/$token',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ProductSlugRoute = ProductSlugRouteImport.update({
   id: '/product/$slug',
   path: '/product/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthVerifyRoute = AuthVerifyRouteImport.update({
+  id: '/auth/verify',
+  path: '/auth/verify',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthSignupRoute = AuthSignupRouteImport.update({
@@ -130,6 +143,11 @@ const AuthSignupRoute = AuthSignupRouteImport.update({
 const AuthSigninRoute = AuthSigninRouteImport.update({
   id: '/auth/signin',
   path: '/auth/signin',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthForgotPasswordRoute = AuthForgotPasswordRouteImport.update({
+  id: '/auth/forgot-password',
+  path: '/auth/forgot-password',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DashboardVendorRouteRoute = DashboardVendorRouteRouteImport.update({
@@ -472,9 +490,12 @@ export interface FileRoutesByFullPath {
   '/dashboard/admin': typeof DashboardAdminRouteRouteWithChildren
   '/dashboard/become-vendor': typeof DashboardBecomeVendorRouteRouteWithChildren
   '/dashboard/vendor': typeof DashboardVendorRouteRouteWithChildren
+  '/auth/forgot-password': typeof AuthForgotPasswordRoute
   '/auth/signin': typeof AuthSigninRoute
   '/auth/signup': typeof AuthSignupRoute
+  '/auth/verify': typeof AuthVerifyRoute
   '/product/$slug': typeof ProductSlugRoute
+  '/reset-password/$token': typeof ResetPasswordTokenRoute
   '/shop/$slug': typeof ShopSlugRoute
   '/dashboard/': typeof DashboardIndexRoute
   '/shops/': typeof ShopsIndexRoute
@@ -545,9 +566,12 @@ export interface FileRoutesByTo {
   '/dashboard/admin': typeof DashboardAdminRouteRouteWithChildren
   '/dashboard/become-vendor': typeof DashboardBecomeVendorRouteRouteWithChildren
   '/dashboard/vendor': typeof DashboardVendorRouteRouteWithChildren
+  '/auth/forgot-password': typeof AuthForgotPasswordRoute
   '/auth/signin': typeof AuthSigninRoute
   '/auth/signup': typeof AuthSignupRoute
+  '/auth/verify': typeof AuthVerifyRoute
   '/product/$slug': typeof ProductSlugRoute
+  '/reset-password/$token': typeof ResetPasswordTokenRoute
   '/shop/$slug': typeof ShopSlugRoute
   '/dashboard': typeof DashboardIndexRoute
   '/shops': typeof ShopsIndexRoute
@@ -620,9 +644,12 @@ export interface FileRoutesById {
   '/dashboard/admin': typeof DashboardAdminRouteRouteWithChildren
   '/dashboard/become-vendor': typeof DashboardBecomeVendorRouteRouteWithChildren
   '/dashboard/vendor': typeof DashboardVendorRouteRouteWithChildren
+  '/auth/forgot-password': typeof AuthForgotPasswordRoute
   '/auth/signin': typeof AuthSigninRoute
   '/auth/signup': typeof AuthSignupRoute
+  '/auth/verify': typeof AuthVerifyRoute
   '/product/$slug': typeof ProductSlugRoute
+  '/reset-password/$token': typeof ResetPasswordTokenRoute
   '/shop/$slug': typeof ShopSlugRoute
   '/dashboard/': typeof DashboardIndexRoute
   '/shops/': typeof ShopsIndexRoute
@@ -696,9 +723,12 @@ export interface FileRouteTypes {
     | '/dashboard/admin'
     | '/dashboard/become-vendor'
     | '/dashboard/vendor'
+    | '/auth/forgot-password'
     | '/auth/signin'
     | '/auth/signup'
+    | '/auth/verify'
     | '/product/$slug'
+    | '/reset-password/$token'
     | '/shop/$slug'
     | '/dashboard/'
     | '/shops/'
@@ -769,9 +799,12 @@ export interface FileRouteTypes {
     | '/dashboard/admin'
     | '/dashboard/become-vendor'
     | '/dashboard/vendor'
+    | '/auth/forgot-password'
     | '/auth/signin'
     | '/auth/signup'
+    | '/auth/verify'
     | '/product/$slug'
+    | '/reset-password/$token'
     | '/shop/$slug'
     | '/dashboard'
     | '/shops'
@@ -843,9 +876,12 @@ export interface FileRouteTypes {
     | '/dashboard/admin'
     | '/dashboard/become-vendor'
     | '/dashboard/vendor'
+    | '/auth/forgot-password'
     | '/auth/signin'
     | '/auth/signup'
+    | '/auth/verify'
     | '/product/$slug'
+    | '/reset-password/$token'
     | '/shop/$slug'
     | '/dashboard/'
     | '/shops/'
@@ -915,9 +951,12 @@ export interface RootRouteChildren {
   DashboardRouteRoute: typeof DashboardRouteRouteWithChildren
   CartRoute: typeof CartRoute
   ProductsRoute: typeof ProductsRouteWithChildren
+  AuthForgotPasswordRoute: typeof AuthForgotPasswordRoute
   AuthSigninRoute: typeof AuthSigninRoute
   AuthSignupRoute: typeof AuthSignupRoute
+  AuthVerifyRoute: typeof AuthVerifyRoute
   ProductSlugRoute: typeof ProductSlugRoute
+  ResetPasswordTokenRoute: typeof ResetPasswordTokenRoute
   ShopSlugRoute: typeof ShopSlugRoute
   ShopsIndexRoute: typeof ShopsIndexRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
@@ -1014,11 +1053,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ShopSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/reset-password/$token': {
+      id: '/reset-password/$token'
+      path: '/reset-password/$token'
+      fullPath: '/reset-password/$token'
+      preLoaderRoute: typeof ResetPasswordTokenRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/product/$slug': {
       id: '/product/$slug'
       path: '/product/$slug'
       fullPath: '/product/$slug'
       preLoaderRoute: typeof ProductSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth/verify': {
+      id: '/auth/verify'
+      path: '/auth/verify'
+      fullPath: '/auth/verify'
+      preLoaderRoute: typeof AuthVerifyRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/auth/signup': {
@@ -1033,6 +1086,13 @@ declare module '@tanstack/react-router' {
       path: '/auth/signin'
       fullPath: '/auth/signin'
       preLoaderRoute: typeof AuthSigninRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth/forgot-password': {
+      id: '/auth/forgot-password'
+      path: '/auth/forgot-password'
+      fullPath: '/auth/forgot-password'
+      preLoaderRoute: typeof AuthForgotPasswordRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/dashboard/vendor': {
@@ -1571,9 +1631,12 @@ const rootRouteChildren: RootRouteChildren = {
   DashboardRouteRoute: DashboardRouteRouteWithChildren,
   CartRoute: CartRoute,
   ProductsRoute: ProductsRouteWithChildren,
+  AuthForgotPasswordRoute: AuthForgotPasswordRoute,
   AuthSigninRoute: AuthSigninRoute,
   AuthSignupRoute: AuthSignupRoute,
+  AuthVerifyRoute: AuthVerifyRoute,
   ProductSlugRoute: ProductSlugRoute,
+  ResetPasswordTokenRoute: ResetPasswordTokenRoute,
   ShopSlugRoute: ShopSlugRoute,
   ShopsIndexRoute: ShopsIndexRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,

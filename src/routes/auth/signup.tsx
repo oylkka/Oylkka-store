@@ -5,7 +5,7 @@ import {
   redirect,
   useNavigate,
 } from '@tanstack/react-router';
-import { Eye, EyeOff, Info } from 'lucide-react';
+import { Eye, EyeOff } from 'lucide-react';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
@@ -23,7 +23,7 @@ import {
   FieldSeparator,
 } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
-import { signUp, signIn, sendVerificationEmail } from '@/lib/auth-client';
+import { signIn, signUp } from '@/lib/auth-client';
 
 export const Route = createFileRoute('/auth/signup')({
   beforeLoad: ({ context }) => {
@@ -59,7 +59,6 @@ function RouteComponent() {
     handleSubmit,
     formState: { errors },
     setError,
-    getValues,
   } = useForm<SignupFormValues>({
     resolver: zodResolver(signupSchema),
     defaultValues: { name: '', email: '', password: '', confirmPassword: '' },
@@ -87,8 +86,7 @@ function RouteComponent() {
             });
           } else if (message.includes('password')) {
             toast.error('Weak password', {
-              description:
-                'Password must be at least 6 characters long.',
+              description: 'Password must be at least 6 characters long.',
             });
             setError('password', {
               type: 'manual',
@@ -118,33 +116,6 @@ function RouteComponent() {
       });
       // biome-ignore lint/suspicious/noConsole: this is fine
       console.error('Signup error:', err);
-    } finally {
-      setIsLoading(false);
-    }
-  }
-
-  async function handleResendVerification() {
-    const email = getValues('email');
-    if (!email) {
-      toast.error('Enter your email first');
-      return;
-    }
-    setIsLoading(true);
-    try {
-      const { error } = await sendVerificationEmail({ email });
-      if (error) {
-        toast.error('Failed to resend', {
-          description: error.message || 'Please try again later.',
-        });
-        return;
-      }
-      toast.success('Verification email sent!', {
-        description: 'Please check your inbox.',
-      });
-    } catch (err) {
-      toast.error('Unexpected error');
-      // biome-ignore lint/suspicious/noConsole: this is fine
-      console.error('Resend verification error:', err);
     } finally {
       setIsLoading(false);
     }
@@ -302,9 +273,7 @@ function RouteComponent() {
                       </Button>
                     </div>
                     {errors.confirmPassword && (
-                      <FieldError>
-                        {errors.confirmPassword.message}
-                      </FieldError>
+                      <FieldError>{errors.confirmPassword.message}</FieldError>
                     )}
                   </Field>
 

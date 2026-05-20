@@ -1,3 +1,15 @@
+import { zodResolver } from '@hookform/resolvers/zod';
+import {
+  createFileRoute,
+  Link,
+  redirect,
+  useNavigate,
+} from '@tanstack/react-router';
+import { Eye, EyeOff, Info } from 'lucide-react';
+import { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { toast } from 'sonner';
+import { z } from 'zod';
 import Footer from '#/components/layout/footer';
 import Header from '#/components/layout/header';
 import { Button } from '@/components/ui/button';
@@ -12,18 +24,6 @@ import {
 } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
 import { signIn } from '@/lib/auth-client';
-import { zodResolver } from '@hookform/resolvers/zod';
-import {
-  createFileRoute,
-  Link,
-  redirect,
-  useNavigate,
-} from '@tanstack/react-router';
-import { Eye, EyeOff, Info } from 'lucide-react';
-import { useState } from 'react';
-import { useForm } from 'react-hook-form';
-import { toast } from 'sonner';
-import { z } from 'zod';
 
 export const Route = createFileRoute('/auth/signin')({
   beforeLoad: ({ context }) => {

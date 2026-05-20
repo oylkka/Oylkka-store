@@ -6,29 +6,12 @@ This document outlines the full implementation plan for building the checkout fl
 
 ## Phase 1: Prerequisites
 
-### 1.1 Sign-Up Page (`/auth/signup`)
+### 1.1 bKash API Setup
 
 | Item | Detail |
 |------|--------|
-| **Route** | `src/routes/auth/signup.tsx` |
-| **Pattern** | Mirror existing sign-in page (`src/routes/auth/signin.tsx`) — same layout, `Header`/`Footer` wrapper |
-| **Fields** | name, email, password, confirm password |
-| **Auth** | Use existing `signUp()` from `src/lib/auth-client.ts` |
-| **On success** | Auto-send verification email (already wired in `src/lib/auth.ts`), redirect to `/auth/signin` with success toast |
-| **Edge cases** | Email already registered, weak password (< 6 chars), verification email resend |
-
-**Files:**
-- `src/routes/auth/signup.tsx` — new route
-
-### 1.2 Stripe SDK Setup
-
-```bash
-bun add @stripe/stripe-js @stripe/react-stripe-js
-```
-
-| Item | Detail |
-|------|--------|
-| **Env vars** | Add `STRIPE_SECRET_KEY` and `VITE_STRIPE_PUBLISHABLE_KEY` to `.env` |
+| **Env vars** | Add `BKASH_APP_KEY`, `BKASH_APP_SECRET`, `BKASH_USERNAME`, `BKASH_PASSWORD`, `BKASH_BASE_URL` to `.env` |
+| **No SDK** | bKash uses server-side API calls — no frontend SDK needed |
 | **Prisma** | No new migrations — `Order` already has `paymentMethod`, `paymentRef`, `paymentStatus` |
 
 ---
@@ -53,8 +36,8 @@ bun add @stripe/stripe-js @stripe/react-stripe-js
 1. **Shipping Address Form** — name, email, phone, addressLine1/2, city, state, country, postalCode. Pre-fill from last order if available.
 2. **Order Summary** — items grouped by shop, quantities, prices, subtotal, shipping estimate
 3. **Order Notes** — optional textarea
-4. **Payment Method** — Stripe credit card via `@stripe/react-stripe-js` `Elements` + `PaymentElement`
-5. **Place Order** — submits shipping, creates Order, processes payment
+4. **Payment Method** — bKash — redirect to bKash hosted payment page
+5. **Place Order** — submits shipping, creates Order, initiates bKash payment
 
 **States:** Loading skeleton, empty cart redirect (`/cart` if cart is empty), error state.
 
@@ -80,31 +63,32 @@ bun add @stripe/stripe-js @stripe/react-stripe-js
    - Delete cart items / clear cart
 6. Return `{ orderId, orderNumber, total }`
 
-### 2.4 Create Payment Intent API (`POST /api/checkout/payment`)
+### 2.4 Create bKash Payment API (`POST /api/checkout/bkash-pay`)
 
 | Item | Detail |
 |------|--------|
-| **Route** | `src/routes/api/checkout/payment.ts` |
+| **Route** | `src/routes/api/checkout/bkash-pay.ts` |
 
 **Flow:**
-1. Create Stripe `PaymentIntent` with order total and currency
-2. Store `paymentRef` (Stripe PaymentIntent ID) on the Order
-3. Return `{ clientSecret }` to frontend
-4. Frontend confirms payment via `stripe.confirmPayment()`
-5. On success → redirect to `/checkout/confirmation?orderId=xxx`
-6. On failure → show error, allow retry
+1. Call bKash `POST /tokenized/checkout/create` with order amount, merchant info, and `callbackURL` pointing to your callback endpoint
+2. Store `paymentRef` (bKash `merchantInvoiceNumber`) on the Order
+3. Return `{ checkoutURL }` to frontend
+4. Frontend redirects user to bKash checkout URL
+5. User completes payment on bKash hosted page
+6. bKash redirects back to callback endpoint
 
-### 2.5 Stripe Webhook (`POST /api/stripe/webhook`)
+### 2.5 bKash Callback + Verify (`GET /api/checkout/bkash-callback`)
 
 | Item | Detail |
 |------|--------|
-| **Route** | `src/routes/api/stripe/webhook.ts` |
+| **Route** | `src/routes/api/checkout/bkash-callback.ts` |
 
-**Events to handle:**
-- `payment_intent.succeeded` → update `Order.paymentStatus = PAID`, `Order.status = CONFIRMED`, trigger confirmation email
-- `payment_intent.payment_failed` → update `Order.paymentStatus = FAILED`
-
-Use Stripe webhook secret to verify signature.
+**Flow:**
+1. bKash redirects user back with query params: `?paymentID=xxx&status=success&orderID=xxx`
+2. Call bKash `POST /tokenized/checkout/execute` with the `paymentID` to confirm payment
+3. On success → update `Order.paymentStatus = PAID`, `Order.status = CONFIRMED`, trigger confirmation email
+4. On failure → update `Order.paymentStatus = FAILED`
+5. Redirect user to `/checkout/confirmation?orderId=xxx` (or show error page)
 
 ### 2.6 Order Confirmation Page (`/checkout/confirmation`)
 
@@ -234,8 +218,8 @@ Hooks to add:
 - All items across all shops with their fulfillment statuses
 - Actions:
   - Update any item's fulfillment status (override)
-  - Process full or partial refund (via Stripe)
-  - View payment details (Stripe PaymentIntent ID, status)
+  - Process full or partial refund (via bKash)
+  - View payment details (bKash paymentID, status)
   - Cancel order
 
 ### 5.3 Admin Order API Routes
@@ -244,7 +228,7 @@ Hooks to add:
 |-------|--------|---------|
 | `/api/orders/admin-list` | GET | All orders with filters/pagination |
 | `/api/orders/admin-single` | GET | Full order detail (admin view) |
-| `/api/orders/admin-refund` | POST | Process refund (full/partial), trigger Stripe refund |
+| `/api/orders/admin-refund` | POST | Process refund (full/partial), trigger bKash refund |
 
 ---
 
@@ -254,7 +238,7 @@ Hooks to add:
 
 | Item | Detail |
 |------|--------|
-| **Trigger** | Stripe webhook `payment_intent.succeeded` → `Order.status = CONFIRMED` |
+| **Trigger** | bKash callback execute success → `Order.status = CONFIRMED` |
 | **Template** | Use existing `sendEmail()` from `src/lib/send-email.ts` |
 | **Content** | Order number, items summary table, total, estimated delivery, "View Order" CTA button |
 | **File** | `src/actions/send-order-email.ts` |
@@ -296,7 +280,6 @@ No changes needed — `nav-main.tsx` already has all nav items for orders/payout
 ### New Route Files
 
 ```
-src/routes/auth/signup.tsx                     # Phase 1.1 — Registration page
 src/routes/checkout.tsx                        # Phase 2.2 — Checkout page
 src/routes/checkout/confirmation.tsx           # Phase 2.6 — Order success page
 src/routes/dashboard/orders/index.tsx          # Phase 3.1 — Customer order list
@@ -310,8 +293,8 @@ src/routes/dashboard/admin/orders/$orderId.tsx # Phase 5.2 — Admin order detai
 
 ```
 src/routes/api/checkout/create.ts              # Phase 2.3 — Create order
-src/routes/api/checkout/payment.ts             # Phase 2.4 — Create payment intent
-src/routes/api/stripe/webhook.ts               # Phase 2.5 — Stripe webhook
+src/routes/api/checkout/bkash-pay.ts           # Phase 2.4 — Create bKash payment session
+src/routes/api/checkout/bkash-callback.ts      # Phase 2.5 — bKash callback + verify
 src/routes/api/orders/customer-list.ts         # Phase 3.3 — Customer orders list
 src/routes/api/orders/customer-single.ts       # Phase 3.3 — Customer order detail
 src/routes/api/orders/vendor-list.ts           # Phase 4.3 — Vendor order items
@@ -333,7 +316,6 @@ src/services/vendor-order.ts    # Phase 4.4 — Vendor order hooks
 ```
 src/components/checkout/shipping-form.tsx   # Phase 2.2 — Shipping address form
 src/components/checkout/order-summary.tsx   # Phase 2.2 — Order summary
-src/components/checkout/payment-form.tsx    # Phase 2.2 — Stripe payment form
 src/components/orders/status-badge.tsx      # Reusable order status badge
 src/components/orders/order-items-table.tsx # Reusable order items table
 ```
@@ -352,11 +334,11 @@ src/actions/send-order-email.ts  # Phase 6 — Order confirmation + shipping ema
 |---------|----------|
 | **Stock contention** | Run order creation + stock decrement in a single Prisma `$transaction`; rollback on failure |
 | **Partial fulfillment** | Each `OrderItem` has its own `fulfillmentStatus` — vendor only manages their own items |
-| **Failed payments** | Keep order as `PENDING`; allow retry with fresh PaymentIntent; expire after 30 min |
-| **Zero-total orders** | Skip Stripe, mark as `PAID` immediately (for 100% discount/free items) |
+| **Failed payments** | Keep order as `PENDING`; allow retry with fresh bKash payment session; expire after 30 min |
+| **Zero-total orders** | Skip bKash, mark as `PAID` immediately (for 100% discount/free items) |
 | **Guest checkout** | Not in scope — all checkout requires authentication |
 | **Multi-currency** | Not in scope — single currency (BDT) for now |
-| **Race conditions** | Use Stripe idempotency keys; webhook handler is idempotent on `paymentRef` |
+| **Race conditions** | Use bKash `merchantInvoiceNumber` for idempotency; callback handler is idempotent on `paymentRef` |
 
 ---
 
@@ -368,7 +350,7 @@ Cart Page                    Checkout Page                  Success
   │ [Proceed to Checkout]       │                             │
   └────────► Shipping Form ──►  │                             │
               Order Summary     │                             │
-              Stripe Payment ──►│                             │
+              Pay with bKash ──►│                             │
                     │           │                             │
                     ▼           │                             │
             /api/checkout/create│                             │
@@ -379,24 +361,40 @@ Cart Page                    Checkout Page                  Success
             Cart cleared        │                             │
                     │           │                             │
                     ▼           │                             │
-            /api/checkout/payment                               │
-            Stripe PaymentIntent                                │
-                    │                                           │
-                    ▼                                           │
-            Stripe Elements                                     │
-            (collect card)                                      │
-                    │                                           │
-          ┌─────────┴──────────┐                                │
-          ▼                    ▼                                │
-   Payment Succeeded    Payment Failed                          │
-          │                    │                                │
-    Stripe Webhook      Show Error                              │
-    order.confirmed     "Try again"                             │
-          │                    │                                │
-    Email: Confirm       Back to Checkout                       │
-          │                                                     │
-    Redirect ───────────────────────────────────────► Thank You Page
-                                                       (Order #, summary)
+            /api/checkout/bkash-pay                           │
+            bKash tokenized/checkout/create                   │
+                    │                                         │
+                    ▼                                         │
+            bKash checkoutURL                                 │
+                    │                                         │
+         ┌──────────┴──────────┐                              │
+         ▼                     ▼                              │
+    Redirect to bKash     bKash API Error                     │
+    (hosted payment page)  Show error, retry                  │
+         │                                                     │
+         │  User pays on bKash                                 │
+         ▼                                                     │
+    bKash redirects back                                       │
+    /api/checkout/bkash-callback                               │
+    ?paymentID=xxx&status=success                              │
+         │                                                     │
+         ▼                                                     │
+    /api/checkout/bkash-callback                               │
+    bKash tokenized/checkout/execute                           │
+         │                                                     │
+   ┌─────┴──────────┐                                          │
+   ▼                 ▼                                         │
+Payment Succeeded   Payment Failed                             │
+   │                 │                                         │
+   │            Show Error                                     │
+   │            "Try again"                                    │
+   │                 │                                         │
+   │            Back to Checkout                               │
+   │                                                           │
+   ├── Email: Confirmation                                     │
+   │                                                           │
+   └──► Thank You Page ◄──────────────────────────────────────┘
+        (Order #, summary)
         │
         ▼
   Customer Dashboard          Vendor Dashboard        Admin Dashboard
