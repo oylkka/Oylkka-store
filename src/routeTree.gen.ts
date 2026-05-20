@@ -17,6 +17,7 @@ import { Route as ShopsIndexRouteImport } from './routes/shops/index'
 import { Route as DashboardIndexRouteImport } from './routes/dashboard/index'
 import { Route as ShopSlugRouteImport } from './routes/shop.$slug'
 import { Route as ProductSlugRouteImport } from './routes/product.$slug'
+import { Route as AuthSignupRouteImport } from './routes/auth/signup'
 import { Route as AuthSigninRouteImport } from './routes/auth/signin'
 import { Route as DashboardVendorRouteRouteImport } from './routes/dashboard/vendor/route'
 import { Route as DashboardBecomeVendorRouteRouteImport } from './routes/dashboard/become-vendor/route'
@@ -119,6 +120,11 @@ const ShopSlugRoute = ShopSlugRouteImport.update({
 const ProductSlugRoute = ProductSlugRouteImport.update({
   id: '/product/$slug',
   path: '/product/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthSignupRoute = AuthSignupRouteImport.update({
+  id: '/auth/signup',
+  path: '/auth/signup',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthSigninRoute = AuthSigninRouteImport.update({
@@ -467,6 +473,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/become-vendor': typeof DashboardBecomeVendorRouteRouteWithChildren
   '/dashboard/vendor': typeof DashboardVendorRouteRouteWithChildren
   '/auth/signin': typeof AuthSigninRoute
+  '/auth/signup': typeof AuthSignupRoute
   '/product/$slug': typeof ProductSlugRoute
   '/shop/$slug': typeof ShopSlugRoute
   '/dashboard/': typeof DashboardIndexRoute
@@ -539,6 +546,7 @@ export interface FileRoutesByTo {
   '/dashboard/become-vendor': typeof DashboardBecomeVendorRouteRouteWithChildren
   '/dashboard/vendor': typeof DashboardVendorRouteRouteWithChildren
   '/auth/signin': typeof AuthSigninRoute
+  '/auth/signup': typeof AuthSignupRoute
   '/product/$slug': typeof ProductSlugRoute
   '/shop/$slug': typeof ShopSlugRoute
   '/dashboard': typeof DashboardIndexRoute
@@ -613,6 +621,7 @@ export interface FileRoutesById {
   '/dashboard/become-vendor': typeof DashboardBecomeVendorRouteRouteWithChildren
   '/dashboard/vendor': typeof DashboardVendorRouteRouteWithChildren
   '/auth/signin': typeof AuthSigninRoute
+  '/auth/signup': typeof AuthSignupRoute
   '/product/$slug': typeof ProductSlugRoute
   '/shop/$slug': typeof ShopSlugRoute
   '/dashboard/': typeof DashboardIndexRoute
@@ -688,6 +697,7 @@ export interface FileRouteTypes {
     | '/dashboard/become-vendor'
     | '/dashboard/vendor'
     | '/auth/signin'
+    | '/auth/signup'
     | '/product/$slug'
     | '/shop/$slug'
     | '/dashboard/'
@@ -760,6 +770,7 @@ export interface FileRouteTypes {
     | '/dashboard/become-vendor'
     | '/dashboard/vendor'
     | '/auth/signin'
+    | '/auth/signup'
     | '/product/$slug'
     | '/shop/$slug'
     | '/dashboard'
@@ -833,6 +844,7 @@ export interface FileRouteTypes {
     | '/dashboard/become-vendor'
     | '/dashboard/vendor'
     | '/auth/signin'
+    | '/auth/signup'
     | '/product/$slug'
     | '/shop/$slug'
     | '/dashboard/'
@@ -904,6 +916,7 @@ export interface RootRouteChildren {
   CartRoute: typeof CartRoute
   ProductsRoute: typeof ProductsRouteWithChildren
   AuthSigninRoute: typeof AuthSigninRoute
+  AuthSignupRoute: typeof AuthSignupRoute
   ProductSlugRoute: typeof ProductSlugRoute
   ShopSlugRoute: typeof ShopSlugRoute
   ShopsIndexRoute: typeof ShopsIndexRoute
@@ -1006,6 +1019,13 @@ declare module '@tanstack/react-router' {
       path: '/product/$slug'
       fullPath: '/product/$slug'
       preLoaderRoute: typeof ProductSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth/signup': {
+      id: '/auth/signup'
+      path: '/auth/signup'
+      fullPath: '/auth/signup'
+      preLoaderRoute: typeof AuthSignupRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/auth/signin': {
@@ -1552,6 +1572,7 @@ const rootRouteChildren: RootRouteChildren = {
   CartRoute: CartRoute,
   ProductsRoute: ProductsRouteWithChildren,
   AuthSigninRoute: AuthSigninRoute,
+  AuthSignupRoute: AuthSignupRoute,
   ProductSlugRoute: ProductSlugRoute,
   ShopSlugRoute: ShopSlugRoute,
   ShopsIndexRoute: ShopsIndexRoute,

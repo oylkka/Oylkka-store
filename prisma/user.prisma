@@ -4,7 +4,7 @@ model User {
   email         String  @unique
   emailVerified Boolean @default(false)
 
-  imageUrl      String
+  imageUrl      String  @default("")
   imagePublicId String?
 
   createdAt DateTime @default(now())

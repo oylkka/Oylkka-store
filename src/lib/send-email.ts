@@ -15,9 +15,9 @@ export async function sendEmail(input: SendEmailInput) {
   const { to, subject, meta } = input;
 
   const mailOptions = {
-    from: process.env.NODEMAILER_USER,
+    from: process.env.SMTP_SENDER,
     to,
-    subject: `BestSlot - ${subject}`,
+    subject: `Oylkka - ${subject}`,
     html: `
       <!DOCTYPE html>
       <html lang="en">

@@ -1,3 +1,15 @@
+import { zodResolver } from '@hookform/resolvers/zod';
+import {
+  createFileRoute,
+  Link,
+  redirect,
+  useNavigate,
+} from '@tanstack/react-router';
+import { Eye, EyeOff, Info } from 'lucide-react';
+import { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { toast } from 'sonner';
+import { z } from 'zod';
 import Footer from '#/components/layout/footer';
 import Header from '#/components/layout/header';
 import { Button } from '@/components/ui/button';
@@ -11,21 +23,9 @@ import {
   FieldSeparator,
 } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
-import { signIn } from '@/lib/auth-client';
-import { zodResolver } from '@hookform/resolvers/zod';
-import {
-  createFileRoute,
-  Link,
-  redirect,
-  useNavigate,
-} from '@tanstack/react-router';
-import { Eye, EyeOff, Info } from 'lucide-react';
-import { useState } from 'react';
-import { useForm } from 'react-hook-form';
-import { toast } from 'sonner';
-import { z } from 'zod';
+import { signUp, signIn, sendVerificationEmail } from '@/lib/auth-client';
 
-export const Route = createFileRoute('/auth/signin')({
+export const Route = createFileRoute('/auth/signup')({
   beforeLoad: ({ context }) => {
     if (context.user) {
       throw redirect({ to: '/dashboard' });
@@ -34,62 +34,73 @@ export const Route = createFileRoute('/auth/signin')({
   component: RouteComponent,
 });
 
-const loginSchema = z.object({
-  email: z.string().email('Invalid email address'),
-  password: z.string().min(1, 'Password is required'),
-});
+const signupSchema = z
+  .object({
+    name: z.string().min(1, 'Name is required'),
+    email: z.string().email('Invalid email address'),
+    password: z.string().min(6, 'Password must be at least 6 characters'),
+    confirmPassword: z.string().min(1, 'Please confirm your password'),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: 'Passwords do not match',
+    path: ['confirmPassword'],
+  });
 
-type LoginFormValues = z.infer<typeof loginSchema>;
+type SignupFormValues = z.infer<typeof signupSchema>;
 
 function RouteComponent() {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-  const [showVerificationLink, setShowVerificationLink] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const {
     register,
     handleSubmit,
     formState: { errors },
     setError,
-  } = useForm<LoginFormValues>({
-    resolver: zodResolver(loginSchema),
-    defaultValues: { email: '', password: '' },
+    getValues,
+  } = useForm<SignupFormValues>({
+    resolver: zodResolver(signupSchema),
+    defaultValues: { name: '', email: '', password: '', confirmPassword: '' },
   });
 
-  async function onSubmit(values: LoginFormValues) {
+  async function onSubmit(values: SignupFormValues) {
     setIsLoading(true);
     try {
-      const { error } = await signIn.email({
+      const { error } = await signUp.email({
+        name: values.name,
         email: values.email,
         password: values.password,
       });
 
       if (error) {
-        if (error.status === 401) {
-          toast.error('Invalid credentials', {
-            description: 'Please check your email and password.',
-          });
-          setError('email', { type: 'manual', message: ' ' });
-          setError('password', {
-            type: 'manual',
-            message: 'Invalid email or password',
-          });
-        } else if (error.status === 404) {
-          toast.error('Account not found', {
-            description: 'No account found with this email address.',
-          });
-          setError('email', {
-            type: 'manual',
-            message: 'No account found with this email',
-          });
-        } else if (error.status === 403) {
-          toast.error('Email Not Verified', {
-            description: 'Please verify your email address before logging in.',
-          });
-          setShowVerificationLink(true);
+        if (error.status === 422) {
+          const message = error.message?.toLowerCase() || '';
+          if (message.includes('email')) {
+            toast.error('Email already registered', {
+              description: 'An account with this email already exists.',
+            });
+            setError('email', {
+              type: 'manual',
+              message: 'Email already registered',
+            });
+          } else if (message.includes('password')) {
+            toast.error('Weak password', {
+              description:
+                'Password must be at least 6 characters long.',
+            });
+            setError('password', {
+              type: 'manual',
+              message: 'Password too weak',
+            });
+          } else {
+            toast.error('Registration failed', {
+              description: error.message || 'Please check your information.',
+            });
+          }
         } else {
-          toast.error('Login failed', {
+          toast.error('Registration failed', {
             description:
               error.message || 'Something went wrong. Please try again.',
           });
@@ -97,16 +108,43 @@ function RouteComponent() {
         return;
       }
 
-      toast.success('Welcome back!', {
-        description: 'Redirecting you to your Profile...',
+      toast.success('Account created!', {
+        description: 'Check your email to verify your account.',
       });
-      navigate({ to: '/dashboard/my-account' });
+      navigate({ to: '/auth/signin' });
     } catch (err) {
       toast.error('Unexpected error', {
         description: 'An unexpected error occurred. Please try again.',
       });
       // biome-ignore lint/suspicious/noConsole: this is fine
-      console.error('Login error:', err);
+      console.error('Signup error:', err);
+    } finally {
+      setIsLoading(false);
+    }
+  }
+
+  async function handleResendVerification() {
+    const email = getValues('email');
+    if (!email) {
+      toast.error('Enter your email first');
+      return;
+    }
+    setIsLoading(true);
+    try {
+      const { error } = await sendVerificationEmail({ email });
+      if (error) {
+        toast.error('Failed to resend', {
+          description: error.message || 'Please try again later.',
+        });
+        return;
+      }
+      toast.success('Verification email sent!', {
+        description: 'Please check your inbox.',
+      });
+    } catch (err) {
+      toast.error('Unexpected error');
+      // biome-ignore lint/suspicious/noConsole: this is fine
+      console.error('Resend verification error:', err);
     } finally {
       setIsLoading(false);
     }
@@ -142,6 +180,7 @@ function RouteComponent() {
       setIsLoading(false);
     }
   }
+
   return (
     <>
       <Header />
@@ -152,11 +191,27 @@ function RouteComponent() {
               <form className='p-6 md:p-8' onSubmit={handleSubmit(onSubmit)}>
                 <FieldGroup>
                   <div className='flex flex-col items-center gap-2 text-center'>
-                    <h1 className='text-2xl font-bold'>Welcome back</h1>
+                    <h1 className='text-2xl font-bold'>Create an account</h1>
                     <p className='text-muted-foreground text-balance'>
-                      Login to your Oylkka account
+                      Sign up for an Oylkka account
                     </p>
                   </div>
+
+                  <Field data-invalid={!!errors.name}>
+                    <FieldLabel htmlFor='name'>Name</FieldLabel>
+                    <Input
+                      id='name'
+                      type='text'
+                      placeholder='John Doe'
+                      autoComplete='name'
+                      disabled={isLoading}
+                      aria-invalid={!!errors.name}
+                      {...register('name')}
+                    />
+                    {errors.name && (
+                      <FieldError>{errors.name.message}</FieldError>
+                    )}
+                  </Field>
 
                   <Field data-invalid={!!errors.email}>
                     <FieldLabel htmlFor='email'>Email</FieldLabel>
@@ -175,21 +230,12 @@ function RouteComponent() {
                   </Field>
 
                   <Field data-invalid={!!errors.password}>
-                    <div className='flex items-center'>
-                      <FieldLabel htmlFor='password'>Password</FieldLabel>
-                      <Link
-                        to='/auth/forgot-password'
-                        className='ml-auto text-sm underline-offset-2 hover:underline'
-                        tabIndex={-1}
-                      >
-                        Forgot password?
-                      </Link>
-                    </div>
+                    <FieldLabel htmlFor='password'>Password</FieldLabel>
                     <div className='relative'>
                       <Input
                         id='password'
                         type={showPassword ? 'text' : 'password'}
-                        autoComplete='current-password'
+                        autoComplete='new-password'
                         disabled={isLoading}
                         aria-invalid={!!errors.password}
                         className='pr-10'
@@ -219,21 +265,48 @@ function RouteComponent() {
                     )}
                   </Field>
 
-                  {showVerificationLink && (
-                    <div className='bg-blue-50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-900/50 rounded-lg p-4 flex gap-3 items-baseline'>
-                      <Info className='h-5 w-5 text-blue-600 dark:text-blue-400 shrink-0 mt-0.5' />
-                      <span className='text-xs text-blue-700 dark:text-blue-300 mt-1'>
-                        Don't have the verification link?
-                      </span>
-                      <Link
-                        to='/auth/verify'
-                        search={{ error: 'lost-verification-email' }}
-                        className='text-primary font-bold text-sm whitespace-nowrap shrink-0'
+                  <Field data-invalid={!!errors.confirmPassword}>
+                    <FieldLabel htmlFor='confirmPassword'>
+                      Confirm Password
+                    </FieldLabel>
+                    <div className='relative'>
+                      <Input
+                        id='confirmPassword'
+                        type={showConfirmPassword ? 'text' : 'password'}
+                        autoComplete='new-password'
+                        disabled={isLoading}
+                        aria-invalid={!!errors.confirmPassword}
+                        className='pr-10'
+                        {...register('confirmPassword')}
+                      />
+                      <Button
+                        type='button'
+                        variant='ghost'
+                        size='icon'
+                        className='absolute right-0 top-0 h-full px-3 hover:bg-transparent'
+                        onClick={() =>
+                          setShowConfirmPassword(!showConfirmPassword)
+                        }
+                        disabled={isLoading}
+                        tabIndex={-1}
                       >
-                        Send Again
-                      </Link>
+                        {showConfirmPassword ? (
+                          <EyeOff className='h-4 w-4' />
+                        ) : (
+                          <Eye className='h-4 w-4' />
+                        )}
+                        <span className='sr-only'>
+                          {showConfirmPassword ? 'Hide' : 'Show'} confirm
+                          password
+                        </span>
+                      </Button>
                     </div>
-                  )}
+                    {errors.confirmPassword && (
+                      <FieldError>
+                        {errors.confirmPassword.message}
+                      </FieldError>
+                    )}
+                  </Field>
 
                   <Field>
                     <Button
@@ -241,7 +314,7 @@ function RouteComponent() {
                       disabled={isLoading}
                       className='w-full'
                     >
-                      {isLoading ? 'Logging in...' : 'Login'}
+                      {isLoading ? 'Creating account...' : 'Create account'}
                     </Button>
                   </Field>
 
@@ -272,12 +345,12 @@ function RouteComponent() {
                   </Field>
 
                   <FieldDescription className='text-center'>
-                    Don&apos;t have an account?{' '}
+                    Already have an account?{' '}
                     <Link
-                      to='/auth/signup'
+                      to='/auth/signin'
                       className='font-medium underline underline-offset-4 hover:text-primary'
                     >
-                      Sign up
+                      Sign in
                     </Link>
                   </FieldDescription>
                 </FieldGroup>
@@ -286,7 +359,7 @@ function RouteComponent() {
               <div className='bg-muted relative hidden md:block'>
                 <img
                   src='/placeholder.svg'
-                  alt='Login illustration'
+                  alt='Signup illustration'
                   className='absolute inset-0 h-full w-full object-cover dark:brightness-[0.2] dark:grayscale'
                 />
               </div>
