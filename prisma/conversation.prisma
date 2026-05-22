@@ -1,0 +1,39 @@
+model Conversation {
+  id            String             @id @default(cuid())
+  customerId    String
+  customer      User               @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  shopId        String
+  shop          Shop               @relation(fields: [shopId], references: [id], onDelete: Cascade)
+  orderId       String?
+  order         Order?             @relation(fields: [orderId], references: [id], onDelete: SetNull)
+  productId     String?
+  product       Product?           @relation(fields: [productId], references: [id], onDelete: SetNull)
+  subject       String
+  status        ConversationStatus @default(OPEN)
+  lastMessageAt DateTime?
+  createdAt     DateTime           @default(now())
+  updatedAt     DateTime           @updatedAt
+  messages      Message[]
+
+  @@index([customerId])
+  @@index([shopId])
+  @@index([status])
+  @@map("conversations")
+}
+
+model Message {
+  id             String       @id @default(cuid())
+  conversationId String
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  senderId       String
+  sender         User         @relation(fields: [senderId], references: [id], onDelete: Cascade)
+  content        String       @db.Text
+  imageUrl       String?
+  imagePublicId  String?
+  isRead         Boolean      @default(false)
+  createdAt      DateTime     @default(now())
+
+  @@index([conversationId])
+  @@index([senderId])
+  @@map("messages")
+}

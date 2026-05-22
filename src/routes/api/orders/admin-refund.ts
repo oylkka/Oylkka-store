@@ -1,5 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { getRequestHeaders } from '@tanstack/react-start/server';
+import { createAuditLog } from '@/lib/audit-log';
 import { auth } from '@/lib/auth';
 import { refundBkashPayment } from '@/lib/bkash';
 import { validateCsrf } from '@/lib/csrf';
@@ -103,6 +104,35 @@ export const Route = createFileRoute('/api/orders/admin-refund')({
             }
           }
 
+          // For wallet orders, credit the refund back to wallet
+          if (order.paymentMethod === 'WALLET') {
+            let wallet = await prisma.wallet.findUnique({
+              where: { userId: order.customerId },
+            });
+
+            if (!wallet) {
+              wallet = await prisma.wallet.create({
+                data: { userId: order.customerId },
+              });
+            }
+
+            await prisma.wallet.update({
+              where: { id: wallet.id },
+              data: { balance: { increment: body.amount } },
+            });
+
+            await prisma.walletTransaction.create({
+              data: {
+                walletId: wallet.id,
+                type: 'CREDIT',
+                amount: body.amount,
+                reference: 'REFUND',
+                orderId: order.id,
+                description: `Refund for order ${order.orderNumber}: ${body.reason}`,
+              },
+            });
+          }
+
           // Update the order and items in a transaction
           const updated = await prisma.$transaction(async (tx) => {
             const updatedOrder = await tx.order.update({
@@ -159,6 +189,20 @@ export const Route = createFileRoute('/api/orders/admin-refund')({
           });
 
           const metadata = updated.metadata as Record<string, unknown> | null;
+
+          createAuditLog({
+            actorId: session.user.id,
+            actorRole: session.user.role,
+            action: 'ORDER_REFUNDED',
+            entity: 'Order',
+            entityId: body.orderId,
+            details: {
+              amount: body.amount,
+              reason: body.reason,
+              itemIds: body.itemIds,
+              orderNumber: order.orderNumber,
+            },
+          }).catch(() => {});
 
           return Response.json(
             {

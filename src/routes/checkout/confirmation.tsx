@@ -103,6 +103,11 @@ function RouteComponent() {
                 </Link>
               </Button>
               <Button variant='outline' asChild>
+                <Link to='/dashboard/orders/$orderId' params={{ orderId }}>
+                  Download Invoice
+                </Link>
+              </Button>
+              <Button variant='ghost' asChild>
                 <Link to='/products'>Continue Shopping</Link>
               </Button>
             </div>

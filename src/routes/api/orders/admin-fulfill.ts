@@ -1,6 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { getRequestHeaders } from '@tanstack/react-start/server';
 import { sendOrderShippedNotification } from '@/actions/send-order-email';
+import { createAuditLog } from '@/lib/audit-log';
 import { auth } from '@/lib/auth';
 import { validateCsrf } from '@/lib/csrf';
 import { prisma } from '@/lib/db';
@@ -101,6 +102,19 @@ export const Route = createFileRoute('/api/orders/admin-fulfill')({
           if (body.fulfillmentStatus === 'SHIPPED') {
             sendOrderShippedNotification(body.orderId, body.itemId);
           }
+
+          createAuditLog({
+            actorId: session.user.id,
+            actorRole: session.user.role,
+            action: 'ORDER_FULFILLED',
+            entity: 'OrderItem',
+            entityId: body.itemId,
+            details: {
+              orderId: body.orderId,
+              newStatus: body.fulfillmentStatus,
+              trackingNumber: body.trackingNumber,
+            },
+          }).catch(() => {});
 
           return Response.json(
             {

@@ -1,11 +1,12 @@
-import { Banknote, CreditCard, Smartphone } from 'lucide-react';
+import { Banknote, CreditCard, Smartphone, Wallet } from 'lucide-react';
 import { toast } from 'sonner';
 
 export type PaymentMethodOption =
   | 'BKASH'
   | 'CASH_ON_DELIVERY'
   | 'NAGAD'
-  | 'ROCKET';
+  | 'ROCKET'
+  | 'WALLET';
 
 type PaymentOption = {
   value: PaymentMethodOption;
@@ -47,14 +48,26 @@ const paymentOptions: PaymentOption[] = [
     available: false,
     comingSoon: true,
   },
+  {
+    value: 'WALLET',
+    label: 'Wallet',
+    description: 'Pay using your Oylkka wallet balance',
+    icon: Wallet,
+    available: true,
+  },
 ];
 
 type PaymentSelectorProps = {
   selected: PaymentMethodOption;
   onSelect: (value: PaymentMethodOption) => void;
+  walletBalance?: number;
 };
 
-export function PaymentSelector({ selected, onSelect }: PaymentSelectorProps) {
+export function PaymentSelector({
+  selected,
+  onSelect,
+  walletBalance,
+}: PaymentSelectorProps) {
   function handleSelect(option: PaymentOption) {
     if (!option.available) {
       toast.error(`${option.label} is not available yet`, {
@@ -91,6 +104,14 @@ export function PaymentSelector({ selected, onSelect }: PaymentSelectorProps) {
               <p className='text-xs text-muted-foreground mt-0.5'>
                 {option.available ? option.description : 'Coming soon'}
               </p>
+              {option.value === 'WALLET' && walletBalance !== undefined && (
+                <p className='text-xs font-medium text-primary mt-1'>
+                  Balance: ৳
+                  {walletBalance.toLocaleString('en-BD', {
+                    minimumFractionDigits: 2,
+                  })}
+                </p>
+              )}
             </div>
             {option.comingSoon && (
               <span className='absolute right-2 top-2 rounded-full bg-muted px-2 py-0.5 text-[10px] font-medium text-muted-foreground'>

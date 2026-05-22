@@ -151,4 +151,3 @@ export const BannerApiSchema = BaseBannerSchema.refine(endDateAfterStart, {
 
 export type BannerFormType = z.infer<typeof BannerFormSchema>;
 export type EditBannerFormType = z.infer<typeof EditBannerFormSchema>;
-export type BannerApiType = z.infer<typeof BannerApiSchema>;

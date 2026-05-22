@@ -1,0 +1,30 @@
+model ReturnRequest {
+  id        String   @id @default(cuid())
+  orderId   String
+  order     Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  itemIds   String[]
+  customerId String
+  customer  User     @relation(fields: [customerId], references: [id], onDelete: Restrict)
+  shopId    String
+  shop      Shop     @relation(fields: [shopId], references: [id], onDelete: Restrict)
+  reason    ReturnReason
+  details   String?
+  images    String[]
+  status    ReturnStatus @default(PENDING)
+  resolution String?
+  refundAmount Float?
+  adminNote  String?
+  customerTrackingNumber String?
+  customerTrackingUrl    String?
+  returnLabelUrl String?
+  reviewedBy String?
+  reviewedAt DateTime?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([orderId])
+  @@index([customerId])
+  @@index([shopId])
+  @@index([status])
+  @@map("return_request")
+}

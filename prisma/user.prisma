@@ -26,6 +26,12 @@ model User {
   orders             Order[]
   vouchers           UserVoucher[]
   wallet             Wallet?
+  returnRequests     ReturnRequest[]
+  shopFollows        ShopFollow[]
+  addresses          UserAddress[]
+  productReports     ProductReport[]
+  conversations      Conversation[] // as customer
+  messages           Message[]     // as sender
 
   @@map("user")
 }

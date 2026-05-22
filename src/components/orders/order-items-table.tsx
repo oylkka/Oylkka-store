@@ -26,7 +26,7 @@ import {
   TooltipTrigger,
 } from '@/components/ui/tooltip';
 
-export type OrderItemRow = {
+type OrderItemRow = {
   id: string;
   productId: string;
   productName: string;

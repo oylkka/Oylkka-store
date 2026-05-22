@@ -2,60 +2,6 @@
 
 > Generated from full codebase audit on May 22, 2026
 
----
-
-## Phase 2: Broken User Flows
-
-| # | Task | Files | Priority |
-|---|------|-------|----------|
-| 2.1 | **Create `/terms` and `/privacy` routes** | `src/routes/terms.tsx`, `privacy.tsx` (new) | HIGH |
-| 2.2 | **Create `/dashboard/my-account` route** | `src/routes/dashboard/my-account.tsx` (new) | HIGH |
-| 2.3 | **Create `/auth/error` route** | `src/routes/auth/error.tsx` (new) | HIGH |
-| 2.4 | **Wire wishlist (heart icon) to real API** | `src/routes/product.$slug.tsx`, `src/routes/api/wishlist/` (new) | HIGH |
-| 2.5 | **Wire "Message Seller" or replace with contact form** | `src/routes/product.$slug.tsx`, `src/routes/api/messages/` (new) | HIGH |
-| 2.6 | **Add BD phone/postalCode validation on checkout** | `src/routes/checkout.tsx`, `src/schemas/` | HIGH |
-| 2.7 | **Add inline field validation (not just submit toasts)** | `src/routes/checkout.tsx` | MEDIUM |
-
----
-
-## Phase 3: Backend Models & Missing Features
-
-### 3A. Database Models
-
-| # | Model | Priority | Notes |
-|---|-------|----------|-------|
-| 3a.1 | `ReturnRequest` | HIGH | RMA workflow (status, reason, images, tracking) |
-| 3a.2 | `ShippingZone` + `ShippingRate` | HIGH | Zone-based rates for BD districts |
-| 3a.3 | `AuditLog` | HIGH | Track all admin actions |
-| 3a.4 | `UserAddress` | MEDIUM | Address book for repeat customers |
-| 3a.5 | `ProductReport` | MEDIUM | User-reported listings |
-| 3a.6 | `ShopFollow` | MEDIUM | Follow/favorite shops |
-| 3a.7 | `RecentlyViewed` | MEDIUM | Recently viewed products |
-| 3a.8 | `Message` / `Conversation` | MEDIUM | Buyer-vendor messaging |
-| 3a.9 | `Page` / `ContentBlock` | MEDIUM | CMS for static pages (About, FAQ, ToS) |
-| 3a.10 | `SiteSetting` | MEDIUM | Platform-wide configuration |
-| 3a.11 | `NotificationPreference` | LOW | In-app notification settings |
-| 3a.12 | `Sale` / `Promotion` | LOW | Scheduled flash deals |
-
-### 3B. Wire Up Existing Models
-
-| # | Task | Priority |
-|---|------|----------|
-| 3b.1 | **Invoice PDF generation** (connect Invoice model) | MEDIUM |
-| 3b.2 | **Wishlist API + frontend** (WishlistItem model exists, no UI) | HIGH |
-| 3b.3 | **Wallet page for users** (Wallet model exists, API exists, no page) | HIGH |
-| 3b.4 | **Payout admin/vendor UI** (Payout model exists, no management) | HIGH |
-
-### 3C. Payment Methods
-
-| # | Task | Priority |
-|---|------|----------|
-| 3c.1 | **Nagad integration** | MEDIUM |
-| 3c.2 | **Wallet balance as payment method** | MEDIUM |
-| 3c.3 | **Credit/debit card (SSLCommerz or ShurjoPay)** | LOW |
-| 3c.4 | **Rocket integration** | LOW |
-
----
 
 ## Phase 4: Missing Public Pages
 
@@ -153,7 +99,7 @@
 
 | # | Task | Priority |
 |---|------|----------|
-| 8.1 | **Set up Vitest with bun** (`bun run test`) | HIGH |
+| 8.1 | **Set up test with bun** (`bun run test`) | HIGH |
 | 8.2 | **Unit tests for utility functions** (slug, SKU service, cn, etc.) | MEDIUM |
 | 8.3 | **Unit tests for Zod schemas** | MEDIUM |
 | 8.4 | **Integration tests for checkout flow** | HIGH |

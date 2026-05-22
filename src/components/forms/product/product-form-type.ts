@@ -76,7 +76,7 @@ const VariantAttributesSchema = z
     { message: 'Variant attributes must have non-empty keys and values' },
   );
 
-export const ProductVariantSchema = z
+const ProductVariantSchema = z
   .object({
     id: z.string().optional(),
     name: z.string().min(1, { message: 'Variant name is required' }),
@@ -275,4 +275,3 @@ export const ProductFormSchema = z
 
 export type ProductFormInput = z.input<typeof ProductFormSchema>;
 export type ProductFormValues = z.output<typeof ProductFormSchema>;
-export type VariantAttributes = z.infer<typeof VariantAttributesSchema>;

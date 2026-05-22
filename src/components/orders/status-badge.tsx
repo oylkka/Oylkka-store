@@ -78,6 +78,3 @@ export function StatusBadge({
     </Badge>
   );
 }
-
-export type { BadgeVariant };
-export { FULFILLMENT_STYLES, ORDER_STYLES, PAYMENT_STYLES };

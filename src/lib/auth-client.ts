@@ -15,5 +15,3 @@ export const {
   resetPassword,
   updateUser,
 } = authClient;
-
-export type Session = typeof authClient.$Infer.Session;

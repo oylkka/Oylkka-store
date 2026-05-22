@@ -13,4 +13,8 @@ export const QUERY_KEYS = {
   VOUCHERS: 'vouchers',
   WALLET: 'wallet',
   WISHLIST: 'wishlist',
+  CONVERSATIONS: 'conversations',
+  VENDOR_CONVERSATIONS: 'vendor-conversations',
+  ADMIN_CONVERSATIONS: 'admin-conversations',
+  MESSAGES: 'messages',
 };

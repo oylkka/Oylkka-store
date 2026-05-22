@@ -7,7 +7,7 @@ import type {
   EditCategoryFormType,
 } from '@/schemas/category-schema';
 
-export type PublicCategory = {
+type PublicCategory = {
   id: string;
   name: string;
   slug: string;

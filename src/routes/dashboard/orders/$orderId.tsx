@@ -1,12 +1,31 @@
-import { createFileRoute, Link } from '@tanstack/react-router';
+import { createFileRoute, Link, useNavigate } from '@tanstack/react-router';
 import { format } from 'date-fns';
-import { ChevronLeft, Package } from 'lucide-react';
-
+import {
+  ChevronLeft,
+  FileText,
+  Loader2,
+  MessageSquare,
+  Package,
+  RotateCcw,
+} from 'lucide-react';
+import { useRef, useState } from 'react';
+import { toast } from 'sonner';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Textarea } from '@/components/ui/textarea';
 import { useOrderDetail } from '@/services/order';
+import { useCreateReturnMutation } from '@/services/returns';
 
 const statusBadge = (status: string) => {
   switch (status) {
@@ -133,12 +152,29 @@ function RouteComponent() {
             Placed on {format(new Date(order.createdAt), 'MMMM d, yyyy')}
           </p>
         </div>
-        <Badge
-          variant={sVariant}
-          className={`text-[10px] uppercase tracking-wider w-fit ${sClass}`}
-        >
-          {sLabel}
-        </Badge>
+        <div className='flex items-center gap-2'>
+          <Badge
+            variant={sVariant}
+            className={`text-[10px] uppercase tracking-wider w-fit ${sClass}`}
+          >
+            {sLabel}
+          </Badge>
+          {order.invoice?.pdfUrl && (
+            <Button variant='outline' size='sm' asChild className='gap-2'>
+              <a
+                href={order.invoice.pdfUrl}
+                target='_blank'
+                rel='noopener noreferrer'
+              >
+                <FileText className='w-4 h-4' />
+                Invoice
+              </a>
+            </Button>
+          )}
+          {order.status === 'DELIVERED' && (
+            <RequestReturnDialog orderId={order.id} />
+          )}
+        </div>
       </div>
 
       {/* Status timeline */}
@@ -249,6 +285,14 @@ function RouteComponent() {
                   </span>
                 </div>
               </div>
+              <div className='shrink-0 self-center ml-2'>
+                <MessageVendorButton
+                  shopId={item.shopId}
+                  productId={item.productId}
+                  productName={item.productName}
+                  orderId={order.id}
+                />
+              </div>
             </div>
           ))}
         </CardContent>
@@ -338,5 +382,186 @@ function RouteComponent() {
         </CardContent>
       </Card>
     </div>
+  );
+}
+
+const RETURN_REASONS = [
+  { value: 'DEFECTIVE', label: 'Defective Item' },
+  { value: 'WRONG_ITEM', label: 'Wrong Item Received' },
+  { value: 'NOT_AS_DESCRIBED', label: 'Not as Described' },
+  { value: 'SIZE_ISSUE', label: 'Size Issue' },
+  { value: 'DAMAGED', label: 'Damaged in Transit' },
+  { value: 'UNWANTED', label: 'No Longer Needed' },
+  { value: 'OTHER', label: 'Other' },
+];
+
+function MessageVendorButton({
+  shopId,
+  productId,
+  productName,
+  orderId,
+}: {
+  shopId: string;
+  productId: string;
+  productName: string;
+  orderId: string;
+}) {
+  const [isSending, setIsSending] = useState(false);
+  const navigate = useNavigate();
+
+  async function handleClick() {
+    setIsSending(true);
+    try {
+      const response = await fetch('/api/conversations/create', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          shopId,
+          subject: `Question about ${productName}`,
+          message: `I have a question about ${productName} from my order.`,
+          orderId,
+          productId,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        toast.error(data.error || 'Failed to start conversation');
+        return;
+      }
+
+      navigate({
+        to: '/dashboard/messages/$id',
+        params: { id: data.conversation.id },
+      });
+    } catch {
+      toast.error('Something went wrong');
+    } finally {
+      setIsSending(false);
+    }
+  }
+
+  return (
+    <Button
+      variant='ghost'
+      size='icon'
+      className='w-7 h-7 rounded-lg'
+      onClick={handleClick}
+      disabled={isSending}
+      title='Message Vendor'
+    >
+      {isSending ? (
+        <Loader2 className='w-3.5 h-3.5 animate-spin' />
+      ) : (
+        <MessageSquare className='w-3.5 h-3.5' />
+      )}
+    </Button>
+  );
+}
+
+function RequestReturnDialog({ orderId }: { orderId: string }) {
+  const navigate = useNavigate();
+  const createMutation = useCreateReturnMutation();
+  const [open, setOpen] = useState(false);
+  const [reason, setReason] = useState('');
+  const [details, setDetails] = useState('');
+  const fileRef = useRef<HTMLInputElement>(null);
+
+  const handleSubmit = async () => {
+    if (!reason) {
+      toast.error('Please select a reason');
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append('orderId', orderId);
+    formData.append('reason', reason);
+    formData.append('details', details);
+    formData.append('resolution', 'REFUND');
+
+    if (fileRef.current?.files) {
+      for (const file of fileRef.current.files) {
+        formData.append('images', file);
+      }
+    }
+
+    try {
+      await createMutation.mutateAsync(formData);
+      toast.success('Return request submitted');
+      setOpen(false);
+      navigate({ to: '/dashboard/orders/returns' });
+    } catch {
+      toast.error('Failed to submit return request');
+    }
+  };
+
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        <Button variant='outline' size='sm' className='gap-2'>
+          <RotateCcw className='w-4 h-4' />
+          Request Return
+        </Button>
+      </DialogTrigger>
+      <DialogContent className='sm:max-w-md'>
+        <DialogHeader>
+          <DialogTitle>Request Return</DialogTitle>
+        </DialogHeader>
+        <div className='space-y-4'>
+          <div>
+            <Label htmlFor='returnReason'>Reason</Label>
+            <select
+              id='returnReason'
+              className='flex h-10 w-full rounded-lg border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50'
+              value={reason}
+              onChange={(e) => setReason(e.target.value)}
+            >
+              <option value=''>Select a reason</option>
+              {RETURN_REASONS.map((r) => (
+                <option key={r.value} value={r.value}>
+                  {r.label}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <Label htmlFor='returnDetails'>Details (optional)</Label>
+            <Textarea
+              id='returnDetails'
+              placeholder='Describe the issue...'
+              value={details}
+              onChange={(e) => setDetails(e.target.value)}
+              rows={3}
+            />
+          </div>
+          <div>
+            <Label htmlFor='returnImages'>Evidence Photos (optional)</Label>
+            <Input
+              id='returnImages'
+              type='file'
+              ref={fileRef}
+              accept='image/*'
+              multiple
+            />
+          </div>
+          <div className='flex justify-end gap-2 pt-2'>
+            <Button
+              variant='outline'
+              onClick={() => setOpen(false)}
+              disabled={createMutation.isPending}
+            >
+              Cancel
+            </Button>
+            <Button onClick={handleSubmit} disabled={createMutation.isPending}>
+              {createMutation.isPending && (
+                <Loader2 className='w-4 h-4 mr-2 animate-spin' />
+              )}
+              Submit
+            </Button>
+          </div>
+        </div>
+      </DialogContent>
+    </Dialog>
   );
 }

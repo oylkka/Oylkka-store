@@ -34,6 +34,13 @@ export const reviewLimiter = new Ratelimit({
   prefix: 'ratelimit:review',
 });
 
+export const messageLimiter = new Ratelimit({
+  redis,
+  limiter: Ratelimit.slidingWindow(10, '60 s'),
+  analytics: true,
+  prefix: 'ratelimit:message',
+});
+
 export const generalLimiter = new Ratelimit({
   redis,
   limiter: Ratelimit.slidingWindow(100, '60 s'),

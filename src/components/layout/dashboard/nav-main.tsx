@@ -330,6 +330,10 @@ export function NavMain({ user }: { user: User }) {
           title: 'Flagged Reviews',
           url: '/dashboard/admin/moderation/reviews',
         },
+        {
+          title: 'Conversations',
+          url: '/dashboard/admin/messages',
+        },
       ],
     },
     {

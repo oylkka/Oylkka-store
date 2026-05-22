@@ -1,0 +1,99 @@
+import { createFileRoute } from '@tanstack/react-router';
+import { getRequestHeaders } from '@tanstack/react-start/server';
+import { auth } from '@/lib/auth';
+import { prisma } from '@/lib/db';
+
+export const Route = createFileRoute('/api/admin/payouts/process')({
+  server: {
+    handlers: {
+      POST: async ({ request }) => {
+        try {
+          const headers = getRequestHeaders();
+          const session = await auth.api.getSession({ headers });
+
+          if (!session?.user || session.user.role !== 'ADMIN') {
+            return Response.json({ error: 'Unauthorized' }, { status: 401 });
+          }
+
+          const body = await request.json();
+          const { shopId, note } = body;
+
+          if (!shopId) {
+            return Response.json(
+              { error: 'shopId is required' },
+              { status: 400 },
+            );
+          }
+
+          const shop = await prisma.shop.findUnique({ where: { id: shopId } });
+          if (!shop) {
+            return Response.json({ error: 'Shop not found' }, { status: 404 });
+          }
+
+          const items = await prisma.orderItem.findMany({
+            where: {
+              shopId,
+              fulfillmentStatus: 'DELIVERED',
+              payoutItem: null,
+            },
+          });
+
+          if (items.length === 0) {
+            return Response.json(
+              { error: 'No pending items for this shop' },
+              { status: 400 },
+            );
+          }
+
+          const totalAmount = items.reduce(
+            (sum, item) => sum + item.vendorAmount,
+            0,
+          );
+
+          const payout = await prisma.$transaction(async (tx) => {
+            const created = await tx.payout.create({
+              data: {
+                shopId,
+                amount: totalAmount,
+                currency: 'BDT',
+                status: 'COMPLETED',
+                note: note || null,
+                processedBy: session.user.id,
+                processedAt: new Date(),
+                items: {
+                  create: items.map((item) => ({
+                    orderItemId: item.id,
+                    amount: item.vendorAmount,
+                    commission: item.commissionAmount,
+                  })),
+                },
+              },
+            });
+
+            return created;
+          });
+
+          const full = await prisma.payout.findUnique({
+            where: { id: payout.id },
+            include: {
+              shop: { select: { id: true, name: true } },
+              _count: { select: { items: true } },
+            },
+          });
+
+          return Response.json({ payout: full }, { status: 201 });
+        } catch (error) {
+          return Response.json(
+            {
+              error:
+                error instanceof Error
+                  ? error.message
+                  : 'Failed to process payout',
+            },
+            { status: 500 },
+          );
+        }
+      },
+    },
+  },
+});

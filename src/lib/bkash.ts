@@ -78,7 +78,7 @@ async function getGrantToken(): Promise<string> {
   return data.id_token;
 }
 
-export type BkashCreatePaymentResult = {
+type BkashCreatePaymentResult = {
   bkashURL: string;
   paymentID: string;
   merchantInvoiceNumber: string;
@@ -165,7 +165,7 @@ export async function executeBkashPayment(
   return await response.json();
 }
 
-export type BkashRefundResult = {
+type BkashRefundResult = {
   refundTrxID: string;
   transactionStatus: string;
   amount: string;

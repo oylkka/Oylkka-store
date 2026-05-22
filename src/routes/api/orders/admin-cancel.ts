@@ -1,5 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { getRequestHeaders } from '@tanstack/react-start/server';
+import { createAuditLog } from '@/lib/audit-log';
 import { auth } from '@/lib/auth';
 import { validateCsrf } from '@/lib/csrf';
 import { prisma } from '@/lib/db';
@@ -93,6 +94,15 @@ export const Route = createFileRoute('/api/orders/admin-cancel')({
               }
             }
           });
+
+          createAuditLog({
+            actorId: session.user.id,
+            actorRole: session.user.role,
+            action: 'ORDER_CANCELLED',
+            entity: 'Order',
+            entityId: body.orderId,
+            details: { reason: body.reason, orderNumber: order.orderNumber },
+          }).catch(() => {});
 
           return Response.json({ success: true }, { status: 200 });
         } catch (error) {

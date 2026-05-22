@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from '@tanstack/react-router';
+import { createFileRoute, Link, useNavigate } from '@tanstack/react-router';
 import {
   BadgeCheck,
   Clock,
@@ -18,7 +18,7 @@ import {
   Truck,
 } from 'lucide-react';
 import { motion } from 'motion/react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 import Footer from '@/components/layout/footer';
 import Header from '@/components/layout/header';
@@ -66,6 +66,7 @@ import {
   useRemoveFromWishlistMutation,
   useWishlist,
 } from '@/services/wishlist';
+import { trackProductView } from './shop.recently-viewed';
 
 export const Route = createFileRoute('/product/$slug')({
   component: RouteComponent,
@@ -128,6 +129,18 @@ function RouteComponent() {
   const { data: wishlistData } = useWishlist({
     enabled: !!user,
   });
+
+  useEffect(() => {
+    if (product) {
+      trackProductView({
+        id: product.id,
+        slug: product.slug,
+        name: product.productName,
+        image: product.images?.[0]?.imageUrl ?? '',
+        price: product.discountPrice ?? product.price,
+      });
+    }
+  }, [product]);
 
   const isInWishlist = wishlistData?.items?.some(
     (item) =>
@@ -518,6 +531,7 @@ function RouteComponent() {
                   <ContactVendorDialog
                     shopId={product.shop.id}
                     shopName={product.shop.name}
+                    productId={product.id}
                   />
                 </div>
               </motion.div>
@@ -587,11 +601,14 @@ function RouteComponent() {
 function ContactVendorDialog({
   shopId,
   shopName,
+  productId,
 }: {
   shopId: string;
   shopName: string;
+  productId?: string;
 }) {
   const { user } = Route.useRouteContext();
+  const navigate = useNavigate();
   const [subject, setSubject] = useState('');
   const [message, setMessage] = useState('');
   const [isSending, setIsSending] = useState(false);
@@ -610,13 +627,14 @@ function ContactVendorDialog({
 
     setIsSending(true);
     try {
-      const response = await fetch('/api/messages/contact-vendor', {
+      const response = await fetch('/api/conversations/create', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           shopId,
           subject: subject.trim(),
           message: message.trim(),
+          productId: productId || undefined,
         }),
       });
 
@@ -627,10 +645,14 @@ function ContactVendorDialog({
         return;
       }
 
-      toast.success('Message sent to the seller!');
+      toast.success('Message sent!');
       setOpen(false);
       setSubject('');
       setMessage('');
+      navigate({
+        to: '/dashboard/messages/$id',
+        params: { id: data.conversation.id },
+      });
     } catch {
       toast.error('Something went wrong. Please try again.');
     } finally {

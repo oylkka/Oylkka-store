@@ -2,7 +2,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import apiClient from '@/lib/api-client';
 import { QUERY_KEYS } from '@/lib/constants';
 
-export type AdminOrderListItem = {
+type AdminOrderListItem = {
   id: string;
   orderNumber: string;
   customerName: string;
@@ -16,7 +16,7 @@ export type AdminOrderListItem = {
   firstItemImage: string | null;
 };
 
-export type AdminOrderItem = {
+type AdminOrderItem = {
   id: string;
   productId: string;
   productName: string;
@@ -35,7 +35,7 @@ export type AdminOrderItem = {
   shopName: string;
 };
 
-export type AdminOrderDetail = {
+type AdminOrderDetail = {
   id: string;
   orderNumber: string;
   status: string;
@@ -74,7 +74,7 @@ export type AdminOrderDetail = {
   items: AdminOrderItem[];
 };
 
-export type AdminOrderListResponse = {
+type AdminOrderListResponse = {
   orders: AdminOrderListItem[];
   total: number;
   totalRevenue: number;

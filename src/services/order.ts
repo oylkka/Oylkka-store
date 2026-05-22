@@ -8,7 +8,7 @@ import type {
 import apiClient from '@/lib/api-client';
 import { QUERY_KEYS } from '@/lib/constants';
 
-export type OrderListItem = {
+type OrderListItem = {
   id: string;
   orderNumber: string;
   status: OrderStatus;
@@ -25,7 +25,7 @@ export type OrderListItem = {
   currency: string;
 };
 
-export type OrderItemDetail = {
+type OrderItemDetail = {
   id: string;
   productId: string;
   productName: string;
@@ -43,7 +43,7 @@ export type OrderItemDetail = {
   deliveredAt: string | null;
 };
 
-export type OrderDetail = {
+type OrderDetail = {
   id: string;
   orderNumber: string;
   status: OrderStatus;
@@ -63,6 +63,11 @@ export type OrderDetail = {
   shippingDistrict: string;
   shippingPostalCode: string | null;
   shippingComment: string | null;
+  invoice: {
+    invoiceNumber: string;
+    pdfUrl: string | null;
+    createdAt: string;
+  } | null;
   createdAt: string;
   confirmedAt: string | null;
   paidAt: string | null;

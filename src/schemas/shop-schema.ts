@@ -50,4 +50,3 @@ export const ShopApiSchema = BaseShopSchema;
 
 export type ShopApplicationFormType = z.infer<typeof ShopApplicationFormSchema>;
 export type EditShopFormType = z.infer<typeof EditShopFormSchema>;
-export type ShopApiType = z.infer<typeof ShopApiSchema>;

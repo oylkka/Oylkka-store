@@ -145,3 +145,32 @@ enum TransactionType {
   CREDIT
   DEBIT
 }
+
+// --- Return / RMA ---
+
+enum ReturnStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  AWAITING_SHIPMENT
+  SHIPPED
+  RECEIVED
+  REFUNDED
+}
+
+// --- Conversation ---
+
+enum ConversationStatus {
+  OPEN
+  CLOSED
+}
+
+enum ReturnReason {
+  DEFECTIVE
+  WRONG_ITEM
+  NOT_AS_DESCRIBED
+  SIZE_ISSUE
+  DAMAGED
+  UNWANTED
+  OTHER
+}

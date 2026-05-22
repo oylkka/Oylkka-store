@@ -75,6 +75,7 @@ function RouteComponent() {
     description?: string;
   } | null>(null);
   const [isValidatingCoupon, setIsValidatingCoupon] = useState(false);
+  const [walletBalance, setWalletBalance] = useState<number | undefined>();
   const [myVouchers, setMyVouchers] = useState<
     {
       id: string;
@@ -132,6 +133,15 @@ function RouteComponent() {
               setSelectedVoucherIds((prev) => new Set(prev).add(v.id));
             }
           }
+        }
+      })
+      .catch(() => {});
+
+    fetch('/api/wallet/get')
+      .then((r) => r.json())
+      .then((data) => {
+        if (data.balance !== undefined) {
+          setWalletBalance(data.balance);
         }
       })
       .catch(() => {});
@@ -285,7 +295,10 @@ function RouteComponent() {
 
       queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.CART] });
 
-      if (orderData.paymentMethod === 'CASH_ON_DELIVERY') {
+      if (
+        orderData.paymentMethod === 'CASH_ON_DELIVERY' ||
+        orderData.paymentMethod === 'WALLET'
+      ) {
         toast.success('Order placed successfully!');
         navigate({
           to: '/checkout/confirmation',
@@ -559,6 +572,7 @@ function RouteComponent() {
                   <PaymentSelector
                     selected={paymentMethod}
                     onSelect={setPaymentMethod}
+                    walletBalance={walletBalance}
                   />
                 </Card>
 
@@ -574,7 +588,7 @@ function RouteComponent() {
                       Placing Order...
                     </>
                   ) : (
-                    `Place Order ${paymentMethod === 'CASH_ON_DELIVERY' ? '(COD)' : ''}`
+                    `Place Order${paymentMethod === 'CASH_ON_DELIVERY' ? ' (COD)' : ''}${paymentMethod === 'WALLET' ? ' (Wallet)' : ''}`
                   )}
                 </Button>
               </div>

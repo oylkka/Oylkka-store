@@ -5,6 +5,7 @@ import { sendOrderConfirmation } from '@/actions/send-order-email';
 import { auth } from '@/lib/auth';
 import { validateCsrf } from '@/lib/csrf';
 import { prisma } from '@/lib/db';
+import { generateInvoicePdf } from '@/lib/invoice-pdf';
 import { checkoutLimiter } from '@/lib/rate-limit';
 import { checkRateLimit } from '@/lib/rate-limit-guard';
 
@@ -30,7 +31,7 @@ const checkoutSchema = z.object({
     .optional()
     .or(z.literal('')),
   shippingComment: z.string().optional(),
-  paymentMethod: z.enum(['BKASH', 'CASH_ON_DELIVERY']),
+  paymentMethod: z.enum(['BKASH', 'CASH_ON_DELIVERY', 'WALLET']),
   voucherIds: z.array(z.string()).optional(),
 });
 
@@ -175,34 +176,77 @@ export const Route = createFileRoute('/api/checkout/create')({
             totalDiscount += discount * item.quantity;
           }
 
-          // --- Shipping calculation ---
+          // --- Shipping calculation (zone-aware) ---
           const shopShippingMap = new Map<
             string,
-            { cost: number; hasNonFree: boolean }
+            {
+              cost: number;
+              hasNonFree: boolean;
+              itemQty: number;
+              shopSubtotal: number;
+            }
           >();
 
+          const shippingDistrict = parsed.data.shippingDistrict;
+
           for (const item of cart.items) {
-            const shopId = item.product.shop?.id;
+            const shop = item.product.shop;
+            const shopId = shop?.id;
             if (!shopId) continue;
+
+            const unitPrice =
+              item.variant?.discountPrice ??
+              item.variant?.price ??
+              item.product.discountPrice ??
+              item.product.price;
 
             if (!shopShippingMap.has(shopId)) {
               shopShippingMap.set(shopId, {
-                cost: item.product.shop?.shippingCost ?? 0,
+                cost: shop?.shippingCost ?? 0,
                 hasNonFree: false,
+                itemQty: 0,
+                shopSubtotal: 0,
               });
             }
 
+            // biome-ignore lint/style/noNonNullAssertion: this is fine
+            const entry = shopShippingMap.get(shopId)!;
+            entry.shopSubtotal += unitPrice * item.quantity;
+
             if (!item.product.freeShipping) {
-              // biome-ignore lint/style/noNonNullAssertion: this is fine
-              const entry = shopShippingMap.get(shopId)!;
               entry.hasNonFree = true;
+              entry.itemQty += item.quantity;
             }
           }
 
           let baseShipping = 0;
-          for (const [, entry] of shopShippingMap) {
+          for (const [shopId, entry] of shopShippingMap) {
             if (entry.hasNonFree) {
-              baseShipping += entry.cost;
+              let cost = entry.cost;
+
+              // Look up matching shipping zone for per-item + freeAbove
+              if (shippingDistrict) {
+                const zone = await prisma.shippingZone.findFirst({
+                  where: {
+                    shopId,
+                    isActive: true,
+                    districts: { has: shippingDistrict },
+                  },
+                  select: { baseCost: true, perItem: true, freeAbove: true },
+                });
+
+                if (zone) {
+                  cost = zone.baseCost + zone.perItem * entry.itemQty;
+                  if (
+                    zone.freeAbove != null &&
+                    entry.shopSubtotal >= zone.freeAbove
+                  ) {
+                    cost = 0;
+                  }
+                }
+              }
+
+              baseShipping += cost;
             }
           }
 
@@ -249,7 +293,6 @@ export const Route = createFileRoute('/api/checkout/create')({
             const globalCoupons: string[] = [];
             const shopCoupons = new Map<string, string>(); // shopId -> couponId
             const productCoupons = new Map<string, string>(); // productId -> couponId
-            let _hasFreeShippingVoucher = false;
 
             for (const uv of userVouchers) {
               const coupon = uv.coupon;
@@ -461,10 +504,6 @@ export const Route = createFileRoute('/api/checkout/create')({
               discountAmount = Math.round(discountAmount * 100) / 100;
               cashbackAmount = Math.round(cashbackAmount * 100) / 100;
 
-              if (coupon.freeShipping) {
-                _hasFreeShippingVoucher = true;
-              }
-
               selectedVouchers.push({
                 id: uv.id,
                 couponId: coupon.id,
@@ -551,12 +590,18 @@ export const Route = createFileRoute('/api/checkout/create')({
                 total,
                 currency: 'BDT',
                 paymentMethod: parsed.data.paymentMethod,
+                paymentStatus:
+                  parsed.data.paymentMethod === 'WALLET' ? 'PAID' : 'PENDING',
+                paidAt:
+                  parsed.data.paymentMethod === 'WALLET' ? new Date() : null,
                 status:
-                  parsed.data.paymentMethod === 'CASH_ON_DELIVERY'
+                  parsed.data.paymentMethod === 'CASH_ON_DELIVERY' ||
+                  parsed.data.paymentMethod === 'WALLET'
                     ? 'CONFIRMED'
                     : 'PENDING',
                 confirmedAt:
-                  parsed.data.paymentMethod === 'CASH_ON_DELIVERY'
+                  parsed.data.paymentMethod === 'CASH_ON_DELIVERY' ||
+                  parsed.data.paymentMethod === 'WALLET'
                     ? new Date()
                     : null,
                 metadata: {
@@ -603,9 +648,45 @@ export const Route = createFileRoute('/api/checkout/create')({
               include: { items: true },
             });
 
-            // Only for COD: destructive side effects (stock, cart, vouchers, cashback)
+            // For COD and WALLET: immediate side effects (stock, cart, vouchers, cashback)
             // For BKASH these happen after payment confirmation in bkash-callback.ts
-            if (parsed.data.paymentMethod === 'CASH_ON_DELIVERY') {
+            if (
+              parsed.data.paymentMethod === 'CASH_ON_DELIVERY' ||
+              parsed.data.paymentMethod === 'WALLET'
+            ) {
+              // Wallet payment: check balance and debit
+              if (parsed.data.paymentMethod === 'WALLET') {
+                const wallet = await tx.wallet.findUnique({
+                  where: { userId: session.user.id },
+                });
+
+                if (!wallet) {
+                  throw new Error('Wallet not found');
+                }
+
+                if (wallet.balance < total) {
+                  throw new Error(
+                    `Insufficient wallet balance. Your balance: ৳${wallet.balance.toFixed(2)}, required: ৳${total.toFixed(2)}`,
+                  );
+                }
+
+                await tx.wallet.update({
+                  where: { id: wallet.id },
+                  data: { balance: { decrement: total } },
+                });
+
+                await tx.walletTransaction.create({
+                  data: {
+                    walletId: wallet.id,
+                    type: 'DEBIT',
+                    amount: total,
+                    reference: 'ORDER_PAYMENT',
+                    orderId: created.id,
+                    description: `Payment for order ${orderNumber}`,
+                  },
+                });
+              }
+
               // Decrement stock with re-validation inside transaction (race condition safety)
               for (const item of cart.items) {
                 const current = await tx.product.findUnique({
@@ -700,9 +781,13 @@ export const Route = createFileRoute('/api/checkout/create')({
             return created;
           });
 
-          // Fire-and-forget: send order confirmation email for COD orders
-          if (parsed.data.paymentMethod === 'CASH_ON_DELIVERY') {
+          // Fire-and-forget: send order confirmation email + generate invoice for confirmed orders
+          if (
+            parsed.data.paymentMethod === 'CASH_ON_DELIVERY' ||
+            parsed.data.paymentMethod === 'WALLET'
+          ) {
             sendOrderConfirmation(order.id);
+            generateInvoicePdf(order.id);
           }
 
           return Response.json(

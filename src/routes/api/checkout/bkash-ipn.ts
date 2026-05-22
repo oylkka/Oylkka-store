@@ -5,6 +5,7 @@ import {
   queryBkashPayment,
 } from '@/lib/bkash';
 import { prisma } from '@/lib/db';
+import { generateInvoicePdf } from '@/lib/invoice-pdf';
 
 export const Route = createFileRoute('/api/checkout/bkash-ipn')({
   server: {
@@ -191,6 +192,8 @@ export const Route = createFileRoute('/api/checkout/bkash-ipn')({
                 });
               }
             });
+
+            generateInvoicePdf(order.id);
 
             return Response.json(
               { message: 'Payment processed successfully' },

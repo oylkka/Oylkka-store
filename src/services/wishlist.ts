@@ -3,7 +3,7 @@ import { toast } from 'sonner';
 import apiClient from '@/lib/api-client';
 import { QUERY_KEYS } from '@/lib/constants';
 
-export type WishlistItem = {
+type WishlistItem = {
   id: string;
   productId: string;
   variantId: string | null;

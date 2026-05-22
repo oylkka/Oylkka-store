@@ -38,4 +38,3 @@ export const CategoryApiSchema = BaseCategorySchema;
 
 export type CategoryFormType = z.infer<typeof CategoryFormSchema>;
 export type EditCategoryFormType = z.infer<typeof EditCategoryFormSchema>;
-export type CategoryApiType = z.infer<typeof CategoryApiSchema>;

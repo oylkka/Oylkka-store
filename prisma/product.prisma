@@ -72,6 +72,7 @@ model Product {
   user      User   @relation(fields: [createdBy], references: [id], onDelete: Restrict, onUpdate: NoAction)
 
   reviews       Review[]
+  reports       ProductReport[]
   wishlistItems WishlistItem[]
   cartItems     CartItem[]
   questions     ProductQuestion[]
@@ -80,7 +81,8 @@ model Product {
 
   createdAt  DateTime    @default(now())
   updatedAt  DateTime    @updatedAt
-  orderItems OrderItem[]
+  orderItems    OrderItem[]
+  conversations Conversation[]
 
   @@index([categoryId])
   @@index([createdBy])

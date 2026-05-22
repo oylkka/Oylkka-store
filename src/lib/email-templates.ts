@@ -115,7 +115,7 @@ function ctaButton(text: string, link: string): string {
   `;
 }
 
-export type EmailOrderItem = {
+type EmailOrderItem = {
   productName: string;
   variantName: string | null;
   imageUrl: string | null;
@@ -124,7 +124,7 @@ export type EmailOrderItem = {
   total: number;
 };
 
-export type EmailOrderData = {
+type EmailOrderData = {
   orderNumber: string;
   customerName: string;
   subtotal: number;
@@ -230,7 +230,7 @@ export function orderConfirmationHtml(order: EmailOrderData): string {
   `);
 }
 
-export type EmailShippedItem = {
+type EmailShippedItem = {
   productName: string;
   variantName: string | null;
   imageUrl: string | null;

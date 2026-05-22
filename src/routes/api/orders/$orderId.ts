@@ -39,6 +39,13 @@ export const Route = createFileRoute('/api/orders/$orderId')({
                   deliveredAt: true,
                 },
               },
+              invoice: {
+                select: {
+                  invoiceNumber: true,
+                  pdfUrl: true,
+                  createdAt: true,
+                },
+              },
             },
           });
 
@@ -74,6 +81,13 @@ export const Route = createFileRoute('/api/orders/$orderId')({
             refundAmount: order.refundAmount,
             refundReason: order.refundReason,
             currency: order.currency,
+            invoice: order.invoice
+              ? {
+                  invoiceNumber: order.invoice.invoiceNumber,
+                  pdfUrl: order.invoice.pdfUrl,
+                  createdAt: order.invoice.createdAt.toISOString(),
+                }
+              : null,
             items: order.items.map((item) => ({
               id: item.id,
               productId: item.productId,

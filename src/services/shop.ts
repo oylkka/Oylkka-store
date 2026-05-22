@@ -2,12 +2,9 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import apiClient from '@/lib/api-client';
 import { QUERY_KEYS } from '@/lib/constants';
-import type {
-  EditShopFormType,
-  ShopApplicationFormType,
-} from '@/schemas/shop-schema';
+import type { ShopApplicationFormType } from '@/schemas/shop-schema';
 
-export type ShopResponse = {
+type ShopResponse = {
   id: string;
   name: string;
   slug: string;
@@ -32,6 +29,7 @@ export type ShopResponse = {
   ownerId: string;
   createdAt: string;
   updatedAt: string;
+  shippingCost: number;
   totalSales: number;
   totalOrders: number;
   rating: number;
@@ -61,18 +59,6 @@ export type AdminShopResponse = ShopResponse & {
     email: string;
   };
 };
-
-export function usePendingShops() {
-  return useQuery<AdminShopResponse[]>({
-    queryKey: [QUERY_KEYS.SHOPS, 'pending'],
-    queryFn: async () => {
-      const response = await apiClient.get<AdminShopResponse[]>(
-        '/api/shop/pending-list',
-      );
-      return response.data;
-    },
-  });
-}
 
 export function useAdminShops(status?: string, search?: string) {
   return useQuery<AdminShopResponse[]>({
@@ -160,71 +146,6 @@ export function useRejectShopMutation() {
   });
 }
 
-export function useUpdateShopMutation() {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: async (values: EditShopFormType & { shopId: string }) => {
-      const formData = new FormData();
-
-      formData.append('name', values.name);
-      formData.append('description', values.description ?? '');
-      formData.append('email', values.email);
-      formData.append('phone', values.phone ?? '');
-      formData.append('website', values.website ?? '');
-      formData.append('addressLine1', values.addressLine1 ?? '');
-      formData.append('addressLine2', values.addressLine2 ?? '');
-      formData.append('city', values.city ?? '');
-      formData.append('state', values.state ?? '');
-      formData.append('country', values.country ?? '');
-      formData.append('postalCode', values.postalCode ?? '');
-      formData.append(
-        'keepExistingLogo',
-        String(values.keepExistingLogo ?? true),
-      );
-      formData.append(
-        'keepExistingBanner',
-        String(values.keepExistingBanner ?? true),
-      );
-
-      if (values.logo instanceof FileList && values.logo.length > 0) {
-        formData.append('logo', values.logo[0]);
-      }
-
-      if (values.banner instanceof FileList && values.banner.length > 0) {
-        formData.append('banner', values.banner[0]);
-      }
-
-      const response = await apiClient.patch<ShopApiResponse>(
-        '/api/shop/update',
-        formData,
-        {
-          headers: { 'Content-Type': 'multipart/form-data' },
-        },
-      );
-
-      return response.data;
-    },
-    onMutate: () => {
-      toast.loading('Updating shop...', {
-        id: 'shop-update',
-      });
-    },
-    onSuccess: () => {
-      toast.success('Shop updated successfully!', {
-        id: 'shop-update',
-      });
-      queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.SHOPS] });
-    },
-    onError: (error: unknown) => {
-      const message = apiClient.isAxiosError(error)
-        ? (error.response?.data?.error ?? error.message)
-        : 'Failed to update shop';
-      toast.error(`Error: ${message}`, { id: 'shop-update' });
-    },
-  });
-}
-
 export function useApplyShopMutation() {
   const queryClient = useQueryClient();
 
@@ -298,7 +219,7 @@ export type PublicShopListShop = {
   _count: { products: number };
 };
 
-export type PublicShopListResponse = {
+type PublicShopListResponse = {
   shops: PublicShopListShop[];
   total: number;
   page: number;
@@ -319,7 +240,7 @@ export function usePublicShops(params: { page?: number; search?: string }) {
   });
 }
 
-export type PublicShopProduct = {
+type PublicShopProduct = {
   id: string;
   productName: string;
   slug: string;
@@ -381,7 +302,7 @@ export function usePublicShop(slug: string) {
   });
 }
 
-export type PublicShopProductsResponse = {
+type PublicShopProductsResponse = {
   products: PublicShopProduct[];
   total: number;
   page: number;

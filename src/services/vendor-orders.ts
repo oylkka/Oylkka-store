@@ -3,7 +3,7 @@ import type { FulfillmentStatus } from '@/generated/prisma/enums';
 import apiClient from '@/lib/api-client';
 import { QUERY_KEYS } from '@/lib/constants';
 
-export type VendorOrderItem = {
+type VendorOrderItem = {
   id: string;
   orderId: string;
   orderNumber: string;
@@ -27,7 +27,7 @@ export type VendorOrderItem = {
   deliveredAt: string | null;
 };
 
-export type VendorOrderDetail = {
+type VendorOrderDetail = {
   id: string;
   orderNumber: string;
   orderDate: string;

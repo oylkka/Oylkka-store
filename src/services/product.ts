@@ -3,7 +3,7 @@ import { toast } from 'sonner';
 import apiClient from '@/lib/api-client';
 import { QUERY_KEYS } from '@/lib/constants';
 
-export type ProductImage = {
+type ProductImage = {
   id: string;
   productId: string;
   imageUrl: string;
@@ -45,7 +45,7 @@ export type VendorProduct = {
   _count: { reviews: number; orderItems: number };
 };
 
-export type VendorCategory = {
+type VendorCategory = {
   id: string;
   name: string;
   slug: string;
@@ -72,7 +72,7 @@ export type CategoryProduct = {
   createdAt: string;
 };
 
-export type ProductListResponse = {
+type ProductListResponse = {
   products: CategoryProduct[];
   total: number;
   page: number;
@@ -193,7 +193,7 @@ export type PublicReview = {
   images: { id: string; imageUrl: string; order: number }[];
 };
 
-export type ProductReviewsResponse = {
+type ProductReviewsResponse = {
   reviews: PublicReview[];
   total: number;
   page: number;
@@ -216,7 +216,7 @@ export function usePublicProductReviews(productId: string, page: number = 1) {
   });
 }
 
-export type PublicQuestion = {
+type PublicQuestion = {
   id: string;
   question: string;
   answer: string | null;
@@ -225,7 +225,7 @@ export type PublicQuestion = {
   user: { id: string; name: string };
 };
 
-export type ProductQuestionsResponse = {
+type ProductQuestionsResponse = {
   questions: PublicQuestion[];
   total: number;
   page: number;

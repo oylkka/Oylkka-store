@@ -3,7 +3,7 @@ import { toast } from 'sonner';
 import apiClient from '@/lib/api-client';
 import { QUERY_KEYS } from '@/lib/constants';
 
-export type CartItemProduct = {
+type CartItemProduct = {
   id: string;
   productName: string;
   slug: string;
@@ -16,7 +16,7 @@ export type CartItemProduct = {
   shop: { id: string; name: string; slug: string; shippingCost: number } | null;
 };
 
-export type CartItemVariant = {
+type CartItemVariant = {
   id: string;
   name: string;
   price: number;
@@ -36,7 +36,7 @@ export type CartItem = {
   variant: CartItemVariant | null;
 };
 
-export type Cart = {
+type Cart = {
   id: string;
   userId: string;
   items: CartItem[];
