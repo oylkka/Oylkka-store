@@ -29,6 +29,7 @@ export const Route = createFileRoute('/api/cart/get')({
                       discountPrice: true,
                       stock: true,
                       hasVariants: true,
+                      freeShipping: true,
                       images: {
                         take: 1,
                         orderBy: { order: 'asc' },
@@ -39,6 +40,7 @@ export const Route = createFileRoute('/api/cart/get')({
                           id: true,
                           name: true,
                           slug: true,
+                          shippingCost: true,
                         },
                       },
                     },

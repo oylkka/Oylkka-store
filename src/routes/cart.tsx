@@ -1,4 +1,9 @@
-import { createFileRoute, Link, redirect } from '@tanstack/react-router';
+import {
+  createFileRoute,
+  Link,
+  redirect,
+  useNavigate,
+} from '@tanstack/react-router';
 import { ArrowLeft, Minus, Plus, ShoppingCart, Trash2 } from 'lucide-react';
 import Footer from '#/components/layout/footer';
 import Header from '#/components/layout/header';
@@ -23,6 +28,7 @@ export const Route = createFileRoute('/cart')({
 });
 
 function RouteComponent() {
+  const navigate = useNavigate();
   const { data: cart, isLoading, isError } = useCart();
   const updateMutation = useUpdateCartItemMutation();
   const removeMutation = useRemoveCartItemMutation();
@@ -176,7 +182,7 @@ function RouteComponent() {
             <Button
               size='lg'
               className='w-full h-12 text-base rounded-xl'
-              disabled
+              onClick={() => navigate({ to: '/checkout' })}
             >
               Proceed to Checkout
             </Button>

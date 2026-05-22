@@ -55,6 +55,8 @@ enum PaymentMethod {
   BANK_TRANSFER
   CASH_ON_DELIVERY
   BKASH
+  NAGAD
+  ROCKET
   WALLET
 }
 
@@ -116,11 +118,12 @@ enum Alignment {
   RIGHT
 }
 
-// --- Marketing ---
+// --- Marketing / Voucher ---
 
 enum DiscountType {
   PERCENTAGE
   FIXED
+  CASHBACK
 }
 
 enum CouponScope {
@@ -128,4 +131,17 @@ enum CouponScope {
   CATEGORY
   PRODUCT
   SHOP
+  GLOBAL
+  USER
+}
+
+enum PlatformRestriction {
+  ALL
+  MOBILE_ONLY
+  WEB_ONLY
+}
+
+enum TransactionType {
+  CREDIT
+  DEBIT
 }

@@ -6,6 +6,7 @@ import {
   LogOut,
   Sparkles,
 } from 'lucide-react';
+import { getInitials } from '#/lib/utils';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import {
   DropdownMenu,
@@ -48,7 +49,9 @@ export function NavUserDropdown({ user }: NavUserDropdownProps) {
             >
               <Avatar className='h-8 w-8 rounded-lg'>
                 <AvatarImage src={user.image ?? undefined} alt={user.name} />
-                <AvatarFallback className='rounded-lg'>CN</AvatarFallback>
+                <AvatarFallback className='rounded-lg'>
+                  {getInitials(user.name)}
+                </AvatarFallback>
               </Avatar>
               <div className='grid flex-1 text-left text-sm leading-tight'>
                 <span className='truncate font-semibold'>{user.name}</span>

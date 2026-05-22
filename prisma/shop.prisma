@@ -32,6 +32,7 @@ model Shop {
   bankAccountName   String?
   bankAccountNumber String?
   commissionRate    Float   @default(10)
+  shippingCost      Float   @default(0)
 
   totalSales   Int   @default(0)
   totalOrders  Int   @default(0)

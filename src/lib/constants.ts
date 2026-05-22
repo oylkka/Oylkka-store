@@ -7,4 +7,6 @@ export const QUERY_KEYS = {
   PUBLIC_PRODUCTS: 'public-products',
   PRODUCT_QUESTIONS: 'product-questions',
   CART: 'cart',
+  ORDERS: 'orders',
+  VENDOR_ORDERS: 'vendor-orders',
 };

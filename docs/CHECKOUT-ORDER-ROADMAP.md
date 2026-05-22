@@ -1,150 +1,15 @@
-# Checkout → Payment → Order Management — Implementation Roadmap
+# Checkout → Payment → Order Management — Remaining Work
 
-This document outlines the full implementation plan for building the checkout flow, payment gateway integration, and order management system for the Oylkka multivendor marketplace. Each phase is designed to be implemented one at a time, in order.
-
----
-
-## Phase 1: Prerequisites
-
-### 1.1 bKash API Setup
-
-| Item | Detail |
-|------|--------|
-| **Env vars** | Add `BKASH_APP_KEY`, `BKASH_APP_SECRET`, `BKASH_USERNAME`, `BKASH_PASSWORD`, `BKASH_BASE_URL` to `.env` |
-| **No SDK** | bKash uses server-side API calls — no frontend SDK needed |
-| **Prisma** | No new migrations — `Order` already has `paymentMethod`, `paymentRef`, `paymentStatus` |
+This document tracks what's **not yet implemented** in the checkout/payment/order system.
 
 ---
 
-## Phase 2: Checkout Flow (Customer Facing)
-
-### 2.1 Enable Checkout Button
-
-| File | Change |
-|------|--------|
-| `src/routes/cart.tsx` (lines 176-182) | Remove `disabled` prop from "Proceed to Checkout" button, wire to `navigate({ to: '/checkout' })` |
-
-### 2.2 Checkout Page (`/checkout`)
-
-| Item | Detail |
-|------|--------|
-| **Route** | `src/routes/checkout.tsx` |
-| **Guard** | `beforeLoad` — require authenticated user (`context.user`) |
-| **Layout** | Minimal header + main + footer |
-
-**Sections on page:**
-1. **Shipping Address Form** — name, email, phone, addressLine1/2, city, state, country, postalCode. Pre-fill from last order if available.
-2. **Order Summary** — items grouped by shop, quantities, prices, subtotal, shipping estimate
-3. **Order Notes** — optional textarea
-4. **Payment Method** — bKash — redirect to bKash hosted payment page
-5. **Place Order** — submits shipping, creates Order, initiates bKash payment
-
-**States:** Loading skeleton, empty cart redirect (`/cart` if cart is empty), error state.
-
-### 2.3 Create Order API (`POST /api/checkout/create`)
-
-| Item | Detail |
-|------|--------|
-| **Route** | `src/routes/api/checkout/create.ts` |
-
-**Flow:**
-1. Validate session (must be logged in)
-2. Fetch cart with items; validate stock for each product/variant
-3. Generate `orderNumber` — format: `ORD-${Date.now().toString(36).toUpperCase()}`
-4. Calculate pricing from cart data:
-   - `subtotal` = sum of `savedPrice` × `quantity` per item
-   - `shippingCost` = flat rate or free shipping per item flags
-   - `tax` = (if applicable)
-   - `total` = subtotal + shippingCost + tax
-5. In a **Prisma transaction**:
-   - Create `Order` with shipping address snapshot
-   - Create `OrderItem` for each cart item — snapshot product/variant details, copy `commissionRate` from shop
-   - Decrement product/variant stock
-   - Delete cart items / clear cart
-6. Return `{ orderId, orderNumber, total }`
-
-### 2.4 Create bKash Payment API (`POST /api/checkout/bkash-pay`)
-
-| Item | Detail |
-|------|--------|
-| **Route** | `src/routes/api/checkout/bkash-pay.ts` |
-
-**Flow:**
-1. Call bKash `POST /tokenized/checkout/create` with order amount, merchant info, and `callbackURL` pointing to your callback endpoint
-2. Store `paymentRef` (bKash `merchantInvoiceNumber`) on the Order
-3. Return `{ checkoutURL }` to frontend
-4. Frontend redirects user to bKash checkout URL
-5. User completes payment on bKash hosted page
-6. bKash redirects back to callback endpoint
-
-### 2.5 bKash Callback + Verify (`GET /api/checkout/bkash-callback`)
-
-| Item | Detail |
-|------|--------|
-| **Route** | `src/routes/api/checkout/bkash-callback.ts` |
-
-**Flow:**
-1. bKash redirects user back with query params: `?paymentID=xxx&status=success&orderID=xxx`
-2. Call bKash `POST /tokenized/checkout/execute` with the `paymentID` to confirm payment
-3. On success → update `Order.paymentStatus = PAID`, `Order.status = CONFIRMED`, trigger confirmation email
-4. On failure → update `Order.paymentStatus = FAILED`
-5. Redirect user to `/checkout/confirmation?orderId=xxx` (or show error page)
-
-### 2.6 Order Confirmation Page (`/checkout/confirmation`)
-
-| Item | Detail |
-|------|--------|
-| **Route** | `src/routes/checkout/confirmation.tsx` |
-| **Query param** | `orderId` |
-
-**Content:** Success checkmark animation, order number display, order summary, "View Order" link → `/dashboard/orders/$orderId`, "Continue Shopping" → `/products`
-
----
-
-## Phase 3: Customer Order Management
-
-### 3.1 Customer Orders List (`/dashboard/orders`)
-
-| Item | Detail |
-|------|--------|
-| **Route** | `src/routes/dashboard/orders/index.tsx` |
-| **Already linked** | `nav-main.tsx` has `{ title: 'My Orders', url: '/dashboard/orders' }` |
-
-**Content:**
-- List of orders with: order number, date, total, status badge, item count
-- Click row → `/dashboard/orders/$orderId`
-- Filter by status tabs (All, Pending, Confirmed, Processing, Shipped, Delivered, Cancelled)
-- Empty state: "No orders yet"
-
-### 3.2 Customer Order Detail (`/dashboard/orders/$orderId`)
-
-| Item | Detail |
-|------|--------|
-| **Route** | `src/routes/dashboard/orders/$orderId.tsx` |
-
-**Content:**
-- Order header: order number, placed date, status timeline
-- Shipping address card
-- Items grouped by shop — each shop section shows `fulfillmentStatus`
-- Price breakdown: subtotal, shipping, tax, total
-- Payment status badge
-- "Track Order" link if tracking number set
-- "Write a Review" button for delivered items (links to product page)
-
-### 3.3 Customer Order API Routes
+## Phase 3: Customer Order API Routes
 
 | Route | Method | Purpose |
 |-------|--------|---------|
 | `/api/orders/customer-list` | GET | Paginated list of current user's orders |
 | `/api/orders/customer-single` | GET | Single order with items for current user |
-
-### 3.4 Order Service (`src/services/order.ts`)
-
-Hooks to add:
-- `useCustomerOrders(page, status?)` — `useQuery`
-- `useCustomerOrder(orderId)` — `useQuery`
-
-Follow existing patterns from `src/services/product.ts`.
 
 ---
 
@@ -259,68 +124,56 @@ The existing `send-email.ts` uses a generic template. For order emails, extend i
 
 ## Phase 7: Supporting Changes
 
-### 7.1 Query Keys
+### Query Keys
 
 **File:** `src/lib/constants.ts`
 
-Add:
+Already done:
 ```ts
 ORDERS: 'orders',
 VENDOR_ORDERS: 'vendor-orders',
+VOUCHERS: 'vouchers',
+WALLET: 'wallet',
 ```
-
-### 7.2 Nav-Main
-
-No changes needed — `nav-main.tsx` already has all nav items for orders/payouts. Routes just need to exist for them to work.
 
 ---
 
-## Full File Manifest
+## File Manifest (Not Yet Created)
 
-### New Route Files
-
-```
-src/routes/checkout.tsx                        # Phase 2.2 — Checkout page
-src/routes/checkout/confirmation.tsx           # Phase 2.6 — Order success page
-src/routes/dashboard/orders/index.tsx          # Phase 3.1 — Customer order list
-src/routes/dashboard/orders/$orderId.tsx       # Phase 3.2 — Customer order detail
-src/routes/dashboard/vendor/orders/index.tsx   # Phase 4.1 — Vendor order management
-src/routes/dashboard/admin/orders/index.tsx    # Phase 5.1 — Admin order list
-src/routes/dashboard/admin/orders/$orderId.tsx # Phase 5.2 — Admin order detail
-```
-
-### New API Route Files
+### Route Files
 
 ```
-src/routes/api/checkout/create.ts              # Phase 2.3 — Create order
-src/routes/api/checkout/bkash-pay.ts           # Phase 2.4 — Create bKash payment session
-src/routes/api/checkout/bkash-callback.ts      # Phase 2.5 — bKash callback + verify
-src/routes/api/orders/customer-list.ts         # Phase 3.3 — Customer orders list
-src/routes/api/orders/customer-single.ts       # Phase 3.3 — Customer order detail
-src/routes/api/orders/vendor-list.ts           # Phase 4.3 — Vendor order items
-src/routes/api/orders/vendor-update-fulfillment.ts # Phase 4.2 — Update fulfillment
-src/routes/api/orders/admin-list.ts            # Phase 5.3 — Admin order list
-src/routes/api/orders/admin-single.ts          # Phase 5.3 — Admin order detail
-src/routes/api/orders/admin-refund.ts          # Phase 5.3 — Admin refund
+src/routes/dashboard/vendor/orders/index.tsx          # Phase 4.1 — Vendor order management
+src/routes/dashboard/admin/orders/index.tsx           # Phase 5.1 — Admin order list
+src/routes/dashboard/admin/orders/$orderId.tsx        # Phase 5.2 — Admin order detail
 ```
 
-### New Service Files
+### API Route Files
 
 ```
-src/services/order.ts           # Phase 3.4 — Customer order hooks
+src/routes/api/orders/customer-list.ts                # Phase 3.3 — Customer orders list
+src/routes/api/orders/customer-single.ts              # Phase 3.3 — Customer order detail
+src/routes/api/orders/vendor-list.ts                  # Phase 4.3 — Vendor order items
+src/routes/api/orders/vendor-update-fulfillment.ts    # Phase 4.2 — Update fulfillment
+src/routes/api/orders/admin-list.ts                   # Phase 5.3 — Admin order list
+src/routes/api/orders/admin-single.ts                 # Phase 5.3 — Admin order detail
+src/routes/api/orders/admin-refund.ts                 # Phase 5.3 — Admin refund
+```
+
+### Service Files
+
+```
 src/services/vendor-order.ts    # Phase 4.4 — Vendor order hooks
 ```
 
-### New Component Files
+### Component Files
 
 ```
-src/components/checkout/shipping-form.tsx   # Phase 2.2 — Shipping address form
-src/components/checkout/order-summary.tsx   # Phase 2.2 — Order summary
-src/components/orders/status-badge.tsx      # Reusable order status badge
-src/components/orders/order-items-table.tsx # Reusable order items table
+src/components/orders/status-badge.tsx        # Reusable order status badge
+src/components/orders/order-items-table.tsx   # Reusable order items table
 ```
 
-### New Action Files
+### Action Files
 
 ```
 src/actions/send-order-email.ts  # Phase 6 — Order confirmation + shipping emails
@@ -328,81 +181,24 @@ src/actions/send-order-email.ts  # Phase 6 — Order confirmation + shipping ema
 
 ---
 
-## Edge Cases & Considerations
+## Edge Cases & Considerations (Still Relevant)
 
 | Concern | Solution |
 |---------|----------|
 | **Stock contention** | Run order creation + stock decrement in a single Prisma `$transaction`; rollback on failure |
 | **Partial fulfillment** | Each `OrderItem` has its own `fulfillmentStatus` — vendor only manages their own items |
-| **Failed payments** | Keep order as `PENDING`; allow retry with fresh bKash payment session; expire after 30 min |
+| **Failed payments** | Order marked `FAILED`; cart intact for retry |
+| **COD fake orders** | Vendor chooses whether to ship — no prepayment means some risk. Future: limit COD to verified users with order history |
+| **COD phone required** | `shippingPhone` is required for COD — delivery agent needs to call the customer |
 | **Zero-total orders** | Skip bKash, mark as `PAID` immediately (for 100% discount/free items) |
+| **Voucher stacking conflicts** | 1 GLOBAL + 1 SHOP per shop + 1 PRODUCT per product + free-shipping; duplicates per scope are skipped silently |
+| **Cashback on cancelled orders** | Not yet implemented — wallet credit is not reversed on cancel |
+| **Flash deal voucher cap** | `claimedCount` on Coupon prevents collecting beyond `maxClaimCount` |
+| **First-order voucher fraud** | `firstOrderOnly` checks existing completed orders for the user — cannot be bypassed by collecting first |
+| **Auto-apply UX** | Vouchers are auto-collected and pre-selected at checkout; user can uncheck to remove |
+| **Platform restriction** | `platformRestriction` validated on the server only — frontend could hide, but backend enforces |
+| **BOGO edge case** | Free items are the cheapest matching items in the cart; if fewer items than `bogoBuyQty`, BOGO is not applied |
+| **Tier selection** | Picks best matching tier by `minQuantity` (highest <= cart quantity); if no tier matches, falls back to parent value |
 | **Guest checkout** | Not in scope — all checkout requires authentication |
 | **Multi-currency** | Not in scope — single currency (BDT) for now |
 | **Race conditions** | Use bKash `merchantInvoiceNumber` for idempotency; callback handler is idempotent on `paymentRef` |
-
----
-
-## Data Flow Diagram
-
-```
-Cart Page                    Checkout Page                  Success
-  │                             │                             │
-  │ [Proceed to Checkout]       │                             │
-  └────────► Shipping Form ──►  │                             │
-              Order Summary     │                             │
-              Pay with bKash ──►│                             │
-                    │           │                             │
-                    ▼           │                             │
-            /api/checkout/create│                             │
-                    │           │                             │
-                    ▼           │                             │
-            Order + OrderItems  │                             │
-            Stock decremented   │                             │
-            Cart cleared        │                             │
-                    │           │                             │
-                    ▼           │                             │
-            /api/checkout/bkash-pay                           │
-            bKash tokenized/checkout/create                   │
-                    │                                         │
-                    ▼                                         │
-            bKash checkoutURL                                 │
-                    │                                         │
-         ┌──────────┴──────────┐                              │
-         ▼                     ▼                              │
-    Redirect to bKash     bKash API Error                     │
-    (hosted payment page)  Show error, retry                  │
-         │                                                     │
-         │  User pays on bKash                                 │
-         ▼                                                     │
-    bKash redirects back                                       │
-    /api/checkout/bkash-callback                               │
-    ?paymentID=xxx&status=success                              │
-         │                                                     │
-         ▼                                                     │
-    /api/checkout/bkash-callback                               │
-    bKash tokenized/checkout/execute                           │
-         │                                                     │
-   ┌─────┴──────────┐                                          │
-   ▼                 ▼                                         │
-Payment Succeeded   Payment Failed                             │
-   │                 │                                         │
-   │            Show Error                                     │
-   │            "Try again"                                    │
-   │                 │                                         │
-   │            Back to Checkout                               │
-   │                                                           │
-   ├── Email: Confirmation                                     │
-   │                                                           │
-   └──► Thank You Page ◄──────────────────────────────────────┘
-        (Order #, summary)
-        │
-        ▼
-  Customer Dashboard          Vendor Dashboard        Admin Dashboard
-  /dashboard/orders           /dashboard/vendor/      /dashboard/admin/
-       │                      /orders                 /orders
-       ▼                          ▼                       ▼
-  Order Detail              Fulfillment Actions      Manage All Orders
-  - Status timeline         - Mark Processing        - View any order
-  - Items by shop           - Mark Shipped           - Process refunds
-  - Write reviews           - Add tracking           - Cancel orders
-```

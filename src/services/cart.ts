@@ -11,8 +11,9 @@ export type CartItemProduct = {
   discountPrice: number | null;
   stock: number;
   hasVariants: boolean;
+  freeShipping: boolean;
   images: { imageUrl: string }[];
-  shop: { id: string; name: string; slug: string } | null;
+  shop: { id: string; name: string; slug: string; shippingCost: number } | null;
 };
 
 export type CartItemVariant = {
