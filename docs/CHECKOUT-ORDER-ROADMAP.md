@@ -4,61 +4,9 @@ This document tracks what's **not yet implemented** in the checkout/payment/orde
 
 ---
 
-## Phase 3: Customer Order API Routes
+## Phase 4: Admin Order Management
 
-| Route | Method | Purpose |
-|-------|--------|---------|
-| `/api/orders/customer-list` | GET | Paginated list of current user's orders |
-| `/api/orders/customer-single` | GET | Single order with items for current user |
-
----
-
-## Phase 4: Vendor Order Management
-
-### 4.1 Vendor Orders List (`/dashboard/vendor/orders`)
-
-| Item | Detail |
-|------|--------|
-| **Route** | `src/routes/dashboard/vendor/orders/index.tsx` |
-| **Already linked** | `nav-main.tsx` has full sub-nav with status tabs |
-
-**Content:**
-- List of `OrderItem` records belonging to this vendor's shop
-- Columns: Order #, product image+name, variant, quantity, unit price, total, fulfillment status, actions
-- Status filter tabs (all links already in nav-main)
-- Search by order number or product name
-- Empty state: "No orders yet"
-
-### 4.2 Fulfillment Actions
-
-| Action | API | Description |
-|--------|-----|-------------|
-| Mark Processing | `PUT /api/orders/vendor-update-fulfillment` | Change `PENDING → PROCESSING` |
-| Mark Shipped | `PUT /api/orders/vendor-update-fulfillment` | Change `PROCESSING → SHIPPED`; add tracking number + URL |
-| Mark Delivered | `PUT /api/orders/vendor-update-fulfillment` | Change `SHIPPED → DELIVERED`; set `deliveredAt` |
-
-- Inline buttons per row (or dropdown)
-- Modal for tracking info when marking as shipped
-- Batch select + bulk update
-
-### 4.3 Vendor Order API Routes
-
-| Route | Method | Purpose |
-|-------|--------|---------|
-| `/api/orders/vendor-list` | GET | OrderItems for vendor's shop with filters |
-| `/api/orders/vendor-update-fulfillment` | PUT | Update fulfillment status + tracking |
-
-### 4.4 Vendor Order Service (`src/services/vendor-order.ts`)
-
-Hooks to add:
-- `useVendorOrders(status?, search?)` — `useQuery`
-- `useUpdateFulfillmentMutation()` — `useMutation`
-
----
-
-## Phase 5: Admin Order Management
-
-### 5.1 Admin Orders List (`/dashboard/admin/orders`)
+### 4.1 Admin Orders List (`/dashboard/admin/orders`)
 
 | Item | Detail |
 |------|--------|
@@ -72,7 +20,7 @@ Hooks to add:
 - Quick stats bar: total orders, total revenue, pending count
 - Click row → `/dashboard/admin/orders/$orderId`
 
-### 5.2 Admin Order Detail (`/dashboard/admin/orders/$orderId`)
+### 4.2 Admin Order Detail (`/dashboard/admin/orders/$orderId`)
 
 | Item | Detail |
 |------|--------|
@@ -87,7 +35,7 @@ Hooks to add:
   - View payment details (bKash paymentID, status)
   - Cancel order
 
-### 5.3 Admin Order API Routes
+### 4.3 Admin Order API Routes
 
 | Route | Method | Purpose |
 |-------|--------|---------|
@@ -97,9 +45,9 @@ Hooks to add:
 
 ---
 
-## Phase 6: Email Notifications
+## Phase 5: Email Notifications
 
-### 6.1 Order Confirmation Email
+### 5.1 Order Confirmation Email
 
 | Item | Detail |
 |------|--------|
@@ -108,7 +56,7 @@ Hooks to add:
 | **Content** | Order number, items summary table, total, estimated delivery, "View Order" CTA button |
 | **File** | `src/actions/send-order-email.ts` |
 
-### 6.2 Shipping Update Email
+### 5.2 Shipping Update Email
 
 | Item | Detail |
 |------|--------|
@@ -116,13 +64,13 @@ Hooks to add:
 | **Content** | Product name, tracking number, tracking URL, "Track Package" CTA |
 | **File** | `src/actions/send-order-email.ts` (same file, separate function) |
 
-### 6.3 Email Template Update
+### 5.3 Email Template Update
 
 The existing `send-email.ts` uses a generic template. For order emails, extend it or create a richer HTML template with order item tables.
 
 ---
 
-## Phase 7: Supporting Changes
+## Phase 6: Supporting Changes
 
 ### Query Keys
 
@@ -143,27 +91,16 @@ WALLET: 'wallet',
 ### Route Files
 
 ```
-src/routes/dashboard/vendor/orders/index.tsx          # Phase 4.1 — Vendor order management
-src/routes/dashboard/admin/orders/index.tsx           # Phase 5.1 — Admin order list
-src/routes/dashboard/admin/orders/$orderId.tsx        # Phase 5.2 — Admin order detail
+src/routes/dashboard/admin/orders/index.tsx           # Phase 4.1 — Admin order list
+src/routes/dashboard/admin/orders/$orderId.tsx        # Phase 4.2 — Admin order detail
 ```
 
 ### API Route Files
 
 ```
-src/routes/api/orders/customer-list.ts                # Phase 3.3 — Customer orders list
-src/routes/api/orders/customer-single.ts              # Phase 3.3 — Customer order detail
-src/routes/api/orders/vendor-list.ts                  # Phase 4.3 — Vendor order items
-src/routes/api/orders/vendor-update-fulfillment.ts    # Phase 4.2 — Update fulfillment
-src/routes/api/orders/admin-list.ts                   # Phase 5.3 — Admin order list
-src/routes/api/orders/admin-single.ts                 # Phase 5.3 — Admin order detail
-src/routes/api/orders/admin-refund.ts                 # Phase 5.3 — Admin refund
-```
-
-### Service Files
-
-```
-src/services/vendor-order.ts    # Phase 4.4 — Vendor order hooks
+src/routes/api/orders/admin-list.ts                   # Phase 4.3 — Admin order list
+src/routes/api/orders/admin-single.ts                 # Phase 4.3 — Admin order detail
+src/routes/api/orders/admin-refund.ts                 # Phase 4.3 — Admin refund
 ```
 
 ### Component Files
@@ -176,7 +113,7 @@ src/components/orders/order-items-table.tsx   # Reusable order items table
 ### Action Files
 
 ```
-src/actions/send-order-email.ts  # Phase 6 — Order confirmation + shipping emails
+src/actions/send-order-email.ts  # Phase 5 — Order confirmation + shipping emails
 ```
 
 ---

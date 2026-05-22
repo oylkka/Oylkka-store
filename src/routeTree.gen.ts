@@ -87,12 +87,14 @@ import { Route as ApiBannersAddRouteImport } from './routes/api/banners/add'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 import { Route as DashboardVendorShopIndexRouteImport } from './routes/dashboard/vendor/shop/index'
 import { Route as DashboardVendorProductsIndexRouteImport } from './routes/dashboard/vendor/products/index'
+import { Route as DashboardVendorOrdersIndexRouteImport } from './routes/dashboard/vendor/orders/index'
 import { Route as DashboardAdminVendorsIndexRouteImport } from './routes/dashboard/admin/vendors/index'
 import { Route as DashboardVendorShopPoliciesRouteImport } from './routes/dashboard/vendor/shop/policies'
 import { Route as DashboardVendorShopMessagesRouteImport } from './routes/dashboard/vendor/shop/messages'
 import { Route as DashboardVendorShopBrandingRouteImport } from './routes/dashboard/vendor/shop/branding'
 import { Route as DashboardVendorProductsEditRouteImport } from './routes/dashboard/vendor/products/edit'
 import { Route as DashboardVendorProductsAddRouteImport } from './routes/dashboard/vendor/products/add'
+import { Route as DashboardVendorOrdersOrderIdRouteImport } from './routes/dashboard/vendor/orders/$orderId'
 import { Route as DashboardAdminVendorsDetailRouteImport } from './routes/dashboard/admin/vendors/detail'
 import { Route as DashboardAdminCategoryEditRouteImport } from './routes/dashboard/admin/category/edit'
 import { Route as DashboardAdminCategoryAllRouteImport } from './routes/dashboard/admin/category/all'
@@ -100,6 +102,8 @@ import { Route as DashboardAdminCategoryAddRouteImport } from './routes/dashboar
 import { Route as DashboardAdminBannerListRouteImport } from './routes/dashboard/admin/banner/list'
 import { Route as DashboardAdminBannerEditRouteImport } from './routes/dashboard/admin/banner/edit'
 import { Route as DashboardAdminBannerAddRouteImport } from './routes/dashboard/admin/banner/add'
+import { Route as ApiVendorOrdersListRouteImport } from './routes/api/vendor/orders/list'
+import { Route as ApiVendorOrdersOrderIdRouteImport } from './routes/api/vendor/orders/$orderId'
 
 const ProductsRoute = ProductsRouteImport.update({
   id: '/products',
@@ -503,6 +507,12 @@ const DashboardVendorProductsIndexRoute =
     path: '/products/',
     getParentRoute: () => DashboardVendorRouteRoute,
   } as any)
+const DashboardVendorOrdersIndexRoute =
+  DashboardVendorOrdersIndexRouteImport.update({
+    id: '/orders/',
+    path: '/orders/',
+    getParentRoute: () => DashboardVendorRouteRoute,
+  } as any)
 const DashboardAdminVendorsIndexRoute =
   DashboardAdminVendorsIndexRouteImport.update({
     id: '/vendors/',
@@ -537,6 +547,12 @@ const DashboardVendorProductsAddRoute =
   DashboardVendorProductsAddRouteImport.update({
     id: '/products/add',
     path: '/products/add',
+    getParentRoute: () => DashboardVendorRouteRoute,
+  } as any)
+const DashboardVendorOrdersOrderIdRoute =
+  DashboardVendorOrdersOrderIdRouteImport.update({
+    id: '/orders/$orderId',
+    path: '/orders/$orderId',
     getParentRoute: () => DashboardVendorRouteRoute,
   } as any)
 const DashboardAdminVendorsDetailRoute =
@@ -579,6 +595,16 @@ const DashboardAdminBannerAddRoute = DashboardAdminBannerAddRouteImport.update({
   id: '/banner/add',
   path: '/banner/add',
   getParentRoute: () => DashboardAdminRouteRoute,
+} as any)
+const ApiVendorOrdersListRoute = ApiVendorOrdersListRouteImport.update({
+  id: '/api/vendor/orders/list',
+  path: '/api/vendor/orders/list',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiVendorOrdersOrderIdRoute = ApiVendorOrdersOrderIdRouteImport.update({
+  id: '/api/vendor/orders/$orderId',
+  path: '/api/vendor/orders/$orderId',
+  getParentRoute: () => rootRouteImport,
 } as any)
 
 export interface FileRoutesByFullPath {
@@ -658,6 +684,8 @@ export interface FileRoutesByFullPath {
   '/dashboard/orders/$orderId': typeof DashboardOrdersOrderIdRoute
   '/products/category/$slug': typeof ProductsCategorySlugRoute
   '/dashboard/orders/': typeof DashboardOrdersIndexRoute
+  '/api/vendor/orders/$orderId': typeof ApiVendorOrdersOrderIdRoute
+  '/api/vendor/orders/list': typeof ApiVendorOrdersListRoute
   '/dashboard/admin/banner/add': typeof DashboardAdminBannerAddRoute
   '/dashboard/admin/banner/edit': typeof DashboardAdminBannerEditRoute
   '/dashboard/admin/banner/list': typeof DashboardAdminBannerListRoute
@@ -665,12 +693,14 @@ export interface FileRoutesByFullPath {
   '/dashboard/admin/category/all': typeof DashboardAdminCategoryAllRoute
   '/dashboard/admin/category/edit': typeof DashboardAdminCategoryEditRoute
   '/dashboard/admin/vendors/detail': typeof DashboardAdminVendorsDetailRoute
+  '/dashboard/vendor/orders/$orderId': typeof DashboardVendorOrdersOrderIdRoute
   '/dashboard/vendor/products/add': typeof DashboardVendorProductsAddRoute
   '/dashboard/vendor/products/edit': typeof DashboardVendorProductsEditRoute
   '/dashboard/vendor/shop/branding': typeof DashboardVendorShopBrandingRoute
   '/dashboard/vendor/shop/messages': typeof DashboardVendorShopMessagesRoute
   '/dashboard/vendor/shop/policies': typeof DashboardVendorShopPoliciesRoute
   '/dashboard/admin/vendors/': typeof DashboardAdminVendorsIndexRoute
+  '/dashboard/vendor/orders/': typeof DashboardVendorOrdersIndexRoute
   '/dashboard/vendor/products/': typeof DashboardVendorProductsIndexRoute
   '/dashboard/vendor/shop/': typeof DashboardVendorShopIndexRoute
 }
@@ -749,6 +779,8 @@ export interface FileRoutesByTo {
   '/dashboard/orders/$orderId': typeof DashboardOrdersOrderIdRoute
   '/products/category/$slug': typeof ProductsCategorySlugRoute
   '/dashboard/orders': typeof DashboardOrdersIndexRoute
+  '/api/vendor/orders/$orderId': typeof ApiVendorOrdersOrderIdRoute
+  '/api/vendor/orders/list': typeof ApiVendorOrdersListRoute
   '/dashboard/admin/banner/add': typeof DashboardAdminBannerAddRoute
   '/dashboard/admin/banner/edit': typeof DashboardAdminBannerEditRoute
   '/dashboard/admin/banner/list': typeof DashboardAdminBannerListRoute
@@ -756,12 +788,14 @@ export interface FileRoutesByTo {
   '/dashboard/admin/category/all': typeof DashboardAdminCategoryAllRoute
   '/dashboard/admin/category/edit': typeof DashboardAdminCategoryEditRoute
   '/dashboard/admin/vendors/detail': typeof DashboardAdminVendorsDetailRoute
+  '/dashboard/vendor/orders/$orderId': typeof DashboardVendorOrdersOrderIdRoute
   '/dashboard/vendor/products/add': typeof DashboardVendorProductsAddRoute
   '/dashboard/vendor/products/edit': typeof DashboardVendorProductsEditRoute
   '/dashboard/vendor/shop/branding': typeof DashboardVendorShopBrandingRoute
   '/dashboard/vendor/shop/messages': typeof DashboardVendorShopMessagesRoute
   '/dashboard/vendor/shop/policies': typeof DashboardVendorShopPoliciesRoute
   '/dashboard/admin/vendors': typeof DashboardAdminVendorsIndexRoute
+  '/dashboard/vendor/orders': typeof DashboardVendorOrdersIndexRoute
   '/dashboard/vendor/products': typeof DashboardVendorProductsIndexRoute
   '/dashboard/vendor/shop': typeof DashboardVendorShopIndexRoute
 }
@@ -843,6 +877,8 @@ export interface FileRoutesById {
   '/dashboard/orders/$orderId': typeof DashboardOrdersOrderIdRoute
   '/products/category/$slug': typeof ProductsCategorySlugRoute
   '/dashboard/orders/': typeof DashboardOrdersIndexRoute
+  '/api/vendor/orders/$orderId': typeof ApiVendorOrdersOrderIdRoute
+  '/api/vendor/orders/list': typeof ApiVendorOrdersListRoute
   '/dashboard/admin/banner/add': typeof DashboardAdminBannerAddRoute
   '/dashboard/admin/banner/edit': typeof DashboardAdminBannerEditRoute
   '/dashboard/admin/banner/list': typeof DashboardAdminBannerListRoute
@@ -850,12 +886,14 @@ export interface FileRoutesById {
   '/dashboard/admin/category/all': typeof DashboardAdminCategoryAllRoute
   '/dashboard/admin/category/edit': typeof DashboardAdminCategoryEditRoute
   '/dashboard/admin/vendors/detail': typeof DashboardAdminVendorsDetailRoute
+  '/dashboard/vendor/orders/$orderId': typeof DashboardVendorOrdersOrderIdRoute
   '/dashboard/vendor/products/add': typeof DashboardVendorProductsAddRoute
   '/dashboard/vendor/products/edit': typeof DashboardVendorProductsEditRoute
   '/dashboard/vendor/shop/branding': typeof DashboardVendorShopBrandingRoute
   '/dashboard/vendor/shop/messages': typeof DashboardVendorShopMessagesRoute
   '/dashboard/vendor/shop/policies': typeof DashboardVendorShopPoliciesRoute
   '/dashboard/admin/vendors/': typeof DashboardAdminVendorsIndexRoute
+  '/dashboard/vendor/orders/': typeof DashboardVendorOrdersIndexRoute
   '/dashboard/vendor/products/': typeof DashboardVendorProductsIndexRoute
   '/dashboard/vendor/shop/': typeof DashboardVendorShopIndexRoute
 }
@@ -938,6 +976,8 @@ export interface FileRouteTypes {
     | '/dashboard/orders/$orderId'
     | '/products/category/$slug'
     | '/dashboard/orders/'
+    | '/api/vendor/orders/$orderId'
+    | '/api/vendor/orders/list'
     | '/dashboard/admin/banner/add'
     | '/dashboard/admin/banner/edit'
     | '/dashboard/admin/banner/list'
@@ -945,12 +985,14 @@ export interface FileRouteTypes {
     | '/dashboard/admin/category/all'
     | '/dashboard/admin/category/edit'
     | '/dashboard/admin/vendors/detail'
+    | '/dashboard/vendor/orders/$orderId'
     | '/dashboard/vendor/products/add'
     | '/dashboard/vendor/products/edit'
     | '/dashboard/vendor/shop/branding'
     | '/dashboard/vendor/shop/messages'
     | '/dashboard/vendor/shop/policies'
     | '/dashboard/admin/vendors/'
+    | '/dashboard/vendor/orders/'
     | '/dashboard/vendor/products/'
     | '/dashboard/vendor/shop/'
   fileRoutesByTo: FileRoutesByTo
@@ -1029,6 +1071,8 @@ export interface FileRouteTypes {
     | '/dashboard/orders/$orderId'
     | '/products/category/$slug'
     | '/dashboard/orders'
+    | '/api/vendor/orders/$orderId'
+    | '/api/vendor/orders/list'
     | '/dashboard/admin/banner/add'
     | '/dashboard/admin/banner/edit'
     | '/dashboard/admin/banner/list'
@@ -1036,12 +1080,14 @@ export interface FileRouteTypes {
     | '/dashboard/admin/category/all'
     | '/dashboard/admin/category/edit'
     | '/dashboard/admin/vendors/detail'
+    | '/dashboard/vendor/orders/$orderId'
     | '/dashboard/vendor/products/add'
     | '/dashboard/vendor/products/edit'
     | '/dashboard/vendor/shop/branding'
     | '/dashboard/vendor/shop/messages'
     | '/dashboard/vendor/shop/policies'
     | '/dashboard/admin/vendors'
+    | '/dashboard/vendor/orders'
     | '/dashboard/vendor/products'
     | '/dashboard/vendor/shop'
   id:
@@ -1122,6 +1168,8 @@ export interface FileRouteTypes {
     | '/dashboard/orders/$orderId'
     | '/products/category/$slug'
     | '/dashboard/orders/'
+    | '/api/vendor/orders/$orderId'
+    | '/api/vendor/orders/list'
     | '/dashboard/admin/banner/add'
     | '/dashboard/admin/banner/edit'
     | '/dashboard/admin/banner/list'
@@ -1129,12 +1177,14 @@ export interface FileRouteTypes {
     | '/dashboard/admin/category/all'
     | '/dashboard/admin/category/edit'
     | '/dashboard/admin/vendors/detail'
+    | '/dashboard/vendor/orders/$orderId'
     | '/dashboard/vendor/products/add'
     | '/dashboard/vendor/products/edit'
     | '/dashboard/vendor/shop/branding'
     | '/dashboard/vendor/shop/messages'
     | '/dashboard/vendor/shop/policies'
     | '/dashboard/admin/vendors/'
+    | '/dashboard/vendor/orders/'
     | '/dashboard/vendor/products/'
     | '/dashboard/vendor/shop/'
   fileRoutesById: FileRoutesById
@@ -1205,6 +1255,8 @@ export interface RootRouteChildren {
   ApiVouchersMyRoute: typeof ApiVouchersMyRoute
   ApiVouchersProductVouchersRoute: typeof ApiVouchersProductVouchersRoute
   ApiWalletGetRoute: typeof ApiWalletGetRoute
+  ApiVendorOrdersOrderIdRoute: typeof ApiVendorOrdersOrderIdRoute
+  ApiVendorOrdersListRoute: typeof ApiVendorOrdersListRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -1755,6 +1807,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardVendorProductsIndexRouteImport
       parentRoute: typeof DashboardVendorRouteRoute
     }
+    '/dashboard/vendor/orders/': {
+      id: '/dashboard/vendor/orders/'
+      path: '/orders'
+      fullPath: '/dashboard/vendor/orders/'
+      preLoaderRoute: typeof DashboardVendorOrdersIndexRouteImport
+      parentRoute: typeof DashboardVendorRouteRoute
+    }
     '/dashboard/admin/vendors/': {
       id: '/dashboard/admin/vendors/'
       path: '/vendors'
@@ -1795,6 +1854,13 @@ declare module '@tanstack/react-router' {
       path: '/products/add'
       fullPath: '/dashboard/vendor/products/add'
       preLoaderRoute: typeof DashboardVendorProductsAddRouteImport
+      parentRoute: typeof DashboardVendorRouteRoute
+    }
+    '/dashboard/vendor/orders/$orderId': {
+      id: '/dashboard/vendor/orders/$orderId'
+      path: '/orders/$orderId'
+      fullPath: '/dashboard/vendor/orders/$orderId'
+      preLoaderRoute: typeof DashboardVendorOrdersOrderIdRouteImport
       parentRoute: typeof DashboardVendorRouteRoute
     }
     '/dashboard/admin/vendors/detail': {
@@ -1845,6 +1911,20 @@ declare module '@tanstack/react-router' {
       fullPath: '/dashboard/admin/banner/add'
       preLoaderRoute: typeof DashboardAdminBannerAddRouteImport
       parentRoute: typeof DashboardAdminRouteRoute
+    }
+    '/api/vendor/orders/list': {
+      id: '/api/vendor/orders/list'
+      path: '/api/vendor/orders/list'
+      fullPath: '/api/vendor/orders/list'
+      preLoaderRoute: typeof ApiVendorOrdersListRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/vendor/orders/$orderId': {
+      id: '/api/vendor/orders/$orderId'
+      path: '/api/vendor/orders/$orderId'
+      fullPath: '/api/vendor/orders/$orderId'
+      preLoaderRoute: typeof ApiVendorOrdersOrderIdRouteImport
+      parentRoute: typeof rootRouteImport
     }
   }
 }
@@ -1904,21 +1984,25 @@ const DashboardOrdersRouteRouteWithChildren =
   DashboardOrdersRouteRoute._addFileChildren(DashboardOrdersRouteRouteChildren)
 
 interface DashboardVendorRouteRouteChildren {
+  DashboardVendorOrdersOrderIdRoute: typeof DashboardVendorOrdersOrderIdRoute
   DashboardVendorProductsAddRoute: typeof DashboardVendorProductsAddRoute
   DashboardVendorProductsEditRoute: typeof DashboardVendorProductsEditRoute
   DashboardVendorShopBrandingRoute: typeof DashboardVendorShopBrandingRoute
   DashboardVendorShopMessagesRoute: typeof DashboardVendorShopMessagesRoute
   DashboardVendorShopPoliciesRoute: typeof DashboardVendorShopPoliciesRoute
+  DashboardVendorOrdersIndexRoute: typeof DashboardVendorOrdersIndexRoute
   DashboardVendorProductsIndexRoute: typeof DashboardVendorProductsIndexRoute
   DashboardVendorShopIndexRoute: typeof DashboardVendorShopIndexRoute
 }
 
 const DashboardVendorRouteRouteChildren: DashboardVendorRouteRouteChildren = {
+  DashboardVendorOrdersOrderIdRoute: DashboardVendorOrdersOrderIdRoute,
   DashboardVendorProductsAddRoute: DashboardVendorProductsAddRoute,
   DashboardVendorProductsEditRoute: DashboardVendorProductsEditRoute,
   DashboardVendorShopBrandingRoute: DashboardVendorShopBrandingRoute,
   DashboardVendorShopMessagesRoute: DashboardVendorShopMessagesRoute,
   DashboardVendorShopPoliciesRoute: DashboardVendorShopPoliciesRoute,
+  DashboardVendorOrdersIndexRoute: DashboardVendorOrdersIndexRoute,
   DashboardVendorProductsIndexRoute: DashboardVendorProductsIndexRoute,
   DashboardVendorShopIndexRoute: DashboardVendorShopIndexRoute,
 }
@@ -2036,6 +2120,8 @@ const rootRouteChildren: RootRouteChildren = {
   ApiVouchersMyRoute: ApiVouchersMyRoute,
   ApiVouchersProductVouchersRoute: ApiVouchersProductVouchersRoute,
   ApiWalletGetRoute: ApiWalletGetRoute,
+  ApiVendorOrdersOrderIdRoute: ApiVendorOrdersOrderIdRoute,
+  ApiVendorOrdersListRoute: ApiVendorOrdersListRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
