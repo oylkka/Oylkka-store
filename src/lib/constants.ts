@@ -9,4 +9,7 @@ export const QUERY_KEYS = {
   CART: 'cart',
   ORDERS: 'orders',
   VENDOR_ORDERS: 'vendor-orders',
+  ADMIN_ORDERS: 'admin-orders',
+  VOUCHERS: 'vouchers',
+  WALLET: 'wallet',
 };

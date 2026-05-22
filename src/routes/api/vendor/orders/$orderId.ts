@@ -1,5 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { getRequestHeaders } from '@tanstack/react-start/server';
+import { sendOrderShippedNotification } from '@/actions/send-order-email';
 import { auth } from '@/lib/auth';
 import { prisma } from '@/lib/db';
 
@@ -218,6 +219,11 @@ export const Route = createFileRoute('/api/vendor/orders/$orderId')({
             where: { id: body.itemId },
             data: updateData,
           });
+
+          // Fire-and-forget: send shipping notification email
+          if (body.fulfillmentStatus === 'SHIPPED') {
+            sendOrderShippedNotification(orderId, body.itemId);
+          }
 
           return Response.json(
             {

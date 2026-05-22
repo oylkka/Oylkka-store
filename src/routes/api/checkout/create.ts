@@ -1,5 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { getRequestHeaders } from '@tanstack/react-start/server';
+import { sendOrderConfirmation } from '@/actions/send-order-email';
 import { auth } from '@/lib/auth';
 import { prisma } from '@/lib/db';
 
@@ -657,6 +658,11 @@ export const Route = createFileRoute('/api/checkout/create')({
 
             return created;
           });
+
+          // Fire-and-forget: send order confirmation email for COD orders
+          if (body.paymentMethod === 'CASH_ON_DELIVERY') {
+            sendOrderConfirmation(order.id);
+          }
 
           return Response.json(
             {

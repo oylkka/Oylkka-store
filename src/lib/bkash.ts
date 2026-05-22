@@ -160,6 +160,54 @@ export async function executeBkashPayment(
   return await response.json();
 }
 
+export type BkashRefundResult = {
+  refundTrxID: string;
+  transactionStatus: string;
+  amount: string;
+  paymentID: string;
+};
+
+export async function refundBkashPayment(params: {
+  paymentID: string;
+  trxID: string;
+  amount: number;
+  reason?: string;
+}): Promise<BkashRefundResult> {
+  if (!isConfigured()) {
+    throw new Error('bKash is not configured');
+  }
+
+  const token = await getGrantToken();
+  const config = getConfig();
+
+  const response = await fetch(
+    `${config.baseUrl}/tokenized/checkout/payment/refund`,
+    {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Accept: 'application/json',
+        'x-app-key': config.appKey,
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        paymentID: params.paymentID,
+        trxID: params.trxID,
+        amount: params.amount.toFixed(2),
+        reason: params.reason || '',
+        sku: 'NA',
+      }),
+    },
+  );
+
+  if (!response.ok) {
+    const text = await response.text();
+    throw new Error(`bKash refund failed: ${text}`);
+  }
+
+  return await response.json();
+}
+
 export async function queryBkashPayment(
   paymentID: string,
 ): Promise<Record<string, unknown>> {

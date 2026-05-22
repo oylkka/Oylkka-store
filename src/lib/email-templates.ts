@@ -1,0 +1,293 @@
+const BRAND = {
+  primary: '#16a34a',
+  primaryDark: '#15803d',
+  background: '#f4f4f5',
+  card: '#ffffff',
+  foreground: '#18181b',
+  mutedForeground: '#71717a',
+  border: '#e4e4e7',
+  destructive: '#ef4444',
+};
+
+function brandHeader(): string {
+  return `
+    <table cellpadding="0" cellspacing="0" style="margin-bottom: 32px;">
+      <tr>
+        <td style="width: 32px; height: 32px; background: ${BRAND.primary}; border-radius: 8px; text-align: center; line-height: 32px; font-size: 16px;">
+          🛍️
+        </td>
+        <td style="padding-left: 10px;">
+          <span style="font-size: 18px; font-weight: 700; letter-spacing: -0.02em; color: ${BRAND.foreground};">Oylkka</span>
+        </td>
+      </tr>
+    </table>
+  `;
+}
+
+function brandFooter(): string {
+  return `
+    <table cellpadding="0" cellspacing="0" style="width: 100%; border-top: 1px solid ${BRAND.border}; padding-top: 24px; margin-top: 32px;">
+      <tr>
+        <td style="text-align: center; padding-bottom: 8px;">
+          <span style="font-size: 11px; color: ${BRAND.mutedForeground};">
+            Secure Checkout
+          </span>
+          <span style="color: ${BRAND.primary}; font-size: 11px; padding: 0 6px;">·</span>
+          <span style="font-size: 11px; color: ${BRAND.mutedForeground};">
+            Verified Vendors
+          </span>
+          <span style="color: ${BRAND.primary}; font-size: 11px; padding: 0 6px;">·</span>
+          <span style="font-size: 11px; color: ${BRAND.mutedForeground};">
+            7-Day Returns
+          </span>
+          <span style="color: ${BRAND.primary}; font-size: 11px; padding: 0 6px;">·</span>
+          <span style="font-size: 11px; color: ${BRAND.mutedForeground};">
+            Nationwide Delivery
+          </span>
+        </td>
+      </tr>
+      <tr>
+        <td style="text-align: center; padding-top: 8px;">
+          <span style="font-size: 11px; color: ${BRAND.mutedForeground};">
+            © ${new Date().getFullYear()} Oylkka. All rights reserved.
+          </span>
+        </td>
+      </tr>
+    </table>
+  `;
+}
+
+function baseWrapper(content: string): string {
+  return `
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+      <meta charset="UTF-8" />
+      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    </head>
+    <body style="margin: 0; padding: 0; background-color: ${BRAND.background}; font-family: 'Helvetica Neue', Arial, sans-serif;">
+      <table align="center" border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 600px; padding: 40px 20px;">
+        <tr>
+          <td>
+            ${brandHeader()}
+            <table cellpadding="0" cellspacing="0" style="width: 100%; background: ${BRAND.card}; border-radius: 12px; border: 1px solid ${BRAND.border};">
+              <tr>
+                <td style="padding: 32px;">
+                  ${content}
+                </td>
+              </tr>
+            </table>
+            ${brandFooter()}
+          </td>
+        </tr>
+      </table>
+    </body>
+    </html>
+  `;
+}
+
+function eyebrow(label: string): string {
+  return `
+    <table cellpadding="0" cellspacing="0" style="margin-bottom: 12px;">
+      <tr>
+        <td style="width: 32px; height: 1px; background: ${BRAND.primary};"></td>
+        <td style="padding-left: 12px;">
+          <span style="font-size: 11px; font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase; color: ${BRAND.primary};">
+            ${label}
+          </span>
+        </td>
+      </tr>
+    </table>
+  `;
+}
+
+function ctaButton(text: string, link: string): string {
+  return `
+    <table cellpadding="0" cellspacing="0" style="margin-top: 24px;">
+      <tr>
+        <td style="background: ${BRAND.primary}; border-radius: 8px; text-align: center;">
+          <a href="${link}" style="display: inline-block; padding: 12px 28px; color: #ffffff !important; text-decoration: none; font-size: 14px; font-weight: 600; border-radius: 8px;">
+            ${text}
+          </a>
+        </td>
+      </tr>
+    </table>
+  `;
+}
+
+export type EmailOrderItem = {
+  productName: string;
+  variantName: string | null;
+  imageUrl: string | null;
+  quantity: number;
+  unitPrice: number;
+  total: number;
+};
+
+export type EmailOrderData = {
+  orderNumber: string;
+  customerName: string;
+  subtotal: number;
+  shippingCost: number;
+  discountAmount: number;
+  total: number;
+  currency: string;
+  items: EmailOrderItem[];
+};
+
+export function orderConfirmationHtml(order: EmailOrderData): string {
+  const itemsHtml = order.items
+    .map(
+      (item) => `
+      <tr style="border-bottom: 1px solid ${BRAND.border};">
+        <td style="padding: 12px 0; width: 48px;">
+          ${
+            item.imageUrl
+              ? `<img src="${item.imageUrl}" alt="${item.productName}" style="width: 40px; height: 40px; border-radius: 8px; object-fit: cover;" />`
+              : `<div style="width: 40px; height: 40px; border-radius: 8px; background: ${BRAND.background};"></div>`
+          }
+        </td>
+        <td style="padding: 12px 8px;">
+          <span style="font-size: 13px; font-weight: 600; color: ${BRAND.foreground};">
+            ${item.productName}
+          </span>
+          ${item.variantName ? `<br /><span style="font-size: 11px; color: ${BRAND.mutedForeground};">${item.variantName}</span>` : ''}
+        </td>
+        <td style="padding: 12px 8px; text-align: center; font-size: 12px; color: ${BRAND.mutedForeground};">
+          ${item.quantity}
+        </td>
+        <td style="padding: 12px 0; text-align: right; font-size: 13px; font-weight: 700; color: ${BRAND.foreground}; white-space: nowrap;">
+          ৳${item.total.toLocaleString('en-BD')}
+        </td>
+      </tr>
+    `,
+    )
+    .join('');
+
+  const shippingDisplay =
+    order.shippingCost > 0
+      ? `৳${order.shippingCost.toLocaleString('en-BD')}`
+      : 'Free';
+
+  const baseUrl = process.env.BETTER_AUTH_URL || 'http://localhost:3000';
+  const orderLink = `${baseUrl}/orders/${order.orderNumber}`;
+
+  return baseWrapper(`
+    ${eyebrow('Order Confirmation')}
+
+    <h1 style="font-size: 24px; font-weight: 700; letter-spacing: -0.02em; margin: 0 0 8px; color: ${BRAND.foreground};">
+      Thanks for your order<span style="color: ${BRAND.primary};">.</span>
+    </h1>
+
+    <p style="font-size: 14px; line-height: 1.6; color: ${BRAND.mutedForeground}; margin: 0 0 24px;">
+      Hi ${order.customerName}, your order <strong style="color: ${BRAND.foreground};">#${order.orderNumber}</strong> has been placed and is being processed.
+    </p>
+
+    <table cellpadding="0" cellspacing="0" style="width: 100%; border-collapse: collapse;">
+      <thead>
+        <tr style="border-bottom: 2px solid ${BRAND.border};">
+          <th style="padding: 8px 0; text-align: left; font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: ${BRAND.mutedForeground};">Item</th>
+          <th style="padding: 8px 0; text-align: left; font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: ${BRAND.mutedForeground};"></th>
+          <th style="padding: 8px 0; text-align: center; font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: ${BRAND.mutedForeground};">Qty</th>
+          <th style="padding: 8px 0; text-align: right; font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: ${BRAND.mutedForeground};">Total</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${itemsHtml}
+      </tbody>
+    </table>
+
+    <table cellpadding="0" cellspacing="0" style="width: 100%; margin-top: 16px; border-top: 1px solid ${BRAND.border}; padding-top: 16px;">
+      <tr>
+        <td style="padding: 4px 0; font-size: 13px; color: ${BRAND.mutedForeground};">Subtotal</td>
+        <td style="padding: 4px 0; text-align: right; font-size: 13px; color: ${BRAND.foreground}; font-weight: 500;">৳${order.subtotal.toLocaleString('en-BD')}</td>
+      </tr>
+      ${
+        order.discountAmount > 0
+          ? `
+      <tr>
+        <td style="padding: 4px 0; font-size: 13px; color: ${BRAND.mutedForeground};">Discount</td>
+        <td style="padding: 4px 0; text-align: right; font-size: 13px; color: ${BRAND.destructive}; font-weight: 500;">-৳${order.discountAmount.toLocaleString('en-BD')}</td>
+      </tr>
+      `
+          : ''
+      }
+      <tr>
+        <td style="padding: 4px 0; font-size: 13px; color: ${BRAND.mutedForeground};">Shipping</td>
+        <td style="padding: 4px 0; text-align: right; font-size: 13px; color: ${BRAND.foreground}; font-weight: 500;">${shippingDisplay}</td>
+      </tr>
+      <tr>
+        <td style="padding: 12px 0 4px; border-top: 2px solid ${BRAND.border}; font-size: 15px; font-weight: 700; color: ${BRAND.foreground};">Total</td>
+        <td style="padding: 12px 0 4px; border-top: 2px solid ${BRAND.border}; text-align: right; font-size: 15px; font-weight: 700; color: ${BRAND.foreground};">৳${order.total.toLocaleString('en-BD')}</td>
+      </tr>
+    </table>
+
+    ${ctaButton('View Order', orderLink)}
+
+    <p style="font-size: 12px; color: ${BRAND.mutedForeground}; margin-top: 24px; line-height: 1.5;">
+      You'll receive a shipping confirmation with tracking details once your items are on the way.
+    </p>
+  `);
+}
+
+export type EmailShippedItem = {
+  productName: string;
+  variantName: string | null;
+  imageUrl: string | null;
+  quantity: number;
+  trackingNumber: string | null;
+  trackingUrl: string | null;
+};
+
+export function orderShippedHtml(
+  order: { orderNumber: string; customerName: string },
+  item: EmailShippedItem,
+): string {
+  const baseUrl = process.env.BETTER_AUTH_URL || 'http://localhost:3000';
+  const orderLink = `${baseUrl}/orders/${order.orderNumber}`;
+  const trackLink = item.trackingUrl || orderLink;
+
+  return baseWrapper(`
+    ${eyebrow('Shipping Update')}
+
+    <h1 style="font-size: 24px; font-weight: 700; letter-spacing: -0.02em; margin: 0 0 8px; color: ${BRAND.foreground};">
+      Your item is on the way<span style="color: ${BRAND.primary};">.</span>
+    </h1>
+
+    <p style="font-size: 14px; line-height: 1.6; color: ${BRAND.mutedForeground}; margin: 0 0 24px;">
+      Hi ${order.customerName}, good news! One of your items from order <strong style="color: ${BRAND.foreground};">#${order.orderNumber}</strong> has been shipped.
+    </p>
+
+    <table cellpadding="0" cellspacing="0" style="width: 100%; border: 1px solid ${BRAND.border}; border-radius: 8px; margin-bottom: 24px;">
+      <tr>
+        <td style="padding: 16px;">
+          <table cellpadding="0" cellspacing="0">
+            <tr>
+              <td style="width: 56px; vertical-align: top;">
+                ${
+                  item.imageUrl
+                    ? `<img src="${item.imageUrl}" alt="${item.productName}" style="width: 48px; height: 48px; border-radius: 8px; object-fit: cover;" />`
+                    : `<div style="width: 48px; height: 48px; border-radius: 8px; background: ${BRAND.background};"></div>`
+                }
+              </td>
+              <td style="padding-left: 12px; vertical-align: top;">
+                <span style="font-size: 14px; font-weight: 600; color: ${BRAND.foreground};">
+                  ${item.productName}
+                </span>
+                ${item.variantName ? `<br /><span style="font-size: 12px; color: ${BRAND.mutedForeground};">${item.variantName}</span>` : ''}
+                <br /><span style="font-size: 12px; color: ${BRAND.mutedForeground};">Qty: ${item.quantity}</span>
+                ${item.trackingNumber ? `<br /><span style="font-size: 12px; color: ${BRAND.mutedForeground};">Tracking: ${item.trackingNumber}</span>` : ''}
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+
+    ${ctaButton('Track Package', trackLink)}
+
+    <p style="font-size: 12px; color: ${BRAND.mutedForeground}; margin-top: 24px; line-height: 1.5;">
+      You can also <a href="${orderLink}" style="color: ${BRAND.primary}; text-decoration: underline;">view your full order</a> for more details.
+    </p>
+  `);
+}

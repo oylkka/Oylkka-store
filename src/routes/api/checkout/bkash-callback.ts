@@ -1,4 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router';
+import { sendOrderConfirmation } from '@/actions/send-order-email';
 import { executeBkashPayment } from '@/lib/bkash';
 import { prisma } from '@/lib/db';
 
@@ -164,6 +165,9 @@ export const Route = createFileRoute('/api/checkout/bkash-callback')({
                 });
               }
             });
+
+            // Fire-and-forget: send order confirmation email
+            sendOrderConfirmation(order.id);
 
             return Response.redirect(
               `${baseUrl}/checkout/confirmation?orderId=${order.id}`,
