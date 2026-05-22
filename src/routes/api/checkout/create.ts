@@ -1,5 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { getRequestHeaders } from '@tanstack/react-start/server';
+import { z } from 'zod';
 import { sendOrderConfirmation } from '@/actions/send-order-email';
 import { auth } from '@/lib/auth';
 import { validateCsrf } from '@/lib/csrf';
@@ -13,18 +14,25 @@ function generateOrderNumber(): string {
   return `ORD-${ts}${rand}`;
 }
 
-type CreateOrderInput = {
-  shippingName: string;
-  shippingEmail: string;
-  shippingPhone: string;
-  shippingAddress: string;
-  shippingUpzila: string;
-  shippingDistrict: string;
-  shippingPostalCode?: string;
-  shippingComment?: string;
-  paymentMethod: 'BKASH' | 'CASH_ON_DELIVERY';
-  voucherIds?: string[];
-};
+const checkoutSchema = z.object({
+  shippingName: z.string().min(1, 'Full name is required'),
+  shippingEmail: z.string().email('Invalid email address'),
+  shippingPhone: z
+    .string()
+    .min(1, 'Phone number is required')
+    .regex(/^(?:\+8801[3-9]\d{8}|01[3-9]\d{8})$/, 'Invalid BD phone number'),
+  shippingAddress: z.string().min(1, 'Address is required'),
+  shippingUpzila: z.string().min(1, 'Upzila / Thana is required'),
+  shippingDistrict: z.string().min(1, 'District is required'),
+  shippingPostalCode: z
+    .string()
+    .regex(/^\d{4}$/, 'Postal code must be 4 digits')
+    .optional()
+    .or(z.literal('')),
+  shippingComment: z.string().optional(),
+  paymentMethod: z.enum(['BKASH', 'CASH_ON_DELIVERY']),
+  voucherIds: z.array(z.string()).optional(),
+});
 
 export const Route = createFileRoute('/api/checkout/create')({
   server: {
@@ -44,36 +52,13 @@ export const Route = createFileRoute('/api/checkout/create')({
           const csrfResponse = validateCsrf();
           if (csrfResponse) return csrfResponse;
 
-          const body: CreateOrderInput = await request.json();
+          const body = await request.json();
 
-          if (
-            !body.shippingName ||
-            !body.shippingEmail ||
-            !body.shippingPhone
-          ) {
+          const parsed = checkoutSchema.safeParse(body);
+          if (!parsed.success) {
+            const firstError = parsed.error.errors[0];
             return Response.json(
-              { error: 'Shipping name, email, and phone are required' },
-              { status: 400 },
-            );
-          }
-
-          if (
-            !body.shippingAddress ||
-            !body.shippingUpzila ||
-            !body.shippingDistrict
-          ) {
-            return Response.json(
-              { error: 'Shipping address is incomplete' },
-              { status: 400 },
-            );
-          }
-
-          if (
-            !body.paymentMethod ||
-            !['BKASH', 'CASH_ON_DELIVERY'].includes(body.paymentMethod)
-          ) {
-            return Response.json(
-              { error: 'Invalid payment method' },
+              { error: firstError?.message || 'Invalid input' },
               { status: 400 },
             );
           }
@@ -246,10 +231,10 @@ export const Route = createFileRoute('/api/checkout/create')({
 
           const now = new Date();
 
-          if (body.voucherIds && body.voucherIds.length > 0) {
+          if (parsed.data.voucherIds && parsed.data.voucherIds.length > 0) {
             const userVouchers = await prisma.userVoucher.findMany({
               where: {
-                id: { in: body.voucherIds },
+                id: { in: parsed.data.voucherIds },
                 userId: session.user.id,
                 usedAt: null,
               },
@@ -352,7 +337,7 @@ export const Route = createFileRoute('/api/checkout/create')({
               // Check requiredPaymentMethod
               if (
                 coupon.requiredPaymentMethod &&
-                coupon.requiredPaymentMethod !== body.paymentMethod
+                coupon.requiredPaymentMethod !== parsed.data.paymentMethod
               )
                 continue;
 
@@ -547,14 +532,14 @@ export const Route = createFileRoute('/api/checkout/create')({
               data: {
                 orderNumber,
                 customerId: session.user.id,
-                shippingName: body.shippingName,
-                shippingEmail: body.shippingEmail,
-                shippingPhone: body.shippingPhone,
-                shippingAddress: body.shippingAddress,
-                shippingUpzila: body.shippingUpzila,
-                shippingDistrict: body.shippingDistrict,
-                shippingPostalCode: body.shippingPostalCode ?? null,
-                shippingComment: body.shippingComment ?? null,
+                shippingName: parsed.data.shippingName,
+                shippingEmail: parsed.data.shippingEmail,
+                shippingPhone: parsed.data.shippingPhone,
+                shippingAddress: parsed.data.shippingAddress,
+                shippingUpzila: parsed.data.shippingUpzila,
+                shippingDistrict: parsed.data.shippingDistrict,
+                shippingPostalCode: parsed.data.shippingPostalCode ?? null,
+                shippingComment: parsed.data.shippingComment ?? null,
                 subtotal,
                 discountAmount: totalDiscount,
                 couponCode:
@@ -565,13 +550,15 @@ export const Route = createFileRoute('/api/checkout/create')({
                 tax,
                 total,
                 currency: 'BDT',
-                paymentMethod: body.paymentMethod,
+                paymentMethod: parsed.data.paymentMethod,
                 status:
-                  body.paymentMethod === 'CASH_ON_DELIVERY'
+                  parsed.data.paymentMethod === 'CASH_ON_DELIVERY'
                     ? 'CONFIRMED'
                     : 'PENDING',
                 confirmedAt:
-                  body.paymentMethod === 'CASH_ON_DELIVERY' ? new Date() : null,
+                  parsed.data.paymentMethod === 'CASH_ON_DELIVERY'
+                    ? new Date()
+                    : null,
                 metadata: {
                   appliedVouchers: appliedVouchersData,
                   cashbackAmount: totalCashback,
@@ -618,7 +605,7 @@ export const Route = createFileRoute('/api/checkout/create')({
 
             // Only for COD: destructive side effects (stock, cart, vouchers, cashback)
             // For BKASH these happen after payment confirmation in bkash-callback.ts
-            if (body.paymentMethod === 'CASH_ON_DELIVERY') {
+            if (parsed.data.paymentMethod === 'CASH_ON_DELIVERY') {
               // Decrement stock with re-validation inside transaction (race condition safety)
               for (const item of cart.items) {
                 const current = await tx.product.findUnique({
@@ -714,7 +701,7 @@ export const Route = createFileRoute('/api/checkout/create')({
           });
 
           // Fire-and-forget: send order confirmation email for COD orders
-          if (body.paymentMethod === 'CASH_ON_DELIVERY') {
+          if (parsed.data.paymentMethod === 'CASH_ON_DELIVERY') {
             sendOrderConfirmation(order.id);
           }
 

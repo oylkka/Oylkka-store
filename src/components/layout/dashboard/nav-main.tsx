@@ -94,11 +94,11 @@ export function NavMain({ user }: { user: User }) {
   const userAccountNavItems: NavItem[] = [
     {
       title: 'Account',
-      url: '/dashboard/profile',
+      url: '/dashboard/my-account',
       icon: Settings,
       roles: ['USER'],
       items: [
-        { title: 'My Profile', url: '/dashboard/profile' },
+        { title: 'My Profile', url: '/dashboard/my-account' },
         { title: 'Addresses', url: '/dashboard/addresses' },
         { title: 'Payment Methods', url: '/dashboard/payment-methods' },
         { title: 'Vouchers & Coupons', url: '/dashboard/vouchers' },
@@ -468,11 +468,11 @@ export function NavMain({ user }: { user: User }) {
   const accountNavItems: NavItem[] = [
     {
       title: 'Account',
-      url: '/dashboard/profile',
+      url: '/dashboard/my-account',
       icon: Settings,
       roles: ['ADMIN', 'MANAGER', 'VENDOR', 'CUSTOMER_SERVICE'],
       items: [
-        { title: 'Profile', url: '/dashboard/profile' },
+        { title: 'Profile', url: '/dashboard/my-account' },
         { title: 'Notifications', url: '/dashboard/notifications' },
         { title: 'Messages', url: '/dashboard/messages' },
       ],

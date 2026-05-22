@@ -12,4 +12,5 @@ export const QUERY_KEYS = {
   ADMIN_ORDERS: 'admin-orders',
   VOUCHERS: 'vouchers',
   WALLET: 'wallet',
+  WISHLIST: 'wishlist',
 };

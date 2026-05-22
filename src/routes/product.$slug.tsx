@@ -4,12 +4,14 @@ import {
   Clock,
   Heart,
   HelpCircle,
+  Loader2,
   MapPin,
   MessageSquare,
   Minus,
   PackageX,
   Plus,
   RefreshCw,
+  Send,
   ShieldCheck,
   ShoppingCart,
   Sparkles,
@@ -38,10 +40,32 @@ import {
   BreadcrumbSeparator,
 } from '@/components/ui/breadcrumb';
 import { Button } from '@/components/ui/button';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog';
+import {
+  Field,
+  FieldError,
+  FieldGroup,
+  FieldLabel,
+} from '@/components/ui/field';
+import { Input } from '@/components/ui/input';
 import { Separator } from '@/components/ui/separator';
 import { Skeleton } from '@/components/ui/skeleton';
+import { cn } from '@/lib/utils';
 import { useAddToCartMutation } from '@/services/cart';
 import { usePublicProduct } from '@/services/product';
+import {
+  useAddToWishlistMutation,
+  useRemoveFromWishlistMutation,
+  useWishlist,
+} from '@/services/wishlist';
 
 export const Route = createFileRoute('/product/$slug')({
   component: RouteComponent,
@@ -90,6 +114,7 @@ function SectionHeader({
 
 function RouteComponent() {
   const { slug } = Route.useParams();
+  const { user } = Route.useRouteContext();
   const { data: product, isLoading, isError } = usePublicProduct(slug);
   const [quantity, setQuantity] = useState(1);
   const [selectedVariant, setSelectedVariant] = useState<{
@@ -98,6 +123,37 @@ function RouteComponent() {
     stock: number;
   } | null>(null);
   const addToCart = useAddToCartMutation();
+  const addToWishlist = useAddToWishlistMutation();
+  const removeFromWishlist = useRemoveFromWishlistMutation();
+  const { data: wishlistData } = useWishlist({
+    enabled: !!user,
+  });
+
+  const isInWishlist = wishlistData?.items?.some(
+    (item) =>
+      item.productId === product?.id &&
+      item.variantId === (selectedVariant?.id ?? null),
+  );
+
+  function handleToggleWishlist() {
+    if (!user) {
+      toast.error('Please sign in to add items to your wishlist');
+      return;
+    }
+    if (!product) return;
+
+    if (isInWishlist) {
+      removeFromWishlist.mutate({
+        productId: product.id,
+        variantId: selectedVariant?.id,
+      });
+    } else {
+      addToWishlist.mutate({
+        productId: product.id,
+        variantId: selectedVariant?.id,
+      });
+    }
+  }
 
   if (isLoading) return <PdpSkeleton />;
   if (isError || !product) return <PdpNotFound />;
@@ -283,12 +339,19 @@ function RouteComponent() {
                 <Button
                   variant='outline'
                   size='icon'
-                  className='h-12 w-12 shrink-0 rounded-xl'
-                  onClick={() =>
-                    toast.success('Added to wishlist! (placeholder)')
+                  className={cn(
+                    'h-12 w-12 shrink-0 rounded-xl transition-colors',
+                    isInWishlist &&
+                      'text-red-500 border-red-200 bg-red-50 hover:bg-red-100 dark:border-red-800 dark:bg-red-950 dark:hover:bg-red-900',
+                  )}
+                  onClick={handleToggleWishlist}
+                  disabled={
+                    addToWishlist.isPending || removeFromWishlist.isPending
                   }
                 >
-                  <Heart className='w-5 h-5' />
+                  <Heart
+                    className={cn('w-5 h-5', isInWishlist && 'fill-current')}
+                  />
                 </Button>
               </div>
 
@@ -452,14 +515,10 @@ function RouteComponent() {
                 <SectionHeader label='Seller' icon={BadgeCheck} />
                 <div className='space-y-3'>
                   <ProductVendorCard shop={product.shop} />
-                  <Button
-                    variant='outline'
-                    className='w-full gap-2 rounded-xl'
-                    onClick={() => toast.success('Messaging coming soon!')}
-                  >
-                    <MessageSquare className='w-4 h-4' />
-                    Message Seller
-                  </Button>
+                  <ContactVendorDialog
+                    shopId={product.shop.id}
+                    shopName={product.shop.name}
+                  />
                 </div>
               </motion.div>
             )}
@@ -522,6 +581,124 @@ function RouteComponent() {
       </div>
       <Footer />
     </div>
+  );
+}
+
+function ContactVendorDialog({
+  shopId,
+  shopName,
+}: {
+  shopId: string;
+  shopName: string;
+}) {
+  const { user } = Route.useRouteContext();
+  const [subject, setSubject] = useState('');
+  const [message, setMessage] = useState('');
+  const [isSending, setIsSending] = useState(false);
+  const [open, setOpen] = useState(false);
+
+  async function handleSend() {
+    if (!subject.trim() || !message.trim()) {
+      toast.error('Please fill in both subject and message');
+      return;
+    }
+
+    if (!user) {
+      toast.error('Please sign in to message a seller');
+      return;
+    }
+
+    setIsSending(true);
+    try {
+      const response = await fetch('/api/messages/contact-vendor', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          shopId,
+          subject: subject.trim(),
+          message: message.trim(),
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        toast.error(data.error || 'Failed to send message');
+        return;
+      }
+
+      toast.success('Message sent to the seller!');
+      setOpen(false);
+      setSubject('');
+      setMessage('');
+    } catch {
+      toast.error('Something went wrong. Please try again.');
+    } finally {
+      setIsSending(false);
+    }
+  }
+
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        <Button variant='outline' className='w-full gap-2 rounded-xl'>
+          <MessageSquare className='w-4 h-4' />
+          Message Seller
+        </Button>
+      </DialogTrigger>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Message {shopName}</DialogTitle>
+          <DialogDescription>
+            Send a message to the seller about this product.
+          </DialogDescription>
+        </DialogHeader>
+        <FieldGroup>
+          <Field>
+            <FieldLabel htmlFor='subject'>Subject</FieldLabel>
+            <Input
+              id='subject'
+              value={subject}
+              onChange={(e) => setSubject(e.target.value)}
+              placeholder='e.g. Question about product'
+              maxLength={200}
+            />
+            {subject.length > 180 && (
+              <FieldError>Maximum 200 characters</FieldError>
+            )}
+          </Field>
+          <Field>
+            <FieldLabel htmlFor='message'>Message</FieldLabel>
+            <textarea
+              id='message'
+              value={message}
+              onChange={(e) => setMessage(e.target.value)}
+              rows={5}
+              placeholder='Write your message here...'
+              className='flex w-full rounded-xl border border-border bg-background px-3 py-2 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary'
+              maxLength={2000}
+            />
+            {message.length > 1900 && (
+              <FieldError>Maximum 2,000 characters</FieldError>
+            )}
+          </Field>
+        </FieldGroup>
+        <DialogFooter>
+          <Button
+            onClick={handleSend}
+            disabled={isSending || !subject.trim() || !message.trim()}
+            className='gap-2'
+          >
+            {isSending ? (
+              <Loader2 className='h-4 w-4 animate-spin' />
+            ) : (
+              <Send className='h-4 w-4' />
+            )}
+            Send Message
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 }
 

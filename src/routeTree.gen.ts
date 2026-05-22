@@ -9,7 +9,9 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as TermsRouteImport } from './routes/terms'
 import { Route as ProductsRouteImport } from './routes/products'
+import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as CheckoutRouteImport } from './routes/checkout'
 import { Route as CartRouteImport } from './routes/cart'
 import { Route as DashboardRouteRouteImport } from './routes/dashboard/route'
@@ -19,11 +21,13 @@ import { Route as DashboardIndexRouteImport } from './routes/dashboard/index'
 import { Route as ShopSlugRouteImport } from './routes/shop.$slug'
 import { Route as ResetPasswordTokenRouteImport } from './routes/reset-password.$token'
 import { Route as ProductSlugRouteImport } from './routes/product.$slug'
+import { Route as DashboardMyAccountRouteImport } from './routes/dashboard/my-account'
 import { Route as CheckoutConfirmationRouteImport } from './routes/checkout/confirmation'
 import { Route as AuthVerifyRouteImport } from './routes/auth/verify'
 import { Route as AuthSignupRouteImport } from './routes/auth/signup'
 import { Route as AuthSigninRouteImport } from './routes/auth/signin'
 import { Route as AuthForgotPasswordRouteImport } from './routes/auth/forgot-password'
+import { Route as AuthErrorRouteImport } from './routes/auth/error'
 import { Route as DashboardVendorRouteRouteImport } from './routes/dashboard/vendor/route'
 import { Route as DashboardOrdersRouteRouteImport } from './routes/dashboard/orders/route'
 import { Route as DashboardBecomeVendorRouteRouteImport } from './routes/dashboard/become-vendor/route'
@@ -33,6 +37,9 @@ import { Route as ProductsCategorySlugRouteImport } from './routes/products/cate
 import { Route as DashboardOrdersOrderIdRouteImport } from './routes/dashboard/orders/$orderId'
 import { Route as DashboardBecomeVendorPendingRouteImport } from './routes/dashboard/become-vendor/pending'
 import { Route as DashboardBecomeVendorApplyRouteImport } from './routes/dashboard/become-vendor/apply'
+import { Route as ApiWishlistRemoveRouteImport } from './routes/api/wishlist/remove'
+import { Route as ApiWishlistListRouteImport } from './routes/api/wishlist/list'
+import { Route as ApiWishlistAddRouteImport } from './routes/api/wishlist/add'
 import { Route as ApiWalletGetRouteImport } from './routes/api/wallet/get'
 import { Route as ApiVouchersProductVouchersRouteImport } from './routes/api/vouchers/product-vouchers'
 import { Route as ApiVouchersMyRouteImport } from './routes/api/vouchers/my'
@@ -69,9 +76,11 @@ import { Route as ApiOrdersAdminListRouteImport } from './routes/api/orders/admi
 import { Route as ApiOrdersAdminFulfillRouteImport } from './routes/api/orders/admin-fulfill'
 import { Route as ApiOrdersAdminCancelRouteImport } from './routes/api/orders/admin-cancel'
 import { Route as ApiOrdersOrderIdRouteImport } from './routes/api/orders/$orderId'
+import { Route as ApiMessagesContactVendorRouteImport } from './routes/api/messages/contact-vendor'
 import { Route as ApiCheckoutValidateCouponRouteImport } from './routes/api/checkout/validate-coupon'
 import { Route as ApiCheckoutCreateRouteImport } from './routes/api/checkout/create'
 import { Route as ApiCheckoutBkashPayRouteImport } from './routes/api/checkout/bkash-pay'
+import { Route as ApiCheckoutBkashIpnRouteImport } from './routes/api/checkout/bkash-ipn'
 import { Route as ApiCheckoutBkashCallbackRouteImport } from './routes/api/checkout/bkash-callback'
 import { Route as ApiCategoriesPublicListRouteImport } from './routes/api/categories/public-list'
 import { Route as ApiCategoriesListRouteImport } from './routes/api/categories/list'
@@ -112,9 +121,19 @@ import { Route as DashboardAdminBannerAddRouteImport } from './routes/dashboard/
 import { Route as ApiVendorOrdersListRouteImport } from './routes/api/vendor/orders/list'
 import { Route as ApiVendorOrdersOrderIdRouteImport } from './routes/api/vendor/orders/$orderId'
 
+const TermsRoute = TermsRouteImport.update({
+  id: '/terms',
+  path: '/terms',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ProductsRoute = ProductsRouteImport.update({
   id: '/products',
   path: '/products',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PrivacyRoute = PrivacyRouteImport.update({
+  id: '/privacy',
+  path: '/privacy',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CheckoutRoute = CheckoutRouteImport.update({
@@ -162,6 +181,11 @@ const ProductSlugRoute = ProductSlugRouteImport.update({
   path: '/product/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DashboardMyAccountRoute = DashboardMyAccountRouteImport.update({
+  id: '/my-account',
+  path: '/my-account',
+  getParentRoute: () => DashboardRouteRoute,
+} as any)
 const CheckoutConfirmationRoute = CheckoutConfirmationRouteImport.update({
   id: '/confirmation',
   path: '/confirmation',
@@ -185,6 +209,11 @@ const AuthSigninRoute = AuthSigninRouteImport.update({
 const AuthForgotPasswordRoute = AuthForgotPasswordRouteImport.update({
   id: '/auth/forgot-password',
   path: '/auth/forgot-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthErrorRoute = AuthErrorRouteImport.update({
+  id: '/auth/error',
+  path: '/auth/error',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DashboardVendorRouteRoute = DashboardVendorRouteRouteImport.update({
@@ -235,6 +264,21 @@ const DashboardBecomeVendorApplyRoute =
     path: '/apply',
     getParentRoute: () => DashboardBecomeVendorRouteRoute,
   } as any)
+const ApiWishlistRemoveRoute = ApiWishlistRemoveRouteImport.update({
+  id: '/api/wishlist/remove',
+  path: '/api/wishlist/remove',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiWishlistListRoute = ApiWishlistListRouteImport.update({
+  id: '/api/wishlist/list',
+  path: '/api/wishlist/list',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiWishlistAddRoute = ApiWishlistAddRouteImport.update({
+  id: '/api/wishlist/add',
+  path: '/api/wishlist/add',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiWalletGetRoute = ApiWalletGetRouteImport.update({
   id: '/api/wallet/get',
   path: '/api/wallet/get',
@@ -420,6 +464,12 @@ const ApiOrdersOrderIdRoute = ApiOrdersOrderIdRouteImport.update({
   path: '/api/orders/$orderId',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiMessagesContactVendorRoute =
+  ApiMessagesContactVendorRouteImport.update({
+    id: '/api/messages/contact-vendor',
+    path: '/api/messages/contact-vendor',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiCheckoutValidateCouponRoute =
   ApiCheckoutValidateCouponRouteImport.update({
     id: '/api/checkout/validate-coupon',
@@ -434,6 +484,11 @@ const ApiCheckoutCreateRoute = ApiCheckoutCreateRouteImport.update({
 const ApiCheckoutBkashPayRoute = ApiCheckoutBkashPayRouteImport.update({
   id: '/api/checkout/bkash-pay',
   path: '/api/checkout/bkash-pay',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiCheckoutBkashIpnRoute = ApiCheckoutBkashIpnRouteImport.update({
+  id: '/api/checkout/bkash-ipn',
+  path: '/api/checkout/bkash-ipn',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiCheckoutBkashCallbackRoute =
@@ -656,16 +711,20 @@ export interface FileRoutesByFullPath {
   '/dashboard': typeof DashboardRouteRouteWithChildren
   '/cart': typeof CartRoute
   '/checkout': typeof CheckoutRouteWithChildren
+  '/privacy': typeof PrivacyRoute
   '/products': typeof ProductsRouteWithChildren
+  '/terms': typeof TermsRoute
   '/dashboard/admin': typeof DashboardAdminRouteRouteWithChildren
   '/dashboard/become-vendor': typeof DashboardBecomeVendorRouteRouteWithChildren
   '/dashboard/orders': typeof DashboardOrdersRouteRouteWithChildren
   '/dashboard/vendor': typeof DashboardVendorRouteRouteWithChildren
+  '/auth/error': typeof AuthErrorRoute
   '/auth/forgot-password': typeof AuthForgotPasswordRoute
   '/auth/signin': typeof AuthSigninRoute
   '/auth/signup': typeof AuthSignupRoute
   '/auth/verify': typeof AuthVerifyRoute
   '/checkout/confirmation': typeof CheckoutConfirmationRoute
+  '/dashboard/my-account': typeof DashboardMyAccountRoute
   '/product/$slug': typeof ProductSlugRoute
   '/reset-password/$token': typeof ResetPasswordTokenRoute
   '/shop/$slug': typeof ShopSlugRoute
@@ -689,9 +748,11 @@ export interface FileRoutesByFullPath {
   '/api/categories/list': typeof ApiCategoriesListRoute
   '/api/categories/public-list': typeof ApiCategoriesPublicListRoute
   '/api/checkout/bkash-callback': typeof ApiCheckoutBkashCallbackRoute
+  '/api/checkout/bkash-ipn': typeof ApiCheckoutBkashIpnRoute
   '/api/checkout/bkash-pay': typeof ApiCheckoutBkashPayRoute
   '/api/checkout/create': typeof ApiCheckoutCreateRoute
   '/api/checkout/validate-coupon': typeof ApiCheckoutValidateCouponRoute
+  '/api/messages/contact-vendor': typeof ApiMessagesContactVendorRoute
   '/api/orders/$orderId': typeof ApiOrdersOrderIdRoute
   '/api/orders/admin-cancel': typeof ApiOrdersAdminCancelRoute
   '/api/orders/admin-fulfill': typeof ApiOrdersAdminFulfillRoute
@@ -728,6 +789,9 @@ export interface FileRoutesByFullPath {
   '/api/vouchers/my': typeof ApiVouchersMyRoute
   '/api/vouchers/product-vouchers': typeof ApiVouchersProductVouchersRoute
   '/api/wallet/get': typeof ApiWalletGetRoute
+  '/api/wishlist/add': typeof ApiWishlistAddRoute
+  '/api/wishlist/list': typeof ApiWishlistListRoute
+  '/api/wishlist/remove': typeof ApiWishlistRemoveRoute
   '/dashboard/become-vendor/apply': typeof DashboardBecomeVendorApplyRoute
   '/dashboard/become-vendor/pending': typeof DashboardBecomeVendorPendingRoute
   '/dashboard/orders/$orderId': typeof DashboardOrdersOrderIdRoute
@@ -759,15 +823,19 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/cart': typeof CartRoute
   '/checkout': typeof CheckoutRouteWithChildren
+  '/privacy': typeof PrivacyRoute
   '/products': typeof ProductsRouteWithChildren
+  '/terms': typeof TermsRoute
   '/dashboard/admin': typeof DashboardAdminRouteRouteWithChildren
   '/dashboard/become-vendor': typeof DashboardBecomeVendorRouteRouteWithChildren
   '/dashboard/vendor': typeof DashboardVendorRouteRouteWithChildren
+  '/auth/error': typeof AuthErrorRoute
   '/auth/forgot-password': typeof AuthForgotPasswordRoute
   '/auth/signin': typeof AuthSigninRoute
   '/auth/signup': typeof AuthSignupRoute
   '/auth/verify': typeof AuthVerifyRoute
   '/checkout/confirmation': typeof CheckoutConfirmationRoute
+  '/dashboard/my-account': typeof DashboardMyAccountRoute
   '/product/$slug': typeof ProductSlugRoute
   '/reset-password/$token': typeof ResetPasswordTokenRoute
   '/shop/$slug': typeof ShopSlugRoute
@@ -791,9 +859,11 @@ export interface FileRoutesByTo {
   '/api/categories/list': typeof ApiCategoriesListRoute
   '/api/categories/public-list': typeof ApiCategoriesPublicListRoute
   '/api/checkout/bkash-callback': typeof ApiCheckoutBkashCallbackRoute
+  '/api/checkout/bkash-ipn': typeof ApiCheckoutBkashIpnRoute
   '/api/checkout/bkash-pay': typeof ApiCheckoutBkashPayRoute
   '/api/checkout/create': typeof ApiCheckoutCreateRoute
   '/api/checkout/validate-coupon': typeof ApiCheckoutValidateCouponRoute
+  '/api/messages/contact-vendor': typeof ApiMessagesContactVendorRoute
   '/api/orders/$orderId': typeof ApiOrdersOrderIdRoute
   '/api/orders/admin-cancel': typeof ApiOrdersAdminCancelRoute
   '/api/orders/admin-fulfill': typeof ApiOrdersAdminFulfillRoute
@@ -830,6 +900,9 @@ export interface FileRoutesByTo {
   '/api/vouchers/my': typeof ApiVouchersMyRoute
   '/api/vouchers/product-vouchers': typeof ApiVouchersProductVouchersRoute
   '/api/wallet/get': typeof ApiWalletGetRoute
+  '/api/wishlist/add': typeof ApiWishlistAddRoute
+  '/api/wishlist/list': typeof ApiWishlistListRoute
+  '/api/wishlist/remove': typeof ApiWishlistRemoveRoute
   '/dashboard/become-vendor/apply': typeof DashboardBecomeVendorApplyRoute
   '/dashboard/become-vendor/pending': typeof DashboardBecomeVendorPendingRoute
   '/dashboard/orders/$orderId': typeof DashboardOrdersOrderIdRoute
@@ -863,16 +936,20 @@ export interface FileRoutesById {
   '/dashboard': typeof DashboardRouteRouteWithChildren
   '/cart': typeof CartRoute
   '/checkout': typeof CheckoutRouteWithChildren
+  '/privacy': typeof PrivacyRoute
   '/products': typeof ProductsRouteWithChildren
+  '/terms': typeof TermsRoute
   '/dashboard/admin': typeof DashboardAdminRouteRouteWithChildren
   '/dashboard/become-vendor': typeof DashboardBecomeVendorRouteRouteWithChildren
   '/dashboard/orders': typeof DashboardOrdersRouteRouteWithChildren
   '/dashboard/vendor': typeof DashboardVendorRouteRouteWithChildren
+  '/auth/error': typeof AuthErrorRoute
   '/auth/forgot-password': typeof AuthForgotPasswordRoute
   '/auth/signin': typeof AuthSigninRoute
   '/auth/signup': typeof AuthSignupRoute
   '/auth/verify': typeof AuthVerifyRoute
   '/checkout/confirmation': typeof CheckoutConfirmationRoute
+  '/dashboard/my-account': typeof DashboardMyAccountRoute
   '/product/$slug': typeof ProductSlugRoute
   '/reset-password/$token': typeof ResetPasswordTokenRoute
   '/shop/$slug': typeof ShopSlugRoute
@@ -896,9 +973,11 @@ export interface FileRoutesById {
   '/api/categories/list': typeof ApiCategoriesListRoute
   '/api/categories/public-list': typeof ApiCategoriesPublicListRoute
   '/api/checkout/bkash-callback': typeof ApiCheckoutBkashCallbackRoute
+  '/api/checkout/bkash-ipn': typeof ApiCheckoutBkashIpnRoute
   '/api/checkout/bkash-pay': typeof ApiCheckoutBkashPayRoute
   '/api/checkout/create': typeof ApiCheckoutCreateRoute
   '/api/checkout/validate-coupon': typeof ApiCheckoutValidateCouponRoute
+  '/api/messages/contact-vendor': typeof ApiMessagesContactVendorRoute
   '/api/orders/$orderId': typeof ApiOrdersOrderIdRoute
   '/api/orders/admin-cancel': typeof ApiOrdersAdminCancelRoute
   '/api/orders/admin-fulfill': typeof ApiOrdersAdminFulfillRoute
@@ -935,6 +1014,9 @@ export interface FileRoutesById {
   '/api/vouchers/my': typeof ApiVouchersMyRoute
   '/api/vouchers/product-vouchers': typeof ApiVouchersProductVouchersRoute
   '/api/wallet/get': typeof ApiWalletGetRoute
+  '/api/wishlist/add': typeof ApiWishlistAddRoute
+  '/api/wishlist/list': typeof ApiWishlistListRoute
+  '/api/wishlist/remove': typeof ApiWishlistRemoveRoute
   '/dashboard/become-vendor/apply': typeof DashboardBecomeVendorApplyRoute
   '/dashboard/become-vendor/pending': typeof DashboardBecomeVendorPendingRoute
   '/dashboard/orders/$orderId': typeof DashboardOrdersOrderIdRoute
@@ -969,16 +1051,20 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/cart'
     | '/checkout'
+    | '/privacy'
     | '/products'
+    | '/terms'
     | '/dashboard/admin'
     | '/dashboard/become-vendor'
     | '/dashboard/orders'
     | '/dashboard/vendor'
+    | '/auth/error'
     | '/auth/forgot-password'
     | '/auth/signin'
     | '/auth/signup'
     | '/auth/verify'
     | '/checkout/confirmation'
+    | '/dashboard/my-account'
     | '/product/$slug'
     | '/reset-password/$token'
     | '/shop/$slug'
@@ -1002,9 +1088,11 @@ export interface FileRouteTypes {
     | '/api/categories/list'
     | '/api/categories/public-list'
     | '/api/checkout/bkash-callback'
+    | '/api/checkout/bkash-ipn'
     | '/api/checkout/bkash-pay'
     | '/api/checkout/create'
     | '/api/checkout/validate-coupon'
+    | '/api/messages/contact-vendor'
     | '/api/orders/$orderId'
     | '/api/orders/admin-cancel'
     | '/api/orders/admin-fulfill'
@@ -1041,6 +1129,9 @@ export interface FileRouteTypes {
     | '/api/vouchers/my'
     | '/api/vouchers/product-vouchers'
     | '/api/wallet/get'
+    | '/api/wishlist/add'
+    | '/api/wishlist/list'
+    | '/api/wishlist/remove'
     | '/dashboard/become-vendor/apply'
     | '/dashboard/become-vendor/pending'
     | '/dashboard/orders/$orderId'
@@ -1072,15 +1163,19 @@ export interface FileRouteTypes {
     | '/'
     | '/cart'
     | '/checkout'
+    | '/privacy'
     | '/products'
+    | '/terms'
     | '/dashboard/admin'
     | '/dashboard/become-vendor'
     | '/dashboard/vendor'
+    | '/auth/error'
     | '/auth/forgot-password'
     | '/auth/signin'
     | '/auth/signup'
     | '/auth/verify'
     | '/checkout/confirmation'
+    | '/dashboard/my-account'
     | '/product/$slug'
     | '/reset-password/$token'
     | '/shop/$slug'
@@ -1104,9 +1199,11 @@ export interface FileRouteTypes {
     | '/api/categories/list'
     | '/api/categories/public-list'
     | '/api/checkout/bkash-callback'
+    | '/api/checkout/bkash-ipn'
     | '/api/checkout/bkash-pay'
     | '/api/checkout/create'
     | '/api/checkout/validate-coupon'
+    | '/api/messages/contact-vendor'
     | '/api/orders/$orderId'
     | '/api/orders/admin-cancel'
     | '/api/orders/admin-fulfill'
@@ -1143,6 +1240,9 @@ export interface FileRouteTypes {
     | '/api/vouchers/my'
     | '/api/vouchers/product-vouchers'
     | '/api/wallet/get'
+    | '/api/wishlist/add'
+    | '/api/wishlist/list'
+    | '/api/wishlist/remove'
     | '/dashboard/become-vendor/apply'
     | '/dashboard/become-vendor/pending'
     | '/dashboard/orders/$orderId'
@@ -1175,16 +1275,20 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/cart'
     | '/checkout'
+    | '/privacy'
     | '/products'
+    | '/terms'
     | '/dashboard/admin'
     | '/dashboard/become-vendor'
     | '/dashboard/orders'
     | '/dashboard/vendor'
+    | '/auth/error'
     | '/auth/forgot-password'
     | '/auth/signin'
     | '/auth/signup'
     | '/auth/verify'
     | '/checkout/confirmation'
+    | '/dashboard/my-account'
     | '/product/$slug'
     | '/reset-password/$token'
     | '/shop/$slug'
@@ -1208,9 +1312,11 @@ export interface FileRouteTypes {
     | '/api/categories/list'
     | '/api/categories/public-list'
     | '/api/checkout/bkash-callback'
+    | '/api/checkout/bkash-ipn'
     | '/api/checkout/bkash-pay'
     | '/api/checkout/create'
     | '/api/checkout/validate-coupon'
+    | '/api/messages/contact-vendor'
     | '/api/orders/$orderId'
     | '/api/orders/admin-cancel'
     | '/api/orders/admin-fulfill'
@@ -1247,6 +1353,9 @@ export interface FileRouteTypes {
     | '/api/vouchers/my'
     | '/api/vouchers/product-vouchers'
     | '/api/wallet/get'
+    | '/api/wishlist/add'
+    | '/api/wishlist/list'
+    | '/api/wishlist/remove'
     | '/dashboard/become-vendor/apply'
     | '/dashboard/become-vendor/pending'
     | '/dashboard/orders/$orderId'
@@ -1280,7 +1389,10 @@ export interface RootRouteChildren {
   DashboardRouteRoute: typeof DashboardRouteRouteWithChildren
   CartRoute: typeof CartRoute
   CheckoutRoute: typeof CheckoutRouteWithChildren
+  PrivacyRoute: typeof PrivacyRoute
   ProductsRoute: typeof ProductsRouteWithChildren
+  TermsRoute: typeof TermsRoute
+  AuthErrorRoute: typeof AuthErrorRoute
   AuthForgotPasswordRoute: typeof AuthForgotPasswordRoute
   AuthSigninRoute: typeof AuthSigninRoute
   AuthSignupRoute: typeof AuthSignupRoute
@@ -1307,9 +1419,11 @@ export interface RootRouteChildren {
   ApiCategoriesListRoute: typeof ApiCategoriesListRoute
   ApiCategoriesPublicListRoute: typeof ApiCategoriesPublicListRoute
   ApiCheckoutBkashCallbackRoute: typeof ApiCheckoutBkashCallbackRoute
+  ApiCheckoutBkashIpnRoute: typeof ApiCheckoutBkashIpnRoute
   ApiCheckoutBkashPayRoute: typeof ApiCheckoutBkashPayRoute
   ApiCheckoutCreateRoute: typeof ApiCheckoutCreateRoute
   ApiCheckoutValidateCouponRoute: typeof ApiCheckoutValidateCouponRoute
+  ApiMessagesContactVendorRoute: typeof ApiMessagesContactVendorRoute
   ApiOrdersOrderIdRoute: typeof ApiOrdersOrderIdRoute
   ApiOrdersAdminCancelRoute: typeof ApiOrdersAdminCancelRoute
   ApiOrdersAdminFulfillRoute: typeof ApiOrdersAdminFulfillRoute
@@ -1346,17 +1460,34 @@ export interface RootRouteChildren {
   ApiVouchersMyRoute: typeof ApiVouchersMyRoute
   ApiVouchersProductVouchersRoute: typeof ApiVouchersProductVouchersRoute
   ApiWalletGetRoute: typeof ApiWalletGetRoute
+  ApiWishlistAddRoute: typeof ApiWishlistAddRoute
+  ApiWishlistListRoute: typeof ApiWishlistListRoute
+  ApiWishlistRemoveRoute: typeof ApiWishlistRemoveRoute
   ApiVendorOrdersOrderIdRoute: typeof ApiVendorOrdersOrderIdRoute
   ApiVendorOrdersListRoute: typeof ApiVendorOrdersListRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/terms': {
+      id: '/terms'
+      path: '/terms'
+      fullPath: '/terms'
+      preLoaderRoute: typeof TermsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/products': {
       id: '/products'
       path: '/products'
       fullPath: '/products'
       preLoaderRoute: typeof ProductsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/privacy': {
+      id: '/privacy'
+      path: '/privacy'
+      fullPath: '/privacy'
+      preLoaderRoute: typeof PrivacyRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/checkout': {
@@ -1422,6 +1553,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProductSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/dashboard/my-account': {
+      id: '/dashboard/my-account'
+      path: '/my-account'
+      fullPath: '/dashboard/my-account'
+      preLoaderRoute: typeof DashboardMyAccountRouteImport
+      parentRoute: typeof DashboardRouteRoute
+    }
     '/checkout/confirmation': {
       id: '/checkout/confirmation'
       path: '/confirmation'
@@ -1455,6 +1593,13 @@ declare module '@tanstack/react-router' {
       path: '/auth/forgot-password'
       fullPath: '/auth/forgot-password'
       preLoaderRoute: typeof AuthForgotPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth/error': {
+      id: '/auth/error'
+      path: '/auth/error'
+      fullPath: '/auth/error'
+      preLoaderRoute: typeof AuthErrorRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/dashboard/vendor': {
@@ -1519,6 +1664,27 @@ declare module '@tanstack/react-router' {
       fullPath: '/dashboard/become-vendor/apply'
       preLoaderRoute: typeof DashboardBecomeVendorApplyRouteImport
       parentRoute: typeof DashboardBecomeVendorRouteRoute
+    }
+    '/api/wishlist/remove': {
+      id: '/api/wishlist/remove'
+      path: '/api/wishlist/remove'
+      fullPath: '/api/wishlist/remove'
+      preLoaderRoute: typeof ApiWishlistRemoveRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/wishlist/list': {
+      id: '/api/wishlist/list'
+      path: '/api/wishlist/list'
+      fullPath: '/api/wishlist/list'
+      preLoaderRoute: typeof ApiWishlistListRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/wishlist/add': {
+      id: '/api/wishlist/add'
+      path: '/api/wishlist/add'
+      fullPath: '/api/wishlist/add'
+      preLoaderRoute: typeof ApiWishlistAddRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/api/wallet/get': {
       id: '/api/wallet/get'
@@ -1772,6 +1938,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiOrdersOrderIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/messages/contact-vendor': {
+      id: '/api/messages/contact-vendor'
+      path: '/api/messages/contact-vendor'
+      fullPath: '/api/messages/contact-vendor'
+      preLoaderRoute: typeof ApiMessagesContactVendorRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/checkout/validate-coupon': {
       id: '/api/checkout/validate-coupon'
       path: '/api/checkout/validate-coupon'
@@ -1791,6 +1964,13 @@ declare module '@tanstack/react-router' {
       path: '/api/checkout/bkash-pay'
       fullPath: '/api/checkout/bkash-pay'
       preLoaderRoute: typeof ApiCheckoutBkashPayRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/checkout/bkash-ipn': {
+      id: '/api/checkout/bkash-ipn'
+      path: '/api/checkout/bkash-ipn'
+      fullPath: '/api/checkout/bkash-ipn'
+      preLoaderRoute: typeof ApiCheckoutBkashIpnRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/checkout/bkash-callback': {
@@ -2159,6 +2339,7 @@ interface DashboardRouteRouteChildren {
   DashboardBecomeVendorRouteRoute: typeof DashboardBecomeVendorRouteRouteWithChildren
   DashboardOrdersRouteRoute: typeof DashboardOrdersRouteRouteWithChildren
   DashboardVendorRouteRoute: typeof DashboardVendorRouteRouteWithChildren
+  DashboardMyAccountRoute: typeof DashboardMyAccountRoute
   DashboardIndexRoute: typeof DashboardIndexRoute
 }
 
@@ -2167,6 +2348,7 @@ const DashboardRouteRouteChildren: DashboardRouteRouteChildren = {
   DashboardBecomeVendorRouteRoute: DashboardBecomeVendorRouteRouteWithChildren,
   DashboardOrdersRouteRoute: DashboardOrdersRouteRouteWithChildren,
   DashboardVendorRouteRoute: DashboardVendorRouteRouteWithChildren,
+  DashboardMyAccountRoute: DashboardMyAccountRoute,
   DashboardIndexRoute: DashboardIndexRoute,
 }
 
@@ -2203,7 +2385,10 @@ const rootRouteChildren: RootRouteChildren = {
   DashboardRouteRoute: DashboardRouteRouteWithChildren,
   CartRoute: CartRoute,
   CheckoutRoute: CheckoutRouteWithChildren,
+  PrivacyRoute: PrivacyRoute,
   ProductsRoute: ProductsRouteWithChildren,
+  TermsRoute: TermsRoute,
+  AuthErrorRoute: AuthErrorRoute,
   AuthForgotPasswordRoute: AuthForgotPasswordRoute,
   AuthSigninRoute: AuthSigninRoute,
   AuthSignupRoute: AuthSignupRoute,
@@ -2230,9 +2415,11 @@ const rootRouteChildren: RootRouteChildren = {
   ApiCategoriesListRoute: ApiCategoriesListRoute,
   ApiCategoriesPublicListRoute: ApiCategoriesPublicListRoute,
   ApiCheckoutBkashCallbackRoute: ApiCheckoutBkashCallbackRoute,
+  ApiCheckoutBkashIpnRoute: ApiCheckoutBkashIpnRoute,
   ApiCheckoutBkashPayRoute: ApiCheckoutBkashPayRoute,
   ApiCheckoutCreateRoute: ApiCheckoutCreateRoute,
   ApiCheckoutValidateCouponRoute: ApiCheckoutValidateCouponRoute,
+  ApiMessagesContactVendorRoute: ApiMessagesContactVendorRoute,
   ApiOrdersOrderIdRoute: ApiOrdersOrderIdRoute,
   ApiOrdersAdminCancelRoute: ApiOrdersAdminCancelRoute,
   ApiOrdersAdminFulfillRoute: ApiOrdersAdminFulfillRoute,
@@ -2269,6 +2456,9 @@ const rootRouteChildren: RootRouteChildren = {
   ApiVouchersMyRoute: ApiVouchersMyRoute,
   ApiVouchersProductVouchersRoute: ApiVouchersProductVouchersRoute,
   ApiWalletGetRoute: ApiWalletGetRoute,
+  ApiWishlistAddRoute: ApiWishlistAddRoute,
+  ApiWishlistListRoute: ApiWishlistListRoute,
+  ApiWishlistRemoveRoute: ApiWishlistRemoveRoute,
   ApiVendorOrdersOrderIdRoute: ApiVendorOrdersOrderIdRoute,
   ApiVendorOrdersListRoute: ApiVendorOrdersListRoute,
 }
