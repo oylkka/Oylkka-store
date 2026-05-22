@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import axios from 'axios';
 import { toast } from 'sonner';
+import apiClient from '@/lib/api-client';
 import { QUERY_KEYS } from '@/lib/constants';
 import type {
   BannerFormType,
@@ -52,7 +52,7 @@ export function useHeroBanner() {
   return useQuery<HeroBanner[]>({
     queryKey: [QUERY_KEYS.HERO_BANNER],
     queryFn: async () => {
-      const response = await axios.get<HeroBanner[]>('/api/banners/hero');
+      const response = await apiClient.get<HeroBanner[]>('/api/banners/hero');
       return response.data;
     },
   });
@@ -62,7 +62,7 @@ export function useAdminBanners() {
   return useQuery<AdminBanner[]>({
     queryKey: [QUERY_KEYS.ADMIN_BANNERS],
     queryFn: async () => {
-      const response = await axios.get<AdminBanner[]>(
+      const response = await apiClient.get<AdminBanner[]>(
         '/api/banners/admin-list',
       );
       return response.data;
@@ -74,7 +74,7 @@ export function useBanner(id: string | undefined) {
   return useQuery<AdminBanner>({
     queryKey: ['banner', id],
     queryFn: async () => {
-      const response = await axios.post<AdminBanner>(
+      const response = await apiClient.post<AdminBanner>(
         '/api/banners/get-single',
         {
           id,
@@ -115,7 +115,7 @@ export function useBannerMutation() {
         formData.append('image', values.image[0]);
       }
 
-      const response = await axios.post<CreateBannerResponse>(
+      const response = await apiClient.post<CreateBannerResponse>(
         '/api/banners/add',
         formData,
         {
@@ -134,7 +134,7 @@ export function useBannerMutation() {
       queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.ADMIN_BANNERS] });
     },
     onError: (error: unknown) => {
-      const message = axios.isAxiosError(error)
+      const message = apiClient.isAxiosError(error)
         ? (error.response?.data?.message ?? error.message)
         : 'Failed to create banner';
       toast.error(`Error: ${message}`, { id: 'banner-mutation' });
@@ -147,7 +147,7 @@ export function useDeleteBannerMutation() {
 
   return useMutation({
     mutationFn: async (id: string) => {
-      const response = await axios.post('/api/banners/delete', { id });
+      const response = await apiClient.post('/api/banners/delete', { id });
       return response.data;
     },
     onMutate: () => {
@@ -159,7 +159,7 @@ export function useDeleteBannerMutation() {
       queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.HERO_BANNER] });
     },
     onError: (error: unknown) => {
-      const message = axios.isAxiosError(error)
+      const message = apiClient.isAxiosError(error)
         ? (error.response?.data?.error ?? error.message)
         : 'Failed to delete banner';
       toast.error(`Error: ${message}`, { id: 'delete-banner' });
@@ -202,7 +202,7 @@ export function useEditBannerMutation() {
         String(values.keepExistingImage ?? false),
       );
 
-      const response = await axios.post('/api/banners/edit', formData, {
+      const response = await apiClient.post('/api/banners/edit', formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
 
@@ -217,7 +217,7 @@ export function useEditBannerMutation() {
       queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.HERO_BANNER] });
     },
     onError: (error: unknown) => {
-      const message = axios.isAxiosError(error)
+      const message = apiClient.isAxiosError(error)
         ? (error.response?.data?.error ?? error.message)
         : 'Failed to update banner';
       toast.error(`Error: ${message}`, { id: 'edit-banner' });

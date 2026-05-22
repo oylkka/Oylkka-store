@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import axios from 'axios';
+import apiClient from '@/lib/api-client';
 import { QUERY_KEYS } from '@/lib/constants';
 
 export type AdminOrderListItem = {
@@ -123,7 +123,7 @@ export function useAdminOrders(filters?: {
       if (filters?.page) params.set('page', String(filters.page));
       if (filters?.limit) params.set('limit', String(filters.limit));
       const qs = params.toString();
-      const response = await axios.get<AdminOrderListResponse>(
+      const response = await apiClient.get<AdminOrderListResponse>(
         `/api/orders/admin-list${qs ? `?${qs}` : ''}`,
       );
       return response.data;
@@ -135,7 +135,7 @@ export function useAdminOrderDetail(orderId: string) {
   return useQuery<AdminOrderDetail>({
     queryKey: [QUERY_KEYS.ADMIN_ORDERS, 'detail', orderId],
     queryFn: async () => {
-      const response = await axios.get<AdminOrderDetail>(
+      const response = await apiClient.get<AdminOrderDetail>(
         `/api/orders/admin-single?orderId=${orderId}`,
       );
       return response.data;
@@ -149,7 +149,7 @@ export function useAdminFulfillMutation(orderId: string) {
 
   return useMutation<void, Error, FulfillPayload>({
     mutationFn: async (payload) => {
-      await axios.post('/api/orders/admin-fulfill', {
+      await apiClient.post('/api/orders/admin-fulfill', {
         orderId,
         ...payload,
       });
@@ -167,7 +167,7 @@ export function useAdminCancelOrderMutation() {
 
   return useMutation<void, Error, { orderId: string; reason: string }>({
     mutationFn: async (payload) => {
-      await axios.post('/api/orders/admin-cancel', payload);
+      await apiClient.post('/api/orders/admin-cancel', payload);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({
@@ -182,7 +182,7 @@ export function useAdminRefundMutation() {
 
   return useMutation<AdminOrderDetail, Error, RefundPayload>({
     mutationFn: async (payload) => {
-      const response = await axios.post<AdminOrderDetail>(
+      const response = await apiClient.post<AdminOrderDetail>(
         '/api/orders/admin-refund',
         payload,
       );

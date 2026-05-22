@@ -2,7 +2,10 @@ import { createFileRoute } from '@tanstack/react-router';
 import { getRequestHeaders } from '@tanstack/react-start/server';
 import { auth } from '@/lib/auth';
 import { createBkashPayment } from '@/lib/bkash';
+import { validateCsrf } from '@/lib/csrf';
 import { prisma } from '@/lib/db';
+import { checkoutLimiter } from '@/lib/rate-limit';
+import { checkRateLimit } from '@/lib/rate-limit-guard';
 
 export const Route = createFileRoute('/api/checkout/bkash-pay')({
   server: {
@@ -15,6 +18,12 @@ export const Route = createFileRoute('/api/checkout/bkash-pay')({
           return Response.json({ error: 'Unauthorized' }, { status: 401 });
         }
 
+        const rateLimitResponse = await checkRateLimit(checkoutLimiter);
+        if (rateLimitResponse) return rateLimitResponse;
+
+        const csrfResponse = validateCsrf();
+        if (csrfResponse) return csrfResponse;
+
         const body: { orderId: string } = await request.json();
 
         if (!body.orderId) {
@@ -24,7 +33,7 @@ export const Route = createFileRoute('/api/checkout/bkash-pay')({
           );
         }
 
-        const order = await prisma.order.findUnique({
+        let order = await prisma.order.findUnique({
           where: { id: body.orderId },
         });
 
@@ -43,10 +52,51 @@ export const Route = createFileRoute('/api/checkout/bkash-pay')({
           );
         }
 
-        if (order.paymentStatus !== 'PENDING') {
+        if (
+          order.paymentStatus !== 'PENDING' &&
+          order.paymentStatus !== 'FAILED'
+        ) {
           return Response.json(
             { error: 'Payment already processed' },
             { status: 400 },
+          );
+        }
+
+        // Allow retry for failed payments: reset to PENDING
+        if (order.paymentStatus === 'FAILED') {
+          const metadata = order.metadata as Record<string, unknown> | null;
+          await prisma.order.update({
+            where: { id: order.id },
+            data: {
+              paymentStatus: 'PENDING',
+              metadata: {
+                ...(metadata || {}),
+                bkashError: undefined,
+              },
+            },
+          });
+          // Re-fetch to get updated metadata
+          order = await prisma.order.findUnique({
+            where: { id: order.id },
+          });
+          if (!order) {
+            return Response.json({ error: 'Order not found' }, { status: 404 });
+          }
+        }
+
+        // Idempotency: if a checkout URL was already generated, return it
+        const existingMetadata = order.metadata as Record<
+          string,
+          unknown
+        > | null;
+        const existingCheckoutURL = existingMetadata?.bkashCheckoutURL as
+          | string
+          | undefined;
+
+        if (existingCheckoutURL && order.paymentStatus === 'PENDING') {
+          return Response.json(
+            { checkoutURL: existingCheckoutURL },
+            { status: 200 },
           );
         }
 

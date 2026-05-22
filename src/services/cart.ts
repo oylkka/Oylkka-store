@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import axios from 'axios';
 import { toast } from 'sonner';
+import apiClient from '@/lib/api-client';
 import { QUERY_KEYS } from '@/lib/constants';
 
 export type CartItemProduct = {
@@ -60,7 +60,7 @@ export function useCart() {
   return useQuery<Cart>({
     queryKey: [QUERY_KEYS.CART],
     queryFn: async () => {
-      const response = await axios.get<Cart>('/api/cart/get');
+      const response = await apiClient.get<Cart>('/api/cart/get');
       return response.data;
     },
   });
@@ -71,7 +71,7 @@ export function useAddToCartMutation() {
 
   return useMutation({
     mutationFn: async (input: AddToCartInput) => {
-      const response = await axios.post('/api/cart/add', input);
+      const response = await apiClient.post('/api/cart/add', input);
       return response.data;
     },
     onMutate: () => {
@@ -82,7 +82,7 @@ export function useAddToCartMutation() {
       queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.CART] });
     },
     onError: (error: unknown) => {
-      const message = axios.isAxiosError(error)
+      const message = apiClient.isAxiosError(error)
         ? (error.response?.data?.error ?? error.message)
         : 'Failed to add to cart';
       toast.error(`Error: ${message}`, { id: 'cart-add' });
@@ -95,14 +95,14 @@ export function useUpdateCartItemMutation() {
 
   return useMutation({
     mutationFn: async (input: UpdateCartItemInput) => {
-      const response = await axios.patch('/api/cart/update', input);
+      const response = await apiClient.patch('/api/cart/update', input);
       return response.data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.CART] });
     },
     onError: (error: unknown) => {
-      const message = axios.isAxiosError(error)
+      const message = apiClient.isAxiosError(error)
         ? (error.response?.data?.error ?? error.message)
         : 'Failed to update cart';
       toast.error(`Error: ${message}`);
@@ -115,7 +115,7 @@ export function useRemoveCartItemMutation() {
 
   return useMutation({
     mutationFn: async (itemId: string) => {
-      const response = await axios.post('/api/cart/remove', { itemId });
+      const response = await apiClient.post('/api/cart/remove', { itemId });
       return response.data;
     },
     onMutate: () => {
@@ -126,7 +126,7 @@ export function useRemoveCartItemMutation() {
       queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.CART] });
     },
     onError: (error: unknown) => {
-      const message = axios.isAxiosError(error)
+      const message = apiClient.isAxiosError(error)
         ? (error.response?.data?.error ?? error.message)
         : 'Failed to remove item';
       toast.error(`Error: ${message}`, { id: 'cart-remove' });

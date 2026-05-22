@@ -2,6 +2,7 @@ import { createFileRoute } from '@tanstack/react-router';
 import { getRequestHeaders } from '@tanstack/react-start/server';
 import { UploadImage } from '@/cloudinary';
 import { auth } from '@/lib/auth';
+import { validateCsrf } from '@/lib/csrf';
 import { prisma } from '@/lib/db';
 import { slugify } from '@/lib/slug';
 import { CategoryApiSchema } from '@/schemas/category-schema';
@@ -17,6 +18,9 @@ export const Route = createFileRoute('/api/categories/add')({
           if (!session?.user || session.user.role !== 'ADMIN') {
             return Response.json({ error: 'Unauthorized' }, { status: 401 });
           }
+
+          const csrfResponse = validateCsrf();
+          if (csrfResponse) return csrfResponse;
 
           const formData = await request.formData();
 

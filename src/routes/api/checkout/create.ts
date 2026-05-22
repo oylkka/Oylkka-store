@@ -2,7 +2,10 @@ import { createFileRoute } from '@tanstack/react-router';
 import { getRequestHeaders } from '@tanstack/react-start/server';
 import { sendOrderConfirmation } from '@/actions/send-order-email';
 import { auth } from '@/lib/auth';
+import { validateCsrf } from '@/lib/csrf';
 import { prisma } from '@/lib/db';
+import { checkoutLimiter } from '@/lib/rate-limit';
+import { checkRateLimit } from '@/lib/rate-limit-guard';
 
 function generateOrderNumber(): string {
   const ts = Date.now().toString(36).toUpperCase();
@@ -34,6 +37,12 @@ export const Route = createFileRoute('/api/checkout/create')({
           if (!session?.user) {
             return Response.json({ error: 'Unauthorized' }, { status: 401 });
           }
+
+          const rateLimitResponse = await checkRateLimit(checkoutLimiter);
+          if (rateLimitResponse) return rateLimitResponse;
+
+          const csrfResponse = validateCsrf();
+          if (csrfResponse) return csrfResponse;
 
           const body: CreateOrderInput = await request.json();
 
@@ -135,6 +144,31 @@ export const Route = createFileRoute('/api/checkout/create')({
                 { status: 400 },
               );
             }
+          }
+
+          // --- Price re-validation: check if prices changed since adding to cart ---
+          const priceChangedItems: string[] = [];
+          for (const item of cart.items) {
+            const currentPrice =
+              item.variant?.discountPrice ??
+              item.variant?.price ??
+              item.product.discountPrice ??
+              item.product.price;
+            const savedPrice = item.savedPrice;
+
+            if (savedPrice != null && savedPrice !== currentPrice) {
+              priceChangedItems.push(item.product.productName);
+            }
+          }
+
+          if (priceChangedItems.length > 0) {
+            return Response.json(
+              {
+                error: `Prices have changed for: ${priceChangedItems.join(', ')}. Please review your cart and try again.`,
+                changedItems: priceChangedItems,
+              },
+              { status: 409 },
+            );
           }
 
           // --- Calculate base pricing ---
@@ -585,14 +619,34 @@ export const Route = createFileRoute('/api/checkout/create')({
             // Only for COD: destructive side effects (stock, cart, vouchers, cashback)
             // For BKASH these happen after payment confirmation in bkash-callback.ts
             if (body.paymentMethod === 'CASH_ON_DELIVERY') {
-              // Decrement stock
+              // Decrement stock with re-validation inside transaction (race condition safety)
               for (const item of cart.items) {
+                const current = await tx.product.findUnique({
+                  where: { id: item.product.id },
+                  select: { stock: true },
+                });
+
+                if (!current || current.stock < item.quantity) {
+                  throw new Error(
+                    `"${item.product.productName}" is out of stock`,
+                  );
+                }
+
                 await tx.product.update({
                   where: { id: item.product.id },
                   data: { stock: { decrement: item.quantity } },
                 });
 
                 if (item.variant) {
+                  const variantCurrent = await tx.productVariant.findUnique({
+                    where: { id: item.variant.id },
+                    select: { stock: true },
+                  });
+
+                  if (!variantCurrent || variantCurrent.stock < item.quantity) {
+                    throw new Error(`"${item.variant.name}" is out of stock`);
+                  }
+
                   await tx.productVariant.update({
                     where: { id: item.variant.id },
                     data: { stock: { decrement: item.quantity } },

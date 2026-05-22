@@ -63,6 +63,11 @@ async function getGrantToken(): Promise<string> {
 
   const data = await response.json();
 
+  // Clean up expired tokens before creating a new one
+  await prisma.bkashToken.deleteMany({
+    where: { expiresAt: { lte: new Date() } },
+  });
+
   await prisma.bkashToken.create({
     data: {
       token: data.id_token,

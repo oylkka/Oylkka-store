@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import axios from 'axios';
 import { toast } from 'sonner';
+import apiClient from '@/lib/api-client';
 import { QUERY_KEYS } from '@/lib/constants';
 
 export type ProductImage = {
@@ -141,7 +141,7 @@ export function useCategoryProducts(slug: string | undefined) {
   return useQuery<CategoryProduct[]>({
     queryKey: [QUERY_KEYS.PUBLIC_PRODUCTS, 'category', slug],
     queryFn: async () => {
-      const response = await axios.get<CategoryProduct[]>(
+      const response = await apiClient.get<CategoryProduct[]>(
         '/api/product/public-by-category',
         { params: { slug } },
       );
@@ -160,7 +160,7 @@ export function useAllProducts(params: {
   return useQuery<ProductListResponse>({
     queryKey: [QUERY_KEYS.PUBLIC_PRODUCTS, 'list', params],
     queryFn: async () => {
-      const response = await axios.get<ProductListResponse>(
+      const response = await apiClient.get<ProductListResponse>(
         '/api/product/public-list',
         { params },
       );
@@ -173,7 +173,7 @@ export function usePublicCategories() {
   return useQuery<{ id: string; name: string; slug: string }[]>({
     queryKey: [QUERY_KEYS.CATEGORIES, 'public'],
     queryFn: async () => {
-      const response = await axios.get('/api/categories/public-list');
+      const response = await apiClient.get('/api/categories/public-list');
       return response.data;
     },
   });
@@ -206,7 +206,7 @@ export function usePublicProductReviews(productId: string, page: number = 1) {
   return useQuery<ProductReviewsResponse>({
     queryKey: [QUERY_KEYS.PUBLIC_PRODUCTS, 'reviews', productId, page],
     queryFn: async () => {
-      const response = await axios.get<ProductReviewsResponse>(
+      const response = await apiClient.get<ProductReviewsResponse>(
         '/api/product/public-reviews',
         { params: { productId, page, limit: 10 } },
       );
@@ -237,7 +237,7 @@ export function useProductQuestions(productId: string, page: number = 1) {
   return useQuery<ProductQuestionsResponse>({
     queryKey: [QUERY_KEYS.PRODUCT_QUESTIONS, productId, page],
     queryFn: async () => {
-      const response = await axios.get<ProductQuestionsResponse>(
+      const response = await apiClient.get<ProductQuestionsResponse>(
         '/api/product/public-questions',
         { params: { productId, page, limit: 10 } },
       );
@@ -258,7 +258,7 @@ export function useAskQuestionMutation() {
       productId: string;
       question: string;
     }) => {
-      const response = await axios.post<PublicQuestion>(
+      const response = await apiClient.post<PublicQuestion>(
         '/api/product/public-questions',
         { productId, question },
       );
@@ -271,7 +271,7 @@ export function useAskQuestionMutation() {
       toast.success('Question submitted successfully!');
     },
     onError: (error: unknown) => {
-      const message = axios.isAxiosError(error)
+      const message = apiClient.isAxiosError(error)
         ? (error.response?.data?.error ?? error.message)
         : 'Failed to submit question';
       toast.error(`Error: ${message}`);
@@ -283,7 +283,7 @@ export function usePublicProduct(slug: string) {
   return useQuery<PublicProduct>({
     queryKey: [QUERY_KEYS.PUBLIC_PRODUCTS, 'single', slug],
     queryFn: async () => {
-      const response = await axios.get<PublicProduct>(
+      const response = await apiClient.get<PublicProduct>(
         '/api/product/public-single',
         { params: { slug } },
       );
@@ -297,7 +297,7 @@ export function useVendorProducts() {
   return useQuery<VendorProduct[]>({
     queryKey: [QUERY_KEYS.PRODUCTS, 'vendor-list'],
     queryFn: async () => {
-      const response = await axios.get<VendorProduct[]>(
+      const response = await apiClient.get<VendorProduct[]>(
         '/api/product/vendor-list',
       );
       return response.data;
@@ -309,7 +309,7 @@ export function useProduct(id: string | undefined) {
   return useQuery<VendorProduct>({
     queryKey: [QUERY_KEYS.PRODUCTS, id],
     queryFn: async () => {
-      const response = await axios.post<VendorProduct>(
+      const response = await apiClient.post<VendorProduct>(
         '/api/product/get-single',
         { id },
       );
@@ -323,7 +323,7 @@ export function useVendorCategories() {
   return useQuery<VendorCategory[]>({
     queryKey: [QUERY_KEYS.CATEGORIES, 'vendor'],
     queryFn: async () => {
-      const response = await axios.get<VendorCategory[]>(
+      const response = await apiClient.get<VendorCategory[]>(
         '/api/product/vendor-categories',
       );
       return response.data;
@@ -336,7 +336,7 @@ export function useDeleteProductMutation() {
 
   return useMutation({
     mutationFn: async (id: string) => {
-      const response = await axios.post('/api/product/delete', { id });
+      const response = await apiClient.post('/api/product/delete', { id });
       return response.data;
     },
     onMutate: () => {
@@ -349,7 +349,7 @@ export function useDeleteProductMutation() {
       queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.PRODUCTS] });
     },
     onError: (error: unknown) => {
-      const message = axios.isAxiosError(error)
+      const message = apiClient.isAxiosError(error)
         ? (error.response?.data?.error ?? error.message)
         : 'Failed to delete product';
       toast.error(`Error: ${message}`, { id: 'product-delete' });
@@ -363,7 +363,7 @@ export function useCreateProduct() {
 
   return useMutation({
     mutationFn: async (formData: FormData) => {
-      const response = await axios.post<CreateProductResponse>(
+      const response = await apiClient.post<CreateProductResponse>(
         '/api/product/create',
         formData,
         { headers: { 'Content-Type': 'multipart/form-data' } },
@@ -382,7 +382,7 @@ export function useUpdateProduct({ productId }: { productId: string }) {
   return useMutation({
     mutationFn: async (formData: FormData) => {
       formData.append('id', productId);
-      const response = await axios.post<CreateProductResponse>(
+      const response = await apiClient.post<CreateProductResponse>(
         '/api/product/edit',
         formData,
         { headers: { 'Content-Type': 'multipart/form-data' } },
@@ -404,7 +404,7 @@ export function useAdminUpdateProduct({ productId }: { productId: string }) {
   return useMutation({
     mutationFn: async (formData: FormData) => {
       formData.append('id', productId);
-      const response = await axios.post<CreateProductResponse>(
+      const response = await apiClient.post<CreateProductResponse>(
         '/api/product/edit',
         formData,
         { headers: { 'Content-Type': 'multipart/form-data' } },

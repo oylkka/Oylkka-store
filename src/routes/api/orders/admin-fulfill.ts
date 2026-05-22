@@ -2,6 +2,7 @@ import { createFileRoute } from '@tanstack/react-router';
 import { getRequestHeaders } from '@tanstack/react-start/server';
 import { sendOrderShippedNotification } from '@/actions/send-order-email';
 import { auth } from '@/lib/auth';
+import { validateCsrf } from '@/lib/csrf';
 import { prisma } from '@/lib/db';
 
 const ALLOWED_FULFILLMENT_STATUSES = [
@@ -27,6 +28,9 @@ export const Route = createFileRoute('/api/orders/admin-fulfill')({
           ) {
             return Response.json({ error: 'Forbidden' }, { status: 403 });
           }
+
+          const csrfResponse = validateCsrf();
+          if (csrfResponse) return csrfResponse;
 
           const body: {
             orderId: string;
@@ -85,12 +89,15 @@ export const Route = createFileRoute('/api/orders/admin-fulfill')({
             updateData.deliveredAt = new Date();
           }
 
-          const updated = await prisma.orderItem.update({
-            where: { id: body.itemId },
-            data: updateData,
+          const updated = await prisma.$transaction(async (tx) => {
+            const result = await tx.orderItem.update({
+              where: { id: body.itemId },
+              data: updateData,
+            });
+            return result;
           });
 
-          // Fire-and-forget: send shipping notification email
+          // Fire-and-forget: send shipping notification email after successful update
           if (body.fulfillmentStatus === 'SHIPPED') {
             sendOrderShippedNotification(body.orderId, body.itemId);
           }

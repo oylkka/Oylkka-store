@@ -1,7 +1,10 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { getRequestHeaders } from '@tanstack/react-start/server';
 import { auth } from '@/lib/auth';
+import { validateCsrf } from '@/lib/csrf';
 import { prisma } from '@/lib/db';
+import { couponLimiter } from '@/lib/rate-limit';
+import { checkRateLimit } from '@/lib/rate-limit-guard';
 
 export const Route = createFileRoute('/api/checkout/validate-coupon')({
   server: {
@@ -14,6 +17,12 @@ export const Route = createFileRoute('/api/checkout/validate-coupon')({
           if (!session?.user) {
             return Response.json({ error: 'Unauthorized' }, { status: 401 });
           }
+
+          const rateLimitResponse = await checkRateLimit(couponLimiter);
+          if (rateLimitResponse) return rateLimitResponse;
+
+          const csrfResponse = validateCsrf();
+          if (csrfResponse) return csrfResponse;
 
           const body: {
             code: string;

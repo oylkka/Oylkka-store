@@ -1,11 +1,11 @@
 import { useQuery } from '@tanstack/react-query';
-import axios from 'axios';
 import type {
   FulfillmentStatus,
   OrderStatus,
   PaymentMethod,
   PaymentStatus,
 } from '@/generated/prisma/enums';
+import apiClient from '@/lib/api-client';
 import { QUERY_KEYS } from '@/lib/constants';
 
 export type OrderListItem = {
@@ -82,7 +82,7 @@ export function useMyOrders(status?: string, search?: string) {
       if (status) params.set('status', status);
       if (search) params.set('search', search);
       const qs = params.toString();
-      const response = await axios.get<OrderListItem[]>(
+      const response = await apiClient.get<OrderListItem[]>(
         `/api/orders/list${qs ? `?${qs}` : ''}`,
       );
       return response.data;
@@ -94,7 +94,9 @@ export function useOrderDetail(orderId: string) {
   return useQuery<OrderDetail>({
     queryKey: [QUERY_KEYS.ORDERS, 'detail', orderId],
     queryFn: async () => {
-      const response = await axios.get<OrderDetail>(`/api/orders/${orderId}`);
+      const response = await apiClient.get<OrderDetail>(
+        `/api/orders/${orderId}`,
+      );
       return response.data;
     },
     enabled: !!orderId,

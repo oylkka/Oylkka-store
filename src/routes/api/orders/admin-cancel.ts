@@ -1,6 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { getRequestHeaders } from '@tanstack/react-start/server';
 import { auth } from '@/lib/auth';
+import { validateCsrf } from '@/lib/csrf';
 import { prisma } from '@/lib/db';
 
 export const Route = createFileRoute('/api/orders/admin-cancel')({
@@ -17,6 +18,9 @@ export const Route = createFileRoute('/api/orders/admin-cancel')({
           ) {
             return Response.json({ error: 'Forbidden' }, { status: 403 });
           }
+
+          const csrfResponse = validateCsrf();
+          if (csrfResponse) return csrfResponse;
 
           const body: { orderId: string; reason: string } =
             await request.json();
@@ -37,6 +41,7 @@ export const Route = createFileRoute('/api/orders/admin-cancel')({
 
           const order = await prisma.order.findUnique({
             where: { id: body.orderId },
+            include: { items: true },
           });
 
           if (!order) {
@@ -70,6 +75,23 @@ export const Route = createFileRoute('/api/orders/admin-cancel')({
                 },
               },
             });
+
+            // Restore stock only if it was previously decremented
+            if (order.status !== 'PENDING') {
+              for (const item of order.items) {
+                await tx.product.update({
+                  where: { id: item.productId },
+                  data: { stock: { increment: item.quantity } },
+                });
+
+                if (item.variantId) {
+                  await tx.productVariant.update({
+                    where: { id: item.variantId },
+                    data: { stock: { increment: item.quantity } },
+                  });
+                }
+              }
+            }
           });
 
           return Response.json({ success: true }, { status: 200 });

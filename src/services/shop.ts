@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import axios from 'axios';
 import { toast } from 'sonner';
+import apiClient from '@/lib/api-client';
 import { QUERY_KEYS } from '@/lib/constants';
 import type {
   EditShopFormType,
@@ -47,7 +47,7 @@ export function useMyShop() {
   return useQuery<ShopResponse | null>({
     queryKey: [QUERY_KEYS.SHOPS, 'my-shop'],
     queryFn: async () => {
-      const response = await axios.get<ShopResponse | null>(
+      const response = await apiClient.get<ShopResponse | null>(
         '/api/shop/my-shop',
       );
       return response.data;
@@ -66,7 +66,7 @@ export function usePendingShops() {
   return useQuery<AdminShopResponse[]>({
     queryKey: [QUERY_KEYS.SHOPS, 'pending'],
     queryFn: async () => {
-      const response = await axios.get<AdminShopResponse[]>(
+      const response = await apiClient.get<AdminShopResponse[]>(
         '/api/shop/pending-list',
       );
       return response.data;
@@ -81,7 +81,7 @@ export function useAdminShops(status?: string, search?: string) {
       const params = new URLSearchParams();
       if (status) params.set('status', status);
       if (search) params.set('search', search);
-      const response = await axios.get<AdminShopResponse[]>(
+      const response = await apiClient.get<AdminShopResponse[]>(
         `/api/shop/admin-list?${params.toString()}`,
       );
       return response.data;
@@ -93,7 +93,7 @@ export function useShopDetail(slug: string | undefined) {
   return useQuery<AdminShopResponse>({
     queryKey: ['shop', slug],
     queryFn: async () => {
-      const response = await axios.post<AdminShopResponse>(
+      const response = await apiClient.post<AdminShopResponse>(
         '/api/shop/get-single',
         { slug },
       );
@@ -108,7 +108,7 @@ export function useApproveShopMutation() {
 
   return useMutation({
     mutationFn: async (id: string) => {
-      const response = await axios.post('/api/shop/approve', { id });
+      const response = await apiClient.post('/api/shop/approve', { id });
       return response.data;
     },
     onMutate: () => {
@@ -119,7 +119,7 @@ export function useApproveShopMutation() {
       queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.SHOPS] });
     },
     onError: (error: unknown) => {
-      const message = axios.isAxiosError(error)
+      const message = apiClient.isAxiosError(error)
         ? (error.response?.data?.error ?? error.message)
         : 'Failed to approve shop';
       toast.error(`Error: ${message}`, { id: 'shop-approve' });
@@ -138,7 +138,7 @@ export function useRejectShopMutation() {
       id: string;
       rejectionReason: string;
     }) => {
-      const response = await axios.post('/api/shop/reject', {
+      const response = await apiClient.post('/api/shop/reject', {
         id,
         rejectionReason,
       });
@@ -152,7 +152,7 @@ export function useRejectShopMutation() {
       queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.SHOPS] });
     },
     onError: (error: unknown) => {
-      const message = axios.isAxiosError(error)
+      const message = apiClient.isAxiosError(error)
         ? (error.response?.data?.error ?? error.message)
         : 'Failed to reject shop';
       toast.error(`Error: ${message}`, { id: 'shop-reject' });
@@ -195,7 +195,7 @@ export function useUpdateShopMutation() {
         formData.append('banner', values.banner[0]);
       }
 
-      const response = await axios.patch<ShopApiResponse>(
+      const response = await apiClient.patch<ShopApiResponse>(
         '/api/shop/update',
         formData,
         {
@@ -217,7 +217,7 @@ export function useUpdateShopMutation() {
       queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.SHOPS] });
     },
     onError: (error: unknown) => {
-      const message = axios.isAxiosError(error)
+      const message = apiClient.isAxiosError(error)
         ? (error.response?.data?.error ?? error.message)
         : 'Failed to update shop';
       toast.error(`Error: ${message}`, { id: 'shop-update' });
@@ -252,7 +252,7 @@ export function useApplyShopMutation() {
         formData.append('banner', values.banner[0]);
       }
 
-      const response = await axios.post<ShopApiResponse>(
+      const response = await apiClient.post<ShopApiResponse>(
         '/api/shop/apply',
         formData,
         {
@@ -274,7 +274,7 @@ export function useApplyShopMutation() {
       queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.SHOPS] });
     },
     onError: (error: unknown) => {
-      const message = axios.isAxiosError(error)
+      const message = apiClient.isAxiosError(error)
         ? (error.response?.data?.error ?? error.message)
         : 'Failed to submit shop application';
       toast.error(`Error: ${message}`, { id: 'shop-apply' });
@@ -310,7 +310,7 @@ export function usePublicShops(params: { page?: number; search?: string }) {
   return useQuery<PublicShopListResponse>({
     queryKey: [QUERY_KEYS.SHOPS, 'public-list', params],
     queryFn: async () => {
-      const response = await axios.get<PublicShopListResponse>(
+      const response = await apiClient.get<PublicShopListResponse>(
         '/api/shop/public-list',
         { params },
       );
@@ -371,7 +371,7 @@ export function usePublicShop(slug: string) {
   return useQuery<PublicShopDetail>({
     queryKey: [QUERY_KEYS.SHOPS, 'public-single', slug],
     queryFn: async () => {
-      const response = await axios.get<PublicShopDetail>(
+      const response = await apiClient.get<PublicShopDetail>(
         '/api/shop/public-single',
         { params: { slug } },
       );
@@ -393,7 +393,7 @@ export function usePublicShopProducts(shopSlug: string, page: number = 1) {
   return useQuery<PublicShopProductsResponse>({
     queryKey: [QUERY_KEYS.SHOPS, 'public-products', shopSlug, page],
     queryFn: async () => {
-      const response = await axios.get<PublicShopProductsResponse>(
+      const response = await apiClient.get<PublicShopProductsResponse>(
         '/api/shop/public-products',
         { params: { shopSlug, page, limit: 20 } },
       );

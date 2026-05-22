@@ -1,59 +1,34 @@
 import { createFileRoute } from '@tanstack/react-router';
-import { sendOrderConfirmation } from '@/actions/send-order-email';
-import { executeBkashPayment } from '@/lib/bkash';
+import {
+  type BkashExecutePaymentResult,
+  executeBkashPayment,
+  queryBkashPayment,
+} from '@/lib/bkash';
 import { prisma } from '@/lib/db';
-import { checkoutLimiter } from '@/lib/rate-limit';
-import { checkRateLimit } from '@/lib/rate-limit-guard';
 
-export const Route = createFileRoute('/api/checkout/bkash-callback')({
+export const Route = createFileRoute('/api/checkout/bkash-ipn')({
   server: {
     handlers: {
-      GET: async ({ request }) => {
+      POST: async ({ request }) => {
         try {
-          const rateLimitResponse = await checkRateLimit(checkoutLimiter);
-          if (rateLimitResponse) return rateLimitResponse;
+          const body: { paymentID?: string; trxID?: string; status?: string } =
+            await request.json();
 
-          const url = new URL(request.url);
-          const paymentID = url.searchParams.get('paymentID');
-          const status = url.searchParams.get('status');
-          const orderIdParam = url.searchParams.get('orderId');
-
-          const baseUrl =
-            process.env.BETTER_AUTH_URL || 'http://localhost:3000';
-
-          if (status === 'cancel' || status === 'failure') {
-            if (orderIdParam) {
-              await prisma.order
-                .update({
-                  where: { id: orderIdParam },
-                  data: { paymentStatus: 'FAILED' },
-                })
-                .catch(() => {});
-            }
-            const redirectUrl = orderIdParam
-              ? `${baseUrl}/checkout/confirmation?orderId=${orderIdParam}&error=payment-cancelled`
-              : `${baseUrl}/checkout?error=payment-cancelled`;
-            return Response.redirect(redirectUrl);
-          }
+          const paymentID = body.paymentID;
 
           if (!paymentID) {
-            return Response.redirect(
-              `${baseUrl}/checkout?error=invalid-payment`,
+            return Response.json(
+              { error: 'paymentID is required' },
+              { status: 400 },
             );
           }
 
-          const result = await executeBkashPayment(paymentID);
+          // Query bKash for the actual payment status
+          const status = await queryBkashPayment(paymentID);
 
-          // Find order by paymentRef or by metadata, including items for stock decrement
-          let order = await prisma.order.findFirst({
-            where: {
-              paymentRef: result.merchantInvoiceNumber || paymentID,
-            },
-            include: { items: true },
-          });
-
-          if (!order) {
-            order = await prisma.order.findFirst({
+          if (status.transactionStatus === 'Completed') {
+            // Find the order by paymentID in metadata
+            const order = await prisma.order.findFirst({
               where: {
                 metadata: {
                   path: ['bkashPaymentID'],
@@ -62,23 +37,41 @@ export const Route = createFileRoute('/api/checkout/bkash-callback')({
               },
               include: { items: true },
             });
-          }
 
-          if (!order) {
-            return Response.redirect(
-              `${baseUrl}/checkout?error=order-not-found`,
-            );
-          }
+            if (!order) {
+              return Response.json(
+                { error: 'Order not found' },
+                { status: 404 },
+              );
+            }
 
-          // Prevent replay — only process if payment is still pending
-          if (order.paymentStatus !== 'PENDING') {
-            return Response.redirect(
-              `${baseUrl}/checkout/confirmation?orderId=${order.id}&error=payment-already-processed`,
-            );
-          }
+            // Only process if still pending (prevent double-processing)
+            if (order.paymentStatus !== 'PENDING') {
+              return Response.json(
+                { message: 'Payment already processed' },
+                { status: 200 },
+              );
+            }
 
-          if (result.transactionStatus === 'Completed') {
-            // Payment confirmed — finalize order with destructive side effects
+            // Execute payment confirmation
+            let executeResult: BkashExecutePaymentResult | null = null;
+            try {
+              executeResult = await executeBkashPayment(paymentID);
+            } catch {
+              return Response.json(
+                { error: 'Failed to execute payment' },
+                { status: 500 },
+              );
+            }
+
+            if (executeResult.transactionStatus !== 'Completed') {
+              return Response.json(
+                { error: 'Payment not completed' },
+                { status: 400 },
+              );
+            }
+
+            // Process the order in a transaction
             const metadata = order.metadata as Record<string, unknown> | null;
             const appliedVouchers =
               (metadata?.appliedVouchers as Array<{
@@ -88,7 +81,6 @@ export const Route = createFileRoute('/api/checkout/bkash-callback')({
             const cashbackAmount = (metadata?.cashbackAmount as number) || 0;
 
             await prisma.$transaction(async (tx) => {
-              // Update order to PAID/CONFIRMED
               await tx.order.update({
                 where: { id: order.id },
                 data: {
@@ -96,16 +88,16 @@ export const Route = createFileRoute('/api/checkout/bkash-callback')({
                   status: 'CONFIRMED',
                   paidAt: new Date(),
                   confirmedAt: new Date(),
-                  paymentRef: result.trxID,
+                  paymentRef: executeResult.trxID,
                   metadata: {
                     ...(metadata || {}),
-                    bkashTrxID: result.trxID,
-                    bkashPaymentStatus: result.transactionStatus,
+                    bkashTrxID: executeResult.trxID,
+                    bkashPaymentStatus: executeResult.transactionStatus,
                   },
                 },
               });
 
-              // Decrement stock with re-validation inside transaction (race condition safety)
+              // Decrement stock with re-validation
               for (const item of order.items) {
                 const current = await tx.product.findUnique({
                   where: { id: item.productId },
@@ -200,27 +192,25 @@ export const Route = createFileRoute('/api/checkout/bkash-callback')({
               }
             });
 
-            // Fire-and-forget: send order confirmation email
-            sendOrderConfirmation(order.id);
-
-            return Response.redirect(
-              `${baseUrl}/checkout/confirmation?orderId=${order.id}`,
+            return Response.json(
+              { message: 'Payment processed successfully' },
+              { status: 200 },
             );
           }
 
-          // Payment failed — mark order as FAILED
-          await prisma.order.update({
-            where: { id: order.id },
-            data: { paymentStatus: 'FAILED' },
-          });
-
-          return Response.redirect(
-            `${baseUrl}/checkout/confirmation?orderId=${order.id}&error=payment-failed`,
+          // Payment not completed — no action needed
+          return Response.json(
+            {
+              message: 'Payment not completed',
+              status: status.transactionStatus,
+            },
+            { status: 200 },
           );
-        } catch (_error) {
-          const baseUrl =
-            process.env.BETTER_AUTH_URL || 'http://localhost:3000';
-          return Response.redirect(`${baseUrl}/checkout?error=payment-failed`);
+        } catch {
+          return Response.json(
+            { error: 'Internal Server Error' },
+            { status: 500 },
+          );
         }
       },
     },

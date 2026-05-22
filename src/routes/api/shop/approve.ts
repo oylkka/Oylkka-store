@@ -1,6 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { getRequestHeaders } from '@tanstack/react-start/server';
 import { auth } from '@/lib/auth';
+import { validateCsrf } from '@/lib/csrf';
 import { prisma } from '@/lib/db';
 
 export const Route = createFileRoute('/api/shop/approve')({
@@ -14,6 +15,9 @@ export const Route = createFileRoute('/api/shop/approve')({
           if (!session?.user || session.user.role !== 'ADMIN') {
             return Response.json({ error: 'Unauthorized' }, { status: 401 });
           }
+
+          const csrfResponse = validateCsrf();
+          if (csrfResponse) return csrfResponse;
 
           const { id } = (await request.json()) as { id: string };
 
@@ -46,25 +50,29 @@ export const Route = createFileRoute('/api/shop/approve')({
             );
           }
 
-          const updated = await prisma.shop.update({
-            where: { id },
-            data: {
-              status: 'ACTIVE',
-              approvedAt: new Date(),
-              approvedBy: session.user.id,
-            },
-          });
-
-          const owner = await prisma.user.findUnique({
-            where: { id: shop.ownerId },
-          });
-
-          if (owner && owner.role !== 'ADMIN' && owner.role !== 'MANAGER') {
-            await prisma.user.update({
-              where: { id: shop.ownerId },
-              data: { role: 'VENDOR' },
+          const [updated] = await prisma.$transaction(async (tx) => {
+            const updatedShop = await tx.shop.update({
+              where: { id },
+              data: {
+                status: 'ACTIVE',
+                approvedAt: new Date(),
+                approvedBy: session.user.id,
+              },
             });
-          }
+
+            const owner = await tx.user.findUnique({
+              where: { id: shop.ownerId },
+            });
+
+            if (owner && owner.role !== 'ADMIN' && owner.role !== 'MANAGER') {
+              await tx.user.update({
+                where: { id: shop.ownerId },
+                data: { role: 'VENDOR' },
+              });
+            }
+
+            return [updatedShop];
+          });
 
           return Response.json(
             { message: 'Shop approved successfully', shop: updated },

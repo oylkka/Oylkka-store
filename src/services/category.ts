@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import axios from 'axios';
 import { toast } from 'sonner';
+import apiClient from '@/lib/api-client';
 import { QUERY_KEYS } from '@/lib/constants';
 import type {
   CategoryFormType,
@@ -43,7 +43,9 @@ export function useCategories() {
   return useQuery<AdminCategory[]>({
     queryKey: [QUERY_KEYS.CATEGORIES],
     queryFn: async () => {
-      const response = await axios.get<AdminCategory[]>('/api/categories/list');
+      const response = await apiClient.get<AdminCategory[]>(
+        '/api/categories/list',
+      );
       return response.data;
     },
   });
@@ -53,7 +55,7 @@ export function usePublicCategories() {
   return useQuery<PublicCategory[]>({
     queryKey: [QUERY_KEYS.CATEGORIES, 'public'],
     queryFn: async () => {
-      const response = await axios.get<PublicCategory[]>(
+      const response = await apiClient.get<PublicCategory[]>(
         '/api/categories/public-list',
       );
       return response.data;
@@ -66,7 +68,7 @@ export function useCategory(id: string | undefined) {
   return useQuery<AdminCategory>({
     queryKey: ['category', id],
     queryFn: async () => {
-      const response = await axios.post<AdminCategory>(
+      const response = await apiClient.post<AdminCategory>(
         '/api/categories/get-single',
         { id },
       );
@@ -93,7 +95,7 @@ export function useCreateCategoryMutation() {
         formData.append('image', values.image[0]);
       }
 
-      const response = await axios.post<CategoryResponse>(
+      const response = await apiClient.post<CategoryResponse>(
         '/api/categories/add',
         formData,
         {
@@ -113,7 +115,7 @@ export function useCreateCategoryMutation() {
       queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.CATEGORIES] });
     },
     onError: (error: unknown) => {
-      const message = axios.isAxiosError(error)
+      const message = apiClient.isAxiosError(error)
         ? (error.response?.data?.error ?? error.message)
         : 'Failed to create category';
       toast.error(`Error: ${message}`, { id: 'category-create' });
@@ -144,7 +146,7 @@ export function useEditCategoryMutation() {
         String(values.keepExistingImage ?? false),
       );
 
-      const response = await axios.post<CategoryResponse>(
+      const response = await apiClient.post<CategoryResponse>(
         '/api/categories/edit',
         formData,
         {
@@ -164,7 +166,7 @@ export function useEditCategoryMutation() {
       queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.CATEGORIES] });
     },
     onError: (error: unknown) => {
-      const message = axios.isAxiosError(error)
+      const message = apiClient.isAxiosError(error)
         ? (error.response?.data?.error ?? error.message)
         : 'Failed to update category';
       toast.error(`Error: ${message}`, { id: 'category-edit' });
@@ -177,7 +179,7 @@ export function useDeleteCategoryMutation() {
 
   return useMutation({
     mutationFn: async (id: string) => {
-      const response = await axios.post('/api/categories/delete', { id });
+      const response = await apiClient.post('/api/categories/delete', { id });
       return response.data;
     },
     onMutate: () => {
@@ -190,7 +192,7 @@ export function useDeleteCategoryMutation() {
       queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.CATEGORIES] });
     },
     onError: (error: unknown) => {
-      const message = axios.isAxiosError(error)
+      const message = apiClient.isAxiosError(error)
         ? (error.response?.data?.error ?? error.message)
         : 'Failed to delete category';
       toast.error(`Error: ${message}`, { id: 'category-delete' });

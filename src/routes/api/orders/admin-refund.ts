@@ -2,6 +2,7 @@ import { createFileRoute } from '@tanstack/react-router';
 import { getRequestHeaders } from '@tanstack/react-start/server';
 import { auth } from '@/lib/auth';
 import { refundBkashPayment } from '@/lib/bkash';
+import { validateCsrf } from '@/lib/csrf';
 import { prisma } from '@/lib/db';
 
 export const Route = createFileRoute('/api/orders/admin-refund')({
@@ -15,6 +16,9 @@ export const Route = createFileRoute('/api/orders/admin-refund')({
           if (!session?.user || session.user.role !== 'ADMIN') {
             return Response.json({ error: 'Forbidden' }, { status: 403 });
           }
+
+          const csrfResponse = validateCsrf();
+          if (csrfResponse) return csrfResponse;
 
           const body: {
             orderId: string;
@@ -116,6 +120,26 @@ export const Route = createFileRoute('/api/orders/admin-refund')({
                 },
               },
             });
+
+            // Restore stock for refunded items
+            const itemsToRestore =
+              body.itemIds && body.itemIds.length > 0
+                ? order.items.filter((i) => body.itemIds?.includes(i.id))
+                : order.items;
+
+            for (const item of itemsToRestore) {
+              await tx.product.update({
+                where: { id: item.productId },
+                data: { stock: { increment: item.quantity } },
+              });
+
+              if (item.variantId) {
+                await tx.productVariant.update({
+                  where: { id: item.variantId },
+                  data: { stock: { increment: item.quantity } },
+                });
+              }
+            }
 
             // Mark specific items as refunded
             if (body.itemIds && body.itemIds.length > 0) {

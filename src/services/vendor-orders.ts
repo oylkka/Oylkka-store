@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import axios from 'axios';
 import type { FulfillmentStatus } from '@/generated/prisma/enums';
+import apiClient from '@/lib/api-client';
 import { QUERY_KEYS } from '@/lib/constants';
 
 export type VendorOrderItem = {
@@ -73,7 +73,7 @@ export function useVendorOrders(status?: string, search?: string) {
       if (status) params.set('status', status);
       if (search) params.set('search', search);
       const qs = params.toString();
-      const response = await axios.get<VendorOrderItem[]>(
+      const response = await apiClient.get<VendorOrderItem[]>(
         `/api/vendor/orders/list${qs ? `?${qs}` : ''}`,
       );
       return response.data;
@@ -85,7 +85,7 @@ export function useVendorOrderDetail(orderId: string) {
   return useQuery<VendorOrderDetail>({
     queryKey: [QUERY_KEYS.VENDOR_ORDERS, 'detail', orderId],
     queryFn: async () => {
-      const response = await axios.get<VendorOrderDetail>(
+      const response = await apiClient.get<VendorOrderDetail>(
         `/api/vendor/orders/${orderId}`,
       );
       return response.data;
@@ -99,7 +99,7 @@ export function useFulfillItemMutation(orderId: string) {
 
   return useMutation<FulfillResponse, Error, FulfillPayload>({
     mutationFn: async (payload) => {
-      const response = await axios.put<FulfillResponse>(
+      const response = await apiClient.put<FulfillResponse>(
         `/api/vendor/orders/${orderId}`,
         payload,
       );

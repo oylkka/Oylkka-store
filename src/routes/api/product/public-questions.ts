@@ -1,7 +1,10 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { getRequestHeaders } from '@tanstack/react-start/server';
 import { auth } from '@/lib/auth';
+import { validateCsrf } from '@/lib/csrf';
 import { prisma } from '@/lib/db';
+import { reviewLimiter } from '@/lib/rate-limit';
+import { checkRateLimit } from '@/lib/rate-limit-guard';
 
 export const Route = createFileRoute('/api/product/public-questions')({
   server: {
@@ -68,6 +71,12 @@ export const Route = createFileRoute('/api/product/public-questions')({
 
       POST: async ({ request }) => {
         try {
+          const rateLimitResponse = await checkRateLimit(reviewLimiter);
+          if (rateLimitResponse) return rateLimitResponse;
+
+          const csrfResponse = validateCsrf();
+          if (csrfResponse) return csrfResponse;
+
           const headers = getRequestHeaders();
           const session = await auth.api.getSession({ headers });
 
