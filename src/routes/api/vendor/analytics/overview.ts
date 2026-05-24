@@ -31,7 +31,6 @@ export const Route = createFileRoute('/api/vendor/analytics/overview')({
             return Response.json({ error: 'No shop found' }, { status: 404 });
           }
 
-          const now = new Date();
           const twelveMonthsAgo = monthsAgo(12);
 
           const [

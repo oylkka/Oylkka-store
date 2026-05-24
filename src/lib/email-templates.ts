@@ -291,3 +291,235 @@ export function orderShippedHtml(
     </p>
   `);
 }
+
+export function vendorApprovalHtml(name: string, shopName: string): string {
+  const baseUrl = process.env.BETTER_AUTH_URL || 'http://localhost:3000';
+  const dashboardLink = `${baseUrl}/vendor/dashboard`;
+
+  return baseWrapper(`
+    ${eyebrow('Shop Approved')}
+
+    <h1 style="font-size: 24px; font-weight: 700; letter-spacing: -0.02em; margin: 0 0 8px; color: ${BRAND.foreground};">
+      Your shop is live<span style="color: ${BRAND.primary};">.</span>
+    </h1>
+
+    <p style="font-size: 14px; line-height: 1.6; color: ${BRAND.mutedForeground}; margin: 0 0 24px;">
+      Hi ${name}, congratulations! Your shop <strong style="color: ${BRAND.foreground};">${shopName}</strong> has been approved and is now visible to customers.
+    </p>
+
+    <p style="font-size: 14px; line-height: 1.6; color: ${BRAND.mutedForeground}; margin: 0 0 24px;">
+      Start adding products and managing your orders from the vendor dashboard.
+    </p>
+
+    ${ctaButton('Go to Dashboard', dashboardLink)}
+  `);
+}
+
+export function vendorRejectionHtml(
+  name: string,
+  shopName: string,
+  reason: string,
+): string {
+  const baseUrl = process.env.BETTER_AUTH_URL || 'http://localhost:3000';
+  const contactLink = `${baseUrl}/contact`;
+
+  return baseWrapper(`
+    ${eyebrow('Shop Update')}
+
+    <h1 style="font-size: 24px; font-weight: 700; letter-spacing: -0.02em; margin: 0 0 8px; color: ${BRAND.foreground};">
+      Shop application update<span style="color: ${BRAND.destructive};">.</span>
+    </h1>
+
+    <p style="font-size: 14px; line-height: 1.6; color: ${BRAND.mutedForeground}; margin: 0 0 24px;">
+      Hi ${name}, unfortunately your shop <strong style="color: ${BRAND.foreground};">${shopName}</strong> could not be approved at this time.
+    </p>
+
+    <p style="font-size: 14px; line-height: 1.6; color: ${BRAND.mutedForeground}; margin: 0 0 24px;">
+      <strong>Reason:</strong> ${reason}
+    </p>
+
+    <p style="font-size: 14px; line-height: 1.6; color: ${BRAND.mutedForeground}; margin: 0 0 24px;">
+      You may re-apply after addressing the above concerns. If you have questions, feel free to reach out.
+    </p>
+
+    ${ctaButton('Contact Support', contactLink)}
+  `);
+}
+
+export function orderCancellationHtml(
+  order: { orderNumber: string; customerName: string },
+  reason: string,
+  items: { productName: string; quantity: number }[],
+): string {
+  const baseUrl = process.env.BETTER_AUTH_URL || 'http://localhost:3000';
+  const orderLink = `${baseUrl}/orders/${order.orderNumber}`;
+
+  const itemsHtml = items
+    .map(
+      (item) =>
+        `<li style="font-size: 13px; color: ${BRAND.foreground}; padding: 4px 0;">${item.productName} × ${item.quantity}</li>`,
+    )
+    .join('');
+
+  return baseWrapper(`
+    ${eyebrow('Order Cancelled')}
+
+    <h1 style="font-size: 24px; font-weight: 700; letter-spacing: -0.02em; margin: 0 0 8px; color: ${BRAND.foreground};">
+      Order cancelled<span style="color: ${BRAND.destructive};">.</span>
+    </h1>
+
+    <p style="font-size: 14px; line-height: 1.6; color: ${BRAND.mutedForeground}; margin: 0 0 24px;">
+      Hi ${order.customerName}, your order <strong style="color: ${BRAND.foreground};">#${order.orderNumber}</strong> has been cancelled.
+    </p>
+
+    <p style="font-size: 14px; line-height: 1.6; color: ${BRAND.mutedForeground}; margin: 0 0 12px;">
+      <strong>Reason:</strong> ${reason}
+    </p>
+
+    <p style="font-size: 14px; line-height: 1.6; color: ${BRAND.mutedForeground}; margin: 0 0 12px;">
+      Cancelled items:
+    </p>
+
+    <ul style="margin: 0 0 24px; padding-left: 20px;">
+      ${itemsHtml}
+    </ul>
+
+    <p style="font-size: 12px; color: ${BRAND.mutedForeground}; margin-top: 24px; line-height: 1.5;">
+      If you made a payment, a refund will be processed according to our refund policy. You can <a href="${orderLink}" style="color: ${BRAND.primary}; text-decoration: underline;">view your order</a> for more details.
+    </p>
+
+    ${ctaButton('View Order', orderLink)}
+  `);
+}
+
+export function orderRefundHtml(
+  order: { orderNumber: string; customerName: string },
+  amount: number,
+  reason: string,
+  paymentMethod: string,
+): string {
+  const baseUrl = process.env.BETTER_AUTH_URL || 'http://localhost:3000';
+  const orderLink = `${baseUrl}/orders/${order.orderNumber}`;
+
+  const paymentLabel: Record<string, string> = {
+    BKASH: 'bKash',
+    WALLET: 'Oylkka Wallet',
+    CASH_ON_DELIVERY: 'Cash on Delivery',
+  };
+
+  return baseWrapper(`
+    ${eyebrow('Refund Processed')}
+
+    <h1 style="font-size: 24px; font-weight: 700; letter-spacing: -0.02em; margin: 0 0 8px; color: ${BRAND.foreground};">
+      Refund completed<span style="color: ${BRAND.primary};">.</span>
+    </h1>
+
+    <p style="font-size: 14px; line-height: 1.6; color: ${BRAND.mutedForeground}; margin: 0 0 24px;">
+      Hi ${order.customerName}, a refund of <strong style="color: ${BRAND.foreground}; font-size: 18px;">৳${amount.toLocaleString('en-BD')}</strong> has been processed for order <strong style="color: ${BRAND.foreground};">#${order.orderNumber}</strong>.
+    </p>
+
+    <p style="font-size: 14px; line-height: 1.6; color: ${BRAND.mutedForeground}; margin: 0 0 12px;">
+      <strong>Reason:</strong> ${reason}
+    </p>
+
+    <p style="font-size: 14px; line-height: 1.6; color: ${BRAND.mutedForeground}; margin: 0 0 24px;">
+      <strong>Refunded to:</strong> ${paymentLabel[paymentMethod] || paymentMethod}
+    </p>
+
+    <p style="font-size: 12px; color: ${BRAND.mutedForeground}; margin-top: 24px; line-height: 1.5;">
+      Depending on your payment method, it may take 1-3 business days for the refund to appear. You can <a href="${orderLink}" style="color: ${BRAND.primary}; text-decoration: underline;">view your order</a> for details.
+    </p>
+
+    ${ctaButton('View Order', orderLink)}
+  `);
+}
+
+export function passwordResetConfirmationHtml(name: string): string {
+  const baseUrl = process.env.BETTER_AUTH_URL || 'http://localhost:3000';
+  const signInLink = `${baseUrl}/auth/signin`;
+
+  return baseWrapper(`
+    ${eyebrow('Password Changed')}
+
+    <h1 style="font-size: 24px; font-weight: 700; letter-spacing: -0.02em; margin: 0 0 8px; color: ${BRAND.foreground};">
+      Password updated<span style="color: ${BRAND.primary};">.</span>
+    </h1>
+
+    <p style="font-size: 14px; line-height: 1.6; color: ${BRAND.mutedForeground}; margin: 0 0 24px;">
+      Hi ${name}, your password has been successfully changed.
+    </p>
+
+    <p style="font-size: 14px; line-height: 1.6; color: ${BRAND.mutedForeground}; margin: 0 0 24px;">
+      If you did not make this change, please contact support immediately to secure your account.
+    </p>
+
+    ${ctaButton('Sign In', signInLink)}
+  `);
+}
+
+export function welcomeHtml(name: string): string {
+  const baseUrl = process.env.BETTER_AUTH_URL || 'http://localhost:3000';
+  const shopLink = `${baseUrl}/products`;
+  const vendorLink = `${baseUrl}/shop/apply`;
+
+  return baseWrapper(`
+    ${eyebrow('Welcome Aboard')}
+
+    <h1 style="font-size: 24px; font-weight: 700; letter-spacing: -0.02em; margin: 0 0 8px; color: ${BRAND.foreground};">
+      Welcome to Oylkka<span style="color: ${BRAND.primary};">.</span>
+    </h1>
+
+    <p style="font-size: 14px; line-height: 1.6; color: ${BRAND.mutedForeground}; margin: 0 0 24px;">
+      Hi ${name}, your email has been verified. You're all set to start shopping on Oylkka!
+    </p>
+
+    <p style="font-size: 14px; line-height: 1.6; color: ${BRAND.mutedForeground}; margin: 0 0 24px;">
+      Browse thousands of products from verified vendors across Bangladesh. Fast delivery, secure payments, and easy returns.
+    </p>
+
+    <table cellpadding="0" cellspacing="0" style="width: 100%; margin-bottom: 24px;">
+      <tr>
+        <td style="padding: 16px; background: ${BRAND.background}; border-radius: 8px; text-align: center;">
+          <span style="font-size: 13px; font-weight: 600; color: ${BRAND.foreground};">🛍️ Start Shopping</span>
+          <p style="font-size: 12px; color: ${BRAND.mutedForeground}; margin: 4px 0 0;">Explore our curated collection</p>
+        </td>
+      </tr>
+    </table>
+
+    <p style="font-size: 14px; line-height: 1.6; color: ${BRAND.mutedForeground}; margin: 0 0 24px;">
+      Want to sell on Oylkka? <a href="${vendorLink}" style="color: ${BRAND.primary}; text-decoration: underline;">Apply to become a vendor</a> and reach customers nationwide.
+    </p>
+
+    ${ctaButton('Browse Products', shopLink)}
+  `);
+}
+
+export function payoutProcessedHtml(
+  shopName: string,
+  amount: number,
+  itemCount: number,
+  note: string | null,
+): string {
+  const baseUrl = process.env.BETTER_AUTH_URL || 'http://localhost:3000';
+  const payoutsLink = `${baseUrl}/vendor/payouts`;
+
+  return baseWrapper(`
+    ${eyebrow('Payout Processed')}
+
+    <h1 style="font-size: 24px; font-weight: 700; letter-spacing: -0.02em; margin: 0 0 8px; color: ${BRAND.foreground};">
+      Payout completed<span style="color: ${BRAND.primary};">.</span>
+    </h1>
+
+    <p style="font-size: 14px; line-height: 1.6; color: ${BRAND.mutedForeground}; margin: 0 0 24px;">
+      Hi ${shopName}, a payout of <strong style="color: ${BRAND.foreground}; font-size: 18px;">৳${amount.toLocaleString('en-BD')}</strong> has been processed for <strong>${itemCount}</strong> item${itemCount !== 1 ? 's' : ''}.
+    </p>
+
+    ${note ? `<p style="font-size: 14px; line-height: 1.6; color: ${BRAND.mutedForeground}; margin: 0 0 24px;"><strong>Note:</strong> ${note}</p>` : ''}
+
+    <p style="font-size: 12px; color: ${BRAND.mutedForeground}; margin-top: 24px; line-height: 1.5;">
+      The funds will be transferred to your registered bank account. You can <a href="${payoutsLink}" style="color: ${BRAND.primary}; text-decoration: underline;">view your payout history</a> for details.
+    </p>
+
+    ${ctaButton('View Payouts', payoutsLink)}
+  `);
+}

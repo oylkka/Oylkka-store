@@ -52,7 +52,6 @@ export const Route = createFileRoute('/api/vendor/payouts/schedule')({
             }
           > = {};
 
-          const now = new Date();
           for (const item of pendingItems) {
             const d = new Date(item.createdAt);
             const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;

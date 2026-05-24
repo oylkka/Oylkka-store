@@ -6,6 +6,7 @@ import {
 } from '@/lib/bkash';
 import { prisma } from '@/lib/db';
 import { generateInvoicePdf } from '@/lib/invoice-pdf';
+import { decrementStock, decrementVariantStock } from '@/lib/stock';
 
 export const Route = createFileRoute('/api/checkout/bkash-ipn')({
   server: {
@@ -98,40 +99,22 @@ export const Route = createFileRoute('/api/checkout/bkash-ipn')({
                 },
               });
 
-              // Decrement stock with re-validation
+              // Atomic stock decrement (race-condition-safe)
               for (const item of order.items) {
-                const current = await tx.product.findUnique({
-                  where: { id: item.productId },
-                  select: { stock: true },
-                });
-
-                if (!current || current.stock < item.quantity) {
-                  throw new Error(
-                    `Product "${item.productName}" is out of stock`,
-                  );
-                }
-
-                await tx.product.update({
-                  where: { id: item.productId },
-                  data: { stock: { decrement: item.quantity } },
-                });
+                await decrementStock(
+                  tx,
+                  item.productId,
+                  item.quantity,
+                  item.productName,
+                );
 
                 if (item.variantId) {
-                  const variantCurrent = await tx.productVariant.findUnique({
-                    where: { id: item.variantId },
-                    select: { stock: true },
-                  });
-
-                  if (!variantCurrent || variantCurrent.stock < item.quantity) {
-                    throw new Error(
-                      `Variant "${item.variantName}" is out of stock`,
-                    );
-                  }
-
-                  await tx.productVariant.update({
-                    where: { id: item.variantId },
-                    data: { stock: { decrement: item.quantity } },
-                  });
+                  await decrementVariantStock(
+                    tx,
+                    item.variantId,
+                    item.quantity,
+                    item.variantName || 'variant',
+                  );
                 }
               }
 

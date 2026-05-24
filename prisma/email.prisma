@@ -1,0 +1,15 @@
+model EmailQueue {
+  id         String      @id @default(cuid())
+  to         String
+  subject    String
+  html       String
+  status     EmailStatus @default(PENDING)
+  retryCount Int         @default(0)
+  maxRetries Int         @default(3)
+  error      String?
+  createdAt  DateTime    @default(now())
+  sentAt     DateTime?
+
+  @@index([status, createdAt])
+  @@map("email_queue")
+}

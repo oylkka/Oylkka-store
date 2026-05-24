@@ -114,18 +114,16 @@ function DashboardHome() {
         className='grid grid-cols-1 sm:grid-cols-3 gap-4'
       >
         {ordersLoading || wishlistLoading ? (
-          <>
-            {[1, 2, 3].map((i) => (
-              <Card key={i}>
-                <CardHeader className='pb-2'>
-                  <Skeleton className='h-4 w-20' />
-                </CardHeader>
-                <CardContent>
-                  <Skeleton className='h-8 w-12' />
-                </CardContent>
-              </Card>
-            ))}
-          </>
+          [1, 2, 3].map((i) => (
+            <Card key={i}>
+              <CardHeader className='pb-2'>
+                <Skeleton className='h-4 w-20' />
+              </CardHeader>
+              <CardContent>
+                <Skeleton className='h-8 w-12' />
+              </CardContent>
+            </Card>
+          ))
         ) : (
           <>
             <Card>

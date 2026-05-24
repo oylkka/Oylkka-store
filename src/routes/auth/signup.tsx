@@ -8,6 +8,7 @@ import {
 import { Eye, EyeOff } from 'lucide-react';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 import { z } from 'zod';
 import Footer from '#/components/layout/footer';
@@ -49,6 +50,7 @@ const signupSchema = z
 type SignupFormValues = z.infer<typeof signupSchema>;
 
 function RouteComponent() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -162,18 +164,20 @@ function RouteComponent() {
               <form className='p-6 md:p-8' onSubmit={handleSubmit(onSubmit)}>
                 <FieldGroup>
                   <div className='flex flex-col items-center gap-2 text-center'>
-                    <h1 className='text-2xl font-bold'>Create an account</h1>
+                    <h1 className='text-2xl font-bold'>
+                      {t('auth.create_account')}
+                    </h1>
                     <p className='text-muted-foreground text-balance'>
-                      Sign up for an Oylkka account
+                      {t('auth.signup_subtitle')}
                     </p>
                   </div>
 
                   <Field data-invalid={!!errors.name}>
-                    <FieldLabel htmlFor='name'>Name</FieldLabel>
+                    <FieldLabel htmlFor='name'>{t('auth.name')}</FieldLabel>
                     <Input
                       id='name'
                       type='text'
-                      placeholder='John Doe'
+                      placeholder={t('auth.name_placeholder')}
                       autoComplete='name'
                       disabled={isLoading}
                       aria-invalid={!!errors.name}
@@ -185,11 +189,11 @@ function RouteComponent() {
                   </Field>
 
                   <Field data-invalid={!!errors.email}>
-                    <FieldLabel htmlFor='email'>Email</FieldLabel>
+                    <FieldLabel htmlFor='email'>{t('auth.email')}</FieldLabel>
                     <Input
                       id='email'
                       type='email'
-                      placeholder='you@example.com'
+                      placeholder={t('auth.email_placeholder')}
                       autoComplete='email'
                       disabled={isLoading}
                       aria-invalid={!!errors.email}
@@ -201,7 +205,9 @@ function RouteComponent() {
                   </Field>
 
                   <Field data-invalid={!!errors.password}>
-                    <FieldLabel htmlFor='password'>Password</FieldLabel>
+                    <FieldLabel htmlFor='password'>
+                      {t('auth.password')}
+                    </FieldLabel>
                     <div className='relative'>
                       <Input
                         id='password'
@@ -227,7 +233,9 @@ function RouteComponent() {
                           <Eye className='h-4 w-4' />
                         )}
                         <span className='sr-only'>
-                          {showPassword ? 'Hide' : 'Show'} password
+                          {showPassword
+                            ? t('common.hide_password')
+                            : t('common.show_password')}
                         </span>
                       </Button>
                     </div>
@@ -238,7 +246,7 @@ function RouteComponent() {
 
                   <Field data-invalid={!!errors.confirmPassword}>
                     <FieldLabel htmlFor='confirmPassword'>
-                      Confirm Password
+                      {t('auth.confirm_password')}
                     </FieldLabel>
                     <div className='relative'>
                       <Input
@@ -267,8 +275,10 @@ function RouteComponent() {
                           <Eye className='h-4 w-4' />
                         )}
                         <span className='sr-only'>
-                          {showConfirmPassword ? 'Hide' : 'Show'} confirm
-                          password
+                          {showConfirmPassword
+                            ? t('common.hide_password')
+                            : t('common.show_password')}{' '}
+                          confirm password
                         </span>
                       </Button>
                     </div>
@@ -283,12 +293,14 @@ function RouteComponent() {
                       disabled={isLoading}
                       className='w-full'
                     >
-                      {isLoading ? 'Creating account...' : 'Create account'}
+                      {isLoading
+                        ? t('auth.creating_account')
+                        : t('auth.create_account')}
                     </Button>
                   </Field>
 
                   <FieldSeparator className='*:data-[slot=field-separator-content]:bg-card'>
-                    Or continue with
+                    {t('auth.or_continue_with')}
                   </FieldSeparator>
 
                   <Field className='grid grid-cols-1 gap-4'>
@@ -303,23 +315,23 @@ function RouteComponent() {
                         xmlns='http://www.w3.org/2000/svg'
                         viewBox='0 0 24 24'
                       >
-                        <title>Google</title>
+                        <title>{t('auth.google')}</title>
                         <path
                           d='M12.48 10.92v3.28h7.84c-.24 1.84-.853 3.187-1.787 4.133-1.147 1.147-2.933 2.4-6.053 2.4-4.827 0-8.6-3.893-8.6-8.72s3.773-8.72 8.6-8.72c2.6 0 4.507 1.027 5.907 2.347l2.307-2.307C18.747 1.44 16.133 0 12.48 0 5.867 0 .307 5.387.307 12s5.56 12 12.173 12c3.573 0 6.267-1.173 8.373-3.36 2.16-2.16 2.84-5.213 2.84-7.667 0-.76-.053-1.467-.173-2.053H12.48z'
                           fill='currentColor'
                         />
                       </svg>
-                      Google
+                      {t('auth.google')}
                     </Button>
                   </Field>
 
                   <FieldDescription className='text-center'>
-                    Already have an account?{' '}
+                    {t('auth.already_have_account')}{' '}
                     <Link
                       to='/auth/signin'
                       className='font-medium underline underline-offset-4 hover:text-primary'
                     >
-                      Sign in
+                      {t('auth.login')}
                     </Link>
                   </FieldDescription>
                 </FieldGroup>
@@ -328,7 +340,7 @@ function RouteComponent() {
               <div className='bg-muted relative hidden md:block'>
                 <img
                   src='/placeholder.svg'
-                  alt='Signup illustration'
+                  alt={t('auth.signup_illustration')}
                   className='absolute inset-0 h-full w-full object-cover dark:brightness-[0.2] dark:grayscale'
                 />
               </div>
@@ -336,21 +348,10 @@ function RouteComponent() {
           </Card>
 
           <FieldDescription className='px-6 text-center text-xs'>
-            By clicking continue, you agree to our{' '}
-            <Link
-              to='/terms'
-              className='underline underline-offset-4 hover:text-primary'
-            >
-              Terms of Service
-            </Link>{' '}
-            and{' '}
-            <Link
-              to='/privacy'
-              className='underline underline-offset-4 hover:text-primary'
-            >
-              Privacy Policy
-            </Link>
-            .
+            {t('auth.legal_notice', {
+              terms: 'Terms of Service',
+              privacy: 'Privacy Policy',
+            })}
           </FieldDescription>
         </div>
       </div>

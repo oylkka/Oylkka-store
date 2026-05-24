@@ -21,6 +21,11 @@ import { Input } from '@/components/ui/input';
 import { resetPassword } from '@/lib/auth-client';
 
 export const Route = createFileRoute('/reset-password/$token')({
+  validateSearch: (
+    search: Record<string, string | undefined>,
+  ): { email?: string } => ({
+    email: search.email,
+  }),
   beforeLoad: ({ context }) => {
     if (context.user) {
       throw redirect({ to: '/dashboard' });
@@ -32,6 +37,7 @@ export const Route = createFileRoute('/reset-password/$token')({
 function RouteComponent() {
   const navigate = useNavigate();
   const { token } = Route.useParams();
+  const { email } = Route.useSearch();
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -77,6 +83,15 @@ function RouteComponent() {
       toast.success('Password reset successfully!', {
         description: 'You can now sign in with your new password.',
       });
+
+      if (email) {
+        fetch('/api/auth/send-password-reset-confirmation', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email }),
+        }).catch(() => {});
+      }
+
       navigate({ to: '/auth/signin' });
     } catch {
       toast.error('Unexpected error');

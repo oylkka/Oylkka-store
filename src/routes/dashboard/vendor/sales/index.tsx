@@ -112,6 +112,7 @@ function RouteComponent() {
       >
         {isLoading
           ? Array.from({ length: 5 }).map((_, i) => (
+              // biome-ignore lint/suspicious/noArrayIndexKey: static skeleton loader
               <Card key={i}>
                 <CardHeader className='pb-2'>
                   <Skeleton className='h-4 w-20' />
@@ -190,7 +191,7 @@ function RouteComponent() {
                           'Nov',
                           'Dec',
                         ];
-                        return `${months[parseInt(m) - 1]} ${y.slice(2)}`;
+                        return `${months[parseInt(m, 10) - 1]} ${y.slice(2)}`;
                       }}
                       tick={{ fontSize: 11 }}
                       interval='preserveStartEnd'
@@ -222,7 +223,7 @@ function RouteComponent() {
                           'November',
                           'December',
                         ];
-                        return `${months[parseInt(m) - 1]} ${y}`;
+                        return `${months[parseInt(m, 10) - 1]} ${y}`;
                       }}
                     />
                     <Bar

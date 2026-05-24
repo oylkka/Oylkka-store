@@ -3,6 +3,8 @@ import { createAuditLog } from '@/lib/audit-log';
 import { requireAdminOrManager, requireAuth } from '@/lib/auth-middleware';
 import { validateCsrf } from '@/lib/csrf';
 import { prisma } from '@/lib/db';
+import { orderCancellationHtml } from '@/lib/email-templates';
+import { sendEmail } from '@/lib/send-email';
 
 export const Route = createFileRoute('/api/orders/admin-cancel')({
   server: {
@@ -98,6 +100,27 @@ export const Route = createFileRoute('/api/orders/admin-cancel')({
             entityId: body.orderId,
             details: { reason: body.reason, orderNumber: order.orderNumber },
           }).catch(() => {});
+
+          sendEmail({
+            to: order.shippingEmail,
+            subject: `Order #${order.orderNumber} Cancelled`,
+            meta: {
+              description: '',
+              link: '',
+              callToActionText: '',
+            },
+            html: orderCancellationHtml(
+              {
+                orderNumber: order.orderNumber,
+                customerName: order.shippingName,
+              },
+              body.reason,
+              order.items.map((i) => ({
+                productName: i.productName,
+                quantity: i.quantity,
+              })),
+            ),
+          });
 
           return Response.json({ success: true }, { status: 200 });
         } catch (error) {

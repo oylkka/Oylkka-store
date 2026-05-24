@@ -165,6 +165,14 @@ enum ConversationStatus {
   CLOSED
 }
 
+// --- Email ---
+
+enum EmailStatus {
+  PENDING
+  SENT
+  FAILED
+}
+
 enum ReturnReason {
   DEFECTIVE
   WRONG_ITEM

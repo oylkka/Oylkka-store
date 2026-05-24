@@ -33,7 +33,7 @@ function RouteComponent() {
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages]);
+  }, []);
 
   async function handleSend() {
     if (!content.trim()) {
@@ -157,7 +157,7 @@ function RouteComponent() {
                     >
                       <img
                         src={msg.imageUrl}
-                        alt='Attached image'
+                        alt='Attached'
                         className='max-w-full h-auto rounded-lg'
                       />
                     </a>

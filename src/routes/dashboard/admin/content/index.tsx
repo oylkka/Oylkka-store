@@ -1,7 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { FileText, Loader2, Plus } from 'lucide-react';
 import { motion } from 'motion/react';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { toast } from 'sonner';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -45,18 +45,18 @@ function RouteComponent() {
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState(emptyForm);
 
-  const load = () => {
+  const load = useCallback(() => {
     setLoading(true);
     apiClient
       .get<{ blocks: (typeof emptyForm)[] }>('/api/admin/content/list')
       .then((r) => setBlocks(r.data.blocks))
       .catch(() => toast.error('Failed to load'))
       .finally(() => setLoading(false));
-  };
+  }, []);
 
   useEffect(() => {
     load();
-  }, []);
+  }, [load]);
 
   const handleSave = async () => {
     if (!form.slug || !form.title || !form.content) return;
@@ -195,9 +195,10 @@ function RouteComponent() {
             ) : (
               <div className='space-y-2'>
                 {blocks.map((b) => (
-                  <div
+                  <button
                     key={b.slug}
-                    className='flex items-center justify-between p-3 rounded-lg border cursor-pointer hover:bg-accent/50'
+                    type='button'
+                    className='flex items-center justify-between p-3 rounded-lg border cursor-pointer hover:bg-accent/50 w-full text-left'
                     onClick={() => openEdit(b)}
                   >
                     <div>
@@ -210,7 +211,7 @@ function RouteComponent() {
                     >
                       {b.published ? 'Published' : 'Draft'}
                     </Badge>
-                  </div>
+                  </button>
                 ))}
               </div>
             )}

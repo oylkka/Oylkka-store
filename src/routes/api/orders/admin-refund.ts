@@ -4,6 +4,8 @@ import { requireAdmin, requireAuth } from '@/lib/auth-middleware';
 import { refundBkashPayment } from '@/lib/bkash';
 import { validateCsrf } from '@/lib/csrf';
 import { prisma } from '@/lib/db';
+import { orderRefundHtml } from '@/lib/email-templates';
+import { sendEmail } from '@/lib/send-email';
 import type { OrderMetadata } from '@/types/orders';
 
 export const Route = createFileRoute('/api/orders/admin-refund')({
@@ -200,6 +202,25 @@ export const Route = createFileRoute('/api/orders/admin-refund')({
               orderNumber: order.orderNumber,
             },
           }).catch(() => {});
+
+          sendEmail({
+            to: order.shippingEmail,
+            subject: `Refund Processed — #${order.orderNumber}`,
+            meta: {
+              description: '',
+              link: '',
+              callToActionText: '',
+            },
+            html: orderRefundHtml(
+              {
+                orderNumber: order.orderNumber,
+                customerName: order.shippingName,
+              },
+              body.amount,
+              body.reason,
+              order.paymentMethod || 'CASH_ON_DELIVERY',
+            ),
+          });
 
           return Response.json(
             {

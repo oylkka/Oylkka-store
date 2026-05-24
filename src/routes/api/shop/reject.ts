@@ -3,6 +3,8 @@ import { createAuditLog } from '@/lib/audit-log';
 import { requireAdmin, requireAuth } from '@/lib/auth-middleware';
 import { validateCsrf } from '@/lib/csrf';
 import { prisma } from '@/lib/db';
+import { vendorRejectionHtml } from '@/lib/email-templates';
+import { sendEmail } from '@/lib/send-email';
 
 export const Route = createFileRoute('/api/shop/reject')({
   server: {
@@ -72,6 +74,29 @@ export const Route = createFileRoute('/api/shop/reject')({
               reason: rejectionReason,
             },
           }).catch(() => {});
+
+          prisma.user
+            .findUnique({
+              where: { id: shop.ownerId },
+              select: { email: true, name: true },
+            })
+            .then((owner) => {
+              if (!owner) return;
+              sendEmail({
+                to: owner.email,
+                subject: 'Your shop application was not approved',
+                meta: {
+                  description: '',
+                  link: '',
+                  callToActionText: '',
+                },
+                html: vendorRejectionHtml(
+                  owner.name,
+                  shop.name,
+                  rejectionReason.trim(),
+                ),
+              });
+            });
 
           return Response.json(
             { message: 'Shop rejected', shop: updated },

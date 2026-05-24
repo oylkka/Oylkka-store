@@ -234,7 +234,7 @@ function FaqPage() {
               </Button>
             </motion.div>
           ) : (
-            filtered.map((group, gi) => (
+            filtered.map((group) => (
               <motion.section
                 key={group.label}
                 initial='hidden'
@@ -250,8 +250,8 @@ function FaqPage() {
                   </span>
                 </div>
                 <Accordion type='single' collapsible className='w-full'>
-                  {group.items.map((item, ii) => (
-                    <AccordionItem key={ii} value={`${gi}-${ii}`}>
+                  {group.items.map((item) => (
+                    <AccordionItem key={item.q} value={item.q}>
                       <AccordionTrigger className='text-sm font-medium text-left'>
                         {item.q}
                       </AccordionTrigger>

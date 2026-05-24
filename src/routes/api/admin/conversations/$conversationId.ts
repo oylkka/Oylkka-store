@@ -7,7 +7,7 @@ export const Route = createFileRoute(
 )({
   server: {
     handlers: {
-      GET: async ({ request }) => {
+      GET: async () => {
         try {
           const authResult = await requireAuth();
           if (authResult.response) return authResult.response;

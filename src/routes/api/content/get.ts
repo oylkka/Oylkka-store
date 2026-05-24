@@ -14,7 +14,7 @@ export const Route = createFileRoute('/api/content/get')({
           const block = await prisma.contentBlock.findUnique({
             where: { slug },
           });
-          if (!block || !block.published) {
+          if (!block?.published) {
             return Response.json({ error: 'Not found' }, { status: 404 });
           }
           return Response.json({ block });

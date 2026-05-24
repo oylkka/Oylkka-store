@@ -8,6 +8,7 @@ import { prisma } from '@/lib/db';
 import { generateInvoicePdf } from '@/lib/invoice-pdf';
 import { checkoutLimiter } from '@/lib/rate-limit';
 import { checkRateLimit } from '@/lib/rate-limit-guard';
+import { decrementStock, decrementVariantStock } from '@/lib/stock';
 import {
   applyShippingDiscounts,
   processVouchers,
@@ -442,38 +443,22 @@ export const Route = createFileRoute('/api/checkout/create')({
                 });
               }
 
-              // Decrement stock with re-validation inside transaction (race condition safety)
+              // Atomic stock decrement (race-condition-safe)
               for (const item of cart.items) {
-                const current = await tx.product.findUnique({
-                  where: { id: item.product.id },
-                  select: { stock: true },
-                });
-
-                if (!current || current.stock < item.quantity) {
-                  throw new Error(
-                    `"${item.product.productName}" is out of stock`,
-                  );
-                }
-
-                await tx.product.update({
-                  where: { id: item.product.id },
-                  data: { stock: { decrement: item.quantity } },
-                });
+                await decrementStock(
+                  tx,
+                  item.product.id,
+                  item.quantity,
+                  item.product.productName,
+                );
 
                 if (item.variant) {
-                  const variantCurrent = await tx.productVariant.findUnique({
-                    where: { id: item.variant.id },
-                    select: { stock: true },
-                  });
-
-                  if (!variantCurrent || variantCurrent.stock < item.quantity) {
-                    throw new Error(`"${item.variant.name}" is out of stock`);
-                  }
-
-                  await tx.productVariant.update({
-                    where: { id: item.variant.id },
-                    data: { stock: { decrement: item.quantity } },
-                  });
+                  await decrementVariantStock(
+                    tx,
+                    item.variant.id,
+                    item.quantity,
+                    item.variant.name,
+                  );
                 }
               }
 

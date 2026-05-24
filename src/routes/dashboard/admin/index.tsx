@@ -169,6 +169,7 @@ function RouteComponent() {
       >
         {isLoading
           ? Array.from({ length: 7 }).map((_, i) => (
+              // biome-ignore lint/suspicious/noArrayIndexKey: static skeleton loader
               <StatCardSkeleton key={i} />
             ))
           : statCards.map((card) => {

@@ -1,6 +1,8 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { requireAdmin, requireAuth } from '@/lib/auth-middleware';
 import { prisma } from '@/lib/db';
+import { orderRefundHtml } from '@/lib/email-templates';
+import { sendEmail } from '@/lib/send-email';
 
 export const Route = createFileRoute('/api/admin/returns/review')({
   server: {
@@ -33,11 +35,14 @@ export const Route = createFileRoute('/api/admin/returns/review')({
               order: {
                 select: {
                   id: true,
+                  orderNumber: true,
                   customerId: true,
                   total: true,
                   refundAmount: true,
                   paymentMethod: true,
                   paymentStatus: true,
+                  shippingName: true,
+                  shippingEmail: true,
                 },
               },
             },
@@ -125,6 +130,25 @@ export const Route = createFileRoute('/api/admin/returns/review')({
             }
 
             updateData.refundAmount = amount;
+
+            sendEmail({
+              to: returnRequest.order.shippingEmail,
+              subject: `Refund Processed — #${returnRequest.order.orderNumber}`,
+              meta: {
+                description: '',
+                link: '',
+                callToActionText: '',
+              },
+              html: orderRefundHtml(
+                {
+                  orderNumber: returnRequest.order.orderNumber,
+                  customerName: returnRequest.order.shippingName,
+                },
+                amount,
+                returnRequest.details || 'Return refund',
+                returnRequest.order.paymentMethod || 'CASH_ON_DELIVERY',
+              ),
+            });
           }
 
           const updated = await prisma.returnRequest.update({

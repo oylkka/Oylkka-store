@@ -179,10 +179,14 @@ function ContactPage() {
               <form onSubmit={handleSubmit} className='space-y-4'>
                 <div className='grid sm:grid-cols-2 gap-4'>
                   <div className='space-y-2'>
-                    <label className='text-xs font-medium text-muted-foreground'>
+                    <label
+                      htmlFor='name'
+                      className='text-xs font-medium text-muted-foreground'
+                    >
                       Name <span className='text-destructive'>*</span>
                     </label>
                     <Input
+                      id='name'
                       placeholder='Your name'
                       value={name}
                       onChange={(e) => setName(e.target.value)}
@@ -190,10 +194,14 @@ function ContactPage() {
                     />
                   </div>
                   <div className='space-y-2'>
-                    <label className='text-xs font-medium text-muted-foreground'>
+                    <label
+                      htmlFor='email'
+                      className='text-xs font-medium text-muted-foreground'
+                    >
                       Email <span className='text-destructive'>*</span>
                     </label>
                     <Input
+                      id='email'
                       type='email'
                       placeholder='your@email.com'
                       value={email}
@@ -204,10 +212,14 @@ function ContactPage() {
                 </div>
 
                 <div className='space-y-2'>
-                  <label className='text-xs font-medium text-muted-foreground'>
+                  <label
+                    htmlFor='subject'
+                    className='text-xs font-medium text-muted-foreground'
+                  >
                     Subject
                   </label>
                   <Input
+                    id='subject'
                     placeholder='How can we help?'
                     value={subject}
                     onChange={(e) => setSubject(e.target.value)}
@@ -215,10 +227,14 @@ function ContactPage() {
                 </div>
 
                 <div className='space-y-2'>
-                  <label className='text-xs font-medium text-muted-foreground'>
+                  <label
+                    htmlFor='message'
+                    className='text-xs font-medium text-muted-foreground'
+                  >
                     Message <span className='text-destructive'>*</span>
                   </label>
                   <Textarea
+                    id='message'
                     placeholder='Tell us more about your inquiry…'
                     rows={5}
                     value={message}

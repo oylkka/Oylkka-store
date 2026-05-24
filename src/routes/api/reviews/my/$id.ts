@@ -51,7 +51,7 @@ export const Route = createFileRoute('/api/reviews/my/$id')({
         }
       },
 
-      DELETE: async ({ params, request }) => {
+      DELETE: async ({ params }) => {
         try {
           const headers = getRequestHeaders();
           const session = await auth.api.getSession({ headers });

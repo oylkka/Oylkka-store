@@ -3,6 +3,7 @@ import { prismaAdapter } from 'better-auth/adapters/prisma';
 import { admin } from 'better-auth/plugins';
 import { tanstackStartCookies } from 'better-auth/tanstack-start';
 import { DeleteImage } from '@/cloudinary';
+import { welcomeHtml } from '@/lib/email-templates';
 import { sendEmail } from '@/lib/send-email';
 import { prisma } from './db';
 
@@ -74,6 +75,26 @@ export const auth = betterAuth({
             }
           }
 
+          // If the user is being email-verified, send a welcome email
+          if (data.emailVerified === true && typeof data.id === 'string') {
+            const currentUser = await prisma.user.findUnique({
+              where: { id: data.id },
+              select: { emailVerified: true, name: true, email: true },
+            });
+            if (currentUser && !currentUser.emailVerified) {
+              sendEmail({
+                to: currentUser.email,
+                subject: 'Welcome to Oylkka!',
+                meta: {
+                  description: '',
+                  link: '',
+                  callToActionText: '',
+                },
+                html: welcomeHtml(currentUser.name),
+              });
+            }
+          }
+
           return { data };
         },
       },
@@ -104,13 +125,15 @@ export const auth = betterAuth({
     minPasswordLength: 6,
     requireEmailVerification: true,
     sendResetPassword: async ({ user, url }) => {
+      const resetUrl = new URL(url);
+      resetUrl.searchParams.set('email', user.email);
       await sendEmail({
         to: user.email,
         subject: 'Reset your password',
         meta: {
           description:
             'You requested a password reset. Click below to continue.',
-          link: url,
+          link: String(resetUrl),
           callToActionText: 'Reset Password',
         },
       });

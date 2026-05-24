@@ -167,6 +167,7 @@ function DealsPage() {
             className='grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4'
           >
             {Array.from({ length: 10 }).map((_, i) => (
+              // biome-ignore lint/suspicious/noArrayIndexKey: static skeleton loader
               <motion.div key={i} variants={fadeUp} custom={0}>
                 <ProductCardSkeleton />
               </motion.div>
@@ -195,7 +196,7 @@ function DealsPage() {
               variants={stagger}
               className='grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4'
             >
-              {products.map((product, i) => (
+              {products.map((product) => (
                 <motion.div key={product.id} variants={fadeUp} custom={0}>
                   <ProductCard product={product} />
                 </motion.div>

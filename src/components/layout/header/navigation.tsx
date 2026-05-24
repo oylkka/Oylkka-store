@@ -1,21 +1,22 @@
 import { Link, useLocation } from '@tanstack/react-router';
 import { useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { cn } from '@/lib/utils';
 
 type NavItem = {
-  label: string;
-  href: string; // We'll map this to the 'to' prop
+  labelKey: string;
+  href: string;
 };
 
-const navItems: NavItem[] = [
-  { label: 'Home', href: '/' },
-  { label: 'Products', href: '/products' },
-  { label: 'Shop', href: '/shops' },
-  { label: 'Sale', href: '/sale' },
-  { label: 'About', href: '/about' },
-];
-
 export default function Navigation() {
+  const { t } = useTranslation();
+  const navItems: NavItem[] = [
+    { labelKey: 'nav.home', href: '/' },
+    { labelKey: 'nav.products', href: '/products' },
+    { labelKey: 'nav.shop', href: '/shops' },
+    { labelKey: 'nav.sale', href: '/sale' },
+    { labelKey: 'nav.about', href: '/about' },
+  ];
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
   const [hoverStyle, setHoverStyle] = useState({});
   const [activeStyle, setActiveStyle] = useState({});
@@ -131,8 +132,8 @@ export default function Navigation() {
                 onMouseLeave={() => setHoveredIndex(null)}
               >
                 <div className='flex h-full items-center justify-center text-sm font-medium whitespace-nowrap'>
-                  {item.label}
-                  {item.label === 'Sale' && (
+                  {t(item.labelKey)}
+                  {item.labelKey === 'nav.sale' && (
                     <span className='ml-1 inline-flex items-center justify-center rounded-full bg-red-500 px-1.5 py-0.5 text-[10px] font-medium text-white'>
                       20%
                     </span>

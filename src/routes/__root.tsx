@@ -10,11 +10,13 @@ import {
 } from '@tanstack/react-router';
 import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Toaster } from '#/components/ui/sonner';
 import { TooltipProvider } from '#/components/ui/tooltip';
 import { ThemeProvider } from '#/context/theme-provider';
 import { RouteErrorBoundary } from '@/components/error-boundary';
 import { getSession } from '@/lib/auth.functions';
+import '@/lib/i18n';
 import appCss from '../styles.css?url';
 
 export const Route = createRootRoute({
@@ -26,9 +28,34 @@ export const Route = createRootRoute({
     meta: [
       { charSet: 'utf-8' },
       { name: 'viewport', content: 'width=device-width, initial-scale=1' },
-      { title: 'Oylkka' },
+      { title: 'Oylkka — Bangladesh Marketplace' },
+      {
+        name: 'description',
+        content:
+          'Shop thousands of products from verified vendors across Bangladesh. Fast delivery, secure payments, and easy returns on Oylkka.',
+      },
+      { property: 'og:title', content: 'Oylkka — Bangladesh Marketplace' },
+      {
+        property: 'og:description',
+        content:
+          'Shop thousands of products from verified vendors across Bangladesh. Fast delivery, secure payments, and easy returns.',
+      },
+      { property: 'og:type', content: 'website' },
+      { property: 'og:image', content: '/og-image.svg' },
+      { name: 'twitter:card', content: 'summary_large_image' },
+      { name: 'twitter:title', content: 'Oylkka — Bangladesh Marketplace' },
+      {
+        name: 'twitter:description',
+        content:
+          'Shop thousands of products from verified vendors across Bangladesh.',
+      },
+      { name: 'twitter:image', content: '/og-image.svg' },
     ],
-    links: [{ rel: 'stylesheet', href: appCss }],
+    links: [
+      { rel: 'stylesheet', href: appCss },
+      { rel: 'canonical', href: 'https://oylkka.com' },
+      { rel: 'icon', type: 'image/svg+xml', href: '/favicon.svg' },
+    ],
   }),
   notFoundComponent: () => (
     <div className='flex min-h-screen flex-col items-center justify-center gap-4'>
@@ -56,8 +83,9 @@ function RootComponent() {
 }
 
 function RootDocument({ children }: { children: React.ReactNode }) {
+  const { i18n } = useTranslation();
   return (
-    <html lang='en' suppressHydrationWarning>
+    <html lang={i18n.language || 'en'} suppressHydrationWarning>
       <head>
         <HeadContent />
       </head>

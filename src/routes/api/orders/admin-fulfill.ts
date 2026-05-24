@@ -64,8 +64,7 @@ export const Route = createFileRoute('/api/orders/admin-fulfill')({
           const allowedNext = FULFILLMENT_TRANSITIONS[item.fulfillmentStatus];
           if (
             !body.fulfillmentStatus ||
-            !allowedNext ||
-            !allowedNext.includes(body.fulfillmentStatus)
+            !allowedNext?.includes(body.fulfillmentStatus)
           ) {
             return Response.json(
               {

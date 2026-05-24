@@ -6,13 +6,12 @@ import { prisma } from '@/lib/db';
 export const Route = createFileRoute('/api/admin/customers/$id')({
   server: {
     handlers: {
-      POST: async ({ request }) => {
+      POST: async () => {
         try {
           const authResult = await requireAuth();
           if (authResult.response) return authResult.response;
           const roleResponse = requireAdminOrManager(authResult.session);
           if (roleResponse) return roleResponse;
-          const session = authResult.session;
 
           const user = await prisma.user.findUnique({
             where: { id: params.id },

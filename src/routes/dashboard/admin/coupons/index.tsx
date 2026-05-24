@@ -1,9 +1,4 @@
-import {
-  createFileRoute,
-  Link,
-  redirect,
-  useNavigate,
-} from '@tanstack/react-router';
+import { createFileRoute, Link, redirect } from '@tanstack/react-router';
 import { format } from 'date-fns';
 import { Edit, Loader2, Plus, Search, Tag, Trash2 } from 'lucide-react';
 import { motion } from 'motion/react';
@@ -84,7 +79,6 @@ export const Route = createFileRoute('/dashboard/admin/coupons/')({
 });
 
 function RouteComponent() {
-  const navigate = useNavigate();
   const [search, setSearch] = useState('');
   const [scopeFilter, setScopeFilter] = useState('');
   const [activeFilter, setActiveFilter] = useState('');
@@ -194,7 +188,7 @@ function RouteComponent() {
                 </SelectContent>
               </Select>
             </div>
-          </CardContent>
+          </CardHeader>
           <CardContent>
             {isLoading ? (
               <div className='space-y-3'>

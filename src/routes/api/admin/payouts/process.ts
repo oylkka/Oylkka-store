@@ -1,6 +1,8 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { requireAdmin, requireAuth } from '@/lib/auth-middleware';
 import { prisma } from '@/lib/db';
+import { payoutProcessedHtml } from '@/lib/email-templates';
+import { sendEmail } from '@/lib/send-email';
 
 export const Route = createFileRoute('/api/admin/payouts/process')({
   server: {
@@ -22,7 +24,12 @@ export const Route = createFileRoute('/api/admin/payouts/process')({
             );
           }
 
-          const shop = await prisma.shop.findUnique({ where: { id: shopId } });
+          const shop = await prisma.shop.findUnique({
+            where: { id: shopId },
+            include: {
+              owner: { select: { email: true, name: true } },
+            },
+          });
           if (!shop) {
             return Response.json({ error: 'Shop not found' }, { status: 404 });
           }
@@ -76,6 +83,22 @@ export const Route = createFileRoute('/api/admin/payouts/process')({
               shop: { select: { id: true, name: true } },
               _count: { select: { items: true } },
             },
+          });
+
+          sendEmail({
+            to: shop.owner.email,
+            subject: 'Payout processed',
+            meta: {
+              description: '',
+              link: '',
+              callToActionText: '',
+            },
+            html: payoutProcessedHtml(
+              shop.name,
+              totalAmount,
+              items.length,
+              note || null,
+            ),
           });
 
           return Response.json({ payout: full }, { status: 201 });

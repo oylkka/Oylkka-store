@@ -50,11 +50,11 @@ function RouteComponent() {
         role: 'vendor',
       });
     }
-  }, [conversationId]);
+  }, [conversationId, markReadMutation.mutate]);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages]);
+  }, []);
 
   function handleImageSelect(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
@@ -201,7 +201,7 @@ function RouteComponent() {
                     >
                       <img
                         src={msg.imageUrl}
-                        alt='Attached image'
+                        alt='Attached'
                         className='max-w-full h-auto rounded-lg'
                       />
                     </a>

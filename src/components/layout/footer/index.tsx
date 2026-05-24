@@ -15,6 +15,7 @@ import {
   Truck,
 } from 'lucide-react';
 import { useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 
@@ -34,53 +35,53 @@ const stagger = {
   show: { transition: { staggerChildren: 0.06 } },
 };
 
-const features = [
+const features = (t: (key: string) => string) => [
   {
     icon: Truck,
-    title: 'Free Shipping',
-    desc: 'On orders over ৳2000',
+    title: t('footer.free_shipping'),
+    desc: t('footer.free_shipping_desc'),
   },
   {
     icon: ShieldCheck,
-    title: 'Secure Payment',
-    desc: '100% protected',
+    title: t('footer.secure_payment'),
+    desc: t('footer.secure_payment_desc'),
   },
   {
     icon: Headphones,
-    title: '24/7 Support',
-    desc: 'Dedicated assistance',
+    title: t('footer.support_247'),
+    desc: t('footer.support_247_desc'),
   },
   {
     icon: Gift,
-    title: 'Special Offers',
-    desc: 'Save up to 25%',
+    title: t('footer.special_offers'),
+    desc: t('footer.special_offers_desc'),
   },
 ];
 
-const shopLinks = [
-  { label: 'All Products', to: '/products' },
-  { label: 'Categories', to: '/categories' },
-  { label: 'Special Offers', to: '/offers' },
-  { label: 'New Arrivals', to: '/new-arrivals' },
-  { label: 'Bestsellers', to: '/bestsellers' },
-  { label: 'FAQs', to: '/faq' },
+const shopLinks = (t: (key: string) => string) => [
+  { label: t('footer.all_products'), to: '/products' },
+  { label: t('footer.categories'), to: '/categories' },
+  { label: t('footer.special_offers'), to: '/offers' },
+  { label: t('footer.new_arrivals'), to: '/new-arrivals' },
+  { label: t('footer.bestsellers'), to: '/bestsellers' },
+  { label: t('footer.faqs'), to: '/faq' },
 ];
 
-const companyLinks = [
-  { label: 'About Us', to: '/about' },
-  { label: 'Contact', to: '/contact' },
-  { label: 'Blog', to: '/blog' },
-  { label: 'Careers', to: '/careers' },
+const companyLinks = (t: (key: string) => string) => [
+  { label: t('footer.about_us'), to: '/about' },
+  { label: t('footer.contact'), to: '/contact' },
+  { label: t('footer.blog'), to: '/blog' },
+  { label: t('footer.careers'), to: '/careers' },
   { label: 'Privacy Policy', to: '/privacy' },
   { label: 'Terms & Conditions', to: '/terms' },
 ];
 
-const supportLinks = [
-  { label: 'Help Center', to: '/help' },
-  { label: 'Shipping Info', to: '/shipping' },
-  { label: 'Returns & Exchanges', to: '/returns' },
-  { label: 'Order Tracking', to: '/tracking' },
-  { label: 'Size Guide', to: '/size-guide' },
+const supportLinks = (t: (key: string) => string) => [
+  { label: t('footer.help_center'), to: '/help' },
+  { label: t('footer.shipping_info'), to: '/shipping' },
+  { label: t('footer.returns_exchanges'), to: '/returns' },
+  { label: t('footer.order_tracking'), to: '/tracking' },
+  { label: t('footer.size_guide'), to: '/size-guide' },
 ];
 
 const contacts = [
@@ -125,6 +126,7 @@ const EyebrowHeader = ({
 );
 
 function NewsletterSection({ inView }: { inView: boolean }) {
+  const { t } = useTranslation();
   return (
     <div className='relative border-b border-border'>
       <div className='container py-10'>
@@ -138,17 +140,14 @@ function NewsletterSection({ inView }: { inView: boolean }) {
             <div className='flex items-center gap-3'>
               <div className='h-px w-8 bg-primary' />
               <span className='text-xs font-semibold tracking-[0.18em] uppercase text-primary'>
-                Newsletter
+                {t('footer.newsletter')}
               </span>
             </div>
             <h3 className='text-2xl font-bold leading-tight tracking-tight md:text-3xl'>
-              Get the best{' '}
-              <span className='italic font-bold text-primary'>deals</span>
-              <span className='text-primary'>.</span>
+              {t('footer.newsletter_heading')}
             </h3>
             <p className='max-w-sm text-sm leading-relaxed text-muted-foreground'>
-              Flash sales, new vendor arrivals, and exclusive offers — straight
-              to your inbox.
+              {t('footer.newsletter_desc')}
             </p>
           </motion.div>
           <motion.div variants={fadeUp} custom={0.08}>
@@ -156,7 +155,7 @@ function NewsletterSection({ inView }: { inView: boolean }) {
               <div className='group relative flex-1'>
                 <Input
                   type='email'
-                  placeholder='your@email.com'
+                  placeholder={t('footer.newsletter_placeholder')}
                   className='h-11 rounded-xl transition-all duration-200 focus:ring-2 focus:ring-primary/30 focus:border-primary/50'
                 />
               </div>
@@ -165,7 +164,7 @@ function NewsletterSection({ inView }: { inView: boolean }) {
                 className='h-11 gap-2 whitespace-nowrap px-6 transition-transform duration-200 hover:scale-[1.02]'
               >
                 <Send className='h-4 w-4' />
-                Subscribe
+                {t('footer.subscribe')}
               </Button>
             </div>
           </motion.div>
@@ -176,6 +175,7 @@ function NewsletterSection({ inView }: { inView: boolean }) {
 }
 
 function FeaturesSection({ inView }: { inView: boolean }) {
+  const { t } = useTranslation();
   return (
     <div className='relative border-b border-border'>
       <div className='container py-6'>
@@ -185,7 +185,7 @@ function FeaturesSection({ inView }: { inView: boolean }) {
           variants={stagger}
           className='grid grid-cols-2 gap-6 md:grid-cols-4'
         >
-          {features.map((feature) => (
+          {features(t).map((feature) => (
             <motion.div
               key={feature.title}
               variants={fadeUp}
@@ -234,6 +234,7 @@ function SocialIcon({
 }
 
 export default function Footer() {
+  const { t } = useTranslation();
   const sectionRef = useRef<HTMLDivElement>(null);
   const inView = useInView(sectionRef, { once: true, margin: '-80px' });
 
@@ -265,9 +266,7 @@ export default function Footer() {
               </span>
             </Link>
             <p className='mb-6 max-w-xs text-sm leading-relaxed text-muted-foreground'>
-              Discover quality products at unbeatable prices. We&apos;re
-              committed to providing exceptional shopping experiences with fast
-              shipping, secure checkout, and premium customer support.
+              {t('footer.brand_desc')}
             </p>
             <div className='mb-8 space-y-1'>
               {contacts.map((contact) => (
@@ -283,11 +282,13 @@ export default function Footer() {
               ))}
             </div>
             <div>
-              <p className='mb-3 text-sm font-medium'>Follow Us</p>
+              <p className='mb-3 text-sm font-medium'>
+                {t('footer.follow_us')}
+              </p>
               <div className='flex items-center gap-3'>
                 <SocialIcon
                   href='https://facebook.com/mookkly'
-                  label='Facebook'
+                  label={t('footer.facebook')}
                 >
                   <svg
                     width='18'
@@ -305,7 +306,7 @@ export default function Footer() {
                 </SocialIcon>
                 <SocialIcon
                   href='https://instagram.com/mookkly'
-                  label='Instagram'
+                  label={t('footer.instagram')}
                 >
                   <svg
                     width='18'
@@ -325,7 +326,7 @@ export default function Footer() {
                 </SocialIcon>
                 <SocialIcon
                   href='https://twitter.com/mookkly'
-                  label='Twitter (X)'
+                  label={t('footer.twitter')}
                 >
                   <svg
                     width='18'
@@ -346,13 +347,13 @@ export default function Footer() {
           </motion.div>
 
           <motion.div variants={fadeUp} custom={0.06}>
-            <EyebrowHeader label='Shop' />
-            <NavLinks links={shopLinks} />
+            <EyebrowHeader label={t('footer.shop')} />
+            <NavLinks links={shopLinks(t)} />
           </motion.div>
 
           <motion.div variants={fadeUp} custom={0.1}>
-            <EyebrowHeader label='Company' />
-            <NavLinks links={companyLinks} />
+            <EyebrowHeader label={t('footer.company')} />
+            <NavLinks links={companyLinks(t)} />
           </motion.div>
 
           <motion.div
@@ -360,12 +361,14 @@ export default function Footer() {
             custom={0.14}
             className='col-span-2 lg:col-span-1'
           >
-            <EyebrowHeader label='Support' />
-            <NavLinks links={supportLinks} />
+            <EyebrowHeader label={t('footer.support')} />
+            <NavLinks links={supportLinks(t)} />
             <div className='mt-6 rounded-xl bg-muted/30 p-4'>
-              <h5 className='mb-3 text-sm font-medium'>Download Our App</h5>
+              <h5 className='mb-3 text-sm font-medium'>
+                {t('footer.download_app')}
+              </h5>
               <p className='mb-4 text-xs text-muted-foreground'>
-                Shop on the go with our mobile app
+                {t('footer.download_app_desc')}
               </p>
               <div className='flex flex-wrap w-full gap-2'>
                 <Button
@@ -397,7 +400,7 @@ export default function Footer() {
                       fill='currentColor'
                     />
                   </svg>
-                  Play Store
+                  {t('footer.play_store')}
                 </Button>
                 <Button
                   variant='outline'
@@ -416,7 +419,7 @@ export default function Footer() {
                       fill='currentColor'
                     />
                   </svg>
-                  App Store
+                  {t('footer.app_store')}
                 </Button>
               </div>
             </div>
@@ -434,7 +437,7 @@ export default function Footer() {
               className='flex items-center gap-2 text-xs text-muted-foreground'
             >
               <Heart className='h-3.5 w-3.5 text-primary' />
-              &copy; {new Date().getFullYear()} Oylkka. All rights reserved.
+              {t('footer.copyright', { year: new Date().getFullYear() })}
             </motion.p>
             <motion.div
               initial={{ opacity: 0 }}
@@ -443,13 +446,13 @@ export default function Footer() {
               className='flex flex-wrap items-center justify-center gap-1.5 text-xs text-muted-foreground'
             >
               <span className='h-1 w-1 rounded-full bg-primary/50' />
-              <span>Secure Checkout</span>
+              <span>{t('footer.secure_checkout')}</span>
               <span className='ml-1 h-1 w-1 rounded-full bg-primary/50' />
-              <span>Verified Vendors</span>
+              <span>{t('footer.verified_vendors')}</span>
               <span className='ml-1 h-1 w-1 rounded-full bg-primary/50' />
-              <span>7-Day Returns</span>
+              <span>{t('footer.seven_day_returns')}</span>
               <span className='ml-1 h-1 w-1 rounded-full bg-primary/50' />
-              <span>Nationwide Delivery</span>
+              <span>{t('footer.nationwide_delivery')}</span>
             </motion.div>
           </div>
         </div>

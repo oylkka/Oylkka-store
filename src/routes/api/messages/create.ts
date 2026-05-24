@@ -134,7 +134,7 @@ async function sendMessageNotification(
     if (!user?.email) return;
 
     const preview =
-      content.length > 100 ? content.slice(0, 100) + '...' : content;
+      content.length > 100 ? `${content.slice(0, 100)}...` : content;
 
     await sendEmail({
       to: user.email,

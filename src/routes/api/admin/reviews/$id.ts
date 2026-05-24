@@ -6,13 +6,12 @@ import { prisma } from '@/lib/db';
 export const Route = createFileRoute('/api/admin/reviews/$id')({
   server: {
     handlers: {
-      POST: async ({ request }) => {
+      POST: async () => {
         try {
           const authResult = await requireAuth();
           if (authResult.response) return authResult.response;
           const roleResponse = requireAdminOrManager(authResult.session);
           if (roleResponse) return roleResponse;
-          const session = authResult.session;
 
           const review = await prisma.review.findUnique({
             where: { id: params.id },
@@ -95,7 +94,7 @@ export const Route = createFileRoute('/api/admin/reviews/$id')({
         }
       },
 
-      DELETE: async ({ params, request }) => {
+      DELETE: async ({ params }) => {
         try {
           const headers = getRequestHeaders();
           const session = await auth.api.getSession({ headers });

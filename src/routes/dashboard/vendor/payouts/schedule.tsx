@@ -162,7 +162,7 @@ function RouteComponent() {
               <div className='space-y-3'>
                 {data.schedule.map((entry) => {
                   const [y, m] = entry.month.split('-');
-                  const monthLabel = `${monthNames[parseInt(m) - 1]} ${y}`;
+                  const monthLabel = `${monthNames[parseInt(m, 10) - 1]} ${y}`;
                   const isPast =
                     entry.estimatedDate < new Date().toISOString().slice(0, 10);
 

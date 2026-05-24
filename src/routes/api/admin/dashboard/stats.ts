@@ -19,7 +19,6 @@ export const Route = createFileRoute('/api/admin/dashboard/stats')({
           const roleResponse = requireAdminOrManager(authResult.session);
           if (roleResponse) return roleResponse;
 
-          const now = new Date();
           const thirtyDaysAgo = daysAgo(30);
 
           const [

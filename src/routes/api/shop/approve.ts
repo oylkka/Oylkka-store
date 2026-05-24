@@ -3,6 +3,8 @@ import { createAuditLog } from '@/lib/audit-log';
 import { requireAdmin, requireAuth } from '@/lib/auth-middleware';
 import { validateCsrf } from '@/lib/csrf';
 import { prisma } from '@/lib/db';
+import { vendorApprovalHtml } from '@/lib/email-templates';
+import { sendEmail } from '@/lib/send-email';
 
 export const Route = createFileRoute('/api/shop/approve')({
   server: {
@@ -81,6 +83,25 @@ export const Route = createFileRoute('/api/shop/approve')({
             entityId: id,
             details: { shopName: shop.name, ownerId: shop.ownerId },
           }).catch(() => {});
+
+          prisma.user
+            .findUnique({
+              where: { id: shop.ownerId },
+              select: { email: true, name: true },
+            })
+            .then((owner) => {
+              if (!owner) return;
+              sendEmail({
+                to: owner.email,
+                subject: 'Your shop has been approved',
+                meta: {
+                  description: '',
+                  link: '',
+                  callToActionText: '',
+                },
+                html: vendorApprovalHtml(owner.name, shop.name),
+              });
+            });
 
           return Response.json(
             { message: 'Shop approved successfully', shop: updated },

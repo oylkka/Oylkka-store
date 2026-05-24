@@ -182,6 +182,7 @@ function ComparePage() {
         ) : isLoading ? (
           <div className='space-y-4'>
             {Array.from({ length: 6 }).map((_, i) => (
+              // biome-ignore lint/suspicious/noArrayIndexKey: static skeleton loader
               <Skeleton key={i} className='h-12 w-full rounded-xl' />
             ))}
           </div>
