@@ -1,22 +1,21 @@
 import { createFileRoute } from '@tanstack/react-router';
-import { getRequestHeaders } from '@tanstack/react-start/server';
 import { createAuditLog } from '@/lib/audit-log';
-import { auth } from '@/lib/auth';
+import { requireAdmin, requireAuth } from '@/lib/auth-middleware';
 import { refundBkashPayment } from '@/lib/bkash';
 import { validateCsrf } from '@/lib/csrf';
 import { prisma } from '@/lib/db';
+import type { OrderMetadata } from '@/types/orders';
 
 export const Route = createFileRoute('/api/orders/admin-refund')({
   server: {
     handlers: {
       POST: async ({ request }) => {
         try {
-          const headers = getRequestHeaders();
-          const session = await auth.api.getSession({ headers });
-
-          if (!session?.user || session.user.role !== 'ADMIN') {
-            return Response.json({ error: 'Forbidden' }, { status: 403 });
-          }
+          const authResult = await requireAuth();
+          if (authResult.response) return authResult.response;
+          const roleResponse = requireAdmin(authResult.session);
+          if (roleResponse) return roleResponse;
+          const session = authResult.session;
 
           const csrfResponse = validateCsrf();
           if (csrfResponse) return csrfResponse;
@@ -87,11 +86,9 @@ export const Route = createFileRoute('/api/orders/admin-refund')({
             order.paymentMethod === 'BKASH' &&
             order.paymentStatus === 'PAID'
           ) {
-            const metadata = order.metadata as Record<string, unknown> | null;
-            const bkashPaymentID = metadata?.bkashPaymentID as
-              | string
-              | undefined;
-            const bkashTrxID = metadata?.bkashTrxID as string | undefined;
+            const metadata = order.metadata as OrderMetadata | null;
+            const bkashPaymentID = metadata?.bkashPaymentID;
+            const bkashTrxID = metadata?.bkashTrxID;
             const paymentRef = order.paymentRef;
 
             if (bkashPaymentID && (bkashTrxID || paymentRef)) {
@@ -188,7 +185,7 @@ export const Route = createFileRoute('/api/orders/admin-refund')({
             return updatedOrder;
           });
 
-          const metadata = updated.metadata as Record<string, unknown> | null;
+          const metadata = updated.metadata as OrderMetadata | null;
 
           createAuditLog({
             actorId: session.user.id,

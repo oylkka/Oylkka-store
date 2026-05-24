@@ -2,12 +2,7 @@ import { createFileRoute, redirect, useNavigate } from '@tanstack/react-router';
 import { motion } from 'motion/react';
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import {
@@ -143,7 +138,9 @@ function RouteComponent() {
               <div className='grid grid-cols-1 sm:grid-cols-2 gap-4'>
                 <div className='space-y-2'>
                   <Label htmlFor='value'>
-                    {type === 'PERCENTAGE' ? 'Discount % *' : 'Discount Amount *'}
+                    {type === 'PERCENTAGE'
+                      ? 'Discount % *'
+                      : 'Discount Amount *'}
                   </Label>
                   <Input
                     id='value'
@@ -263,7 +260,10 @@ function RouteComponent() {
                       checked={autoApply}
                       onCheckedChange={setAutoApply}
                     />
-                    <Label htmlFor='autoApply' className='ml-2 text-sm text-muted-foreground'>
+                    <Label
+                      htmlFor='autoApply'
+                      className='ml-2 text-sm text-muted-foreground'
+                    >
                       Automatically apply to eligible carts
                     </Label>
                   </div>

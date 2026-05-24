@@ -1,22 +1,17 @@
 import { createFileRoute } from '@tanstack/react-router';
-import { getRequestHeaders } from '@tanstack/react-start/server';
-import { auth } from '@/lib/auth';
+import { requireAdminOrManager, requireAuth } from '@/lib/auth-middleware';
 import { prisma } from '@/lib/db';
+import type { OrderMetadata } from '@/types/orders';
 
 export const Route = createFileRoute('/api/orders/admin-single')({
   server: {
     handlers: {
       GET: async ({ request }) => {
         try {
-          const headers = getRequestHeaders();
-          const session = await auth.api.getSession({ headers });
-
-          if (
-            !session?.user ||
-            (session.user.role !== 'ADMIN' && session.user.role !== 'MANAGER')
-          ) {
-            return Response.json({ error: 'Forbidden' }, { status: 403 });
-          }
+          const authResult = await requireAuth();
+          if (authResult.response) return authResult.response;
+          const roleResponse = requireAdminOrManager(authResult.session);
+          if (roleResponse) return roleResponse;
 
           const url = new URL(request.url);
           const orderId = url.searchParams.get('orderId');
@@ -44,7 +39,7 @@ export const Route = createFileRoute('/api/orders/admin-single')({
             return Response.json({ error: 'Order not found' }, { status: 404 });
           }
 
-          const metadata = order.metadata as Record<string, unknown> | null;
+          const metadata = order.metadata as OrderMetadata | null;
 
           const data = {
             id: order.id,

@@ -90,7 +90,12 @@ export function useModerateReviewMutation() {
     mutationFn: async ({
       id,
       ...data
-    }: { id: string; verified?: boolean; reported?: boolean; reviewedByAdmin?: boolean }) => {
+    }: {
+      id: string;
+      verified?: boolean;
+      reported?: boolean;
+      reviewedByAdmin?: boolean;
+    }) => {
       const r = await apiClient.put<{ review: AdminReview }>(
         `/api/admin/reviews/${id}`,
         data,
@@ -105,10 +110,9 @@ export function useModerateReviewMutation() {
       queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.ADMIN_REVIEWS] });
     },
     onError: (error: { response?: { data?: { error?: string } } }) => {
-      toast.error(
-        error.response?.data?.error || 'Failed to moderate review',
-        { id: 'moderate-review' },
-      );
+      toast.error(error.response?.data?.error || 'Failed to moderate review', {
+        id: 'moderate-review',
+      });
     },
   });
 }
@@ -128,10 +132,9 @@ export function useDeleteReviewMutation() {
       queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.ADMIN_REVIEWS] });
     },
     onError: (error: { response?: { data?: { error?: string } } }) => {
-      toast.error(
-        error.response?.data?.error || 'Failed to delete review',
-        { id: 'delete-review' },
-      );
+      toast.error(error.response?.data?.error || 'Failed to delete review', {
+        id: 'delete-review',
+      });
     },
   });
 }

@@ -1,22 +1,18 @@
 import { createFileRoute } from '@tanstack/react-router';
-import { getRequestHeaders } from '@tanstack/react-start/server';
-import { auth } from '@/lib/auth';
-import { prisma } from '@/lib/db';
 import { createAuditLog } from '@/lib/audit-log';
+import { requireAdminOrManager, requireAuth } from '@/lib/auth-middleware';
+import { prisma } from '@/lib/db';
 
 export const Route = createFileRoute('/api/admin/coupons/$id')({
   server: {
     handlers: {
-      GET: async ({ params }) => {
+      POST: async ({ request }) => {
         try {
-          const headers = getRequestHeaders();
-          const session = await auth.api.getSession({ headers });
-          if (
-            !session?.user ||
-            (session.user.role !== 'ADMIN' && session.user.role !== 'MANAGER')
-          ) {
-            return Response.json({ error: 'Unauthorized' }, { status: 401 });
-          }
+          const authResult = await requireAuth();
+          if (authResult.response) return authResult.response;
+          const roleResponse = requireAdminOrManager(authResult.session);
+          if (roleResponse) return roleResponse;
+          const session = authResult.session;
 
           const coupon = await prisma.coupon.findUnique({
             where: { id: params.id },
@@ -124,7 +120,9 @@ export const Route = createFileRoute('/api/admin/coupons/$id')({
               ...(shippingDiscount !== undefined && {
                 shippingDiscount: shippingDiscount || null,
               }),
-              ...(bogoBuyQty !== undefined && { bogoBuyQty: bogoBuyQty || null }),
+              ...(bogoBuyQty !== undefined && {
+                bogoBuyQty: bogoBuyQty || null,
+              }),
               ...(bogoFreeQty !== undefined && {
                 bogoFreeQty: bogoFreeQty || null,
               }),
@@ -158,7 +156,11 @@ export const Route = createFileRoute('/api/admin/coupons/$id')({
             if (tiers.length > 0) {
               await prisma.couponTier.createMany({
                 data: tiers.map(
-                  (t: { minQuantity: number; value: number; type?: string }) => ({
+                  (t: {
+                    minQuantity: number;
+                    value: number;
+                    type?: string;
+                  }) => ({
                     couponId: params.id,
                     minQuantity: t.minQuantity,
                     value: t.value,
@@ -192,10 +194,7 @@ export const Route = createFileRoute('/api/admin/coupons/$id')({
         try {
           const headers = getRequestHeaders();
           const session = await auth.api.getSession({ headers });
-          if (
-            !session?.user ||
-            session.user.role !== 'ADMIN'
-          ) {
+          if (!session?.user || session.user.role !== 'ADMIN') {
             return Response.json({ error: 'Unauthorized' }, { status: 401 });
           }
 

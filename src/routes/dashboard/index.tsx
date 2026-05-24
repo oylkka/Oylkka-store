@@ -1,5 +1,4 @@
 import { createFileRoute, Link } from '@tanstack/react-router';
-import { motion } from 'motion/react';
 import {
   Heart,
   Package,
@@ -7,14 +6,10 @@ import {
   ShoppingCart,
   Wallet,
 } from 'lucide-react';
+import { motion } from 'motion/react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useMyOrders } from '@/services/order';
 import { useWishlist } from '@/services/wishlist';
@@ -141,9 +136,7 @@ function DashboardHome() {
                 <ShoppingCart className='w-5 h-5 text-blue-600' />
               </CardHeader>
               <CardContent>
-                <div className='text-2xl font-bold'>
-                  {orderCount}
-                </div>
+                <div className='text-2xl font-bold'>{orderCount}</div>
                 <p className='text-xs text-muted-foreground mt-1'>
                   {orders?.filter((o) => o.status === 'DELIVERED').length ?? 0}{' '}
                   delivered

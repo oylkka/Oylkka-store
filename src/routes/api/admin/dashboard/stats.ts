@@ -1,6 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router';
-import { getRequestHeaders } from '@tanstack/react-start/server';
-import { auth } from '@/lib/auth';
+import { requireAdminOrManager, requireAuth } from '@/lib/auth-middleware';
 import { prisma } from '@/lib/db';
 
 function daysAgo(n: number): Date {
@@ -15,14 +14,10 @@ export const Route = createFileRoute('/api/admin/dashboard/stats')({
     handlers: {
       GET: async () => {
         try {
-          const headers = getRequestHeaders();
-          const session = await auth.api.getSession({ headers });
-          if (
-            !session?.user ||
-            (session.user.role !== 'ADMIN' && session.user.role !== 'MANAGER')
-          ) {
-            return Response.json({ error: 'Unauthorized' }, { status: 401 });
-          }
+          const authResult = await requireAuth();
+          if (authResult.response) return authResult.response;
+          const roleResponse = requireAdminOrManager(authResult.session);
+          if (roleResponse) return roleResponse;
 
           const now = new Date();
           const thirtyDaysAgo = daysAgo(30);
@@ -78,10 +73,12 @@ export const Route = createFileRoute('/api/admin/dashboard/stats')({
               revenueByDay[key] += r._sum.total ?? 0;
             }
           }
-          const chartData = Object.entries(revenueByDay).map(([date, amount]) => ({
-            date,
-            amount,
-          }));
+          const chartData = Object.entries(revenueByDay).map(
+            ([date, amount]) => ({
+              date,
+              amount,
+            }),
+          );
 
           return Response.json({
             stats: {
@@ -105,7 +102,12 @@ export const Route = createFileRoute('/api/admin/dashboard/stats')({
           });
         } catch (error) {
           return Response.json(
-            { error: error instanceof Error ? error.message : 'Failed to load dashboard stats' },
+            {
+              error:
+                error instanceof Error
+                  ? error.message
+                  : 'Failed to load dashboard stats',
+            },
             { status: 500 },
           );
         }

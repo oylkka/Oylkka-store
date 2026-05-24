@@ -8,10 +8,16 @@ import { prisma } from '@/lib/db';
 import { generateInvoicePdf } from '@/lib/invoice-pdf';
 import { checkoutLimiter } from '@/lib/rate-limit';
 import { checkRateLimit } from '@/lib/rate-limit-guard';
+import {
+  applyShippingDiscounts,
+  processVouchers,
+  sumVoucherTotals,
+} from '@/services/checkout/voucher-processor';
+import type { OrderMetadata } from '@/types/orders';
 
 function generateOrderNumber(): string {
   const ts = Date.now().toString(36).toUpperCase();
-  const rand = Math.random().toString(36).substring(2, 6).toUpperCase();
+  const rand = crypto.randomUUID().substring(0, 8).toUpperCase();
   return `ORD-${ts}${rand}`;
 }
 
@@ -251,303 +257,52 @@ export const Route = createFileRoute('/api/checkout/create')({
           }
 
           // --- Voucher validation & application ---
-          const selectedVouchers: {
-            id: string;
-            couponId: string;
-            code: string;
-            discountAmount: number;
-            shippingDiscount: number;
-            freeShipping: boolean;
-            cashbackAmount: number;
-            scope: string;
-            scopeId: string | null;
-            tierUsed: {
-              minQuantity: number;
-              value: number;
-              type?: string;
-            } | null;
-            bogoApplied: {
-              buyQty: number;
-              freeQty: number;
-              freeItemPrice: number;
-            } | null;
-          }[] = [];
+          const customerOrderCount = await prisma.order.count({
+            where: { customerId: session.user.id },
+          });
 
           const now = new Date();
 
-          if (parsed.data.voucherIds && parsed.data.voucherIds.length > 0) {
-            const userVouchers = await prisma.userVoucher.findMany({
-              where: {
-                id: { in: parsed.data.voucherIds },
-                userId: session.user.id,
-                usedAt: null,
-              },
-              include: {
-                coupon: {
-                  include: { tiers: { orderBy: { minQuantity: 'asc' } } },
+          const selectedVouchers = parsed.data.voucherIds?.length
+            ? processVouchers(
+                await prisma.userVoucher.findMany({
+                  where: {
+                    id: { in: parsed.data.voucherIds },
+                    userId: session.user.id,
+                    usedAt: null,
+                  },
+                  include: {
+                    coupon: {
+                      include: { tiers: { orderBy: { minQuantity: 'asc' } } },
+                    },
+                  },
+                }),
+                cart,
+                subtotal,
+                {
+                  paymentMethod: parsed.data.paymentMethod,
+                  customerOrderCount,
+                  userAgent: headers.get('user-agent') || undefined,
                 },
-              },
-            });
-
-            // Group by scope for stacking rules
-            const globalCoupons: string[] = [];
-            const shopCoupons = new Map<string, string>(); // shopId -> couponId
-            const productCoupons = new Map<string, string>(); // productId -> couponId
-
-            for (const uv of userVouchers) {
-              const coupon = uv.coupon;
-
-              // Re-validate
-              if (!coupon.isActive) continue;
-              if (coupon.expiresAt && coupon.expiresAt < now) continue;
-              if (coupon.startsAt && coupon.startsAt > now) continue;
-              if (coupon.maxUses > 0 && coupon.usedCount >= coupon.maxUses)
-                continue;
-
-              // Stacking rules
-              if (coupon.scope === 'GLOBAL') {
-                if (globalCoupons.length > 0) continue;
-                globalCoupons.push(coupon.id);
-              } else if (coupon.scope === 'SHOP' && coupon.scopeId) {
-                if (shopCoupons.has(coupon.scopeId)) continue;
-                shopCoupons.set(coupon.scopeId, coupon.id);
-              } else if (coupon.scope === 'PRODUCT' && coupon.scopeId) {
-                if (productCoupons.has(coupon.scopeId)) continue;
-                productCoupons.set(coupon.scopeId, coupon.id);
-              }
-
-              // Calculate discount
-              let discountAmount = 0;
-              let cashbackAmount = 0;
-              let tierUsed = null;
-              let bogoApplied = null;
-
-              const totalQty = cart.items.reduce((s, i) => s + i.quantity, 0);
-              const effectiveScopeId = coupon.scopeId;
-              const scopedItems = cart.items.filter(
-                (item) =>
-                  !effectiveScopeId ||
-                  item.product.id === effectiveScopeId ||
-                  item.product.shop?.id === effectiveScopeId,
-              );
-              const scopedSubtotal = scopedItems.reduce(
-                (s, item) =>
-                  s + (item.savedPrice ?? item.product.price) * item.quantity,
-                0,
-              );
-
-              // Check minQuantity
-              if (coupon.minQuantity) {
-                let qtyOk = false;
-                if (coupon.scope === 'PRODUCT' && coupon.scopeId) {
-                  const scopedQty = cart.items
-                    .filter((i) => i.product.id === coupon.scopeId)
-                    .reduce((s, i) => s + i.quantity, 0);
-                  qtyOk = scopedQty >= coupon.minQuantity;
-                } else {
-                  qtyOk = totalQty >= coupon.minQuantity;
-                }
-                if (!qtyOk) continue;
-              }
-
-              // Check minOrderAmount
-              if (coupon.minOrderAmount && subtotal < coupon.minOrderAmount)
-                continue;
-
-              // Check maxClaimCount
-              if (
-                coupon.maxClaimCount > 0 &&
-                coupon.claimedCount >= coupon.maxClaimCount
               )
-                continue;
-
-              // Check firstOrderOnly
-              if (coupon.firstOrderOnly) {
-                const count = await prisma.order.count({
-                  where: { customerId: session.user.id },
-                });
-                if (count > 0) continue;
-              }
-
-              // Check repeatPurchaseOnly
-              if (coupon.repeatPurchaseOnly) {
-                const count = await prisma.order.count({
-                  where: { customerId: session.user.id },
-                });
-                if (count === 0) continue;
-              }
-
-              // Check requiredPaymentMethod
-              if (
-                coupon.requiredPaymentMethod &&
-                coupon.requiredPaymentMethod !== parsed.data.paymentMethod
-              )
-                continue;
-
-              // Check platformRestriction
-              if (coupon.platformRestriction !== 'ALL') {
-                const userAgent = headers.get('user-agent') || '';
-                const isMobile =
-                  /Android|iPhone|iPad|iPod|webOS|BlackBerry|IEMobile|Opera Mini/i.test(
-                    userAgent,
-                  );
-                if (coupon.platformRestriction === 'MOBILE_ONLY' && !isMobile)
-                  continue;
-                if (coupon.platformRestriction === 'WEB_ONLY' && isMobile)
-                  continue;
-              }
-
-              // Calculate discount — tiers
-              if (coupon.tiers.length > 0) {
-                const matchingTier = [...coupon.tiers]
-                  .reverse()
-                  .find((t) => totalQty >= t.minQuantity);
-                if (matchingTier) {
-                  const tType = matchingTier.type || coupon.type;
-                  if (tType === 'PERCENTAGE') {
-                    discountAmount =
-                      (scopedSubtotal * matchingTier.value) / 100;
-                    if (coupon.maxDiscount) {
-                      discountAmount = Math.min(
-                        discountAmount,
-                        coupon.maxDiscount,
-                      );
-                    }
-                  } else if (tType === 'FIXED') {
-                    discountAmount = Math.min(
-                      matchingTier.value,
-                      scopedSubtotal,
-                    );
-                  } else if (tType === 'CASHBACK') {
-                    cashbackAmount =
-                      (scopedSubtotal * matchingTier.value) / 100;
-                    if (coupon.maxDiscount) {
-                      cashbackAmount = Math.min(
-                        cashbackAmount,
-                        coupon.maxDiscount,
-                      );
-                    }
-                  }
-                  tierUsed = {
-                    minQuantity: matchingTier.minQuantity,
-                    value: matchingTier.value,
-                    type: tType,
-                  };
-                }
-              }
-
-              // No tier — use coupon value
-              if (!tierUsed) {
-                if (coupon.type === 'PERCENTAGE') {
-                  discountAmount = (scopedSubtotal * coupon.value) / 100;
-                  if (coupon.maxDiscount) {
-                    discountAmount = Math.min(
-                      discountAmount,
-                      coupon.maxDiscount,
-                    );
-                  }
-                } else if (coupon.type === 'FIXED') {
-                  discountAmount = Math.min(coupon.value, scopedSubtotal);
-                } else if (coupon.type === 'CASHBACK') {
-                  cashbackAmount = (scopedSubtotal * coupon.value) / 100;
-                  if (coupon.maxDiscount) {
-                    cashbackAmount = Math.min(
-                      cashbackAmount,
-                      coupon.maxDiscount,
-                    );
-                  }
-                }
-              }
-
-              // BOGO
-              if (coupon.bogoBuyQty && coupon.bogoFreeQty) {
-                const bogoItems = effectiveScopeId
-                  ? cart.items.filter(
-                      (item) =>
-                        item.product.id === effectiveScopeId ||
-                        item.product.shop?.id === effectiveScopeId,
-                    )
-                  : cart.items;
-
-                const totalBogoQty = bogoItems.reduce(
-                  (s, i) => s + i.quantity,
-                  0,
-                );
-                if (totalBogoQty >= coupon.bogoBuyQty) {
-                  const freeBatches = Math.floor(
-                    totalBogoQty / coupon.bogoBuyQty,
-                  );
-                  const maxFreeItems = freeBatches * coupon.bogoFreeQty;
-
-                  const sortedByPrice = [...bogoItems].sort(
-                    (a, b) => (a.product.price ?? 0) - (b.product.price ?? 0),
-                  );
-
-                  let remainingFree = maxFreeItems;
-                  let totalFreeValue = 0;
-                  for (const item of sortedByPrice) {
-                    if (remainingFree <= 0) break;
-                    const take = Math.min(remainingFree, item.quantity);
-                    totalFreeValue += take * (item.product.price ?? 0);
-                    remainingFree -= take;
-                  }
-
-                  discountAmount += totalFreeValue;
-                  bogoApplied = {
-                    buyQty: coupon.bogoBuyQty,
-                    freeQty: coupon.bogoFreeQty * freeBatches,
-                    freeItemPrice: totalFreeValue,
-                  };
-                }
-              }
-
-              discountAmount = Math.round(discountAmount * 100) / 100;
-              cashbackAmount = Math.round(cashbackAmount * 100) / 100;
-
-              selectedVouchers.push({
-                id: uv.id,
-                couponId: coupon.id,
-                code: coupon.code,
-                discountAmount: Math.max(0, discountAmount),
-                shippingDiscount: coupon.shippingDiscount || 0,
-                freeShipping: coupon.freeShipping,
-                cashbackAmount: Math.max(0, cashbackAmount),
-                scope: coupon.scope,
-                scopeId: effectiveScopeId,
-                tierUsed,
-                bogoApplied,
-              });
-            }
-          }
+            : [];
 
           // --- Apply shipping discounts ---
-          let finalShipping = baseShipping;
-
-          if (selectedVouchers.some((v) => v.freeShipping)) {
-            finalShipping = 0;
-          } else {
-            for (const v of selectedVouchers) {
-              finalShipping = Math.max(0, finalShipping - v.shippingDiscount);
-            }
-          }
+          const finalShipping = applyShippingDiscounts(
+            selectedVouchers,
+            baseShipping,
+          );
 
           // --- Apply discount stacking ---
-          let totalCouponDiscount = 0;
-          let totalCashback = 0;
-
-          for (const v of selectedVouchers) {
-            totalCouponDiscount += v.discountAmount;
-            totalCashback += v.cashbackAmount;
-          }
-
-          // Cap discount at subtotal
-          totalCouponDiscount = Math.min(totalCouponDiscount, subtotal);
+          const { totalCouponDiscount, totalCashback } =
+            sumVoucherTotals(selectedVouchers);
+          const cappedCouponDiscount = Math.min(totalCouponDiscount, subtotal);
 
           const tax = 0;
           const total =
             subtotal -
             totalDiscount -
-            totalCouponDiscount +
+            cappedCouponDiscount +
             finalShipping +
             tax;
 
@@ -584,7 +339,7 @@ export const Route = createFileRoute('/api/checkout/create')({
                 couponCode:
                   selectedVouchers.map((v) => v.code).join(',') || null,
                 couponDiscount:
-                  totalCouponDiscount > 0 ? totalCouponDiscount : null,
+                  cappedCouponDiscount > 0 ? cappedCouponDiscount : null,
                 shippingCost: finalShipping,
                 tax,
                 total,
@@ -607,7 +362,7 @@ export const Route = createFileRoute('/api/checkout/create')({
                 metadata: {
                   appliedVouchers: appliedVouchersData,
                   cashbackAmount: totalCashback,
-                },
+                } as OrderMetadata,
                 items: {
                   create: cart.items.map((item) => {
                     const unitPrice =

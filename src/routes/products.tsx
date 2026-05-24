@@ -8,11 +8,8 @@ import {
   ProductCardSkeleton,
 } from '@/components/pages/shop/product-card';
 import { Button } from '@/components/ui/button';
-import {
-  type ProductSortOption,
-  useAllProducts,
-  usePublicCategories,
-} from '@/services/product';
+import { usePublicCategories } from '@/services/category';
+import { type ProductSortOption, useAllProducts } from '@/services/product';
 
 export const Route = createFileRoute('/products')({
   component: RouteComponent,

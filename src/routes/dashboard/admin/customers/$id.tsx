@@ -1,4 +1,9 @@
-import { createFileRoute, Link, redirect, useNavigate } from '@tanstack/react-router';
+import {
+  createFileRoute,
+  Link,
+  redirect,
+  useNavigate,
+} from '@tanstack/react-router';
 import { format } from 'date-fns';
 import {
   ArrowLeft,
@@ -12,12 +17,7 @@ import { useState } from 'react';
 import { toast } from 'sonner';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
   Dialog,
   DialogContent,
@@ -223,7 +223,10 @@ function RouteComponent() {
               <div className='grid grid-cols-2 gap-4 pt-2'>
                 <div>
                   <p className='text-xs text-muted-foreground'>Role</p>
-                  <Badge variant='outline' className='mt-1 uppercase text-[10px]'>
+                  <Badge
+                    variant='outline'
+                    className='mt-1 uppercase text-[10px]'
+                  >
                     {customer.role}
                   </Badge>
                 </div>
@@ -294,10 +297,7 @@ function RouteComponent() {
               <div className='space-y-2'>
                 <Label>Change Role</Label>
                 <div className='flex gap-2'>
-                  <Select
-                    value={newRole}
-                    onValueChange={setNewRole}
-                  >
+                  <Select value={newRole} onValueChange={setNewRole}>
                     <SelectTrigger className='flex-1'>
                       <SelectValue placeholder='Select role...' />
                     </SelectTrigger>
@@ -323,10 +323,7 @@ function RouteComponent() {
               </div>
 
               <div className='pt-2 border-t'>
-                <Dialog
-                  open={banDialogOpen}
-                  onOpenChange={setBanDialogOpen}
-                >
+                <Dialog open={banDialogOpen} onOpenChange={setBanDialogOpen}>
                   <DialogTrigger asChild>
                     <Button
                       variant={customer.banned ? 'default' : 'destructive'}
@@ -348,9 +345,7 @@ function RouteComponent() {
                   <DialogContent>
                     <DialogHeader>
                       <DialogTitle>
-                        {customer.banned
-                          ? 'Unban Customer'
-                          : 'Ban Customer'}
+                        {customer.banned ? 'Unban Customer' : 'Ban Customer'}
                       </DialogTitle>
                       <DialogDescription>
                         {customer.banned
@@ -392,9 +387,7 @@ function RouteComponent() {
                         Cancel
                       </Button>
                       <Button
-                        variant={
-                          customer.banned ? 'default' : 'destructive'
-                        }
+                        variant={customer.banned ? 'default' : 'destructive'}
                         onClick={handleBanToggle}
                         disabled={banMutation.isPending}
                       >
@@ -441,10 +434,7 @@ function RouteComponent() {
                             {order.orderNumber}
                           </p>
                           <p className='text-xs text-muted-foreground'>
-                            {format(
-                              new Date(order.createdAt),
-                              'MMM d, yyyy',
-                            )}
+                            {format(new Date(order.createdAt), 'MMM d, yyyy')}
                           </p>
                         </div>
                         <div className='flex items-center gap-3'>

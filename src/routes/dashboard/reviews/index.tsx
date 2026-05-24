@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from '@tanstack/react-router';
 import { format } from 'date-fns';
+import { Star, Trash2 } from 'lucide-react';
 import { motion } from 'motion/react';
 import { useState } from 'react';
 import {
@@ -15,12 +16,7 @@ import {
 } from '@/components/ui/alert-dialog';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import {
   Dialog,
   DialogContent,
@@ -32,7 +28,6 @@ import {
 } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Star, Text, Trash2 } from 'lucide-react';
 import { Textarea } from '@/components/ui/textarea';
 import {
   useDeleteReviewMutation,
@@ -98,7 +93,11 @@ function RouteComponent() {
   const [editContent, setEditContent] = useState('');
   const [deleteId, setDeleteId] = useState<string | null>(null);
 
-  const openEditDialog = (review: { id: string; rating: number; content: string }) => {
+  const openEditDialog = (review: {
+    id: string;
+    rating: number;
+    content: string;
+  }) => {
     setEditId(review.id);
     setEditRating(review.rating);
     setEditContent(review.content);

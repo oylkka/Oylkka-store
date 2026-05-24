@@ -3,13 +3,7 @@ import { FileText, Loader2 } from 'lucide-react';
 import { motion } from 'motion/react';
 import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
-import { Label } from '@/components/ui/label';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Textarea } from '@/components/ui/textarea';
 import {
@@ -68,8 +62,12 @@ function RouteComponent() {
         <Skeleton className='h-8 w-48' />
         {[1, 2, 3].map((i) => (
           <Card key={i}>
-            <CardHeader><Skeleton className='h-5 w-32' /></CardHeader>
-            <CardContent><Skeleton className='h-32 w-full' /></CardContent>
+            <CardHeader>
+              <Skeleton className='h-5 w-32' />
+            </CardHeader>
+            <CardContent>
+              <Skeleton className='h-32 w-full' />
+            </CardContent>
           </Card>
         ))}
       </div>
@@ -132,9 +130,7 @@ function RouteComponent() {
       <motion.div variants={fadeUp} custom={3}>
         <Card>
           <CardHeader>
-            <CardTitle className='text-lg'>
-              Terms & Conditions
-            </CardTitle>
+            <CardTitle className='text-lg'>Terms & Conditions</CardTitle>
           </CardHeader>
           <CardContent>
             <Textarea
@@ -150,10 +146,7 @@ function RouteComponent() {
 
       <motion.div variants={fadeUp} custom={4}>
         <div className='flex items-center gap-3'>
-          <Button
-            onClick={handleSave}
-            disabled={updateMutation.isPending}
-          >
+          <Button onClick={handleSave} disabled={updateMutation.isPending}>
             {updateMutation.isPending && (
               <Loader2 className='w-4 h-4 mr-2 animate-spin' />
             )}

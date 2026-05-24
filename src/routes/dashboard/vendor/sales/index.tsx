@@ -1,4 +1,11 @@
 import { createFileRoute } from '@tanstack/react-router';
+import {
+  BarChart3,
+  DollarSign,
+  Package,
+  ShoppingCart,
+  TrendingUp,
+} from 'lucide-react';
 import { motion } from 'motion/react';
 import {
   Bar,
@@ -9,21 +16,8 @@ import {
   XAxis,
   YAxis,
 } from 'recharts';
-import {
-  BarChart3,
-  DollarSign,
-  Package,
-  ShoppingCart,
-  TrendingUp,
-} from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useVendorAnalytics } from '@/services/vendor-analytics';
 
@@ -43,21 +37,52 @@ export const Route = createFileRoute('/dashboard/vendor/sales/')({
 });
 
 const statCards = [
-  { key: 'revenue', label: 'Total Revenue', icon: DollarSign, color: 'text-emerald-600' },
-  { key: 'totalOrders', label: 'Total Orders', icon: ShoppingCart, color: 'text-blue-600' },
-  { key: 'pendingOrders', label: 'Pending Orders', icon: BarChart3, color: 'text-amber-600' },
-  { key: 'fulfilledOrders', label: 'Delivered', icon: TrendingUp, color: 'text-violet-600' },
-  { key: 'products', label: 'Products Sold', icon: Package, color: 'text-rose-600' },
+  {
+    key: 'revenue',
+    label: 'Total Revenue',
+    icon: DollarSign,
+    color: 'text-emerald-600',
+  },
+  {
+    key: 'totalOrders',
+    label: 'Total Orders',
+    icon: ShoppingCart,
+    color: 'text-blue-600',
+  },
+  {
+    key: 'pendingOrders',
+    label: 'Pending Orders',
+    icon: BarChart3,
+    color: 'text-amber-600',
+  },
+  {
+    key: 'fulfilledOrders',
+    label: 'Delivered',
+    icon: TrendingUp,
+    color: 'text-violet-600',
+  },
+  {
+    key: 'products',
+    label: 'Products Sold',
+    icon: Package,
+    color: 'text-rose-600',
+  },
 ];
 
 const statusBadge = (status: string) => {
   switch (status) {
-    case 'PENDING': return { variant: 'secondary' as const, label: 'Pending' };
-    case 'PROCESSING': return { variant: 'default' as const, label: 'Processing' };
-    case 'SHIPPED': return { variant: 'default' as const, label: 'Shipped' };
-    case 'DELIVERED': return { variant: 'default' as const, label: 'Delivered' };
-    case 'CANCELLED': return { variant: 'destructive' as const, label: 'Cancelled' };
-    default: return { variant: 'outline' as const, label: status };
+    case 'PENDING':
+      return { variant: 'secondary' as const, label: 'Pending' };
+    case 'PROCESSING':
+      return { variant: 'default' as const, label: 'Processing' };
+    case 'SHIPPED':
+      return { variant: 'default' as const, label: 'Shipped' };
+    case 'DELIVERED':
+      return { variant: 'default' as const, label: 'Delivered' };
+    case 'CANCELLED':
+      return { variant: 'destructive' as const, label: 'Cancelled' };
+    default:
+      return { variant: 'outline' as const, label: status };
   }
 };
 
@@ -97,7 +122,8 @@ function RouteComponent() {
               </Card>
             ))
           : statCards.map((card) => {
-              const value = data?.stats[card.key as keyof typeof data.stats] ?? 0;
+              const value =
+                data?.stats[card.key as keyof typeof data.stats] ?? 0;
               const Icon = card.icon;
               return (
                 <Card key={card.key}>
@@ -117,7 +143,8 @@ function RouteComponent() {
                       {card.key === 'revenue' && 'Net vendor earnings'}
                       {card.key === 'totalOrders' && 'All time items ordered'}
                       {card.key === 'pendingOrders' && 'Awaiting processing'}
-                      {card.key === 'fulfilledOrders' && 'Successfully delivered'}
+                      {card.key === 'fulfilledOrders' &&
+                        'Successfully delivered'}
                       {card.key === 'products' && 'Total units sold'}
                     </p>
                   </CardContent>
@@ -130,7 +157,9 @@ function RouteComponent() {
         <motion.div variants={fadeUp} custom={2}>
           <Card>
             <CardHeader>
-              <CardTitle className='text-lg'>Monthly Revenue (12 Months)</CardTitle>
+              <CardTitle className='text-lg'>
+                Monthly Revenue (12 Months)
+              </CardTitle>
             </CardHeader>
             <CardContent>
               {isLoading ? (
@@ -147,7 +176,20 @@ function RouteComponent() {
                       dataKey='month'
                       tickFormatter={(v) => {
                         const [y, m] = v.split('-');
-                        const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+                        const months = [
+                          'Jan',
+                          'Feb',
+                          'Mar',
+                          'Apr',
+                          'May',
+                          'Jun',
+                          'Jul',
+                          'Aug',
+                          'Sep',
+                          'Oct',
+                          'Nov',
+                          'Dec',
+                        ];
                         return `${months[parseInt(m) - 1]} ${y.slice(2)}`;
                       }}
                       tick={{ fontSize: 11 }}
@@ -155,13 +197,31 @@ function RouteComponent() {
                     />
                     <YAxis
                       tick={{ fontSize: 11 }}
-                      tickFormatter={(v) => (v >= 1000 ? `${(v / 1000).toFixed(0)}k` : v)}
+                      tickFormatter={(v) =>
+                        v >= 1000 ? `${(v / 1000).toFixed(0)}k` : v
+                      }
                     />
                     <Tooltip
-                      formatter={(value: number) => [`BDT ${value.toLocaleString()}`, 'Revenue']}
+                      formatter={(value: number) => [
+                        `BDT ${value.toLocaleString()}`,
+                        'Revenue',
+                      ]}
                       labelFormatter={(label) => {
                         const [y, m] = label.split('-');
-                        const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+                        const months = [
+                          'January',
+                          'February',
+                          'March',
+                          'April',
+                          'May',
+                          'June',
+                          'July',
+                          'August',
+                          'September',
+                          'October',
+                          'November',
+                          'December',
+                        ];
                         return `${months[parseInt(m) - 1]} ${y}`;
                       }}
                     />
@@ -252,7 +312,8 @@ function RouteComponent() {
                             {order.productName}
                           </p>
                           <p className='text-xs text-muted-foreground'>
-                            {order.orderNumber} · {order.quantity} unit{order.quantity !== 1 ? 's' : ''}
+                            {order.orderNumber} · {order.quantity} unit
+                            {order.quantity !== 1 ? 's' : ''}
                           </p>
                         </div>
                         <div className='flex items-center gap-3 ml-3'>

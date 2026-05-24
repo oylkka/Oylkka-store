@@ -1,22 +1,20 @@
 import { createFileRoute } from '@tanstack/react-router';
-import { getRequestHeaders } from '@tanstack/react-start/server';
 import { DeleteImage, UploadImage } from '@/cloudinary';
-import { auth } from '@/lib/auth';
+import { requireAuth } from '@/lib/auth-middleware';
 import { validateCsrf } from '@/lib/csrf';
 import { prisma } from '@/lib/db';
 import { slugify } from '@/lib/slug';
+import { ProductApiEditSchema } from '@/schemas/product-api-schema';
+import { SkuService } from '@/services/sku-service';
 
 export const Route = createFileRoute('/api/product/edit')({
   server: {
     handlers: {
       POST: async ({ request }) => {
         try {
-          const headers = getRequestHeaders();
-          const session = await auth.api.getSession({ headers });
-
-          if (!session?.user) {
-            return Response.json({ error: 'Unauthorized' }, { status: 401 });
-          }
+          const authResult = await requireAuth();
+          if (authResult.response) return authResult.response;
+          const session = authResult.session;
 
           const csrfResponse = validateCsrf();
           if (csrfResponse) return csrfResponse;
@@ -114,39 +112,70 @@ export const Route = createFileRoute('/api/product/edit')({
             return Response.json({ error: 'Unauthorized' }, { status: 401 });
           }
 
+          // Normalize optional category field
+          if (!data.category && data.categoryId) {
+            data.category = data.categoryId;
+          }
+
+          // Validate parsed data against schema
+          const parsed = ProductApiEditSchema.safeParse(data);
+          if (!parsed.success) {
+            return Response.json(
+              {
+                error: 'Validation failed',
+                details: parsed.error.flatten(),
+              },
+              { status: 400 },
+            );
+          }
+          const v = parsed.data;
+
+          // Validate SKU format if provided
+          if (v.sku && !SkuService.isValidSku(v.sku)) {
+            return Response.json(
+              {
+                error: 'Invalid SKU format. Expected pattern like CAT-PRD-001',
+              },
+              { status: 400 },
+            );
+          }
+
+          // Check SKU uniqueness if changed
+          if (v.sku && v.sku !== existing.sku) {
+            const existingSku = await prisma.product.findUnique({
+              where: { sku: v.sku },
+              select: { id: true },
+            });
+            if (existingSku) {
+              return Response.json(
+                { error: `SKU "${v.sku}" is already in use` },
+                { status: 409 },
+              );
+            }
+          }
+
           // Map field names
-          const categoryId =
-            (data.category as string) ||
-            (data.categoryId as string) ||
-            existing.categoryId;
+          const categoryId = v.category || existing.categoryId;
 
           // Handle dimensions
-          const dims = data.dimensions as Record<string, unknown> | undefined;
+          const dims = v.dimensions;
           let dimensionLength = existing.dimensionLength;
           let dimensionWidth = existing.dimensionWidth;
           let dimensionHeight = existing.dimensionHeight;
           let dimensionUnit = existing.dimensionUnit;
 
-          if (dims) {
-            dimensionLength =
-              (dims.length as number) ?? existing.dimensionLength;
-            dimensionWidth = (dims.width as number) ?? existing.dimensionWidth;
-            dimensionHeight =
-              (dims.height as number) ?? existing.dimensionHeight;
-            dimensionUnit = (dims.unit as string) || existing.dimensionUnit;
-          } else if (data.dimensionLength !== undefined) {
-            dimensionLength = data.dimensionLength as number;
-            dimensionWidth = data.dimensionWidth as number;
-            dimensionHeight = data.dimensionHeight as number;
-            dimensionUnit =
-              (data.dimensionUnit as string) || existing.dimensionUnit;
+          if (dims && dims.length !== undefined) {
+            dimensionLength = dims.length ?? existing.dimensionLength;
+            dimensionWidth = dims.width ?? existing.dimensionWidth;
+            dimensionHeight = dims.height ?? existing.dimensionHeight;
+            dimensionUnit = dims.unit || existing.dimensionUnit;
           }
 
           // Generate slug if name changed
-          const nameChanged = data.productName !== existing.productName;
+          const nameChanged = v.productName !== existing.productName;
           let slug = existing.slug;
           if (nameChanged) {
-            const baseSlug = slugify(data.productName as string);
+            const baseSlug = slugify(v.productName);
             if (!baseSlug) {
               return Response.json(
                 { error: 'Invalid product name — unable to generate slug' },
@@ -166,10 +195,9 @@ export const Route = createFileRoute('/api/product/edit')({
           }
 
           // Handle image updates (all images stored in ProductImage[])
-          const keepExistingImage = data.keepExistingImage === true;
+          const keepExistingImage = v.keepExistingImage === true;
           const productImages = data.productImages as File[] | undefined;
-          const removedImageIds: string[] =
-            (data.removedGalleryIds as string[]) || [];
+          const removedImageIds: string[] = v.removedGalleryIds || [];
 
           // Delete removed images
           if (removedImageIds.length > 0) {
@@ -236,9 +264,7 @@ export const Route = createFileRoute('/api/product/edit')({
           }
 
           // Handle attributes update
-          const attributes = data.attributes as
-            | Record<string, string[]>
-            | undefined;
+          const attributes = v.attributes;
           if (attributes) {
             await prisma.productAttributeOption.deleteMany({
               where: { productId },
@@ -255,9 +281,7 @@ export const Route = createFileRoute('/api/product/edit')({
           }
 
           // Handle variants update
-          const variants = data.variants as
-            | Array<Record<string, unknown>>
-            | undefined;
+          const variants = v.variants;
           if (variants) {
             // Delete existing variants
             await prisma.productVariant.deleteMany({
@@ -268,12 +292,12 @@ export const Route = createFileRoute('/api/product/edit')({
             const variantImages = data.variantImages as
               | Record<string, File>
               | undefined;
-            for (const v of variants) {
-              const attrRecord = (v.attributes as Record<string, string>) || {};
+            for (const variant of variants) {
+              const attrRecord = variant.attributes;
               let variantImageUrl: string | null = null;
               let variantImagePublicId: string | null = null;
 
-              const vId = v.id as string;
+              const vId = variant.id ?? '';
               const vImage = variantImages?.[vId];
               if (vImage instanceof File && vImage.size > 0) {
                 const result = await UploadImage(vImage, 'products/variants');
@@ -284,11 +308,11 @@ export const Route = createFileRoute('/api/product/edit')({
               await prisma.productVariant.create({
                 data: {
                   productId,
-                  name: v.name as string,
-                  sku: v.sku as string,
-                  price: (v.price as number) || 0,
-                  discountPrice: (v.discountPrice as number) || null,
-                  stock: (v.stock as number) || 0,
+                  name: variant.name,
+                  sku: variant.sku,
+                  price: variant.price || 0,
+                  discountPrice: variant.discountPrice ?? null,
+                  stock: variant.stock,
                   attributes: attrRecord,
                   imageUrl: variantImageUrl,
                   imagePublicId: variantImagePublicId,
@@ -300,20 +324,19 @@ export const Route = createFileRoute('/api/product/edit')({
           const product = await prisma.product.update({
             where: { id: productId },
             data: {
-              productName: data.productName as string,
+              productName: v.productName ?? existing.productName,
               slug,
-              description: data.description as string,
+              description: v.description ?? existing.description,
               categoryId,
-              tags: (data.tags as string[]) || existing.tags,
-              sku: data.sku as string,
-              brand: (data.brand as string) || null,
-              price: (data.price as number) || existing.price,
-              discountPrice:
-                (data.discountPrice as number) ?? existing.discountPrice,
-              stock: (data.stock as number) ?? existing.stock,
+              tags: v.tags ?? existing.tags,
+              sku: v.sku ?? existing.sku,
+              brand: v.brand ?? existing.brand,
+              price: v.price ?? existing.price,
+              discountPrice: v.discountPrice ?? existing.discountPrice,
+              stock: v.stock ?? existing.stock,
               hasVariants: !!(variants && variants.length > 0),
               condition:
-                (data.condition as
+                (v.condition as
                   | 'NEW'
                   | 'USED'
                   | 'LIKE_NEW'
@@ -321,14 +344,12 @@ export const Route = createFileRoute('/api/product/edit')({
                   | 'GOOD'
                   | 'FAIR'
                   | 'POOR'
-                  | 'FOR_PARTS') || existing.condition,
+                  | 'FOR_PARTS') ?? existing.condition,
               conditionDescription:
-                (data.conditionDescription as string) ??
-                existing.conditionDescription,
-              weight: (data.weight as number) ?? existing.weight,
-              weightUnit: (data.weightUnit as string) || existing.weightUnit,
-              freeShipping:
-                data.freeShipping === true || data.freeShipping === 'true',
+                v.conditionDescription ?? existing.conditionDescription,
+              weight: v.weight ?? existing.weight,
+              weightUnit: v.weightUnit ?? existing.weightUnit,
+              freeShipping: v.freeShipping ?? existing.freeShipping,
               dimensionLength,
               dimensionWidth,
               dimensionHeight,
@@ -349,16 +370,15 @@ export const Route = createFileRoute('/api/product/edit')({
                     },
                   }
                 : {}),
-              metaTitle: (data.metaTitle as string) ?? existing.metaTitle,
-              metaDescription:
-                (data.metaDescription as string) ?? existing.metaDescription,
+              metaTitle: v.metaTitle ?? existing.metaTitle,
+              metaDescription: v.metaDescription ?? existing.metaDescription,
               status:
-                (data.status as
+                (v.status as
                   | 'DRAFT'
                   | 'ACTIVE'
                   | 'ARCHIVED'
-                  | 'OUT_OF_STOCK') || existing.status,
-              featured: data.featured === true || data.featured === 'true',
+                  | 'OUT_OF_STOCK') ?? existing.status,
+              featured: v.featured ?? existing.featured,
             },
             include: {
               images: { orderBy: { order: 'asc' } },

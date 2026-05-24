@@ -31,7 +31,7 @@ const httpUrl = (val: string | undefined) => !val || val.startsWith('http');
 // ─── Base schema ────────────────────────────────────────────────────────────
 
 const BaseBannerSchema = z.object({
-  title: z.string().min(5, 'Title is required'),
+  title: z.string().min(1, 'Title is required'),
   subtitle: z.string().optional(),
   description: z.string().optional(),
   bannerTag: z.enum(['PROMO', 'INFO', 'ANNOUNCEMENT']).optional(),
@@ -72,8 +72,8 @@ export const BannerFormSchema = BaseBannerSchema.extend({
       (files) =>
         !files ||
         files.length === 0 ||
-        (files instanceof FileList && files[0]?.size <= 512000),
-      { message: 'Image size must not exceed 500KB' },
+        (files instanceof FileList && files[0]?.size <= 2_097_152),
+      { message: 'Image size must not exceed 2MB' },
     ),
 })
   .refine(endDateAfterStart, {
@@ -127,9 +127,9 @@ export const EditBannerFormSchema = BaseBannerSchema.extend({
   .refine(
     (data) => {
       if (!data.image || data.image.length === 0) return true;
-      return data.image instanceof FileList && data.image[0]?.size <= 512000;
+      return data.image instanceof FileList && data.image[0]?.size <= 2_097_152;
     },
-    { message: 'Image size must not exceed 500KB', path: ['image'] },
+    { message: 'Image size must not exceed 2MB', path: ['image'] },
   );
 
 // ─── API schema (server-side, no image — validated separately) ──────────────

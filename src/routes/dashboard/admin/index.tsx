@@ -20,12 +20,7 @@ import {
 } from 'recharts';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useAdminDashboardStats } from '@/services/admin-dashboard';
 
@@ -75,13 +70,55 @@ export const Route = createFileRoute('/dashboard/admin/')({
 });
 
 const statCards = [
-  { key: 'revenue', label: 'Total Revenue', icon: DollarSign, color: 'text-emerald-600', prefix: 'BDT ' },
-  { key: 'orders', label: 'Total Orders', icon: ShoppingCart, color: 'text-blue-600', prefix: '' },
-  { key: 'pendingOrders', label: 'Pending Orders', icon: BarChart3, color: 'text-amber-600', prefix: '' },
-  { key: 'processingOrders', label: 'Processing', icon: TrendingUp, color: 'text-violet-600', prefix: '' },
-  { key: 'products', label: 'Products', icon: Package, color: 'text-rose-600', prefix: '' },
-  { key: 'users', label: 'Users', icon: Users, color: 'text-cyan-600', prefix: '' },
-  { key: 'vendors', label: 'Active Vendors', icon: Store, color: 'text-orange-600', prefix: '' },
+  {
+    key: 'revenue',
+    label: 'Total Revenue',
+    icon: DollarSign,
+    color: 'text-emerald-600',
+    prefix: 'BDT ',
+  },
+  {
+    key: 'orders',
+    label: 'Total Orders',
+    icon: ShoppingCart,
+    color: 'text-blue-600',
+    prefix: '',
+  },
+  {
+    key: 'pendingOrders',
+    label: 'Pending Orders',
+    icon: BarChart3,
+    color: 'text-amber-600',
+    prefix: '',
+  },
+  {
+    key: 'processingOrders',
+    label: 'Processing',
+    icon: TrendingUp,
+    color: 'text-violet-600',
+    prefix: '',
+  },
+  {
+    key: 'products',
+    label: 'Products',
+    icon: Package,
+    color: 'text-rose-600',
+    prefix: '',
+  },
+  {
+    key: 'users',
+    label: 'Users',
+    icon: Users,
+    color: 'text-cyan-600',
+    prefix: '',
+  },
+  {
+    key: 'vendors',
+    label: 'Active Vendors',
+    icon: Store,
+    color: 'text-orange-600',
+    prefix: '',
+  },
 ];
 
 function StatCardSkeleton() {
@@ -131,9 +168,12 @@ function RouteComponent() {
         className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4'
       >
         {isLoading
-          ? Array.from({ length: 7 }).map((_, i) => <StatCardSkeleton key={i} />)
+          ? Array.from({ length: 7 }).map((_, i) => (
+              <StatCardSkeleton key={i} />
+            ))
           : statCards.map((card) => {
-              const value = data?.stats[card.key as keyof typeof data.stats] ?? 0;
+              const value =
+                data?.stats[card.key as keyof typeof data.stats] ?? 0;
               const Icon = card.icon;
               return (
                 <Card key={card.key}>
@@ -190,7 +230,9 @@ function RouteComponent() {
                     />
                     <YAxis
                       tick={{ fontSize: 11 }}
-                      tickFormatter={(v) => (v >= 1000 ? `${(v / 1000).toFixed(0)}k` : v)}
+                      tickFormatter={(v) =>
+                        v >= 1000 ? `${(v / 1000).toFixed(0)}k` : v
+                      }
                     />
                     <Tooltip
                       formatter={(value: number) => [

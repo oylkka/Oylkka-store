@@ -1,6 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router';
-import { getRequestHeaders } from '@tanstack/react-start/server';
-import { auth } from '@/lib/auth';
+import { requireAuth } from '@/lib/auth-middleware';
 import { validateCsrf } from '@/lib/csrf';
 import { prisma } from '@/lib/db';
 
@@ -9,12 +8,9 @@ export const Route = createFileRoute('/api/cart/update')({
     handlers: {
       PATCH: async ({ request }) => {
         try {
-          const headers = getRequestHeaders();
-          const session = await auth.api.getSession({ headers });
-
-          if (!session?.user) {
-            return Response.json({ error: 'Unauthorized' }, { status: 401 });
-          }
+          const authResult = await requireAuth();
+          if (authResult.response) return authResult.response;
+          const session = authResult.session;
 
           const csrfResponse = validateCsrf();
           if (csrfResponse) return csrfResponse;
@@ -34,6 +30,7 @@ export const Route = createFileRoute('/api/cart/update')({
             include: {
               cart: { select: { userId: true } },
               product: { select: { stock: true } },
+              variant: { select: { stock: true } },
             },
           });
 
@@ -48,9 +45,13 @@ export const Route = createFileRoute('/api/cart/update')({
             return Response.json({ error: 'Unauthorized' }, { status: 403 });
           }
 
-          if (quantity > item.product.stock) {
+          const maxStock = item.variantId
+            ? (item.variant?.stock ?? 0)
+            : item.product.stock;
+
+          if (quantity > maxStock) {
             return Response.json(
-              { error: `Only ${item.product.stock} items available` },
+              { error: `Only ${maxStock} items available` },
               { status: 400 },
             );
           }

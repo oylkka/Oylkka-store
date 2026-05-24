@@ -1,7 +1,7 @@
 import { createFileRoute, redirect } from '@tanstack/react-router';
+import { MessageSquare, Search, Star } from 'lucide-react';
 import { motion } from 'motion/react';
 import { useState } from 'react';
-import { MessageSquare, Search, Star } from 'lucide-react';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -15,11 +15,7 @@ import {
 } from '@/components/ui/alert-dialog';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import {
-  Card,
-  CardContent,
-  CardHeader,
-} from '@/components/ui/card';
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import {
   Select,
@@ -311,9 +307,7 @@ function RouteComponent() {
                               <Button
                                 variant='outline'
                                 size='sm'
-                                onClick={() =>
-                                  handleModerate(review.id, true)
-                                }
+                                onClick={() => handleModerate(review.id, true)}
                                 disabled={moderateMutation.isPending}
                               >
                                 Verify
@@ -350,8 +344,8 @@ function RouteComponent() {
                                     Delete Review
                                   </AlertDialogTitle>
                                   <AlertDialogDescription>
-                                    Are you sure you want to delete this
-                                    review? This action cannot be undone.
+                                    Are you sure you want to delete this review?
+                                    This action cannot be undone.
                                   </AlertDialogDescription>
                                 </AlertDialogHeader>
                                 <AlertDialogFooter>

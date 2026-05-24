@@ -1,22 +1,16 @@
 import { createFileRoute } from '@tanstack/react-router';
-import { getRequestHeaders } from '@tanstack/react-start/server';
-import { auth } from '@/lib/auth';
+import { requireAdminOrManager, requireAuth } from '@/lib/auth-middleware';
 import { prisma } from '@/lib/db';
 
 export const Route = createFileRoute('/api/admin/audit-logs')({
   server: {
     handlers: {
-      GET: async () => {
+      GET: async ({ request }) => {
         try {
-          const headers = getRequestHeaders();
-          const session = await auth.api.getSession({ headers });
-
-          if (
-            !session?.user ||
-            (session.user.role !== 'ADMIN' && session.user.role !== 'MANAGER')
-          ) {
-            return Response.json({ error: 'Forbidden' }, { status: 403 });
-          }
+          const authResult = await requireAuth();
+          if (authResult.response) return authResult.response;
+          const roleResponse = requireAdminOrManager(authResult.session);
+          if (roleResponse) return roleResponse;
 
           const logs = await prisma.auditLog.findMany({
             orderBy: { createdAt: 'desc' },

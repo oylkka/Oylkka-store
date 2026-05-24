@@ -1,14 +1,9 @@
 import { createFileRoute } from '@tanstack/react-router';
-import { Calendar, DollarSign, Loader2, Package } from 'lucide-react';
+import { Calendar, DollarSign, Package } from 'lucide-react';
 import { motion } from 'motion/react';
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
-import { Skeleton } from '@/components/ui/skeleton';
 import { Badge } from '@/components/ui/badge';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Skeleton } from '@/components/ui/skeleton';
 import { useVendorPayoutSchedule } from '@/services/payouts';
 
 const EASE: [number, number, number, number] = [0.22, 1, 0.36, 1];
@@ -27,8 +22,18 @@ export const Route = createFileRoute('/dashboard/vendor/payouts/schedule')({
 });
 
 const monthNames = [
-  'January', 'February', 'March', 'April', 'May', 'June',
-  'July', 'August', 'September', 'October', 'November', 'December',
+  'January',
+  'February',
+  'March',
+  'April',
+  'May',
+  'June',
+  'July',
+  'August',
+  'September',
+  'October',
+  'November',
+  'December',
 ];
 
 function RouteComponent() {
@@ -147,9 +152,7 @@ function RouteComponent() {
             ) : !data?.schedule || data.schedule.length === 0 ? (
               <div className='flex flex-col items-center justify-center py-12 text-center'>
                 <Calendar className='w-10 h-10 text-muted-foreground mb-3' />
-                <p className='text-sm font-semibold'>
-                  No pending payouts
-                </p>
+                <p className='text-sm font-semibold'>No pending payouts</p>
                 <p className='text-sm text-muted-foreground mt-1 max-w-sm'>
                   Payouts are processed for delivered orders. Once orders are
                   delivered, they will appear here with estimated payout dates.
@@ -160,7 +163,8 @@ function RouteComponent() {
                 {data.schedule.map((entry) => {
                   const [y, m] = entry.month.split('-');
                   const monthLabel = `${monthNames[parseInt(m) - 1]} ${y}`;
-                  const isPast = entry.estimatedDate < new Date().toISOString().slice(0, 10);
+                  const isPast =
+                    entry.estimatedDate < new Date().toISOString().slice(0, 10);
 
                   return (
                     <div
@@ -180,13 +184,14 @@ function RouteComponent() {
                         <p className='text-xs text-muted-foreground mt-0.5'>
                           {entry.items} item{entry.items !== 1 ? 's' : ''}
                           {' · Est. '}
-                          {new Date(
-                            entry.estimatedDate,
-                          ).toLocaleDateString('en-US', {
-                            month: 'long',
-                            day: 'numeric',
-                            year: 'numeric',
-                          })}
+                          {new Date(entry.estimatedDate).toLocaleDateString(
+                            'en-US',
+                            {
+                              month: 'long',
+                              day: 'numeric',
+                              year: 'numeric',
+                            },
+                          )}
                         </p>
                       </div>
                       <div className='text-right ml-3'>

@@ -111,10 +111,9 @@ export function useCreateCouponMutation() {
       queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.ADMIN_COUPONS] });
     },
     onError: (error: { response?: { data?: { error?: string } } }) => {
-      toast.error(
-        error.response?.data?.error || 'Failed to create coupon',
-        { id: 'create-coupon' },
-      );
+      toast.error(error.response?.data?.error || 'Failed to create coupon', {
+        id: 'create-coupon',
+      });
     },
   });
 }
@@ -141,10 +140,9 @@ export function useUpdateCouponMutation() {
       queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.ADMIN_COUPONS] });
     },
     onError: (error: { response?: { data?: { error?: string } } }) => {
-      toast.error(
-        error.response?.data?.error || 'Failed to update coupon',
-        { id: 'update-coupon' },
-      );
+      toast.error(error.response?.data?.error || 'Failed to update coupon', {
+        id: 'update-coupon',
+      });
     },
   });
 }
@@ -164,10 +162,9 @@ export function useDeleteCouponMutation() {
       queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.ADMIN_COUPONS] });
     },
     onError: (error: { response?: { data?: { error?: string } } }) => {
-      toast.error(
-        error.response?.data?.error || 'Failed to delete coupon',
-        { id: 'delete-coupon' },
-      );
+      toast.error(error.response?.data?.error || 'Failed to delete coupon', {
+        id: 'delete-coupon',
+      });
     },
   });
 }

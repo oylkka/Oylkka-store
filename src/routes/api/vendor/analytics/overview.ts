@@ -102,7 +102,9 @@ export const Route = createFileRoute('/api/vendor/analytics/overview')({
           for (let i = 0; i < 12; i++) {
             const d = new Date();
             d.setMonth(d.getMonth() - (11 - i));
-            monthlyMap[`${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`] = 0;
+            monthlyMap[
+              `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`
+            ] = 0;
           }
           for (const item of monthlyRevenue) {
             const key = `${item.createdAt.getFullYear()}-${String(item.createdAt.getMonth() + 1).padStart(2, '0')}`;
@@ -110,10 +112,12 @@ export const Route = createFileRoute('/api/vendor/analytics/overview')({
               monthlyMap[key] += item.vendorAmount;
             }
           }
-          const chartData = Object.entries(monthlyMap).map(([month, amount]) => ({
-            month,
-            amount,
-          }));
+          const chartData = Object.entries(monthlyMap).map(
+            ([month, amount]) => ({
+              month,
+              amount,
+            }),
+          );
 
           const totalOrders = orderStats.reduce((sum, s) => sum + s._count, 0);
           const fulfilledOrders =

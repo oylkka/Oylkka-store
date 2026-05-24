@@ -58,7 +58,11 @@ export const Route = createFileRoute('/api/vendor/payouts/schedule')({
             const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
 
             if (!monthlyBuckets[key]) {
-              const estimatedDate = new Date(d.getFullYear(), d.getMonth() + 2, 15);
+              const estimatedDate = new Date(
+                d.getFullYear(),
+                d.getMonth() + 2,
+                15,
+              );
               monthlyBuckets[key] = {
                 month: key,
                 items: 0,

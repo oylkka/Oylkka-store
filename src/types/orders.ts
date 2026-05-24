@@ -1,0 +1,26 @@
+export type AppliedVoucher = {
+  couponId: string;
+  code: string;
+  discountType: 'PERCENTAGE' | 'FIXED' | 'CASHBACK';
+  discountValue: number;
+  discountAmount: number;
+  shippingDiscount: number;
+  freeShipping: boolean;
+  cashbackAmount: number;
+  scope: string;
+  scopeId: string | null;
+  tierUsed: string | null;
+  bogoApplied: {
+    freeItemProductId: string;
+    buyQty: number;
+    freeQty: number;
+    freeItemPrice: number;
+  } | null;
+};
+
+export type OrderMetadata = {
+  appliedVouchers?: AppliedVoucher[];
+  cashbackAmount?: number;
+  bkashPaymentID?: string;
+  bkashTrxID?: string;
+};

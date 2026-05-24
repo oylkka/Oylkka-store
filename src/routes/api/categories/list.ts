@@ -1,6 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router';
-import { getRequestHeaders } from '@tanstack/react-start/server';
-import { auth } from '@/lib/auth';
+import { requireAdmin, requireAuth } from '@/lib/auth-middleware';
 import { prisma } from '@/lib/db';
 
 export const Route = createFileRoute('/api/categories/list')({
@@ -8,12 +7,10 @@ export const Route = createFileRoute('/api/categories/list')({
     handlers: {
       GET: async () => {
         try {
-          const headers = getRequestHeaders();
-          const session = await auth.api.getSession({ headers });
-
-          if (!session?.user || session.user.role !== 'ADMIN') {
-            return Response.json({ error: 'Unauthorized' }, { status: 401 });
-          }
+          const authResult = await requireAuth();
+          if (authResult.response) return authResult.response;
+          const roleResponse = requireAdmin(authResult.session);
+          if (roleResponse) return roleResponse;
 
           const categories = await prisma.category.findMany({
             include: {

@@ -1,21 +1,16 @@
 import { createFileRoute } from '@tanstack/react-router';
-import { getRequestHeaders } from '@tanstack/react-start/server';
-import { auth } from '@/lib/auth';
+import { requireAdminOrManager, requireAuth } from '@/lib/auth-middleware';
 import { prisma } from '@/lib/db';
 
 export const Route = createFileRoute('/api/admin/reports/list')({
   server: {
     handlers: {
-      GET: async ({ request }) => {
+      GET: async () => {
         try {
-          const headers = getRequestHeaders();
-          const session = await auth.api.getSession({ headers });
-          if (
-            !session?.user ||
-            (session.user.role !== 'ADMIN' && session.user.role !== 'MANAGER')
-          ) {
-            return Response.json({ error: 'Unauthorized' }, { status: 401 });
-          }
+          const authResult = await requireAuth();
+          if (authResult.response) return authResult.response;
+          const roleResponse = requireAdminOrManager(authResult.session);
+          if (roleResponse) return roleResponse;
           const url = new URL(request.url);
           const status = url.searchParams.get('status') || undefined;
           const where: Record<string, unknown> = {};

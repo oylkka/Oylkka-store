@@ -1,34 +1,29 @@
 import { createFileRoute } from '@tanstack/react-router';
-import { getRequestHeaders } from '@tanstack/react-start/server';
 import { sendOrderShippedNotification } from '@/actions/send-order-email';
 import { createAuditLog } from '@/lib/audit-log';
-import { auth } from '@/lib/auth';
+import { requireAdminOrManager, requireAuth } from '@/lib/auth-middleware';
 import { validateCsrf } from '@/lib/csrf';
 import { prisma } from '@/lib/db';
 
-const ALLOWED_FULFILLMENT_STATUSES = [
-  'PENDING',
-  'PROCESSING',
-  'SHIPPED',
-  'DELIVERED',
-  'CANCELLED',
-  'REFUNDED',
-];
+const FULFILLMENT_TRANSITIONS: Record<string, string[]> = {
+  PENDING: ['PROCESSING', 'CANCELLED'],
+  PROCESSING: ['SHIPPED', 'CANCELLED'],
+  SHIPPED: ['DELIVERED'],
+  DELIVERED: [],
+  CANCELLED: [],
+  REFUNDED: [],
+};
 
 export const Route = createFileRoute('/api/orders/admin-fulfill')({
   server: {
     handlers: {
       POST: async ({ request }) => {
         try {
-          const headers = getRequestHeaders();
-          const session = await auth.api.getSession({ headers });
-
-          if (
-            !session?.user ||
-            (session.user.role !== 'ADMIN' && session.user.role !== 'MANAGER')
-          ) {
-            return Response.json({ error: 'Forbidden' }, { status: 403 });
-          }
+          const authResult = await requireAuth();
+          if (authResult.response) return authResult.response;
+          const roleResponse = requireAdminOrManager(authResult.session);
+          if (roleResponse) return roleResponse;
+          const session = authResult.session;
 
           const csrfResponse = validateCsrf();
           if (csrfResponse) return csrfResponse;
@@ -55,16 +50,6 @@ export const Route = createFileRoute('/api/orders/admin-fulfill')({
             );
           }
 
-          if (
-            !body.fulfillmentStatus ||
-            !ALLOWED_FULFILLMENT_STATUSES.includes(body.fulfillmentStatus)
-          ) {
-            return Response.json(
-              { error: 'Invalid fulfillment status' },
-              { status: 400 },
-            );
-          }
-
           const item = await prisma.orderItem.findFirst({
             where: { id: body.itemId, orderId: body.orderId },
           });
@@ -73,6 +58,20 @@ export const Route = createFileRoute('/api/orders/admin-fulfill')({
             return Response.json(
               { error: 'Order item not found' },
               { status: 404 },
+            );
+          }
+
+          const allowedNext = FULFILLMENT_TRANSITIONS[item.fulfillmentStatus];
+          if (
+            !body.fulfillmentStatus ||
+            !allowedNext ||
+            !allowedNext.includes(body.fulfillmentStatus)
+          ) {
+            return Response.json(
+              {
+                error: `Cannot transition from ${item.fulfillmentStatus} to ${body.fulfillmentStatus}`,
+              },
+              { status: 400 },
             );
           }
 

@@ -104,10 +104,9 @@ export function useBanCustomerMutation() {
       queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.ADMIN_CUSTOMERS] });
     },
     onError: (error: { response?: { data?: { error?: string } } }) => {
-      toast.error(
-        error.response?.data?.error || 'Failed to update customer',
-        { id: 'ban-customer' },
-      );
+      toast.error(error.response?.data?.error || 'Failed to update customer', {
+        id: 'ban-customer',
+      });
     },
   });
 }
@@ -116,13 +115,7 @@ export function useUpdateCustomerRoleMutation() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({
-      id,
-      role,
-    }: {
-      id: string;
-      role: string;
-    }) => {
+    mutationFn: async ({ id, role }: { id: string; role: string }) => {
       const r = await apiClient.put<{ customer: AdminCustomer }>(
         `/api/admin/customers/${id}`,
         { role },
@@ -137,10 +130,9 @@ export function useUpdateCustomerRoleMutation() {
       queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.ADMIN_CUSTOMERS] });
     },
     onError: (error: { response?: { data?: { error?: string } } }) => {
-      toast.error(
-        error.response?.data?.error || 'Failed to update role',
-        { id: 'role-customer' },
-      );
+      toast.error(error.response?.data?.error || 'Failed to update role', {
+        id: 'role-customer',
+      });
     },
   });
 }

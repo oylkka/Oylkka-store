@@ -1,5 +1,6 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router';
 import { Clock, Loader2 } from 'lucide-react';
+import { useEffect } from 'react';
 
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -11,7 +12,14 @@ export const Route = createFileRoute('/dashboard/become-vendor/pending')({
 
 function RouteComponent() {
   const navigate = useNavigate();
-  const { data: shop, isLoading } = useMyShop();
+  const { data: shop, isLoading, refetch } = useMyShop();
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      refetch();
+    }, 30000);
+    return () => clearInterval(interval);
+  }, [refetch]);
 
   if (isLoading) {
     return (

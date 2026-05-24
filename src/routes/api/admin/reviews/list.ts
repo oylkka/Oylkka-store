@@ -1,21 +1,16 @@
 import { createFileRoute } from '@tanstack/react-router';
-import { getRequestHeaders } from '@tanstack/react-start/server';
-import { auth } from '@/lib/auth';
+import { requireAdminOrManager, requireAuth } from '@/lib/auth-middleware';
 import { prisma } from '@/lib/db';
 
 export const Route = createFileRoute('/api/admin/reviews/list')({
   server: {
     handlers: {
-      GET: async ({ request }) => {
+      POST: async ({ request }) => {
         try {
-          const headers = getRequestHeaders();
-          const session = await auth.api.getSession({ headers });
-          if (
-            !session?.user ||
-            (session.user.role !== 'ADMIN' && session.user.role !== 'MANAGER')
-          ) {
-            return Response.json({ error: 'Unauthorized' }, { status: 401 });
-          }
+          const authResult = await requireAuth();
+          if (authResult.response) return authResult.response;
+          const roleResponse = requireAdminOrManager(authResult.session);
+          if (roleResponse) return roleResponse;
 
           const url = new URL(request.url);
           const reported =
@@ -55,7 +50,9 @@ export const Route = createFileRoute('/api/admin/reviews/list')({
             prisma.review.findMany({
               where,
               include: {
-                user: { select: { id: true, name: true, email: true, imageUrl: true } },
+                user: {
+                  select: { id: true, name: true, email: true, imageUrl: true },
+                },
                 product: {
                   select: {
                     id: true,

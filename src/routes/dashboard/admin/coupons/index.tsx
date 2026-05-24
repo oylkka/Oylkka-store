@@ -1,4 +1,9 @@
-import { createFileRoute, Link, redirect, useNavigate } from '@tanstack/react-router';
+import {
+  createFileRoute,
+  Link,
+  redirect,
+  useNavigate,
+} from '@tanstack/react-router';
 import { format } from 'date-fns';
 import { Edit, Loader2, Plus, Search, Tag, Trash2 } from 'lucide-react';
 import { motion } from 'motion/react';
@@ -16,12 +21,7 @@ import {
 } from '@/components/ui/alert-dialog';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import {
   Select,
@@ -275,11 +275,7 @@ function RouteComponent() {
                         </TableCell>
                         <TableCell className='text-right'>
                           <div className='flex items-center justify-end gap-1'>
-                            <Button
-                              variant='ghost'
-                              size='icon'
-                              asChild
-                            >
+                            <Button variant='ghost' size='icon' asChild>
                               <Link
                                 to='/dashboard/admin/coupons/$id'
                                 params={{ id: coupon.id }}

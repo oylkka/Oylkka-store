@@ -5,6 +5,11 @@ import { validateCsrf } from '@/lib/csrf';
 import { prisma } from '@/lib/db';
 import { couponLimiter } from '@/lib/rate-limit';
 import { checkRateLimit } from '@/lib/rate-limit-guard';
+import { checkCouponEligibility } from '@/services/checkout/coupon-validator';
+import {
+  calculateDiscount,
+  type DiscountCartItem,
+} from '@/services/checkout/discount-calculator';
 
 export const Route = createFileRoute('/api/checkout/validate-coupon')({
   server: {
@@ -57,146 +62,6 @@ export const Route = createFileRoute('/api/checkout/validate-coupon')({
             );
           }
 
-          if (!coupon.isActive) {
-            return Response.json(
-              { valid: false, error: 'This coupon is no longer active' },
-              { status: 200 },
-            );
-          }
-
-          const now = new Date();
-
-          if (coupon.expiresAt && coupon.expiresAt < now) {
-            return Response.json(
-              { valid: false, error: 'This coupon has expired' },
-              { status: 200 },
-            );
-          }
-
-          if (coupon.startsAt && coupon.startsAt > now) {
-            return Response.json(
-              { valid: false, error: 'This coupon is not yet valid' },
-              { status: 200 },
-            );
-          }
-
-          if (coupon.maxUses > 0 && coupon.usedCount >= coupon.maxUses) {
-            return Response.json(
-              {
-                valid: false,
-                error: 'This coupon has reached its usage limit',
-              },
-              { status: 200 },
-            );
-          }
-
-          if (coupon.maxUsesPerUser > 0) {
-            const userUsageCount = await prisma.couponUsage.count({
-              where: {
-                couponId: coupon.id,
-                userId: session.user.id,
-              },
-            });
-
-            if (userUsageCount >= coupon.maxUsesPerUser) {
-              return Response.json(
-                {
-                  valid: false,
-                  error: 'You have already used this coupon',
-                },
-                { status: 200 },
-              );
-            }
-          }
-
-          if (
-            coupon.maxClaimCount > 0 &&
-            coupon.claimedCount >= coupon.maxClaimCount
-          ) {
-            return Response.json(
-              {
-                valid: false,
-                error: 'This voucher is no longer available (all claimed)',
-              },
-              { status: 200 },
-            );
-          }
-
-          if (coupon.firstOrderOnly) {
-            const orderCount = await prisma.order.count({
-              where: { customerId: session.user.id },
-            });
-
-            if (orderCount > 0) {
-              return Response.json(
-                {
-                  valid: false,
-                  error: 'This coupon is for first-time buyers only',
-                },
-                { status: 200 },
-              );
-            }
-          }
-
-          if (coupon.repeatPurchaseOnly) {
-            const orderCount = await prisma.order.count({
-              where: { customerId: session.user.id },
-            });
-
-            if (orderCount === 0) {
-              return Response.json(
-                {
-                  valid: false,
-                  error: 'This coupon is for repeat customers only',
-                },
-                { status: 200 },
-              );
-            }
-          }
-
-          if (coupon.requiredPaymentMethod) {
-            if (
-              !body.paymentMethod ||
-              body.paymentMethod !== coupon.requiredPaymentMethod
-            ) {
-              return Response.json(
-                {
-                  valid: false,
-                  error: `This coupon requires ${coupon.requiredPaymentMethod} payment`,
-                },
-                { status: 200 },
-              );
-            }
-          }
-
-          if (coupon.platformRestriction !== 'ALL') {
-            const userAgent = headers.get('user-agent') || '';
-            const isMobile =
-              /Android|iPhone|iPad|iPod|webOS|BlackBerry|IEMobile|Opera Mini/i.test(
-                userAgent,
-              );
-
-            if (coupon.platformRestriction === 'MOBILE_ONLY' && !isMobile) {
-              return Response.json(
-                {
-                  valid: false,
-                  error: 'This coupon is available on mobile app only',
-                },
-                { status: 200 },
-              );
-            }
-
-            if (coupon.platformRestriction === 'WEB_ONLY' && isMobile) {
-              return Response.json(
-                {
-                  valid: false,
-                  error: 'This coupon is available on web only',
-                },
-                { status: 200 },
-              );
-            }
-          }
-
           const cartItems =
             body.cartItems ||
             (
@@ -220,48 +85,6 @@ export const Route = createFileRoute('/api/checkout/validate-coupon')({
             0,
           );
 
-          if (coupon.minQuantity) {
-            if (coupon.scope === 'PRODUCT' && coupon.scopeId) {
-              const scopedQty = cartItems
-                .filter((item) => item.product.id === coupon.scopeId)
-                .reduce((sum, item) => sum + item.quantity, 0);
-
-              if (scopedQty < coupon.minQuantity) {
-                return Response.json(
-                  {
-                    valid: false,
-                    error: `Need ${coupon.minQuantity} of this product (${scopedQty} in cart)`,
-                    minQuantity: coupon.minQuantity,
-                    currentQuantity: scopedQty,
-                  },
-                  { status: 200 },
-                );
-              }
-            } else {
-              if (totalQty < coupon.minQuantity) {
-                return Response.json(
-                  {
-                    valid: false,
-                    error: `Minimum ${coupon.minQuantity} items required (${totalQty} in cart)`,
-                    minQuantity: coupon.minQuantity,
-                    currentQuantity: totalQty,
-                  },
-                  { status: 200 },
-                );
-              }
-            }
-          }
-
-          if (coupon.minOrderAmount && body.subtotal < coupon.minOrderAmount) {
-            return Response.json(
-              {
-                valid: false,
-                error: `Minimum order amount is ৳${coupon.minOrderAmount.toLocaleString()}`,
-              },
-              { status: 200 },
-            );
-          }
-
           if (body.subtotal <= 0) {
             return Response.json(
               { valid: false, error: 'Cart is empty or invalid' },
@@ -269,112 +92,63 @@ export const Route = createFileRoute('/api/checkout/validate-coupon')({
             );
           }
 
-          // --- Calculate discount ---
-          let discountAmount = 0;
-          let tierUsed: {
-            minQuantity: number;
-            value: number;
-            type?: string;
-          } | null = null;
-          let bogoApplied: {
-            buyQty: number;
-            freeQty: number;
-            freeItemPrice: number;
-          } | null = null;
-          let cashbackAmount = 0;
+          // Check basic eligibility
+          const eligibility = checkCouponEligibility(coupon, {
+            now: new Date(),
+            subtotal: body.subtotal,
+            totalQty,
+            cartItems: cartItems.map((i) => ({
+              productId: i.product.id,
+              quantity: i.quantity,
+            })),
+            paymentMethod: body.paymentMethod,
+            userAgent: headers.get('user-agent') || undefined,
+            customerOrderCount: await prisma.order.count({
+              where: { customerId: session.user.id },
+            }),
+          });
 
-          // Check tiers first
-          if (coupon.tiers.length > 0) {
-            const matchingTier = [...coupon.tiers]
-              .reverse()
-              .find((t) => totalQty >= t.minQuantity);
-
-            if (matchingTier) {
-              const tierType = matchingTier.type || coupon.type;
-              if (tierType === 'PERCENTAGE') {
-                discountAmount = (body.subtotal * matchingTier.value) / 100;
-                if (coupon.maxDiscount) {
-                  discountAmount = Math.min(discountAmount, coupon.maxDiscount);
-                }
-              } else if (tierType === 'FIXED') {
-                discountAmount = Math.min(matchingTier.value, body.subtotal);
-              } else if (tierType === 'CASHBACK') {
-                cashbackAmount = (body.subtotal * matchingTier.value) / 100;
-                if (coupon.maxDiscount) {
-                  cashbackAmount = Math.min(cashbackAmount, coupon.maxDiscount);
-                }
-              }
-
-              tierUsed = {
-                minQuantity: matchingTier.minQuantity,
-                value: matchingTier.value,
-                type: tierType,
-              };
-            }
-          }
-
-          // No tier matched or no tiers — use coupon-level value
-          if (!tierUsed) {
-            if (coupon.type === 'PERCENTAGE') {
-              discountAmount = (body.subtotal * coupon.value) / 100;
-              if (coupon.maxDiscount) {
-                discountAmount = Math.min(discountAmount, coupon.maxDiscount);
-              }
-            } else if (coupon.type === 'FIXED') {
-              discountAmount = Math.min(coupon.value, body.subtotal);
-            } else if (coupon.type === 'CASHBACK') {
-              cashbackAmount = (body.subtotal * coupon.value) / 100;
-              if (coupon.maxDiscount) {
-                cashbackAmount = Math.min(cashbackAmount, coupon.maxDiscount);
-              }
-            }
-          }
-
-          // BOGO — calculate free items discount
-          if (coupon.bogoBuyQty && coupon.bogoFreeQty) {
-            const scopedItems = coupon.scopeId
-              ? cartItems.filter(
-                  (item) =>
-                    item.product.id === coupon.scopeId ||
-                    item.product.shopId === coupon.scopeId,
-                )
-              : cartItems;
-
-            const totalScopedQty = scopedItems.reduce(
-              (sum, item) => sum + item.quantity,
-              0,
+          if (eligibility) {
+            return Response.json(
+              { valid: false, error: eligibility },
+              { status: 200 },
             );
+          }
 
-            if (totalScopedQty >= coupon.bogoBuyQty) {
-              const freeBatches = Math.floor(
-                totalScopedQty / coupon.bogoBuyQty,
+          // maxUsesPerUser check (unique to this route)
+          if (coupon.maxUsesPerUser > 0) {
+            const userUsageCount = await prisma.couponUsage.count({
+              where: {
+                couponId: coupon.id,
+                userId: session.user.id,
+              },
+            });
+
+            if (userUsageCount >= coupon.maxUsesPerUser) {
+              return Response.json(
+                {
+                  valid: false,
+                  error: 'You have already used this coupon',
+                },
+                { status: 200 },
               );
-              const maxFreeItems = freeBatches * coupon.bogoFreeQty;
-
-              const sortedByPrice = [...scopedItems].sort(
-                (a, b) => a.product.price - b.product.price,
-              );
-
-              let remainingFree = maxFreeItems;
-              let totalFreeValue = 0;
-              for (const item of sortedByPrice) {
-                if (remainingFree <= 0) break;
-                const take = Math.min(remainingFree, item.quantity);
-                totalFreeValue += take * item.product.price;
-                remainingFree -= take;
-              }
-
-              discountAmount += totalFreeValue;
-              bogoApplied = {
-                buyQty: coupon.bogoBuyQty,
-                freeQty: coupon.bogoFreeQty * freeBatches,
-                freeItemPrice: totalFreeValue,
-              };
             }
           }
 
-          discountAmount = Math.round(discountAmount * 100) / 100;
-          cashbackAmount = Math.round(cashbackAmount * 100) / 100;
+          // Calculate discount
+          const discountItems: DiscountCartItem[] = cartItems.map((item) => ({
+            productId: item.product.id,
+            shopId: item.product.shopId ?? undefined,
+            price: item.product.price,
+            quantity: item.quantity,
+          }));
+
+          const result = calculateDiscount(
+            coupon,
+            discountItems,
+            body.subtotal,
+            totalQty,
+          );
 
           return Response.json(
             {
@@ -384,13 +158,13 @@ export const Route = createFileRoute('/api/checkout/validate-coupon')({
               description: coupon.description,
               type: coupon.type,
               value: coupon.value,
-              discountAmount,
+              discountAmount: result.discountAmount,
               maxDiscount: coupon.maxDiscount,
               shippingDiscount: coupon.shippingDiscount || 0,
               freeShipping: coupon.freeShipping,
-              cashbackAmount,
-              tierUsed,
-              bogoApplied,
+              cashbackAmount: result.cashbackAmount,
+              tierUsed: result.tierUsed,
+              bogoApplied: result.bogoApplied,
               scope: coupon.scope,
               scopeId: coupon.scopeId,
               autoApply: coupon.autoApply,

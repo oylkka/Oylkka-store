@@ -1,22 +1,20 @@
 import { createFileRoute } from '@tanstack/react-router';
-import { getRequestHeaders } from '@tanstack/react-start/server';
 import { UploadImage } from '@/cloudinary';
-import { auth } from '@/lib/auth';
+import { requireAuth } from '@/lib/auth-middleware';
 import { validateCsrf } from '@/lib/csrf';
 import { prisma } from '@/lib/db';
 import { slugify } from '@/lib/slug';
+import { ProductApiCreateSchema } from '@/schemas/product-api-schema';
+import { SkuService } from '@/services/sku-service';
 
 export const Route = createFileRoute('/api/product/create')({
   server: {
     handlers: {
       POST: async ({ request }) => {
         try {
-          const headers = getRequestHeaders();
-          const session = await auth.api.getSession({ headers });
-
-          if (!session?.user) {
-            return Response.json({ error: 'Unauthorized' }, { status: 401 });
-          }
+          const authResult = await requireAuth();
+          if (authResult.response) return authResult.response;
+          const session = authResult.session;
 
           const csrfResponse = validateCsrf();
           if (csrfResponse) return csrfResponse;
@@ -94,47 +92,78 @@ export const Route = createFileRoute('/api/product/create')({
             ];
           }
 
+          // Normalize optional category field
+          if (!data.category && data.categoryId) {
+            data.category = data.categoryId;
+          }
+
+          // Validate parsed data against schema
+          const parsed = ProductApiCreateSchema.safeParse(data);
+          if (!parsed.success) {
+            return Response.json(
+              {
+                error: 'Validation failed',
+                details: parsed.error.flatten(),
+              },
+              { status: 400 },
+            );
+          }
+          const v = parsed.data;
+
+          // Validate SKU format
+          if (!SkuService.isValidSku(v.sku)) {
+            return Response.json(
+              {
+                error: 'Invalid SKU format. Expected pattern like CAT-PRD-001',
+              },
+              { status: 400 },
+            );
+          }
+
+          // Check SKU uniqueness
+          const existingSku = await prisma.product.findUnique({
+            where: { sku: v.sku },
+            select: { id: true },
+          });
+          if (existingSku) {
+            return Response.json(
+              { error: `SKU "${v.sku}" is already in use` },
+              { status: 409 },
+            );
+          }
+
           // Map field names (handle both old and new formats)
-          const categoryId =
-            (data.category as string) || (data.categoryId as string) || '';
+          const categoryId = v.category;
 
           const textFields: Record<string, unknown> = {
-            productName: data.productName as string,
-            description: data.description as string,
+            productName: v.productName,
+            description: v.description,
             categoryId,
-            slug: data.slug as string,
-            sku: data.sku as string,
-            brand: (data.brand as string) || null,
-            price: data.price as number,
-            discountPrice: (data.discountPrice as number) || null,
-            stock: (data.stock as number) || 0,
-            lowStockAlert: (data.lowStockAlert as number) || 5,
-            condition: (data.condition as string) || 'NEW',
-            conditionDescription: (data.conditionDescription as string) || null,
-            weight: (data.weight as number) || null,
-            weightUnit: (data.weightUnit as string) || 'kg',
-            freeShipping:
-              data.freeShipping === true || data.freeShipping === 'true',
-            metaTitle: (data.metaTitle as string) || null,
-            metaDescription: (data.metaDescription as string) || null,
-            status: (data.status as string) || 'DRAFT',
-            featured: data.featured === true || data.featured === 'true',
+            slug: v.slug,
+            sku: v.sku,
+            brand: v.brand || null,
+            price: v.price,
+            discountPrice: v.discountPrice || null,
+            stock: v.stock,
+            lowStockAlert: v.lowStockAlert,
+            condition: v.condition,
+            conditionDescription: v.conditionDescription || null,
+            weight: v.weight || null,
+            weightUnit: v.weightUnit,
+            freeShipping: v.freeShipping,
+            metaTitle: v.metaTitle || null,
+            metaDescription: v.metaDescription || null,
+            status: v.status,
+            featured: v.featured,
           };
 
           // Handle dimensions (nested JSON or flat)
-          const dims = data.dimensions as Record<string, unknown> | undefined;
-          if (dims) {
-            textFields.dimensionLength = (dims.length as number) || null;
-            textFields.dimensionWidth = (dims.width as number) || null;
-            textFields.dimensionHeight = (dims.height as number) || null;
-            textFields.dimensionUnit = (dims.unit as string) || 'cm';
-          } else {
-            textFields.dimensionLength =
-              (data.dimensionLength as number) || null;
-            textFields.dimensionWidth = (data.dimensionWidth as number) || null;
-            textFields.dimensionHeight =
-              (data.dimensionHeight as number) || null;
-            textFields.dimensionUnit = (data.dimensionUnit as string) || 'cm';
+          const dims = v.dimensions;
+          if (dims && dims.length !== undefined) {
+            textFields.dimensionLength = dims.length ?? null;
+            textFields.dimensionWidth = dims.width ?? null;
+            textFields.dimensionHeight = dims.height ?? null;
+            textFields.dimensionUnit = dims.unit || 'cm';
           }
 
           // Generate slug from product name if not provided
@@ -195,13 +224,8 @@ export const Route = createFileRoute('/api/product/create')({
             }
           }
 
-          // Parse attributes and variants
-          const attributes = data.attributes as
-            | Record<string, string[]>
-            | undefined;
-          const variants = data.variants as
-            | Array<Record<string, unknown>>
-            | undefined;
+          const attributes = v.attributes;
+          const variants = v.variants;
 
           // Handle variant images
           const variantImages = data.variantImages as
@@ -214,7 +238,7 @@ export const Route = createFileRoute('/api/product/create')({
               slug,
               description: textFields.description as string,
               categoryId: textFields.categoryId as string,
-              tags: (data.tags as string[]) || [],
+              tags: v.tags,
               sku: textFields.sku as string,
               brand: textFields.brand as string | null,
               price: textFields.price as number,
@@ -282,14 +306,13 @@ export const Route = createFileRoute('/api/product/create')({
                 ? {
                     variants: {
                       create: await Promise.all(
-                        variants.map(async (v) => {
-                          const attrRecord =
-                            (v.attributes as Record<string, string>) || {};
+                        variants.map(async (variant) => {
+                          const attrRecord = variant.attributes;
 
                           let variantImageUrl: string | null = null;
                           let variantImagePublicId: string | null = null;
 
-                          const vId = v.id as string;
+                          const vId = variant.id ?? '';
                           const vImage = variantImages?.[vId];
                           if (vImage instanceof File && vImage.size > 0) {
                             const result = await UploadImage(
@@ -301,11 +324,11 @@ export const Route = createFileRoute('/api/product/create')({
                           }
 
                           return {
-                            name: v.name as string,
-                            sku: v.sku as string,
-                            price: (v.price as number) || 0,
-                            discountPrice: (v.discountPrice as number) || null,
-                            stock: (v.stock as number) || 0,
+                            name: variant.name,
+                            sku: variant.sku,
+                            price: variant.price || 0,
+                            discountPrice: variant.discountPrice ?? null,
+                            stock: variant.stock,
                             attributes: attrRecord,
                             imageUrl: variantImageUrl,
                             imagePublicId: variantImagePublicId,

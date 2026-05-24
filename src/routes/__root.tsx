@@ -13,6 +13,7 @@ import { useState } from 'react';
 import { Toaster } from '#/components/ui/sonner';
 import { TooltipProvider } from '#/components/ui/tooltip';
 import { ThemeProvider } from '#/context/theme-provider';
+import { RouteErrorBoundary } from '@/components/error-boundary';
 import { getSession } from '@/lib/auth.functions';
 import appCss from '../styles.css?url';
 
@@ -25,7 +26,7 @@ export const Route = createRootRoute({
     meta: [
       { charSet: 'utf-8' },
       { name: 'viewport', content: 'width=device-width, initial-scale=1' },
-      { title: 'TanStack Start Starter' },
+      { title: 'Oylkka' },
     ],
     links: [{ rel: 'stylesheet', href: appCss }],
   }),
@@ -38,6 +39,7 @@ export const Route = createRootRoute({
       </Link>
     </div>
   ),
+  errorComponent: RouteErrorBoundary,
   shellComponent: RootDocument,
   component: RootComponent,
 });

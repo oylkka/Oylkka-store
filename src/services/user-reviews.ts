@@ -47,7 +47,12 @@ export function useUpdateReviewMutation() {
     mutationFn: async ({
       id,
       ...data
-    }: { id: string; rating?: number; title?: string; content?: string }) => {
+    }: {
+      id: string;
+      rating?: number;
+      title?: string;
+      content?: string;
+    }) => {
       const r = await apiClient.put(`/api/reviews/my/${id}`, data);
       return r.data;
     },
@@ -56,13 +61,14 @@ export function useUpdateReviewMutation() {
     },
     onSuccess: () => {
       toast.success('Review updated', { id: 'update-review' });
-      queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.ORDERS, 'my-reviews'] });
+      queryClient.invalidateQueries({
+        queryKey: [QUERY_KEYS.ORDERS, 'my-reviews'],
+      });
     },
     onError: (error: { response?: { data?: { error?: string } } }) => {
-      toast.error(
-        error.response?.data?.error || 'Failed to update review',
-        { id: 'update-review' },
-      );
+      toast.error(error.response?.data?.error || 'Failed to update review', {
+        id: 'update-review',
+      });
     },
   });
 }
@@ -79,13 +85,14 @@ export function useDeleteReviewMutation() {
     },
     onSuccess: () => {
       toast.success('Review deleted', { id: 'delete-review' });
-      queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.ORDERS, 'my-reviews'] });
+      queryClient.invalidateQueries({
+        queryKey: [QUERY_KEYS.ORDERS, 'my-reviews'],
+      });
     },
     onError: (error: { response?: { data?: { error?: string } } }) => {
-      toast.error(
-        error.response?.data?.error || 'Failed to delete review',
-        { id: 'delete-review' },
-      );
+      toast.error(error.response?.data?.error || 'Failed to delete review', {
+        id: 'delete-review',
+      });
     },
   });
 }

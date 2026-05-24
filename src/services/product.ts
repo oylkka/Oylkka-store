@@ -198,16 +198,6 @@ export function useCompareProducts(ids: string[]) {
   });
 }
 
-export function usePublicCategories() {
-  return useQuery<{ id: string; name: string; slug: string }[]>({
-    queryKey: [QUERY_KEYS.CATEGORIES, 'public'],
-    queryFn: async () => {
-      const response = await apiClient.get('/api/categories/public-list');
-      return response.data;
-    },
-  });
-}
-
 export type PublicReview = {
   id: string;
   rating: number;

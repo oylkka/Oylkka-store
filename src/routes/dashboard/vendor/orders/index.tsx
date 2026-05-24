@@ -12,6 +12,7 @@ import { useVendorOrders } from '@/services/vendor-orders';
 const STATUS_TABS = [
   { label: 'All', value: '' },
   { label: 'Pending', value: 'PENDING' },
+  { label: 'Confirmed', value: 'CONFIRMED' },
   { label: 'Processing', value: 'PROCESSING' },
   { label: 'Shipped', value: 'SHIPPED' },
   { label: 'Delivered', value: 'DELIVERED' },
@@ -23,6 +24,8 @@ const statusBadge = (status: string) => {
   switch (status) {
     case 'PENDING':
       return { variant: 'secondary' as const, label: 'Pending' };
+    case 'CONFIRMED':
+      return { variant: 'default' as const, label: 'Confirmed' };
     case 'PROCESSING':
       return { variant: 'outline' as const, label: 'Processing' };
     case 'SHIPPED':

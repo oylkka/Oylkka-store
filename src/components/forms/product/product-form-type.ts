@@ -158,7 +158,7 @@ export const ProductFormSchema = z
       .max(100, { message: 'Discount percent cannot exceed 100%' })
       .optional()
       .default(0),
-    stock: z.number().int().min(1, { message: 'Stock must be at least 1' }),
+    stock: z.number().int().min(0, { message: 'Stock cannot be negative' }),
     lowStockAlert: z
       .number()
       .int()
@@ -270,6 +270,18 @@ export const ProductFormSchema = z
     {
       message: 'Variants must have unique attribute combinations',
       path: ['variants'],
+    },
+  )
+  .refine(
+    (data) => {
+      if (data.status !== 'PUBLISHED') return true;
+      if (data.hasVariants && data.variants && data.variants.length > 0)
+        return true;
+      return data.stock >= 1;
+    },
+    {
+      message: 'Stock must be at least 1 for published products',
+      path: ['stock'],
     },
   );
 

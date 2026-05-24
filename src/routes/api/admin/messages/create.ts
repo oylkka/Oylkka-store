@@ -1,6 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router';
-import { getRequestHeaders } from '@tanstack/react-start/server';
-import { auth } from '@/lib/auth';
+import { requireAuth, requireStaff } from '@/lib/auth-middleware';
 import { validateCsrf } from '@/lib/csrf';
 import { prisma } from '@/lib/db';
 import { messageLimiter } from '@/lib/rate-limit';
@@ -11,11 +10,11 @@ export const Route = createFileRoute('/api/admin/messages/create')({
     handlers: {
       POST: async ({ request }) => {
         try {
-          const headers = getRequestHeaders();
-          const session = await auth.api.getSession({ headers });
-          if (!session?.user) {
-            return Response.json({ error: 'Unauthorized' }, { status: 401 });
-          }
+          const authResult = await requireAuth();
+          if (authResult.response) return authResult.response;
+          const roleResponse = requireStaff(authResult.session);
+          if (roleResponse) return roleResponse;
+          const session = authResult.session;
 
           const isAdmin =
             session.user.role === 'ADMIN' ||

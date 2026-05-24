@@ -3,12 +3,7 @@ import { ImageIcon, Loader2, Palette, Upload, X } from 'lucide-react';
 import { motion } from 'motion/react';
 import { useRef, useState } from 'react';
 import { Button } from '@/components/ui/button';
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useMyShop, useUpdateShopMutation } from '@/services/shop';
 
@@ -268,10 +263,7 @@ function RouteComponent() {
 
       <motion.div variants={fadeUp} custom={3}>
         <div className='flex items-center gap-3'>
-          <Button
-            onClick={handleSave}
-            disabled={updateMutation.isPending}
-          >
+          <Button onClick={handleSave} disabled={updateMutation.isPending}>
             {updateMutation.isPending && (
               <Loader2 className='w-4 h-4 mr-2 animate-spin' />
             )}

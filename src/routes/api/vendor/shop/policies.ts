@@ -54,9 +54,11 @@ export const Route = createFileRoute('/api/vendor/shop/policies')({
           const { shippingPolicy, returnPolicy, termsAndConditions } = body;
 
           const policies: Record<string, string> = {};
-          if (shippingPolicy !== undefined) policies.shippingPolicy = shippingPolicy;
+          if (shippingPolicy !== undefined)
+            policies.shippingPolicy = shippingPolicy;
           if (returnPolicy !== undefined) policies.returnPolicy = returnPolicy;
-          if (termsAndConditions !== undefined) policies.termsAndConditions = termsAndConditions;
+          if (termsAndConditions !== undefined)
+            policies.termsAndConditions = termsAndConditions;
 
           const updated = await prisma.shop.update({
             where: { id: shop.id },

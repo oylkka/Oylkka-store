@@ -1,15 +1,11 @@
 import { createFileRoute, Link, redirect } from '@tanstack/react-router';
-import { motion } from 'motion/react';
 import { format } from 'date-fns';
 import { Search, Users } from 'lucide-react';
+import { motion } from 'motion/react';
 import { useState } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import {
-  Card,
-  CardContent,
-  CardHeader,
-} from '@/components/ui/card';
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import {
   Select,
@@ -40,7 +36,13 @@ const fadeUp = {
   }),
 };
 
-const ROLE_BADGES: Record<string, { variant: 'default' | 'secondary' | 'destructive' | 'outline'; label: string }> = {
+const ROLE_BADGES: Record<
+  string,
+  {
+    variant: 'default' | 'secondary' | 'destructive' | 'outline';
+    label: string;
+  }
+> = {
   ADMIN: { variant: 'destructive', label: 'Admin' },
   MANAGER: { variant: 'default', label: 'Manager' },
   VENDOR: { variant: 'default', label: 'Vendor' },

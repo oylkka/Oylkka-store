@@ -39,10 +39,9 @@ export function useUpdatePoliciesMutation() {
       queryClient.invalidateQueries({ queryKey: ['shop-policies'] });
     },
     onError: (error: { response?: { data?: { error?: string } } }) => {
-      toast.error(
-        error.response?.data?.error || 'Failed to save policies',
-        { id: 'save-policies' },
-      );
+      toast.error(error.response?.data?.error || 'Failed to save policies', {
+        id: 'save-policies',
+      });
     },
   });
 }

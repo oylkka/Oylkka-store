@@ -98,7 +98,7 @@ function RouteComponent() {
 
       <div className='flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between'>
         <div className='flex gap-2'>
-          {['all', 'ACTIVE', 'DRAFT', 'ARCHIVED'].map((s) => (
+          {['all', 'ACTIVE', 'DRAFT', 'OUT_OF_STOCK', 'ARCHIVED'].map((s) => (
             <Button
               key={s}
               variant={statusFilter === s ? 'default' : 'outline'}

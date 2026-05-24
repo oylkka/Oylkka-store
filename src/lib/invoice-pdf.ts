@@ -1,6 +1,6 @@
+import { PDFDocument, rgb, StandardFonts } from 'pdf-lib';
 import cloudinary from '@/cloudinary/cloudinary';
 import { prisma } from '@/lib/db';
-import { PDFDocument, rgb, StandardFonts } from 'pdf-lib';
 
 const PRIMARY = rgb(0.094, 0.094, 0.106);
 const MUTED = rgb(0.631, 0.631, 0.671);
@@ -71,7 +71,13 @@ export async function generateInvoicePdf(
       const f = opts?.font ?? regular;
       const w = f.widthOfTextAtSize(str, size);
       const px = opts?.align === 'right' ? x - w : x;
-      page.drawText(str, { x: px, y: y - size, size, font: f, color: opts?.color ?? PRIMARY });
+      page.drawText(str, {
+        x: px,
+        y: y - size,
+        size,
+        font: f,
+        color: opts?.color ?? PRIMARY,
+      });
     }
 
     function line(yPos: number, color?: ReturnType<typeof rgb>) {
@@ -93,12 +99,24 @@ export async function generateInvoicePdf(
     // Invoice info
     text(`Invoice #: ${invoiceNumber}`, MARGIN, 10, { font: bold });
     const dateStr = fmtDate(order.createdAt);
-    text(dateStr, MARGIN + bold.widthOfTextAtSize(`Invoice #: ${invoiceNumber}`, 10) + 30, 10, { color: MUTED });
+    text(
+      dateStr,
+      MARGIN + bold.widthOfTextAtSize(`Invoice #: ${invoiceNumber}`, 10) + 30,
+      10,
+      { color: MUTED },
+    );
     y -= 14;
-    text(`Payment: ${order.paymentMethod ?? 'N/A'}`, MARGIN, 10, { color: MUTED });
+    text(`Payment: ${order.paymentMethod ?? 'N/A'}`, MARGIN, 10, {
+      color: MUTED,
+    });
     y -= 14;
     const statusColor = order.paymentStatus === 'PAID' ? GREEN : ORANGE;
-    text(`Status: ${order.paymentStatus === 'PAID' ? 'Paid' : 'Pending'}`, MARGIN, 10, { color: statusColor });
+    text(
+      `Status: ${order.paymentStatus === 'PAID' ? 'Paid' : 'Pending'}`,
+      MARGIN,
+      10,
+      { color: statusColor },
+    );
     y -= 20;
 
     // Bill To
@@ -106,11 +124,20 @@ export async function generateInvoicePdf(
     y -= 14;
     text(order.shippingName ?? '', PAGE_W - MARGIN, 9, { align: 'right' });
     y -= 13;
-    text(order.shippingEmail ?? '', PAGE_W - MARGIN, 9, { align: 'right', color: MUTED });
+    text(order.shippingEmail ?? '', PAGE_W - MARGIN, 9, {
+      align: 'right',
+      color: MUTED,
+    });
     y -= 13;
-    text(order.shippingPhone ?? '', PAGE_W - MARGIN, 9, { align: 'right', color: MUTED });
+    text(order.shippingPhone ?? '', PAGE_W - MARGIN, 9, {
+      align: 'right',
+      color: MUTED,
+    });
     y -= 13;
-    text(order.shippingAddress ?? '', PAGE_W - MARGIN, 9, { align: 'right', color: MUTED });
+    text(order.shippingAddress ?? '', PAGE_W - MARGIN, 9, {
+      align: 'right',
+      color: MUTED,
+    });
     y -= 13;
     const LOC = `${order.shippingUpzila ?? ''}, ${order.shippingDistrict ?? ''}${order.shippingPostalCode ? ` - ${order.shippingPostalCode}` : ''}`;
     text(LOC, PAGE_W - MARGIN, 9, { align: 'right', color: MUTED });
@@ -118,14 +145,26 @@ export async function generateInvoicePdf(
 
     // Table header
     const COL = [30, CONTENT_W - 30 - 100 - 50 - 60 - 70, 100, 50, 60, 70];
-    const colsX = COL.map((_, i) => MARGIN + COL.slice(0, i).reduce((a, b) => a + b, 0));
+    const colsX = COL.map(
+      (_, i) => MARGIN + COL.slice(0, i).reduce((a, b) => a + b, 0),
+    );
     const TH = ['#', 'Item', 'Shop', 'Qty', 'Price', 'Total'];
-    const TH_ALIGN: ('left' | 'right' | 'center')[] = ['center', 'left', 'center', 'center', 'right', 'right'];
+    const TH_ALIGN: ('left' | 'right' | 'center')[] = [
+      'center',
+      'left',
+      'center',
+      'center',
+      'right',
+      'right',
+    ];
 
     line(y);
     y -= 5;
     page.drawRectangle({
-      x: MARGIN, y: y - 8, width: CONTENT_W, height: 8,
+      x: MARGIN,
+      y: y - 8,
+      width: CONTENT_W,
+      height: 8,
       color: HEADER_BG,
     });
 
@@ -136,7 +175,12 @@ export async function generateInvoicePdf(
       if (TH_ALIGN[i] === 'right') px = cx + w;
       else if (TH_ALIGN[i] === 'center') px = cx + w / 2;
       page.drawText(h, {
-        x: TH_ALIGN[i] === 'right' ? px : TH_ALIGN[i] === 'center' ? px - bold.widthOfTextAtSize(h, 8) / 2 : px,
+        x:
+          TH_ALIGN[i] === 'right'
+            ? px
+            : TH_ALIGN[i] === 'center'
+              ? px - bold.widthOfTextAtSize(h, 8) / 2
+              : px,
         y: y - 7,
         size: 8,
         font: bold,
@@ -164,7 +208,12 @@ export async function generateInvoicePdf(
         if (TH_ALIGN[j] === 'right') px = cx + w;
         else if (TH_ALIGN[j] === 'center') px = cx + w / 2;
         page.drawText(v, {
-          x: TH_ALIGN[j] === 'right' ? px : TH_ALIGN[j] === 'center' ? px - narrow.widthOfTextAtSize(v, 8) / 2 : px,
+          x:
+            TH_ALIGN[j] === 'right'
+              ? px
+              : TH_ALIGN[j] === 'center'
+                ? px - narrow.widthOfTextAtSize(v, 8) / 2
+                : px,
           y: y - 6,
           size: 8,
           font: j === 5 ? bold : narrow,
@@ -180,14 +229,26 @@ export async function generateInvoicePdf(
 
     // Totals
     const totalsX = PAGE_W - MARGIN - 160;
-    const totalItems: { label: string; value: string; color?: ReturnType<typeof rgb>; sz?: number; bd?: boolean }[] = [
-      { label: 'Subtotal', value: fmtCurrency(order.subtotal) },
-    ];
+    const totalItems: {
+      label: string;
+      value: string;
+      color?: ReturnType<typeof rgb>;
+      sz?: number;
+      bd?: boolean;
+    }[] = [{ label: 'Subtotal', value: fmtCurrency(order.subtotal) }];
     if (order.discountAmount > 0) {
-      totalItems.push({ label: 'Discount', value: `-${fmtCurrency(order.discountAmount)}`, color: GREEN });
+      totalItems.push({
+        label: 'Discount',
+        value: `-${fmtCurrency(order.discountAmount)}`,
+        color: GREEN,
+      });
     }
     if (order.couponDiscount && order.couponDiscount > 0) {
-      totalItems.push({ label: `Coupon (${order.couponCode})`, value: `-${fmtCurrency(order.couponDiscount)}`, color: GREEN });
+      totalItems.push({
+        label: `Coupon (${order.couponCode})`,
+        value: `-${fmtCurrency(order.couponDiscount)}`,
+        color: GREEN,
+      });
     }
     totalItems.push({
       label: 'Shipping',
@@ -216,11 +277,21 @@ export async function generateInvoicePdf(
     // Thank you
     y -= 14;
     const thankYou = 'Thank you for your order!';
-    text(thankYou, MARGIN + (CONTENT_W - narrow.widthOfTextAtSize(thankYou, 10)) / 2, 10, { color: MUTED });
+    text(
+      thankYou,
+      MARGIN + (CONTENT_W - narrow.widthOfTextAtSize(thankYou, 10)) / 2,
+      10,
+      { color: MUTED },
+    );
 
     // Footer
     const footerText = `Oylkka — Invoice ${invoiceNumber} | Page 1 of 1`;
-    text(footerText, MARGIN + (CONTENT_W - narrow.widthOfTextAtSize(footerText, 7)) / 2, 7, { color: MUTED });
+    text(
+      footerText,
+      MARGIN + (CONTENT_W - narrow.widthOfTextAtSize(footerText, 7)) / 2,
+      7,
+      { color: MUTED },
+    );
 
     const pdfBytes = await doc.save();
     const pdfBuffer = Buffer.from(pdfBytes);

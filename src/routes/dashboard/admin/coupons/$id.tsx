@@ -14,12 +14,7 @@ import {
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import {
@@ -249,7 +244,9 @@ function RouteComponent() {
               <div className='grid grid-cols-1 sm:grid-cols-2 gap-4'>
                 <div className='space-y-2'>
                   <Label htmlFor='value'>
-                    {type === 'PERCENTAGE' ? 'Discount % *' : 'Discount Amount *'}
+                    {type === 'PERCENTAGE'
+                      ? 'Discount % *'
+                      : 'Discount Amount *'}
                   </Label>
                   <Input
                     id='value'
@@ -354,7 +351,10 @@ function RouteComponent() {
                       checked={autoApply}
                       onCheckedChange={setAutoApply}
                     />
-                    <Label htmlFor='autoApply' className='ml-2 text-sm text-muted-foreground'>
+                    <Label
+                      htmlFor='autoApply'
+                      className='ml-2 text-sm text-muted-foreground'
+                    >
                       Automatically apply to eligible carts
                     </Label>
                   </div>
@@ -409,7 +409,9 @@ function RouteComponent() {
                 <div className='flex items-center gap-3'>
                   <Button
                     type='submit'
-                    disabled={updateMutation.isPending || !code.trim() || !value}
+                    disabled={
+                      updateMutation.isPending || !code.trim() || !value
+                    }
                   >
                     {updateMutation.isPending && (
                       <span className='w-4 h-4 mr-2 animate-spin rounded-full border-2 border-current border-t-transparent' />
