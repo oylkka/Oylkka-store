@@ -156,6 +156,7 @@ export function useAllProducts(params: {
   page?: number;
   limit?: number;
   category?: string;
+  hasDiscount?: boolean;
 }) {
   return useQuery<ProductListResponse>({
     queryKey: [QUERY_KEYS.PUBLIC_PRODUCTS, 'list', params],
@@ -166,6 +167,34 @@ export function useAllProducts(params: {
       );
       return response.data;
     },
+  });
+}
+
+type CompareProduct = CategoryProduct & {
+  description: string;
+  sku: string;
+  brand: string | null;
+  condition: string;
+  freeShipping: boolean;
+  tags: string[];
+  discountPercent: number | null;
+};
+
+type CompareResponse = {
+  products: CompareProduct[];
+};
+
+export function useCompareProducts(ids: string[]) {
+  return useQuery<CompareResponse>({
+    queryKey: [QUERY_KEYS.PUBLIC_PRODUCTS, 'compare', ids],
+    queryFn: async () => {
+      const response = await apiClient.get<CompareResponse>(
+        '/api/product/public-compare',
+        { params: { ids: ids.join(',') } },
+      );
+      return response.data;
+    },
+    enabled: ids.length >= 2,
   });
 }
 

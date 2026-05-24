@@ -10,10 +10,18 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as TermsRouteImport } from './routes/terms'
+import { Route as ShippingRouteImport } from './routes/shipping'
+import { Route as ReturnsRouteImport } from './routes/returns'
 import { Route as ProductsRouteImport } from './routes/products'
 import { Route as PrivacyRouteImport } from './routes/privacy'
+import { Route as FaqRouteImport } from './routes/faq'
+import { Route as DealsRouteImport } from './routes/deals'
+import { Route as ContactRouteImport } from './routes/contact'
+import { Route as CompareRouteImport } from './routes/compare'
 import { Route as CheckoutRouteImport } from './routes/checkout'
 import { Route as CartRouteImport } from './routes/cart'
+import { Route as BlogRouteImport } from './routes/blog'
+import { Route as AboutRouteImport } from './routes/about'
 import { Route as DashboardRouteRouteImport } from './routes/dashboard/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ShopsIndexRouteImport } from './routes/shops/index'
@@ -33,6 +41,7 @@ import { Route as AuthSignupRouteImport } from './routes/auth/signup'
 import { Route as AuthSigninRouteImport } from './routes/auth/signin'
 import { Route as AuthForgotPasswordRouteImport } from './routes/auth/forgot-password'
 import { Route as AuthErrorRouteImport } from './routes/auth/error'
+import { Route as ApiContactRouteImport } from './routes/api/contact'
 import { Route as DashboardVendorRouteRouteImport } from './routes/dashboard/vendor/route'
 import { Route as DashboardOrdersRouteRouteImport } from './routes/dashboard/orders/route'
 import { Route as DashboardBecomeVendorRouteRouteImport } from './routes/dashboard/become-vendor/route'
@@ -73,6 +82,7 @@ import { Route as ApiProductPublicSingleRouteImport } from './routes/api/product
 import { Route as ApiProductPublicReviewsRouteImport } from './routes/api/product/public-reviews'
 import { Route as ApiProductPublicQuestionsRouteImport } from './routes/api/product/public-questions'
 import { Route as ApiProductPublicListRouteImport } from './routes/api/product/public-list'
+import { Route as ApiProductPublicCompareRouteImport } from './routes/api/product/public-compare'
 import { Route as ApiProductPublicByCategoryRouteImport } from './routes/api/product/public-by-category'
 import { Route as ApiProductGetSingleRouteImport } from './routes/api/product/get-single'
 import { Route as ApiProductEditRouteImport } from './routes/api/product/edit'
@@ -194,6 +204,16 @@ const TermsRoute = TermsRouteImport.update({
   path: '/terms',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ShippingRoute = ShippingRouteImport.update({
+  id: '/shipping',
+  path: '/shipping',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ReturnsRoute = ReturnsRouteImport.update({
+  id: '/returns',
+  path: '/returns',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ProductsRoute = ProductsRouteImport.update({
   id: '/products',
   path: '/products',
@@ -204,6 +224,26 @@ const PrivacyRoute = PrivacyRouteImport.update({
   path: '/privacy',
   getParentRoute: () => rootRouteImport,
 } as any)
+const FaqRoute = FaqRouteImport.update({
+  id: '/faq',
+  path: '/faq',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DealsRoute = DealsRouteImport.update({
+  id: '/deals',
+  path: '/deals',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ContactRoute = ContactRouteImport.update({
+  id: '/contact',
+  path: '/contact',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CompareRoute = CompareRouteImport.update({
+  id: '/compare',
+  path: '/compare',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const CheckoutRoute = CheckoutRouteImport.update({
   id: '/checkout',
   path: '/checkout',
@@ -212,6 +252,16 @@ const CheckoutRoute = CheckoutRouteImport.update({
 const CartRoute = CartRouteImport.update({
   id: '/cart',
   path: '/cart',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BlogRoute = BlogRouteImport.update({
+  id: '/blog',
+  path: '/blog',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AboutRoute = AboutRouteImport.update({
+  id: '/about',
+  path: '/about',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DashboardRouteRoute = DashboardRouteRouteImport.update({
@@ -307,6 +357,11 @@ const AuthForgotPasswordRoute = AuthForgotPasswordRouteImport.update({
 const AuthErrorRoute = AuthErrorRouteImport.update({
   id: '/auth/error',
   path: '/auth/error',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiContactRoute = ApiContactRouteImport.update({
+  id: '/api/contact',
+  path: '/api/contact',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DashboardVendorRouteRoute = DashboardVendorRouteRouteImport.update({
@@ -513,6 +568,11 @@ const ApiProductPublicQuestionsRoute =
 const ApiProductPublicListRoute = ApiProductPublicListRouteImport.update({
   id: '/api/product/public-list',
   path: '/api/product/public-list',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiProductPublicCompareRoute = ApiProductPublicCompareRouteImport.update({
+  id: '/api/product/public-compare',
+  path: '/api/product/public-compare',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiProductPublicByCategoryRoute =
@@ -1142,15 +1202,24 @@ const DashboardVendorShopMessagesIdRoute =
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/dashboard': typeof DashboardRouteRouteWithChildren
+  '/about': typeof AboutRoute
+  '/blog': typeof BlogRoute
   '/cart': typeof CartRoute
   '/checkout': typeof CheckoutRouteWithChildren
+  '/compare': typeof CompareRoute
+  '/contact': typeof ContactRoute
+  '/deals': typeof DealsRoute
+  '/faq': typeof FaqRoute
   '/privacy': typeof PrivacyRoute
   '/products': typeof ProductsRouteWithChildren
+  '/returns': typeof ReturnsRoute
+  '/shipping': typeof ShippingRoute
   '/terms': typeof TermsRoute
   '/dashboard/admin': typeof DashboardAdminRouteRouteWithChildren
   '/dashboard/become-vendor': typeof DashboardBecomeVendorRouteRouteWithChildren
   '/dashboard/orders': typeof DashboardOrdersRouteRouteWithChildren
   '/dashboard/vendor': typeof DashboardVendorRouteRouteWithChildren
+  '/api/contact': typeof ApiContactRoute
   '/auth/error': typeof AuthErrorRoute
   '/auth/forgot-password': typeof AuthForgotPasswordRoute
   '/auth/signin': typeof AuthSigninRoute
@@ -1220,6 +1289,7 @@ export interface FileRoutesByFullPath {
   '/api/product/edit': typeof ApiProductEditRoute
   '/api/product/get-single': typeof ApiProductGetSingleRoute
   '/api/product/public-by-category': typeof ApiProductPublicByCategoryRoute
+  '/api/product/public-compare': typeof ApiProductPublicCompareRoute
   '/api/product/public-list': typeof ApiProductPublicListRoute
   '/api/product/public-questions': typeof ApiProductPublicQuestionsRoute
   '/api/product/public-reviews': typeof ApiProductPublicReviewsRoute
@@ -1322,14 +1392,23 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/about': typeof AboutRoute
+  '/blog': typeof BlogRoute
   '/cart': typeof CartRoute
   '/checkout': typeof CheckoutRouteWithChildren
+  '/compare': typeof CompareRoute
+  '/contact': typeof ContactRoute
+  '/deals': typeof DealsRoute
+  '/faq': typeof FaqRoute
   '/privacy': typeof PrivacyRoute
   '/products': typeof ProductsRouteWithChildren
+  '/returns': typeof ReturnsRoute
+  '/shipping': typeof ShippingRoute
   '/terms': typeof TermsRoute
   '/dashboard/admin': typeof DashboardAdminRouteRouteWithChildren
   '/dashboard/become-vendor': typeof DashboardBecomeVendorRouteRouteWithChildren
   '/dashboard/vendor': typeof DashboardVendorRouteRouteWithChildren
+  '/api/contact': typeof ApiContactRoute
   '/auth/error': typeof AuthErrorRoute
   '/auth/forgot-password': typeof AuthForgotPasswordRoute
   '/auth/signin': typeof AuthSigninRoute
@@ -1396,6 +1475,7 @@ export interface FileRoutesByTo {
   '/api/product/edit': typeof ApiProductEditRoute
   '/api/product/get-single': typeof ApiProductGetSingleRoute
   '/api/product/public-by-category': typeof ApiProductPublicByCategoryRoute
+  '/api/product/public-compare': typeof ApiProductPublicCompareRoute
   '/api/product/public-list': typeof ApiProductPublicListRoute
   '/api/product/public-questions': typeof ApiProductPublicQuestionsRoute
   '/api/product/public-reviews': typeof ApiProductPublicReviewsRoute
@@ -1500,15 +1580,24 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/dashboard': typeof DashboardRouteRouteWithChildren
+  '/about': typeof AboutRoute
+  '/blog': typeof BlogRoute
   '/cart': typeof CartRoute
   '/checkout': typeof CheckoutRouteWithChildren
+  '/compare': typeof CompareRoute
+  '/contact': typeof ContactRoute
+  '/deals': typeof DealsRoute
+  '/faq': typeof FaqRoute
   '/privacy': typeof PrivacyRoute
   '/products': typeof ProductsRouteWithChildren
+  '/returns': typeof ReturnsRoute
+  '/shipping': typeof ShippingRoute
   '/terms': typeof TermsRoute
   '/dashboard/admin': typeof DashboardAdminRouteRouteWithChildren
   '/dashboard/become-vendor': typeof DashboardBecomeVendorRouteRouteWithChildren
   '/dashboard/orders': typeof DashboardOrdersRouteRouteWithChildren
   '/dashboard/vendor': typeof DashboardVendorRouteRouteWithChildren
+  '/api/contact': typeof ApiContactRoute
   '/auth/error': typeof AuthErrorRoute
   '/auth/forgot-password': typeof AuthForgotPasswordRoute
   '/auth/signin': typeof AuthSigninRoute
@@ -1578,6 +1667,7 @@ export interface FileRoutesById {
   '/api/product/edit': typeof ApiProductEditRoute
   '/api/product/get-single': typeof ApiProductGetSingleRoute
   '/api/product/public-by-category': typeof ApiProductPublicByCategoryRoute
+  '/api/product/public-compare': typeof ApiProductPublicCompareRoute
   '/api/product/public-list': typeof ApiProductPublicListRoute
   '/api/product/public-questions': typeof ApiProductPublicQuestionsRoute
   '/api/product/public-reviews': typeof ApiProductPublicReviewsRoute
@@ -1683,15 +1773,24 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/dashboard'
+    | '/about'
+    | '/blog'
     | '/cart'
     | '/checkout'
+    | '/compare'
+    | '/contact'
+    | '/deals'
+    | '/faq'
     | '/privacy'
     | '/products'
+    | '/returns'
+    | '/shipping'
     | '/terms'
     | '/dashboard/admin'
     | '/dashboard/become-vendor'
     | '/dashboard/orders'
     | '/dashboard/vendor'
+    | '/api/contact'
     | '/auth/error'
     | '/auth/forgot-password'
     | '/auth/signin'
@@ -1761,6 +1860,7 @@ export interface FileRouteTypes {
     | '/api/product/edit'
     | '/api/product/get-single'
     | '/api/product/public-by-category'
+    | '/api/product/public-compare'
     | '/api/product/public-list'
     | '/api/product/public-questions'
     | '/api/product/public-reviews'
@@ -1863,14 +1963,23 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/about'
+    | '/blog'
     | '/cart'
     | '/checkout'
+    | '/compare'
+    | '/contact'
+    | '/deals'
+    | '/faq'
     | '/privacy'
     | '/products'
+    | '/returns'
+    | '/shipping'
     | '/terms'
     | '/dashboard/admin'
     | '/dashboard/become-vendor'
     | '/dashboard/vendor'
+    | '/api/contact'
     | '/auth/error'
     | '/auth/forgot-password'
     | '/auth/signin'
@@ -1937,6 +2046,7 @@ export interface FileRouteTypes {
     | '/api/product/edit'
     | '/api/product/get-single'
     | '/api/product/public-by-category'
+    | '/api/product/public-compare'
     | '/api/product/public-list'
     | '/api/product/public-questions'
     | '/api/product/public-reviews'
@@ -2040,15 +2150,24 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/dashboard'
+    | '/about'
+    | '/blog'
     | '/cart'
     | '/checkout'
+    | '/compare'
+    | '/contact'
+    | '/deals'
+    | '/faq'
     | '/privacy'
     | '/products'
+    | '/returns'
+    | '/shipping'
     | '/terms'
     | '/dashboard/admin'
     | '/dashboard/become-vendor'
     | '/dashboard/orders'
     | '/dashboard/vendor'
+    | '/api/contact'
     | '/auth/error'
     | '/auth/forgot-password'
     | '/auth/signin'
@@ -2118,6 +2237,7 @@ export interface FileRouteTypes {
     | '/api/product/edit'
     | '/api/product/get-single'
     | '/api/product/public-by-category'
+    | '/api/product/public-compare'
     | '/api/product/public-list'
     | '/api/product/public-questions'
     | '/api/product/public-reviews'
@@ -2222,11 +2342,20 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   DashboardRouteRoute: typeof DashboardRouteRouteWithChildren
+  AboutRoute: typeof AboutRoute
+  BlogRoute: typeof BlogRoute
   CartRoute: typeof CartRoute
   CheckoutRoute: typeof CheckoutRouteWithChildren
+  CompareRoute: typeof CompareRoute
+  ContactRoute: typeof ContactRoute
+  DealsRoute: typeof DealsRoute
+  FaqRoute: typeof FaqRoute
   PrivacyRoute: typeof PrivacyRoute
   ProductsRoute: typeof ProductsRouteWithChildren
+  ReturnsRoute: typeof ReturnsRoute
+  ShippingRoute: typeof ShippingRoute
   TermsRoute: typeof TermsRoute
+  ApiContactRoute: typeof ApiContactRoute
   AuthErrorRoute: typeof AuthErrorRoute
   AuthForgotPasswordRoute: typeof AuthForgotPasswordRoute
   AuthSigninRoute: typeof AuthSigninRoute
@@ -2285,6 +2414,7 @@ export interface RootRouteChildren {
   ApiProductEditRoute: typeof ApiProductEditRoute
   ApiProductGetSingleRoute: typeof ApiProductGetSingleRoute
   ApiProductPublicByCategoryRoute: typeof ApiProductPublicByCategoryRoute
+  ApiProductPublicCompareRoute: typeof ApiProductPublicCompareRoute
   ApiProductPublicListRoute: typeof ApiProductPublicListRoute
   ApiProductPublicQuestionsRoute: typeof ApiProductPublicQuestionsRoute
   ApiProductPublicReviewsRoute: typeof ApiProductPublicReviewsRoute
@@ -2355,6 +2485,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TermsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/shipping': {
+      id: '/shipping'
+      path: '/shipping'
+      fullPath: '/shipping'
+      preLoaderRoute: typeof ShippingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/returns': {
+      id: '/returns'
+      path: '/returns'
+      fullPath: '/returns'
+      preLoaderRoute: typeof ReturnsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/products': {
       id: '/products'
       path: '/products'
@@ -2369,6 +2513,34 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PrivacyRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/faq': {
+      id: '/faq'
+      path: '/faq'
+      fullPath: '/faq'
+      preLoaderRoute: typeof FaqRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/deals': {
+      id: '/deals'
+      path: '/deals'
+      fullPath: '/deals'
+      preLoaderRoute: typeof DealsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/contact': {
+      id: '/contact'
+      path: '/contact'
+      fullPath: '/contact'
+      preLoaderRoute: typeof ContactRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/compare': {
+      id: '/compare'
+      path: '/compare'
+      fullPath: '/compare'
+      preLoaderRoute: typeof CompareRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/checkout': {
       id: '/checkout'
       path: '/checkout'
@@ -2381,6 +2553,20 @@ declare module '@tanstack/react-router' {
       path: '/cart'
       fullPath: '/cart'
       preLoaderRoute: typeof CartRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/blog': {
+      id: '/blog'
+      path: '/blog'
+      fullPath: '/blog'
+      preLoaderRoute: typeof BlogRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/about': {
+      id: '/about'
+      path: '/about'
+      fullPath: '/about'
+      preLoaderRoute: typeof AboutRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/dashboard': {
@@ -2514,6 +2700,13 @@ declare module '@tanstack/react-router' {
       path: '/auth/error'
       fullPath: '/auth/error'
       preLoaderRoute: typeof AuthErrorRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/contact': {
+      id: '/api/contact'
+      path: '/api/contact'
+      fullPath: '/api/contact'
+      preLoaderRoute: typeof ApiContactRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/dashboard/vendor': {
@@ -2794,6 +2987,13 @@ declare module '@tanstack/react-router' {
       path: '/api/product/public-list'
       fullPath: '/api/product/public-list'
       preLoaderRoute: typeof ApiProductPublicListRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/product/public-compare': {
+      id: '/api/product/public-compare'
+      path: '/api/product/public-compare'
+      fullPath: '/api/product/public-compare'
+      preLoaderRoute: typeof ApiProductPublicCompareRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/product/public-by-category': {
@@ -3837,11 +4037,20 @@ const ProductsRouteWithChildren = ProductsRoute._addFileChildren(
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   DashboardRouteRoute: DashboardRouteRouteWithChildren,
+  AboutRoute: AboutRoute,
+  BlogRoute: BlogRoute,
   CartRoute: CartRoute,
   CheckoutRoute: CheckoutRouteWithChildren,
+  CompareRoute: CompareRoute,
+  ContactRoute: ContactRoute,
+  DealsRoute: DealsRoute,
+  FaqRoute: FaqRoute,
   PrivacyRoute: PrivacyRoute,
   ProductsRoute: ProductsRouteWithChildren,
+  ReturnsRoute: ReturnsRoute,
+  ShippingRoute: ShippingRoute,
   TermsRoute: TermsRoute,
+  ApiContactRoute: ApiContactRoute,
   AuthErrorRoute: AuthErrorRoute,
   AuthForgotPasswordRoute: AuthForgotPasswordRoute,
   AuthSigninRoute: AuthSigninRoute,
@@ -3900,6 +4109,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiProductEditRoute: ApiProductEditRoute,
   ApiProductGetSingleRoute: ApiProductGetSingleRoute,
   ApiProductPublicByCategoryRoute: ApiProductPublicByCategoryRoute,
+  ApiProductPublicCompareRoute: ApiProductPublicCompareRoute,
   ApiProductPublicListRoute: ApiProductPublicListRoute,
   ApiProductPublicQuestionsRoute: ApiProductPublicQuestionsRoute,
   ApiProductPublicReviewsRoute: ApiProductPublicReviewsRoute,
@@ -3965,3 +4175,12 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { createStart } from '@tanstack/react-start'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+  }
+}

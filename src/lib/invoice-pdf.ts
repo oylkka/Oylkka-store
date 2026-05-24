@@ -1,40 +1,20 @@
-import vfsFonts from 'pdfmake/build/vfs_fonts';
-import PdfPrinter from 'pdfmake/src/Printer';
 import cloudinary from '@/cloudinary/cloudinary';
 import { prisma } from '@/lib/db';
+import { PDFDocument, rgb, StandardFonts } from 'pdf-lib';
 
-const vfs = {
-  readFileSync: (path: string) => {
-    const key = path.replace(/^\//, '');
-    const content = (vfsFonts as Record<string, string>)[key];
-    if (content) {
-      return Buffer.from(content, 'base64');
-    }
-    throw new Error(`File '${path}' not found in virtual file system`);
-  },
-  existsSync: (path: string) => {
-    const key = path.replace(/^\//, '');
-    return !!(vfsFonts as Record<string, string>)[key];
-  },
-};
+const PRIMARY = rgb(0.094, 0.094, 0.106);
+const MUTED = rgb(0.631, 0.631, 0.671);
+const GREEN = rgb(0.086, 0.627, 0.29);
+const ORANGE = rgb(0.918, 0.345, 0.047);
+const BORDER = rgb(0.894, 0.894, 0.902);
+const HEADER_BG = rgb(0.957, 0.957, 0.961);
 
-const urlResolver = {
-  resolve: (url: string) => ({ url, headers: {} as Record<string, string> }),
-  resolved: () => Promise.resolve(),
-};
+const PAGE_W = 595.28;
+const PAGE_H = 841.89;
+const MARGIN = 40;
+const CONTENT_W = PAGE_W - MARGIN * 2;
 
-const fonts = {
-  Roboto: {
-    normal: 'Roboto-Regular.ttf',
-    bold: 'Roboto-Medium.ttf',
-    italics: 'Roboto-Italic.ttf',
-    bolditalics: 'Roboto-MediumItalic.ttf',
-  },
-};
-
-const printer = new PdfPrinter(fonts, vfs, urlResolver, () => true);
-
-function formatDate(date: Date): string {
+function fmtDate(date: Date): string {
   return date.toLocaleDateString('en-BD', {
     year: 'numeric',
     month: 'long',
@@ -42,7 +22,7 @@ function formatDate(date: Date): string {
   });
 }
 
-function formatCurrency(amount: number): string {
+function fmtCurrency(amount: number): string {
   return `৳${amount.toLocaleString('en-BD', { minimumFractionDigits: 2 })}`;
 }
 
@@ -53,10 +33,7 @@ export async function generateInvoicePdf(
     const existing = await prisma.invoice.findUnique({
       where: { orderId },
     });
-
-    if (existing?.pdfUrl) {
-      return existing.pdfUrl;
-    }
+    if (existing?.pdfUrl) return existing.pdfUrl;
 
     const order = await prisma.order.findUnique({
       where: { id: orderId },
@@ -69,247 +46,184 @@ export async function generateInvoicePdf(
         },
       },
     });
-
     if (!order) return null;
 
     const invoiceNumber = `INV-${order.orderNumber}`;
 
-    const docDefinition = {
-      pageSize: 'A4',
-      pageMargins: [40, 40, 40, 60],
-      defaultStyle: { font: 'Roboto', fontSize: 9 },
-      header: () => ({
-        columns: [
-          {
-            text: 'OYLKKA',
-            fontSize: 22,
-            bold: true,
-            color: '#18181b',
-          },
-          {
-            text: 'INVOICE',
-            fontSize: 22,
-            bold: true,
-            color: '#18181b',
-            alignment: 'right',
-          },
-        ],
-        margin: [40, 30, 40, 10],
-      }),
-      footer: (currentPage: number, pageCount: number) => ({
-        text: `Oylkka — Invoice ${invoiceNumber} | Page ${currentPage} of ${pageCount}`,
-        alignment: 'center',
-        fontSize: 7,
-        color: '#a1a1aa',
-        margin: [40, 0, 40, 0],
-      }),
-      content: [
-        {
-          columns: [
-            {
-              text: [
-                { text: 'Invoice #: ', bold: true, fontSize: 10 },
-                { text: invoiceNumber, fontSize: 10 },
-                { text: '\nDate: ', bold: true, fontSize: 10 },
-                { text: formatDate(order.createdAt), fontSize: 10 },
-                {
-                  text: `\nPayment: ${order.paymentMethod ?? 'N/A'}`,
-                  fontSize: 10,
-                  color: '#52525b',
-                },
-                {
-                  text: `\nStatus: ${order.paymentStatus === 'PAID' ? 'Paid' : 'Pending'}`,
-                  fontSize: 10,
-                  color: order.paymentStatus === 'PAID' ? '#16a34a' : '#ea580c',
-                },
-              ],
-              alignment: 'left',
-            },
-            {
-              text: [
-                { text: 'Bill To:\n', bold: true, fontSize: 10 },
-                { text: `${order.shippingName}\n`, fontSize: 9 },
-                { text: `${order.shippingEmail}\n`, fontSize: 9 },
-                { text: `${order.shippingPhone}\n`, fontSize: 9 },
-                { text: `${order.shippingAddress}\n`, fontSize: 9 },
-                {
-                  text: `${order.shippingUpzila}, ${order.shippingDistrict}${order.shippingPostalCode ? ` - ${order.shippingPostalCode}` : ''}`,
-                  fontSize: 9,
-                },
-              ],
-              alignment: 'right',
-            },
-          ],
-          margin: [0, 20, 0, 0],
-        },
-        {
-          table: {
-            headerRows: 1,
-            widths: ['auto', '*', 'auto', 'auto', 'auto', 'auto'],
-            body: [
-              [
-                { text: '#', style: 'tableHeader' },
-                { text: 'Item', style: 'tableHeader' },
-                { text: 'Shop', style: 'tableHeader', alignment: 'center' },
-                { text: 'Qty', style: 'tableHeader', alignment: 'center' },
-                { text: 'Price', style: 'tableHeader', alignment: 'right' },
-                { text: 'Total', style: 'tableHeader', alignment: 'right' },
-              ],
-              ...order.items.map((item, i) => [
-                { text: `${i + 1}`, alignment: 'center', fontSize: 8 },
-                {
-                  text: `${item.productName}${item.variantName ? ` (${item.variantName})` : ''}`,
-                  fontSize: 8,
-                },
-                {
-                  text: item.shop.name,
-                  alignment: 'center',
-                  fontSize: 8,
-                },
-                { text: `${item.quantity}`, alignment: 'center', fontSize: 8 },
-                {
-                  text: formatCurrency(item.unitPrice),
-                  alignment: 'right',
-                  fontSize: 8,
-                },
-                {
-                  text: formatCurrency(item.total),
-                  alignment: 'right',
-                  fontSize: 8,
-                  bold: true,
-                },
-              ]),
-            ],
-          },
-          layout: {
-            hLineWidth: (_i: number, node: { table: { body: unknown[] } }) =>
-              _i === 0 || _i === 1 || _i === node.table.body.length ? 0.5 : 0.1,
-            vLineWidth: () => 0,
-            hLineColor: () => '#e4e4e7',
-            paddingLeft: (_i: number) => 6,
-            paddingRight: (_i: number) => 6,
-            paddingTop: (_i: number) => 5,
-            paddingBottom: (_i: number) => 5,
-          },
-          margin: [0, 16, 0, 0],
-        },
-        {
-          columns: [
-            { width: '*', text: '' },
-            {
-              width: 'auto',
-              layout: 'noBorders',
-              table: {
-                widths: ['auto', 'auto'],
-                body: [
-                  [
-                    { text: 'Subtotal', alignment: 'right', fontSize: 9 },
-                    {
-                      text: formatCurrency(order.subtotal),
-                      alignment: 'right',
-                      fontSize: 9,
-                    },
-                  ],
-                  ...(order.discountAmount > 0
-                    ? [
-                        [
-                          {
-                            text: 'Discount',
-                            alignment: 'right',
-                            fontSize: 9,
-                            color: '#16a34a',
-                          },
-                          {
-                            text: `-${formatCurrency(order.discountAmount)}`,
-                            alignment: 'right',
-                            fontSize: 9,
-                            color: '#16a34a',
-                          },
-                        ],
-                      ]
-                    : []),
-                  ...(order.couponDiscount && order.couponDiscount > 0
-                    ? [
-                        [
-                          {
-                            text: `Coupon (${order.couponCode})`,
-                            alignment: 'right',
-                            fontSize: 9,
-                            color: '#16a34a',
-                          },
-                          {
-                            text: `-${formatCurrency(order.couponDiscount)}`,
-                            alignment: 'right',
-                            fontSize: 9,
-                            color: '#16a34a',
-                          },
-                        ],
-                      ]
-                    : []),
-                  [
-                    {
-                      text: 'Shipping',
-                      alignment: 'right',
-                      fontSize: 9,
-                    },
-                    {
-                      text:
-                        order.shippingCost > 0
-                          ? formatCurrency(order.shippingCost)
-                          : 'Free',
-                      alignment: 'right',
-                      fontSize: 9,
-                    },
-                  ],
-                  [
-                    {
-                      text: 'Total',
-                      alignment: 'right',
-                      fontSize: 11,
-                      bold: true,
-                    },
-                    {
-                      text: formatCurrency(order.total),
-                      alignment: 'right',
-                      fontSize: 11,
-                      bold: true,
-                    },
-                  ],
-                ],
-              },
-              margin: [0, 8, 0, 0],
-            },
-          ],
-        },
-        {
-          text: '\n\nThank you for your order!',
-          alignment: 'center',
-          fontSize: 9,
-          color: '#71717a',
-          margin: [0, 20, 0, 0],
-        },
-      ],
-      styles: {
-        tableHeader: {
-          fontSize: 8,
-          bold: true,
-          color: '#18181b',
-          fillColor: '#f4f4f5',
-        },
+    const doc = await PDFDocument.create();
+    const page = doc.addPage([PAGE_W, PAGE_H]);
+    const regular = await doc.embedFont(StandardFonts.Helvetica);
+    const bold = await doc.embedFont(StandardFonts.HelveticaBold);
+    const narrow = await doc.embedFont(StandardFonts.Helvetica);
+
+    let y = PAGE_H - MARGIN;
+
+    function text(
+      str: string,
+      x: number,
+      size: number,
+      opts?: {
+        font?: typeof regular;
+        color?: ReturnType<typeof rgb>;
+        align?: 'left' | 'right';
       },
-    };
+    ) {
+      const f = opts?.font ?? regular;
+      const w = f.widthOfTextAtSize(str, size);
+      const px = opts?.align === 'right' ? x - w : x;
+      page.drawText(str, { x: px, y: y - size, size, font: f, color: opts?.color ?? PRIMARY });
+    }
 
-    const pdfDoc = await printer.createPdfKitDocument(docDefinition);
+    function line(yPos: number, color?: ReturnType<typeof rgb>) {
+      page.drawLine({
+        start: { x: MARGIN, y: yPos },
+        end: { x: PAGE_W - MARGIN, y: yPos },
+        thickness: 0.5,
+        color: color ?? BORDER,
+      });
+    }
 
-    const chunks: Buffer[] = [];
-    await new Promise<void>((resolve, reject) => {
-      pdfDoc.on('data', (chunk: Buffer) => chunks.push(chunk));
-      pdfDoc.on('end', resolve);
-      pdfDoc.on('error', reject);
-      pdfDoc.end();
+    // Header
+    text('OYLKKA', MARGIN, 22, { font: bold });
+    text('INVOICE', PAGE_W - MARGIN, 22, { font: bold, align: 'right' });
+    y -= 16;
+    line(y);
+    y -= 28;
+
+    // Invoice info
+    text(`Invoice #: ${invoiceNumber}`, MARGIN, 10, { font: bold });
+    const dateStr = fmtDate(order.createdAt);
+    text(dateStr, MARGIN + bold.widthOfTextAtSize(`Invoice #: ${invoiceNumber}`, 10) + 30, 10, { color: MUTED });
+    y -= 14;
+    text(`Payment: ${order.paymentMethod ?? 'N/A'}`, MARGIN, 10, { color: MUTED });
+    y -= 14;
+    const statusColor = order.paymentStatus === 'PAID' ? GREEN : ORANGE;
+    text(`Status: ${order.paymentStatus === 'PAID' ? 'Paid' : 'Pending'}`, MARGIN, 10, { color: statusColor });
+    y -= 20;
+
+    // Bill To
+    text('Bill To:', PAGE_W - MARGIN, 10, { font: bold, align: 'right' });
+    y -= 14;
+    text(order.shippingName ?? '', PAGE_W - MARGIN, 9, { align: 'right' });
+    y -= 13;
+    text(order.shippingEmail ?? '', PAGE_W - MARGIN, 9, { align: 'right', color: MUTED });
+    y -= 13;
+    text(order.shippingPhone ?? '', PAGE_W - MARGIN, 9, { align: 'right', color: MUTED });
+    y -= 13;
+    text(order.shippingAddress ?? '', PAGE_W - MARGIN, 9, { align: 'right', color: MUTED });
+    y -= 13;
+    const LOC = `${order.shippingUpzila ?? ''}, ${order.shippingDistrict ?? ''}${order.shippingPostalCode ? ` - ${order.shippingPostalCode}` : ''}`;
+    text(LOC, PAGE_W - MARGIN, 9, { align: 'right', color: MUTED });
+    y -= 24;
+
+    // Table header
+    const COL = [30, CONTENT_W - 30 - 100 - 50 - 60 - 70, 100, 50, 60, 70];
+    const colsX = COL.map((_, i) => MARGIN + COL.slice(0, i).reduce((a, b) => a + b, 0));
+    const TH = ['#', 'Item', 'Shop', 'Qty', 'Price', 'Total'];
+    const TH_ALIGN: ('left' | 'right' | 'center')[] = ['center', 'left', 'center', 'center', 'right', 'right'];
+
+    line(y);
+    y -= 5;
+    page.drawRectangle({
+      x: MARGIN, y: y - 8, width: CONTENT_W, height: 8,
+      color: HEADER_BG,
     });
 
-    const pdfBuffer = Buffer.concat(chunks);
+    TH.forEach((h, i) => {
+      const cx = colsX[i];
+      const w = COL[i];
+      let px = cx;
+      if (TH_ALIGN[i] === 'right') px = cx + w;
+      else if (TH_ALIGN[i] === 'center') px = cx + w / 2;
+      page.drawText(h, {
+        x: TH_ALIGN[i] === 'right' ? px : TH_ALIGN[i] === 'center' ? px - bold.widthOfTextAtSize(h, 8) / 2 : px,
+        y: y - 7,
+        size: 8,
+        font: bold,
+        color: PRIMARY,
+      });
+    });
+
+    y -= 13;
+
+    // Table rows
+    const items = [...order.items];
+    items.forEach((item, i) => {
+      const vals = [
+        `${i + 1}`,
+        `${item.productName}${item.variantName ? ` (${item.variantName})` : ''}`,
+        item.shop.name,
+        `${item.quantity}`,
+        fmtCurrency(item.unitPrice),
+        fmtCurrency(item.total),
+      ];
+      vals.forEach((v, j) => {
+        const cx = colsX[j];
+        const w = COL[j];
+        let px = cx;
+        if (TH_ALIGN[j] === 'right') px = cx + w;
+        else if (TH_ALIGN[j] === 'center') px = cx + w / 2;
+        page.drawText(v, {
+          x: TH_ALIGN[j] === 'right' ? px : TH_ALIGN[j] === 'center' ? px - narrow.widthOfTextAtSize(v, 8) / 2 : px,
+          y: y - 6,
+          size: 8,
+          font: j === 5 ? bold : narrow,
+          color: PRIMARY,
+        });
+      });
+      y -= 14;
+    });
+
+    y -= 4;
+    line(y);
+    y -= 18;
+
+    // Totals
+    const totalsX = PAGE_W - MARGIN - 160;
+    const totalItems: { label: string; value: string; color?: ReturnType<typeof rgb>; sz?: number; bd?: boolean }[] = [
+      { label: 'Subtotal', value: fmtCurrency(order.subtotal) },
+    ];
+    if (order.discountAmount > 0) {
+      totalItems.push({ label: 'Discount', value: `-${fmtCurrency(order.discountAmount)}`, color: GREEN });
+    }
+    if (order.couponDiscount && order.couponDiscount > 0) {
+      totalItems.push({ label: `Coupon (${order.couponCode})`, value: `-${fmtCurrency(order.couponDiscount)}`, color: GREEN });
+    }
+    totalItems.push({
+      label: 'Shipping',
+      value: order.shippingCost > 0 ? fmtCurrency(order.shippingCost) : 'Free',
+    });
+    totalItems.push({
+      label: 'Total',
+      value: fmtCurrency(order.total),
+      sz: 11,
+      bd: true,
+    });
+
+    totalItems.forEach((ti) => {
+      text(ti.label, totalsX, ti.sz ?? 9, {
+        font: ti.bd ? bold : narrow,
+        color: ti.color ?? PRIMARY,
+      });
+      text(ti.value, PAGE_W - MARGIN, ti.sz ?? 9, {
+        font: ti.bd ? bold : narrow,
+        color: ti.color ?? PRIMARY,
+        align: 'right',
+      });
+      y -= (ti.sz ?? 9) + 6;
+    });
+
+    // Thank you
+    y -= 14;
+    const thankYou = 'Thank you for your order!';
+    text(thankYou, MARGIN + (CONTENT_W - narrow.widthOfTextAtSize(thankYou, 10)) / 2, 10, { color: MUTED });
+
+    // Footer
+    const footerText = `Oylkka — Invoice ${invoiceNumber} | Page 1 of 1`;
+    text(footerText, MARGIN + (CONTENT_W - narrow.widthOfTextAtSize(footerText, 7)) / 2, 7, { color: MUTED });
+
+    const pdfBytes = await doc.save();
+    const pdfBuffer = Buffer.from(pdfBytes);
 
     const uploadResult = await new Promise<{ secure_url: string }>(
       (resolve, reject) => {

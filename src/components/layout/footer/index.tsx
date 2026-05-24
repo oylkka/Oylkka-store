@@ -71,7 +71,7 @@ const companyLinks = [
   { label: 'Contact', to: '/contact' },
   { label: 'Blog', to: '/blog' },
   { label: 'Careers', to: '/careers' },
-  { label: 'Privacy Policy', to: '/privacy-policy' },
+  { label: 'Privacy Policy', to: '/privacy' },
   { label: 'Terms & Conditions', to: '/terms' },
 ];
 

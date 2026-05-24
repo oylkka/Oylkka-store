@@ -3,21 +3,6 @@
 > Generated from full codebase audit on May 22, 2026
 
 
-## Phase 4: Missing Public Pages
-
-| # | Page | Priority | Notes |
-|---|------|----------|-------|
-| 4.1 | `/about` | MEDIUM | Brand story |
-| 4.2 | `/contact` | MEDIUM | Contact form / info |
-| 4.3 | `/faq` | MEDIUM | FAQ with search |
-| 4.4 | `/shipping-policy` | LOW | Standalone shipping info |
-| 4.5 | `/return-policy` | LOW | Return/refund policy |
-| 4.6 | `/compare` | LOW | Product comparison |
-| 4.7 | `/deals` | LOW | Flash deals page |
-| 4.8 | `/blog` | LOW | Blog/news for SEO |
-
----
-
 ## Phase 5: Missing Dashboard Pages
 
 ### 5A. Admin Dashboard
