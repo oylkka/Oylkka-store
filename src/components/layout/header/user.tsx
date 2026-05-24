@@ -5,7 +5,6 @@ import {
   Settings,
   UserIcon,
 } from 'lucide-react';
-import { useTranslation } from 'react-i18next';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import {
@@ -32,12 +31,35 @@ interface UserDropDownProps {
 }
 
 export default function UserDropDown({ user }: UserDropDownProps) {
-  const { t } = useTranslation();
+  //   const { unreadCount } = useUnreadMessageCount();
+  //   const { getChannel } = useNotification(user?.id ?? null);
 
+  //   useEffect(() => {
+  //     if (user?.id) {
+  //       const channelName = `private:unread_count:${user.id}`;
+  //       const channel = getChannel(channelName);
+
+  //       if (channel) {
+  //         const handleUpdate = () => {
+  //           notificationSound(true);
+  //           toast('You have a new message!', {
+  //             icon: '✉️',
+  //           });
+  //         };
+
+  //         channel.subscribe('unread_update', handleUpdate);
+  //         return () => {
+  //           channel.unsubscribe('unread_update', handleUpdate);
+  //         };
+  //       }
+  //     }
+  //   }, [user?.id, getChannel]);
+
+  // If no user, show the Sign In button using TanStack Link
   if (!user) {
     return (
       <Link to='/auth/signin'>
-        <Button size='sm'>{t('nav.sign_in')}</Button>
+        <Button size='sm'>Sign In</Button>
       </Link>
     );
   }
@@ -88,39 +110,7 @@ export default function UserDropDown({ user }: UserDropDownProps) {
               className='flex w-full cursor-pointer items-center'
             >
               <LayoutDashboard className='text-primary/70 mr-2 h-4 w-4' />
-              {t('nav.dashboard')}
-            </Link>
-          </DropdownMenuItem>
-
-          <DropdownMenuItem asChild>
-            <Link
-              to='/chat'
-              className='flex w-full cursor-pointer items-center justify-between'
-            >
-              <div className='flex items-center gap-2'>
-                <MessageSquare className='text-primary/70 mr-2 h-4 w-4' />
-                {t('nav.messages')}
-              </div>
-            </Link>
-          </DropdownMenuItem>
-
-          <DropdownMenuItem asChild>
-            <Link
-              to='/dashboard/my-account'
-              className='flex w-full cursor-pointer items-center'
-            >
-              <Settings className='text-primary/70 mr-2 h-4 w-4' />
-              {t('nav.edit_account')}
-            </Link>
-          </DropdownMenuItem>
-
-          <DropdownMenuItem asChild>
-            <Link
-              to='/dashboard/my-account'
-              className='flex w-full cursor-pointer items-center'
-            >
-              <UserIcon className='text-primary/70 mr-2 h-4 w-4' />
-              {t('nav.account_details')}
+              Dashboard
             </Link>
           </DropdownMenuItem>
 
@@ -143,7 +133,7 @@ export default function UserDropDown({ user }: UserDropDownProps) {
 
           <DropdownMenuItem asChild>
             <Link
-              to='/dashboard/my-account'
+              to='/dashboard/profile/edit-profile'
               className='flex w-full cursor-pointer items-center'
             >
               <Settings className='text-primary/70 mr-2 h-4 w-4' />
@@ -153,7 +143,7 @@ export default function UserDropDown({ user }: UserDropDownProps) {
 
           <DropdownMenuItem asChild>
             <Link
-              to='/dashboard/my-account'
+              to='/dashboard/profile'
               className='flex w-full cursor-pointer items-center'
             >
               <UserIcon className='text-primary/70 mr-2 h-4 w-4' />

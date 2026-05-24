@@ -3,6 +3,8 @@ import { getRequestHeaders } from '@tanstack/react-start/server';
 import { auth } from '@/lib/auth';
 import { validateCsrf } from '@/lib/csrf';
 import { prisma } from '@/lib/db';
+import { couponLimiter } from '@/lib/rate-limit';
+import { checkRateLimit } from '@/lib/rate-limit-guard';
 
 export const Route = createFileRoute('/api/vouchers/collect')({
   server: {
@@ -18,6 +20,8 @@ export const Route = createFileRoute('/api/vouchers/collect')({
 
           const csrfResponse = validateCsrf();
           if (csrfResponse) return csrfResponse;
+          const rateLimitResponse = await checkRateLimit(couponLimiter);
+          if (rateLimitResponse) return rateLimitResponse;
 
           const body: { couponId: string } = await request.json();
 
@@ -108,14 +112,9 @@ export const Route = createFileRoute('/api/vouchers/collect')({
             { success: true, voucher: userVoucher },
             { status: 200 },
           );
-        } catch (error) {
+        } catch (_error) {
           return Response.json(
-            {
-              error:
-                error instanceof Error
-                  ? error.message
-                  : 'Internal Server Error',
-            },
+            { error: 'Internal Server Error' },
             { status: 500 },
           );
         }

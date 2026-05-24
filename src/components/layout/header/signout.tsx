@@ -1,6 +1,3 @@
-import { useRouter } from '@tanstack/react-router';
-import { Power } from 'lucide-react';
-import { useTranslation } from 'react-i18next';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -13,11 +10,12 @@ import {
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
+import { useRouter } from '@tanstack/react-router';
+import { Power } from 'lucide-react';
 // 1. Import the server function you showed me
 import { signOut } from '@/lib/auth.functions';
 
 export function SignOut() {
-  const { t } = useTranslation();
   const router = useRouter();
 
   const handleSignOut = async () => {
@@ -43,22 +41,22 @@ export function SignOut() {
       <AlertDialogTrigger asChild>
         <div className='w-full flex items-center gap-2 px-2 py-1.5 text-sm group cursor-pointer hover:bg-destructive hover:text-white rounded-sm transition-colors'>
           <Power className='mr-2 h-4 w-4 text-destructive group-hover:text-white' />
-          {t('nav.sign_out')}
+          Sign Out
         </div>
       </AlertDialogTrigger>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>{t('common.are_you_sure')}</AlertDialogTitle>
+          <AlertDialogTitle>Are you sure?</AlertDialogTitle>
           <AlertDialogDescription>
-            {t('nav.sign_out_confirm')}
+            You will be signed out and your server session will be cleared.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel>{t('common.cancel')}</AlertDialogCancel>
+          <AlertDialogCancel>Cancel</AlertDialogCancel>
           <AlertDialogAction asChild>
             <Button variant='destructive' onClick={handleSignOut}>
               <Power />
-              {t('nav.sign_out')}
+              Sign Out
             </Button>
           </AlertDialogAction>
         </AlertDialogFooter>

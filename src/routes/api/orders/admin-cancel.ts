@@ -57,6 +57,17 @@ export const Route = createFileRoute('/api/orders/admin-cancel')({
             );
           }
 
+          // Prevent cancelling paid orders without refund — use refund endpoint instead
+          if (order.paymentStatus === 'PAID' || order.status === 'CONFIRMED') {
+            return Response.json(
+              {
+                error:
+                  'Order has been paid. Use the refund endpoint instead of cancel.',
+              },
+              { status: 400 },
+            );
+          }
+
           await prisma.$transaction(async (tx) => {
             await tx.order.update({
               where: { id: body.orderId },
@@ -94,7 +105,7 @@ export const Route = createFileRoute('/api/orders/admin-cancel')({
 
           createAuditLog({
             actorId: session.user.id,
-            actorRole: session.user.role,
+            actorRole: session.user.role ?? 'ADMIN',
             action: 'ORDER_CANCELLED',
             entity: 'Order',
             entityId: body.orderId,
@@ -123,14 +134,9 @@ export const Route = createFileRoute('/api/orders/admin-cancel')({
           });
 
           return Response.json({ success: true }, { status: 200 });
-        } catch (error) {
+        } catch (_error) {
           return Response.json(
-            {
-              error:
-                error instanceof Error
-                  ? error.message
-                  : 'Internal Server Error',
-            },
+            { error: 'Internal Server Error' },
             { status: 500 },
           );
         }

@@ -1,4 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import axios from 'axios';
 import { toast } from 'sonner';
 import apiClient from '@/lib/api-client';
 import { QUERY_KEYS } from '@/lib/constants';
@@ -132,9 +133,10 @@ export function useBannerMutation() {
       toast.success('Banner created successfully!', { id: 'banner-mutation' });
       queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.HERO_BANNER] });
       queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.ADMIN_BANNERS] });
+      queryClient.invalidateQueries({ queryKey: ['banner'] });
     },
     onError: (error: unknown) => {
-      const message = apiClient.isAxiosError(error)
+      const message = axios.isAxiosError(error)
         ? (error.response?.data?.message ?? error.message)
         : 'Failed to create banner';
       toast.error(`Error: ${message}`, { id: 'banner-mutation' });
@@ -157,9 +159,10 @@ export function useDeleteBannerMutation() {
       toast.success('Banner deleted successfully!', { id: 'delete-banner' });
       queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.ADMIN_BANNERS] });
       queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.HERO_BANNER] });
+      queryClient.invalidateQueries({ queryKey: ['banner'] });
     },
     onError: (error: unknown) => {
-      const message = apiClient.isAxiosError(error)
+      const message = axios.isAxiosError(error)
         ? (error.response?.data?.error ?? error.message)
         : 'Failed to delete banner';
       toast.error(`Error: ${message}`, { id: 'delete-banner' });
@@ -215,9 +218,10 @@ export function useEditBannerMutation() {
       toast.success('Banner updated successfully!', { id: 'edit-banner' });
       queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.ADMIN_BANNERS] });
       queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.HERO_BANNER] });
+      queryClient.invalidateQueries({ queryKey: ['banner'] });
     },
     onError: (error: unknown) => {
-      const message = apiClient.isAxiosError(error)
+      const message = axios.isAxiosError(error)
         ? (error.response?.data?.error ?? error.message)
         : 'Failed to update banner';
       toast.error(`Error: ${message}`, { id: 'edit-banner' });

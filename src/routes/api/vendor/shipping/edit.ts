@@ -1,6 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { getRequestHeaders } from '@tanstack/react-start/server';
 import { auth } from '@/lib/auth';
+import { validateCsrf } from '@/lib/csrf';
 import { prisma } from '@/lib/db';
 
 export const Route = createFileRoute('/api/vendor/shipping/edit')({
@@ -14,6 +15,9 @@ export const Route = createFileRoute('/api/vendor/shipping/edit')({
           if (!session?.user) {
             return Response.json({ error: 'Unauthorized' }, { status: 401 });
           }
+
+          const csrfResponse = validateCsrf();
+          if (csrfResponse) return csrfResponse;
 
           const shop = await prisma.shop.findUnique({
             where: { ownerId: session.user.id },
@@ -69,14 +73,9 @@ export const Route = createFileRoute('/api/vendor/shipping/edit')({
           });
 
           return Response.json({ zone });
-        } catch (error) {
+        } catch (_error) {
           return Response.json(
-            {
-              error:
-                error instanceof Error
-                  ? error.message
-                  : 'Failed to update shipping zone',
-            },
+            { error: 'Internal Server Error' },
             { status: 500 },
           );
         }

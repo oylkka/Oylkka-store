@@ -1,4 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router';
+import { getRequestHeaders } from '@tanstack/react-start/server';
 import { createAuditLog } from '@/lib/audit-log';
 import { requireAdminOrManager, requireAuth } from '@/lib/auth-middleware';
 import { prisma } from '@/lib/db';
@@ -114,13 +115,13 @@ export const Route = createFileRoute('/api/admin/coupons/create')({
             entity: 'Coupon',
             entityId: coupon.id,
             details: { code: coupon.code, type, value, scope },
-            ipAddress: headers.get('x-forwarded-for') || undefined,
+            ipAddress: getRequestHeaders().get('x-forwarded-for') || undefined,
           });
 
           return Response.json({ coupon }, { status: 201 });
-        } catch (error) {
+        } catch (_error) {
           return Response.json(
-            { error: error instanceof Error ? error.message : 'Failed' },
+            { error: 'Internal Server Error' },
             { status: 500 },
           );
         }

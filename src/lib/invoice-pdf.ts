@@ -198,8 +198,8 @@ export async function generateInvoicePdf(
         `${item.productName}${item.variantName ? ` (${item.variantName})` : ''}`,
         item.shop.name,
         `${item.quantity}`,
-        fmtCurrency(item.unitPrice),
-        fmtCurrency(item.total),
+        fmtCurrency(Number(item.unitPrice)),
+        fmtCurrency(Number(item.total)),
       ];
       vals.forEach((v, j) => {
         const cx = colsX[j];
@@ -235,28 +235,31 @@ export async function generateInvoicePdf(
       color?: ReturnType<typeof rgb>;
       sz?: number;
       bd?: boolean;
-    }[] = [{ label: 'Subtotal', value: fmtCurrency(order.subtotal) }];
-    if (order.discountAmount > 0) {
+    }[] = [{ label: 'Subtotal', value: fmtCurrency(Number(order.subtotal)) }];
+    if (Number(order.discountAmount) > 0) {
       totalItems.push({
         label: 'Discount',
-        value: `-${fmtCurrency(order.discountAmount)}`,
+        value: `-${fmtCurrency(Number(order.discountAmount))}`,
         color: GREEN,
       });
     }
-    if (order.couponDiscount && order.couponDiscount > 0) {
+    if (order.couponDiscount && Number(order.couponDiscount) > 0) {
       totalItems.push({
         label: `Coupon (${order.couponCode})`,
-        value: `-${fmtCurrency(order.couponDiscount)}`,
+        value: `-${fmtCurrency(Number(order.couponDiscount))}`,
         color: GREEN,
       });
     }
     totalItems.push({
       label: 'Shipping',
-      value: order.shippingCost > 0 ? fmtCurrency(order.shippingCost) : 'Free',
+      value:
+        Number(order.shippingCost) > 0
+          ? fmtCurrency(Number(order.shippingCost))
+          : 'Free',
     });
     totalItems.push({
       label: 'Total',
-      value: fmtCurrency(order.total),
+      value: fmtCurrency(Number(order.total)),
       sz: 11,
       bd: true,
     });

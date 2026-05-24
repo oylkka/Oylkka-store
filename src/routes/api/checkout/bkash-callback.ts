@@ -72,13 +72,6 @@ export const Route = createFileRoute('/api/checkout/bkash-callback')({
             );
           }
 
-          // Prevent replay — only process if payment is still pending
-          if (order.paymentStatus !== 'PENDING') {
-            return Response.redirect(
-              `${baseUrl}/checkout/confirmation?orderId=${order.id}&error=payment-already-processed`,
-            );
-          }
-
           if (result.transactionStatus === 'Completed') {
             // Payment confirmed — finalize order with destructive side effects
             const metadata = order.metadata as Record<string, unknown> | null;
@@ -90,6 +83,15 @@ export const Route = createFileRoute('/api/checkout/bkash-callback')({
             const cashbackAmount = (metadata?.cashbackAmount as number) || 0;
 
             await prisma.$transaction(async (tx) => {
+              // Atomic guard: re-read order inside tx to prevent double-processing
+              const currentOrder = await tx.order.findUnique({
+                where: { id: order.id },
+                select: { paymentStatus: true },
+              });
+              if (currentOrder?.paymentStatus !== 'PENDING') {
+                throw new Error('Payment already processed');
+              }
+
               // Update order to PAID/CONFIRMED
               await tx.order.update({
                 where: { id: order.id },

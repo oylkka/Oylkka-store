@@ -103,7 +103,7 @@ export const Route = createFileRoute('/api/orders/admin-fulfill')({
 
           createAuditLog({
             actorId: session.user.id,
-            actorRole: session.user.role,
+            actorRole: session.user.role ?? 'ADMIN',
             action: 'ORDER_FULFILLED',
             entity: 'OrderItem',
             entityId: body.itemId,

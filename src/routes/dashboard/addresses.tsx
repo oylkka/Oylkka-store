@@ -2,6 +2,7 @@ import { createFileRoute, Link } from '@tanstack/react-router';
 import { ArrowLeft, MapPin, Pencil, Plus, Trash2 } from 'lucide-react';
 import { motion } from 'motion/react';
 import { useState } from 'react';
+import { toast } from 'sonner';
 
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -100,7 +101,9 @@ function RouteComponent() {
       }
       setOpen(false);
       resetForm();
-    } catch {}
+    } catch {
+      toast.error('Failed to save address');
+    }
   };
 
   const handleDelete = async (id: string) => {

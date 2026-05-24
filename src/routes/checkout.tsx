@@ -117,14 +117,16 @@ function RouteComponent() {
   const formValues = watch();
 
   useEffect(() => {
-    fetch('/api/vouchers/my')
+    const controller = new AbortController();
+
+    fetch('/api/vouchers/my', { signal: controller.signal })
       .then((r) => r.json())
       .then((data) => {
         if (data.vouchers) setMyVouchers(data.vouchers);
       })
       .catch(() => {});
 
-    fetch('/api/vouchers/auto-apply')
+    fetch('/api/vouchers/auto-apply', { signal: controller.signal })
       .then((r) => r.json())
       .then((data) => {
         if (data.vouchers) {
@@ -137,7 +139,7 @@ function RouteComponent() {
       })
       .catch(() => {});
 
-    fetch('/api/wallet/get')
+    fetch('/api/wallet/get', { signal: controller.signal })
       .then((r) => r.json())
       .then((data) => {
         if (data.balance !== undefined) {
@@ -145,6 +147,8 @@ function RouteComponent() {
         }
       })
       .catch(() => {});
+
+    return () => controller.abort();
   }, []);
 
   if (isLoading) return <CheckoutSkeleton />;
@@ -205,6 +209,16 @@ function RouteComponent() {
 
   if (appliedCoupon) {
     totalVoucherDiscount += appliedCoupon.discountAmount;
+  }
+
+  for (const v of myVouchers) {
+    if (selectedVoucherIds.has(v.id)) {
+      if (v.coupon.type === 'FIXED') {
+        totalVoucherDiscount += v.coupon.value;
+      } else if (v.coupon.type === 'PERCENTAGE') {
+        totalVoucherDiscount += (subtotal * v.coupon.value) / 100;
+      }
+    }
   }
 
   const total = subtotal + finalShipping - totalVoucherDiscount;

@@ -1,4 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import axios from 'axios';
 import { toast } from 'sonner';
 import apiClient from '@/lib/api-client';
 import { QUERY_KEYS } from '@/lib/constants';
@@ -113,9 +114,10 @@ export function useCreateCategoryMutation() {
         id: 'category-create',
       });
       queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.CATEGORIES] });
+      queryClient.invalidateQueries({ queryKey: ['category'] });
     },
     onError: (error: unknown) => {
-      const message = apiClient.isAxiosError(error)
+      const message = axios.isAxiosError(error)
         ? (error.response?.data?.error ?? error.message)
         : 'Failed to create category';
       toast.error(`Error: ${message}`, { id: 'category-create' });
@@ -164,9 +166,10 @@ export function useEditCategoryMutation() {
         id: 'category-edit',
       });
       queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.CATEGORIES] });
+      queryClient.invalidateQueries({ queryKey: ['category'] });
     },
     onError: (error: unknown) => {
-      const message = apiClient.isAxiosError(error)
+      const message = axios.isAxiosError(error)
         ? (error.response?.data?.error ?? error.message)
         : 'Failed to update category';
       toast.error(`Error: ${message}`, { id: 'category-edit' });
@@ -190,9 +193,10 @@ export function useDeleteCategoryMutation() {
         id: 'category-delete',
       });
       queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.CATEGORIES] });
+      queryClient.invalidateQueries({ queryKey: ['category'] });
     },
     onError: (error: unknown) => {
-      const message = apiClient.isAxiosError(error)
+      const message = axios.isAxiosError(error)
         ? (error.response?.data?.error ?? error.message)
         : 'Failed to delete category';
       toast.error(`Error: ${message}`, { id: 'category-delete' });

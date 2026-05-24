@@ -69,7 +69,7 @@ export const Route = createFileRoute('/api/admin/dashboard/stats')({
           for (const r of dailyRevenue) {
             const key = r.createdAt.toISOString().slice(0, 10);
             if (revenueByDay[key] !== undefined) {
-              revenueByDay[key] += r._sum.total ?? 0;
+              revenueByDay[key] += Number(r._sum.total ?? 0);
             }
           }
           const chartData = Object.entries(revenueByDay).map(
@@ -81,7 +81,7 @@ export const Route = createFileRoute('/api/admin/dashboard/stats')({
 
           return Response.json({
             stats: {
-              revenue: revenueAgg._sum.total ?? 0,
+              revenue: Number(revenueAgg._sum.total ?? 0),
               orders: totalOrders,
               pendingOrders,
               processingOrders,
@@ -94,7 +94,7 @@ export const Route = createFileRoute('/api/admin/dashboard/stats')({
               id: o.id,
               orderNumber: o.orderNumber,
               customerName: o.customer.name,
-              total: o.total,
+              total: Number(o.total),
               status: o.status,
               createdAt: o.createdAt,
             })),

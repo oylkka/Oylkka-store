@@ -23,7 +23,7 @@ export const Route = createFileRoute('/dashboard/followed-shops')({
 });
 
 function RouteComponent() {
-  const { data: follows, isLoading } = useFollowedShops();
+  const { data: follows, isLoading, isError } = useFollowedShops();
   const toggleMutation = useToggleFollowMutation();
 
   const handleUnfollow = async (shopId: string) => {
@@ -65,6 +65,22 @@ function RouteComponent() {
                   <Skeleton key={i} className='h-16 w-full' />
                 ))}
               </div>
+            ) : isError ? (
+              <div className='flex flex-col items-center justify-center py-16 text-center'>
+                <Store className='w-10 h-10 text-muted-foreground mb-3' />
+                <p className='text-sm font-semibold'>Failed to load</p>
+                <p className='text-sm text-muted-foreground mt-1'>
+                  Could not load followed shops. Please try again.
+                </p>
+                <Button
+                  variant='outline'
+                  size='sm'
+                  onClick={() => window.location.reload()}
+                  className='mt-4'
+                >
+                  Try Again
+                </Button>
+              </div>
             ) : !follows || follows.length === 0 ? (
               <div className='flex flex-col items-center justify-center py-16 text-center'>
                 <Store className='w-10 h-10 text-muted-foreground mb-3' />
@@ -73,7 +89,7 @@ function RouteComponent() {
                   Follow shops to see their updates here.
                 </p>
                 <Button asChild className='mt-4' size='sm'>
-                  <Link to='/shop'>Browse Shops</Link>
+                  <Link to='/shops'>Browse Shops</Link>
                 </Button>
               </div>
             ) : (

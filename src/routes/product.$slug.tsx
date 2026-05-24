@@ -264,7 +264,7 @@ function RouteComponent() {
               </div>
             )}
 
-            {!product.hasVariants && (
+            {(!product.hasVariants || selectedVariant) && (
               <div className='rounded-2xl border border-border bg-card p-5 space-y-5'>
                 <div className='flex items-center justify-between'>
                   <p className='text-sm font-medium'>Quantity</p>

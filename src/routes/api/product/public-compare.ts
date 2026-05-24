@@ -48,7 +48,11 @@ export const Route = createFileRoute('/api/product/public-compare')({
           const productsWithDiscount = products.map((p) => ({
             ...p,
             discountPercent: p.discountPrice
-              ? Math.round(((p.price - p.discountPrice) / p.price) * 100)
+              ? Math.round(
+                  ((Number(p.price) - Number(p.discountPrice)) /
+                    Number(p.price)) *
+                    100,
+                )
               : null,
           }));
 

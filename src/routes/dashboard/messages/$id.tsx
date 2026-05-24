@@ -47,9 +47,10 @@ function RouteComponent() {
     }
   }, [conversationId, markReadMutation.mutate]);
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: this is fine
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, []);
+  }, [messages]);
 
   function handleImageSelect(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];

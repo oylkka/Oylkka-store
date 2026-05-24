@@ -72,8 +72,10 @@ export const Route = createFileRoute('/api/vendor/payouts/schedule')({
             }
 
             monthlyBuckets[key].items += 1;
-            monthlyBuckets[key].totalAmount += item.vendorAmount;
-            monthlyBuckets[key].totalCommission += item.commissionAmount;
+            monthlyBuckets[key].totalAmount += Number(item.vendorAmount);
+            monthlyBuckets[key].totalCommission += Number(
+              item.commissionAmount,
+            );
           }
 
           const schedule = Object.values(monthlyBuckets).sort((a, b) =>
@@ -81,11 +83,11 @@ export const Route = createFileRoute('/api/vendor/payouts/schedule')({
           );
 
           const totalPendingAmount = pendingItems.reduce(
-            (sum, i) => sum + i.vendorAmount,
+            (sum, i) => sum + Number(i.vendorAmount),
             0,
           );
           const totalPendingCommission = pendingItems.reduce(
-            (sum, i) => sum + i.commissionAmount,
+            (sum, i) => sum + Number(i.commissionAmount),
             0,
           );
           const pendingItemCount = pendingItems.length;
@@ -102,7 +104,7 @@ export const Route = createFileRoute('/api/vendor/payouts/schedule')({
               totalPending: totalPendingAmount,
               totalCommission: totalPendingCommission,
               lastPayoutDate: lastPayout?.processedAt || null,
-              lastPayoutAmount: lastPayout?.amount || 0,
+              lastPayoutAmount: Number(lastPayout?.amount || 0),
             },
           });
         } catch (error) {

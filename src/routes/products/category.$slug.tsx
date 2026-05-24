@@ -22,7 +22,7 @@ function formatSlug(slug: string) {
 
 function RouteComponent() {
   const { slug } = Route.useParams();
-  const { data: products, isLoading } = useCategoryProducts(slug);
+  const { data: products, isLoading, isError } = useCategoryProducts(slug);
 
   return (
     <div>
@@ -49,6 +49,26 @@ function RouteComponent() {
               // biome-ignore lint/suspicious/noArrayIndexKey: skeleton
               <ProductCardSkeleton key={i} />
             ))}
+          </div>
+        ) : isError ? (
+          <div className='flex flex-col items-center justify-center py-20 gap-4 text-center'>
+            <div className='w-16 h-16 rounded-2xl bg-muted flex items-center justify-center'>
+              <PackageX className='w-7 h-7 text-muted-foreground' />
+            </div>
+            <div>
+              <p className='text-sm font-semibold'>Failed to load products</p>
+              <p className='text-sm text-muted-foreground mt-1 max-w-xs'>
+                Something went wrong loading this category. Please try again.
+              </p>
+            </div>
+            <Button
+              size='sm'
+              variant='outline'
+              onClick={() => window.location.reload()}
+              className='mt-2'
+            >
+              Try Again
+            </Button>
           </div>
         ) : products && products.length > 0 ? (
           <div className='grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4'>

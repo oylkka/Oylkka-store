@@ -10,7 +10,7 @@ import {
   Store,
 } from 'lucide-react';
 import { motion } from 'motion/react';
-import { useMemo, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import Footer from '@/components/layout/footer';
 import Header from '@/components/layout/header';
 import { ProductCard } from '@/components/pages/shop/product-card';
@@ -81,10 +81,17 @@ function RouteComponent() {
     }),
   );
 
-  const allProducts =
-    productPage === 1
-      ? initialProducts
-      : [...initialProducts, ...fetchedProducts];
+  const accumulatedRef = useRef<CategoryProduct[]>([]);
+  if (productPage === 1) {
+    accumulatedRef.current = initialProducts;
+  } else if (fetchedProducts.length > 0) {
+    const seen = new Set(accumulatedRef.current.map((p) => p.id));
+    accumulatedRef.current = [
+      ...accumulatedRef.current,
+      ...fetchedProducts.filter((p) => !seen.has(p.id)),
+    ];
+  }
+  const allProducts = accumulatedRef.current;
 
   const categories = useMemo(() => {
     const cats = new Map<string, string>();

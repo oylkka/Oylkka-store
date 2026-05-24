@@ -1,4 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router';
+import { getRequestHeaders } from '@tanstack/react-start/server';
 import { createAuditLog } from '@/lib/audit-log';
 import { requireAdminOrManager, requireAuth } from '@/lib/auth-middleware';
 import { prisma } from '@/lib/db';
@@ -6,7 +7,7 @@ import { prisma } from '@/lib/db';
 export const Route = createFileRoute('/api/admin/reviews/$id')({
   server: {
     handlers: {
-      POST: async () => {
+      POST: async ({ params }) => {
         try {
           const authResult = await requireAuth();
           if (authResult.response) return authResult.response;

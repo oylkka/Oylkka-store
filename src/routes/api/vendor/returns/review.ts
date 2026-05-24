@@ -1,7 +1,10 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { getRequestHeaders } from '@tanstack/react-start/server';
 import { auth } from '@/lib/auth';
+import { validateCsrf } from '@/lib/csrf';
 import { prisma } from '@/lib/db';
+import { generalLimiter } from '@/lib/rate-limit';
+import { checkRateLimit } from '@/lib/rate-limit-guard';
 
 export const Route = createFileRoute('/api/vendor/returns/review')({
   server: {
@@ -14,6 +17,12 @@ export const Route = createFileRoute('/api/vendor/returns/review')({
           if (!session?.user) {
             return Response.json({ error: 'Unauthorized' }, { status: 401 });
           }
+
+          const csrfResponse = validateCsrf();
+          if (csrfResponse) return csrfResponse;
+
+          const rateLimitResponse = await checkRateLimit(generalLimiter);
+          if (rateLimitResponse) return rateLimitResponse;
 
           const shop = await prisma.shop.findUnique({
             where: { ownerId: session.user.id },
@@ -67,14 +76,9 @@ export const Route = createFileRoute('/api/vendor/returns/review')({
           });
 
           return Response.json({ return: updated });
-        } catch (error) {
+        } catch (_error) {
           return Response.json(
-            {
-              error:
-                error instanceof Error
-                  ? error.message
-                  : 'Failed to review return request',
-            },
+            { error: 'Internal Server Error' },
             { status: 500 },
           );
         }

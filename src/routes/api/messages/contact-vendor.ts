@@ -50,7 +50,7 @@ export const Route = createFileRoute('/api/messages/contact-vendor')({
             where: { id: shopId },
             select: {
               name: true,
-              userId: true,
+              ownerId: true,
             },
           });
 
@@ -62,7 +62,7 @@ export const Route = createFileRoute('/api/messages/contact-vendor')({
           }
 
           const vendor = await prisma.user.findUnique({
-            where: { id: shop.userId },
+            where: { id: shop.ownerId },
             select: { email: true, name: true },
           });
 

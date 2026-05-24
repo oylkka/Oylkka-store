@@ -90,35 +90,40 @@ export default function HeaderClient() {
                         All
                       </Link>
                       <Link
-                        to='/products/category/clothing'
+                        to='/products/category/$slug'
+                        params={{ slug: 'clothing' }}
                         onClick={() => setIsOpen(false)}
                         className='hover:bg-muted/50 rounded-md px-3 py-2 transition-colors'
                       >
                         Clothing
                       </Link>
                       <Link
-                        to='/products/category/accessories'
+                        to='/products/category/$slug'
+                        params={{ slug: 'accessories' }}
                         onClick={() => setIsOpen(false)}
                         className='hover:bg-muted/50 rounded-md px-3 py-2 transition-colors'
                       >
                         Accessories
                       </Link>
                       <Link
-                        to='/products/category/footwear'
+                        to='/products/category/$slug'
+                        params={{ slug: 'footwear' }}
                         onClick={() => setIsOpen(false)}
                         className='hover:bg-muted/50 rounded-md px-3 py-2 transition-colors'
                       >
                         Footwear
                       </Link>
                       <Link
-                        to='/products/category/jewelry'
+                        to='/products/category/$slug'
+                        params={{ slug: 'jewelry' }}
                         onClick={() => setIsOpen(false)}
                         className='hover:bg-muted/50 rounded-md px-3 py-2 transition-colors'
                       >
                         Jewelry
                       </Link>
                       <Link
-                        to='/products/category/watches'
+                        to='/products/category/$slug'
+                        params={{ slug: 'watches' }}
                         onClick={() => setIsOpen(false)}
                         className='hover:bg-muted/50 rounded-md px-3 py-2 transition-colors'
                       >
@@ -133,35 +138,35 @@ export default function HeaderClient() {
                     </AccordionTrigger>
                     <AccordionContent className='ml-4 flex flex-col space-y-3 pt-2'>
                       <Link
-                        to='/collections/summer'
+                        to='/products'
                         onClick={() => setIsOpen(false)}
                         className='hover:bg-muted/50 rounded-md px-3 py-2 transition-colors'
                       >
                         Summer
                       </Link>
                       <Link
-                        to='/collections/winter'
+                        to='/products'
                         onClick={() => setIsOpen(false)}
                         className='hover:bg-muted/50 rounded-md px-3 py-2 transition-colors'
                       >
                         Winter
                       </Link>
                       <Link
-                        to='/collections/spring'
+                        to='/products'
                         onClick={() => setIsOpen(false)}
                         className='hover:bg-muted/50 rounded-md px-3 py-2 transition-colors'
                       >
                         Spring
                       </Link>
                       <Link
-                        to='/collections/fall'
+                        to='/products'
                         onClick={() => setIsOpen(false)}
                         className='hover:bg-muted/50 rounded-md px-3 py-2 transition-colors'
                       >
                         Fall
                       </Link>
                       <Link
-                        to='/collections/festival'
+                        to='/products'
                         onClick={() => setIsOpen(false)}
                         className='hover:bg-muted/50 rounded-md px-3 py-2 transition-colors'
                       >
@@ -176,35 +181,35 @@ export default function HeaderClient() {
                     </AccordionTrigger>
                     <AccordionContent className='ml-4 flex flex-col space-y-3 pt-2'>
                       <Link
-                        to='/categories/men'
+                        to='/products'
                         onClick={() => setIsOpen(false)}
                         className='hover:bg-muted/50 rounded-md px-3 py-2 transition-colors'
                       >
                         Men
                       </Link>
                       <Link
-                        to='/categories/women'
+                        to='/products'
                         onClick={() => setIsOpen(false)}
                         className='hover:bg-muted/50 rounded-md px-3 py-2 transition-colors'
                       >
                         Women
                       </Link>
                       <Link
-                        to='/categories/kids'
+                        to='/products'
                         onClick={() => setIsOpen(false)}
                         className='hover:bg-muted/50 rounded-md px-3 py-2 transition-colors'
                       >
                         Kids
                       </Link>
                       <Link
-                        to='/categories/unisex'
+                        to='/products'
                         onClick={() => setIsOpen(false)}
                         className='hover:bg-muted/50 rounded-md px-3 py-2 transition-colors'
                       >
                         Unisex
                       </Link>
                       <Link
-                        to='/categories/plus-size'
+                        to='/products'
                         onClick={() => setIsOpen(false)}
                         className='hover:bg-muted/50 rounded-md px-3 py-2 transition-colors'
                       >
@@ -247,7 +252,7 @@ export default function HeaderClient() {
                         Contact Us
                       </Link>
                       <Link
-                        to='/help-center'
+                        to='/'
                         onClick={() => setIsOpen(false)}
                         className='hover:bg-muted/50 rounded-md px-3 py-2 transition-colors'
                       >
@@ -262,35 +267,35 @@ export default function HeaderClient() {
                     </AccordionTrigger>
                     <AccordionContent className='ml-4 flex flex-col space-y-3 pt-2'>
                       <Link
-                        to='/account/login'
+                        to='/auth/signin'
                         onClick={() => setIsOpen(false)}
                         className='hover:bg-muted/50 rounded-md px-3 py-2 transition-colors'
                       >
                         Login
                       </Link>
                       <Link
-                        to='/account/register'
+                        to='/auth/signup'
                         onClick={() => setIsOpen(false)}
                         className='hover:bg-muted/50 rounded-md px-3 py-2 transition-colors'
                       >
                         Register
                       </Link>
                       <Link
-                        to='/account/orders'
+                        to='/dashboard/orders'
                         onClick={() => setIsOpen(false)}
                         className='hover:bg-muted/50 rounded-md px-3 py-2 transition-colors'
                       >
                         My Orders
                       </Link>
                       <Link
-                        to='/account/wishlist'
+                        to='/dashboard/wishlist'
                         onClick={() => setIsOpen(false)}
                         className='hover:bg-muted/50 rounded-md px-3 py-2 transition-colors'
                       >
                         Wishlist
                       </Link>
                       <Link
-                        to='/account/settings'
+                        to='/dashboard/my-account'
                         onClick={() => setIsOpen(false)}
                         className='hover:bg-muted/50 rounded-md px-3 py-2 transition-colors'
                       >
@@ -301,14 +306,14 @@ export default function HeaderClient() {
                 </Accordion>
                 <div className='space-y-2'>
                   <Link
-                    to='/new-arrivals'
+                    to='/products'
                     className='hover:bg-muted/50 hover:text-primary flex items-center rounded-md px-3 py-2 text-lg font-medium transition-colors'
                     onClick={() => setIsOpen(false)}
                   >
                     New Arrivals
                   </Link>
                   <Link
-                    to='/sale'
+                    to='/products'
                     className='flex items-center rounded-md px-3 py-2 text-lg font-medium text-red-500 transition-colors hover:bg-red-50 dark:hover:bg-red-950/20'
                     onClick={() => setIsOpen(false)}
                   >
@@ -332,14 +337,7 @@ export default function HeaderClient() {
                     Blog
                   </Link>
                   <Link
-                    to='/blog'
-                    onClick={() => setIsOpen(false)}
-                    className='hover:bg-muted/50 hover:text-primary flex items-center rounded-md px-3 py-2 text-lg font-medium transition-colors'
-                  >
-                    Blog
-                  </Link>
-                  <Link
-                    to='/careers'
+                    to='/'
                     onClick={() => setIsOpen(false)}
                     className='hover:bg-muted/50 hover:text-primary flex items-center rounded-md px-3 py-2 text-lg font-medium transition-colors'
                   >

@@ -2,7 +2,6 @@ import { cn } from '@/lib/utils';
 import { Route as RootRoute } from '@/routes/__root';
 import Cart from './cart';
 import HeaderClient from './header-client';
-import { LanguageSwitcher } from './language-switcher';
 import Navigation from './navigation';
 import SearchBar from './searchbar';
 import { ModeToggle } from './theme-switcher';
@@ -52,7 +51,6 @@ export default function Header({
               <div className='hidden md:block'>
                 <ModeToggle />
               </div>
-              <LanguageSwitcher />
               {user && <Cart />}
               <UserDropDown user={user} />
             </div>

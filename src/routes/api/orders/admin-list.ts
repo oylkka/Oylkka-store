@@ -1,5 +1,5 @@
-import type { Prisma } from '@prisma/client';
 import { createFileRoute } from '@tanstack/react-router';
+import type { Prisma } from '@/generated/prisma/client';
 import { requireAdminOrManager, requireAuth } from '@/lib/auth-middleware';
 import { prisma } from '@/lib/db';
 

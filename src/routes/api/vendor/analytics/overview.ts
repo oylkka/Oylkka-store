@@ -108,7 +108,7 @@ export const Route = createFileRoute('/api/vendor/analytics/overview')({
           for (const item of monthlyRevenue) {
             const key = `${item.createdAt.getFullYear()}-${String(item.createdAt.getMonth() + 1).padStart(2, '0')}`;
             if (monthlyMap[key] !== undefined) {
-              monthlyMap[key] += item.vendorAmount;
+              monthlyMap[key] += Number(item.vendorAmount);
             }
           }
           const chartData = Object.entries(monthlyMap).map(
@@ -125,8 +125,8 @@ export const Route = createFileRoute('/api/vendor/analytics/overview')({
 
           return Response.json({
             stats: {
-              revenue: revenueAgg._sum.vendorAmount ?? 0,
-              commission: revenueAgg._sum.commissionAmount ?? 0,
+              revenue: Number(revenueAgg._sum.vendorAmount ?? 0),
+              commission: Number(revenueAgg._sum.commissionAmount ?? 0),
               totalOrders,
               fulfilledOrders,
               pendingOrders,
@@ -138,14 +138,14 @@ export const Route = createFileRoute('/api/vendor/analytics/overview')({
               orderNumber: o.order.orderNumber,
               productName: o.productName,
               quantity: o.quantity,
-              total: o.total,
+              total: Number(o.total),
               status: o.fulfillmentStatus,
               createdAt: o.createdAt,
             })),
             topProducts: topProducts.map((p) => ({
               name: p.productName,
               quantity: p._sum.quantity ?? 0,
-              revenue: p._sum.vendorAmount ?? 0,
+              revenue: Number(p._sum.vendorAmount ?? 0),
             })),
           });
         } catch (error) {

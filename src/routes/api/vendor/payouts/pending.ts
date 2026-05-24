@@ -37,11 +37,11 @@ export const Route = createFileRoute('/api/vendor/payouts/pending')({
           });
 
           const totalPending = items.reduce(
-            (sum, i) => sum + i.vendorAmount,
+            (sum, i) => sum + Number(i.vendorAmount),
             0,
           );
           const totalCommission = items.reduce(
-            (sum, i) => sum + i.commissionAmount,
+            (sum, i) => sum + Number(i.commissionAmount),
             0,
           );
 

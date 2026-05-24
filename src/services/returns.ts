@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import type { ReturnReason, ReturnStatus } from '@/generated/prisma/enums';
 import apiClient from '@/lib/api-client';
+import { QUERY_KEYS } from '@/lib/constants';
 
 type ReturnRequestItem = {
   id: string;
@@ -83,7 +84,7 @@ export function useCreateReturnMutation() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['my-returns'] });
-      queryClient.invalidateQueries({ queryKey: ['orders'] });
+      queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.ORDERS] });
     },
   });
 }

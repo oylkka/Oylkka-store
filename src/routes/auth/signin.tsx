@@ -8,7 +8,6 @@ import {
 import { Eye, EyeOff, Info } from 'lucide-react';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 import { z } from 'zod';
 import Footer from '#/components/layout/footer';
@@ -36,14 +35,13 @@ export const Route = createFileRoute('/auth/signin')({
 });
 
 const loginSchema = z.object({
-  email: z.string().email('Invalid email address'),
+  email: z.email('Invalid email address'),
   password: z.string().min(1, 'Password is required'),
 });
 
 type LoginFormValues = z.infer<typeof loginSchema>;
 
 function RouteComponent() {
-  const { t } = useTranslation();
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -154,20 +152,18 @@ function RouteComponent() {
               <form className='p-6 md:p-8' onSubmit={handleSubmit(onSubmit)}>
                 <FieldGroup>
                   <div className='flex flex-col items-center gap-2 text-center'>
-                    <h1 className='text-2xl font-bold'>
-                      {t('auth.welcome_back')}
-                    </h1>
+                    <h1 className='text-2xl font-bold'>Welcome Back</h1>
                     <p className='text-muted-foreground text-balance'>
-                      {t('auth.login_subtitle')}
+                      Sign in to your oylkka account to continue
                     </p>
                   </div>
 
                   <Field data-invalid={!!errors.email}>
-                    <FieldLabel htmlFor='email'>{t('auth.email')}</FieldLabel>
+                    <FieldLabel htmlFor='email'>Email</FieldLabel>
                     <Input
                       id='email'
                       type='email'
-                      placeholder={t('auth.email_placeholder')}
+                      placeholder='you@example.com'
                       autoComplete='email'
                       disabled={isLoading}
                       aria-invalid={!!errors.email}
@@ -180,15 +176,13 @@ function RouteComponent() {
 
                   <Field data-invalid={!!errors.password}>
                     <div className='flex items-center'>
-                      <FieldLabel htmlFor='password'>
-                        {t('auth.password')}
-                      </FieldLabel>
+                      <FieldLabel htmlFor='password'>Password</FieldLabel>
                       <Link
                         to='/auth/forgot-password'
                         className='ml-auto text-sm underline-offset-2 hover:underline'
                         tabIndex={-1}
                       >
-                        {t('auth.forgot_password')}
+                        Forgot Password?
                       </Link>
                     </div>
                     <div className='relative'>
@@ -216,9 +210,7 @@ function RouteComponent() {
                           <Eye className='h-4 w-4' />
                         )}
                         <span className='sr-only'>
-                          {showPassword
-                            ? t('common.hide_password')
-                            : t('common.show_password')}
+                          {showPassword ? 'Hide password' : 'Show password'}
                         </span>
                       </Button>
                     </div>
@@ -231,14 +223,14 @@ function RouteComponent() {
                     <div className='bg-blue-50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-900/50 rounded-lg p-4 flex gap-3 items-baseline'>
                       <Info className='h-5 w-5 text-blue-600 dark:text-blue-400 shrink-0 mt-0.5' />
                       <span className='text-xs text-blue-700 dark:text-blue-300 mt-1'>
-                        {t('auth.no_verification_link')}
+                        Don't receive the verification email?
                       </span>
                       <Link
                         to='/auth/verify'
                         search={{ error: 'lost-verification-email' }}
                         className='text-primary font-bold text-sm whitespace-nowrap shrink-0'
                       >
-                        {t('auth.send_again')}
+                        Resend Link
                       </Link>
                     </div>
                   )}
@@ -249,12 +241,14 @@ function RouteComponent() {
                       disabled={isLoading}
                       className='w-full'
                     >
-                      {isLoading ? t('auth.logging_in') : t('auth.login')}
+                      {isLoading ? 'Signing in...' : 'Sign In'}
                     </Button>
                   </Field>
 
                   <FieldSeparator className='*:data-[slot=field-separator-content]:bg-card'>
-                    {t('auth.or_continue_with')}
+                    <span className='text-muted-foreground'>
+                      or continue with
+                    </span>
                   </FieldSeparator>
 
                   <Field className='grid grid-cols-1 gap-4'>
@@ -269,23 +263,23 @@ function RouteComponent() {
                         xmlns='http://www.w3.org/2000/svg'
                         viewBox='0 0 24 24'
                       >
-                        <title>{t('auth.google')}</title>
+                        <title>Google</title>
                         <path
                           d='M12.48 10.92v3.28h7.84c-.24 1.84-.853 3.187-1.787 4.133-1.147 1.147-2.933 2.4-6.053 2.4-4.827 0-8.6-3.893-8.6-8.72s3.773-8.72 8.6-8.72c2.6 0 4.507 1.027 5.907 2.347l2.307-2.307C18.747 1.44 16.133 0 12.48 0 5.867 0 .307 5.387.307 12s5.56 12 12.173 12c3.573 0 6.267-1.173 8.373-3.36 2.16-2.16 2.84-5.213 2.84-7.667 0-.76-.053-1.467-.173-2.053H12.48z'
                           fill='currentColor'
                         />
                       </svg>
-                      {t('auth.google')}
+                      Sign in with Google
                     </Button>
                   </Field>
 
                   <FieldDescription className='text-center'>
-                    {t('auth.dont_have_account')}{' '}
+                    Don&apos;t have an account?{' '}
                     <Link
                       to='/auth/signup'
                       className='font-medium underline underline-offset-4 hover:text-primary'
                     >
-                      {t('auth.signup')}
+                      Sign up
                     </Link>
                   </FieldDescription>
                 </FieldGroup>
@@ -294,7 +288,7 @@ function RouteComponent() {
               <div className='bg-muted relative hidden md:block'>
                 <img
                   src='/placeholder.svg'
-                  alt={t('auth.login_illustration')}
+                  alt='Login Illustration'
                   className='absolute inset-0 h-full w-full object-cover dark:brightness-[0.2] dark:grayscale'
                 />
               </div>
@@ -302,10 +296,21 @@ function RouteComponent() {
           </Card>
 
           <FieldDescription className='px-6 text-center text-xs'>
-            {t('auth.legal_notice', {
-              terms: 'Terms of Service',
-              privacy: 'Privacy Policy',
-            })}
+            By clicking continue, you agree to our{' '}
+            <Link
+              to='/terms'
+              className='underline underline-offset-4 hover:text-primary'
+            >
+              Terms of Service
+            </Link>{' '}
+            and{' '}
+            <Link
+              to='/privacy'
+              className='underline underline-offset-4 hover:text-primary'
+            >
+              Privacy Policy
+            </Link>
+            .
           </FieldDescription>
         </div>
       </div>

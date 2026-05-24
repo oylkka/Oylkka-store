@@ -10,13 +10,11 @@ import {
 } from '@tanstack/react-router';
 import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools';
 import { useState } from 'react';
-import { useTranslation } from 'react-i18next';
 import { Toaster } from '#/components/ui/sonner';
 import { TooltipProvider } from '#/components/ui/tooltip';
 import { ThemeProvider } from '#/context/theme-provider';
 import { RouteErrorBoundary } from '@/components/error-boundary';
 import { getSession } from '@/lib/auth.functions';
-import '@/lib/i18n';
 import appCss from '../styles.css?url';
 
 export const Route = createRootRoute({
@@ -83,9 +81,8 @@ function RootComponent() {
 }
 
 function RootDocument({ children }: { children: React.ReactNode }) {
-  const { i18n } = useTranslation();
   return (
-    <html lang={i18n.language || 'en'} suppressHydrationWarning>
+    <html lang='en' suppressHydrationWarning>
       <head>
         <HeadContent />
       </head>

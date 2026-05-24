@@ -12,7 +12,7 @@ model ReturnRequest {
   images    String[]
   status    ReturnStatus @default(PENDING)
   resolution String?
-  refundAmount Float?
+  refundAmount Decimal? @db.Decimal(10, 2)
   adminNote  String?
   customerTrackingNumber String?
   customerTrackingUrl    String?

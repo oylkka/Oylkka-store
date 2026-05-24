@@ -1,4 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import axios from 'axios';
 import { toast } from 'sonner';
 import apiClient from '@/lib/api-client';
 import { QUERY_KEYS } from '@/lib/constants';
@@ -290,7 +291,7 @@ export function useAskQuestionMutation() {
       toast.success('Question submitted successfully!');
     },
     onError: (error: unknown) => {
-      const message = apiClient.isAxiosError(error)
+      const message = axios.isAxiosError(error)
         ? (error.response?.data?.error ?? error.message)
         : 'Failed to submit question';
       toast.error(`Error: ${message}`);
@@ -368,7 +369,7 @@ export function useDeleteProductMutation() {
       queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.PRODUCTS] });
     },
     onError: (error: unknown) => {
-      const message = apiClient.isAxiosError(error)
+      const message = axios.isAxiosError(error)
         ? (error.response?.data?.error ?? error.message)
         : 'Failed to delete product';
       toast.error(`Error: ${message}`, { id: 'product-delete' });

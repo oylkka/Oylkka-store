@@ -42,7 +42,7 @@ export const Route = createFileRoute('/api/vouchers/auto-apply')({
           ];
           const productIds = cart.items.map((i) => i.product.id);
           const subtotal = cart.items.reduce(
-            (sum, item) => sum + item.product.price * item.quantity,
+            (sum, item) => sum + Number(item.product.price) * item.quantity,
             0,
           );
           const totalQty = cart.items.reduce(

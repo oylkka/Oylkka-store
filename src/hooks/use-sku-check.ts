@@ -1,4 +1,4 @@
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 interface SkuCheckResult {
   isChecking: boolean;
@@ -13,6 +13,13 @@ export function useSkuCheck(options?: { productId?: string }): SkuCheckResult {
   const [error, setError] = useState<string | null>(null);
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const lastSkuRef = useRef<string>('');
+  const mountedRef = useRef(true);
+
+  useEffect(() => {
+    return () => {
+      mountedRef.current = false;
+    };
+  }, []);
 
   const checkSkuAvailability = useCallback(
     (sku: string) => {
@@ -40,12 +47,18 @@ export function useSkuCheck(options?: { productId?: string }): SkuCheckResult {
           }
           const res = await fetch(`/api/product/check-sku?${params}`);
           const data = await res.json();
-          setIsAvailable(data.available ?? true);
+          if (mountedRef.current) {
+            setIsAvailable(data.available ?? true);
+          }
         } catch {
-          setError('Failed to check SKU availability');
-          setIsAvailable(null);
+          if (mountedRef.current) {
+            setError('Failed to check SKU availability');
+            setIsAvailable(null);
+          }
         } finally {
-          setIsChecking(false);
+          if (mountedRef.current) {
+            setIsChecking(false);
+          }
         }
       }, 500);
     },

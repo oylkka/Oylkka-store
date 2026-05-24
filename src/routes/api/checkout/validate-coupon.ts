@@ -139,7 +139,7 @@ export const Route = createFileRoute('/api/checkout/validate-coupon')({
           const discountItems: DiscountCartItem[] = cartItems.map((item) => ({
             productId: item.product.id,
             shopId: item.product.shopId ?? undefined,
-            price: item.product.price,
+            price: Number(item.product.price),
             quantity: item.quantity,
           }));
 

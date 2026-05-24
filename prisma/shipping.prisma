@@ -4,9 +4,9 @@ model ShippingZone {
   shop      Shop     @relation(fields: [shopId], references: [id], onDelete: Cascade)
   name      String
   districts String[]
-  baseCost  Float
-  perItem   Float    @default(0)
-  freeAbove Float?
+  baseCost  Decimal @db.Decimal(10, 2)
+  perItem   Decimal @default(0) @db.Decimal(10, 2)
+  freeAbove Decimal? @db.Decimal(10, 2)
   estDays   String?
   isActive  Boolean  @default(true)
   createdAt DateTime @default(now())

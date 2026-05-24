@@ -1,5 +1,6 @@
 import { createFileRoute, Link, redirect } from '@tanstack/react-router';
 import { CheckCircle2 } from 'lucide-react';
+import { useEffect, useState } from 'react';
 import Footer from '#/components/layout/footer';
 import Header from '#/components/layout/header';
 import { Button } from '@/components/ui/button';
@@ -22,6 +23,18 @@ export const Route = createFileRoute('/checkout/confirmation')({
 
 function RouteComponent() {
   const { orderId, error } = Route.useSearch();
+  const [invoiceUrl, setInvoiceUrl] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (orderId) {
+      fetch(`/api/orders/${orderId}`)
+        .then((r) => r.json())
+        .then((data) => {
+          if (data.invoice?.pdfUrl) setInvoiceUrl(data.invoice.pdfUrl);
+        })
+        .catch(() => {});
+    }
+  }, [orderId]);
 
   if (error) {
     const isCancelled = error === 'payment-cancelled';
@@ -102,11 +115,23 @@ function RouteComponent() {
                   View Order
                 </Link>
               </Button>
-              <Button variant='outline' asChild>
-                <Link to='/dashboard/orders/$orderId' params={{ orderId }}>
-                  Download Invoice
-                </Link>
-              </Button>
+              {invoiceUrl ? (
+                <Button variant='outline' asChild>
+                  <a
+                    href={invoiceUrl}
+                    target='_blank'
+                    rel='noopener noreferrer'
+                  >
+                    Download Invoice
+                  </a>
+                </Button>
+              ) : (
+                <Button variant='outline' asChild>
+                  <Link to='/dashboard/orders/$orderId' params={{ orderId }}>
+                    View Details
+                  </Link>
+                </Button>
+              )}
               <Button variant='ghost' asChild>
                 <Link to='/products'>Continue Shopping</Link>
               </Button>

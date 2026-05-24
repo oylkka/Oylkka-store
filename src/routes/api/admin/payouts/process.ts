@@ -1,5 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { requireAdmin, requireAuth } from '@/lib/auth-middleware';
+import { validateCsrf } from '@/lib/csrf';
 import { prisma } from '@/lib/db';
 import { payoutProcessedHtml } from '@/lib/email-templates';
 import { sendEmail } from '@/lib/send-email';
@@ -13,6 +14,10 @@ export const Route = createFileRoute('/api/admin/payouts/process')({
           if (authResult.response) return authResult.response;
           const roleResponse = requireAdmin(authResult.session);
           if (roleResponse) return roleResponse;
+          const session = authResult.session;
+
+          const csrfResponse = validateCsrf();
+          if (csrfResponse) return csrfResponse;
 
           const body = await request.json();
           const { shopId, note } = body;
@@ -50,7 +55,7 @@ export const Route = createFileRoute('/api/admin/payouts/process')({
           }
 
           const totalAmount = items.reduce(
-            (sum, item) => sum + item.vendorAmount,
+            (sum, item) => sum + Number(item.vendorAmount),
             0,
           );
 
@@ -67,8 +72,8 @@ export const Route = createFileRoute('/api/admin/payouts/process')({
                 items: {
                   create: items.map((item) => ({
                     orderItemId: item.id,
-                    amount: item.vendorAmount,
-                    commission: item.commissionAmount,
+                    amount: Number(item.vendorAmount),
+                    commission: Number(item.commissionAmount),
                   })),
                 },
               },
@@ -102,14 +107,9 @@ export const Route = createFileRoute('/api/admin/payouts/process')({
           });
 
           return Response.json({ payout: full }, { status: 201 });
-        } catch (error) {
+        } catch (_error) {
           return Response.json(
-            {
-              error:
-                error instanceof Error
-                  ? error.message
-                  : 'Failed to process payout',
-            },
+            { error: 'Internal Server Error' },
             { status: 500 },
           );
         }

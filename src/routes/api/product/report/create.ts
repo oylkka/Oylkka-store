@@ -1,7 +1,10 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { getRequestHeaders } from '@tanstack/react-start/server';
 import { auth } from '@/lib/auth';
+import { validateCsrf } from '@/lib/csrf';
 import { prisma } from '@/lib/db';
+import { reviewLimiter } from '@/lib/rate-limit';
+import { checkRateLimit } from '@/lib/rate-limit-guard';
 
 export const Route = createFileRoute('/api/product/report/create')({
   server: {
@@ -13,6 +16,10 @@ export const Route = createFileRoute('/api/product/report/create')({
           if (!session?.user) {
             return Response.json({ error: 'Unauthorized' }, { status: 401 });
           }
+          const csrfResponse = validateCsrf();
+          if (csrfResponse) return csrfResponse;
+          const rateLimitResponse = await checkRateLimit(reviewLimiter);
+          if (rateLimitResponse) return rateLimitResponse;
           const body = await request.json();
           const { productId, reason, details } = body;
           if (!productId || !reason) {
@@ -39,9 +46,9 @@ export const Route = createFileRoute('/api/product/report/create')({
             },
           });
           return Response.json({ report }, { status: 201 });
-        } catch (error) {
+        } catch (_error) {
           return Response.json(
-            { error: error instanceof Error ? error.message : 'Failed' },
+            { error: 'Internal Server Error' },
             { status: 500 },
           );
         }

@@ -119,35 +119,17 @@ export const Route = createFileRoute('/api/checkout/create')({
             return Response.json({ error: 'Cart is empty' }, { status: 400 });
           }
 
-          for (const item of cart.items) {
-            if (item.product.stock < item.quantity) {
-              return Response.json(
-                {
-                  error: `"${item.product.productName}" has insufficient stock. Available: ${item.product.stock}`,
-                },
-                { status: 400 },
-              );
-            }
-
-            if (item.variant && item.variant.stock < item.quantity) {
-              return Response.json(
-                {
-                  error: `"${item.variant.name}" has insufficient stock. Available: ${item.variant.stock}`,
-                },
-                { status: 400 },
-              );
-            }
-          }
-
           // --- Price re-validation: check if prices changed since adding to cart ---
           const priceChangedItems: string[] = [];
           for (const item of cart.items) {
-            const currentPrice =
+            const currentPrice = Number(
               item.variant?.discountPrice ??
-              item.variant?.price ??
-              item.product.discountPrice ??
-              item.product.price;
-            const savedPrice = item.savedPrice;
+                item.variant?.price ??
+                item.product.discountPrice ??
+                item.product.price,
+            );
+            const savedPrice =
+              item.savedPrice != null ? Number(item.savedPrice) : null;
 
             if (savedPrice != null && savedPrice !== currentPrice) {
               priceChangedItems.push(item.product.productName);
@@ -171,12 +153,14 @@ export const Route = createFileRoute('/api/checkout/create')({
           let totalDiscount = 0;
 
           for (const item of cart.items) {
-            const unitPrice =
+            const unitPrice = Number(
               item.variant?.discountPrice ??
-              item.variant?.price ??
-              item.product.discountPrice ??
-              item.product.price;
-            const savedPrice = item.savedPrice ?? unitPrice;
+                item.variant?.price ??
+                item.product.discountPrice ??
+                item.product.price,
+            );
+            const savedPrice =
+              item.savedPrice != null ? Number(item.savedPrice) : unitPrice;
             const discount = unitPrice - savedPrice;
 
             subtotal += unitPrice * item.quantity;
@@ -201,15 +185,16 @@ export const Route = createFileRoute('/api/checkout/create')({
             const shopId = shop?.id;
             if (!shopId) continue;
 
-            const unitPrice =
+            const unitPrice = Number(
               item.variant?.discountPrice ??
-              item.variant?.price ??
-              item.product.discountPrice ??
-              item.product.price;
+                item.variant?.price ??
+                item.product.discountPrice ??
+                item.product.price,
+            );
 
             if (!shopShippingMap.has(shopId)) {
               shopShippingMap.set(shopId, {
-                cost: shop?.shippingCost ?? 0,
+                cost: Number(shop?.shippingCost ?? 0),
                 hasNonFree: false,
                 itemQty: 0,
                 shopSubtotal: 0,
@@ -243,10 +228,12 @@ export const Route = createFileRoute('/api/checkout/create')({
                 });
 
                 if (zone) {
-                  cost = zone.baseCost + zone.perItem * entry.itemQty;
+                  cost =
+                    Number(zone.baseCost) +
+                    Number(zone.perItem) * entry.itemQty;
                   if (
                     zone.freeAbove != null &&
-                    entry.shopSubtotal >= zone.freeAbove
+                    entry.shopSubtotal >= Number(zone.freeAbove)
                   ) {
                     cost = 0;
                   }
@@ -366,12 +353,16 @@ export const Route = createFileRoute('/api/checkout/create')({
                 } as OrderMetadata,
                 items: {
                   create: cart.items.map((item) => {
-                    const unitPrice =
+                    const unitPrice = Number(
                       item.variant?.discountPrice ??
-                      item.variant?.price ??
-                      item.product.discountPrice ??
-                      item.product.price;
-                    const savedPrice = item.savedPrice ?? unitPrice;
+                        item.variant?.price ??
+                        item.product.discountPrice ??
+                        item.product.price,
+                    );
+                    const savedPrice =
+                      item.savedPrice != null
+                        ? Number(item.savedPrice)
+                        : unitPrice;
                     const discountPrice =
                       savedPrice < unitPrice ? savedPrice : null;
                     const lineTotal = savedPrice * item.quantity;
@@ -410,26 +401,28 @@ export const Route = createFileRoute('/api/checkout/create')({
               parsed.data.paymentMethod === 'CASH_ON_DELIVERY' ||
               parsed.data.paymentMethod === 'WALLET'
             ) {
-              // Wallet payment: check balance and debit
+              // Wallet payment: atomic balance check + debit (race-condition-safe)
               if (parsed.data.paymentMethod === 'WALLET') {
+                const result = await tx.wallet.updateMany({
+                  where: { userId: session.user.id, balance: { gte: total } },
+                  data: { balance: { decrement: total } },
+                });
+
+                if (result.count === 0) {
+                  const wallet = await tx.wallet.findUnique({
+                    where: { userId: session.user.id },
+                  });
+                  const balance = wallet?.balance ?? 0;
+                  throw new Error(
+                    `Insufficient wallet balance. Your balance: ৳${Number(balance).toFixed(2)}, required: ৳${Number(total).toFixed(2)}`,
+                  );
+                }
+
                 const wallet = await tx.wallet.findUnique({
                   where: { userId: session.user.id },
                 });
 
-                if (!wallet) {
-                  throw new Error('Wallet not found');
-                }
-
-                if (wallet.balance < total) {
-                  throw new Error(
-                    `Insufficient wallet balance. Your balance: ৳${wallet.balance.toFixed(2)}, required: ৳${total.toFixed(2)}`,
-                  );
-                }
-
-                await tx.wallet.update({
-                  where: { id: wallet.id },
-                  data: { balance: { decrement: total } },
-                });
+                if (!wallet) throw new Error('Wallet not found after debit');
 
                 await tx.walletTransaction.create({
                   data: {
@@ -534,11 +527,11 @@ export const Route = createFileRoute('/api/checkout/create')({
             {
               orderId: order.id,
               orderNumber: order.orderNumber,
-              total: order.total,
-              subtotal: order.subtotal,
-              discountAmount: order.discountAmount,
-              couponDiscount: order.couponDiscount,
-              shippingCost: order.shippingCost,
+              total: Number(order.total),
+              subtotal: Number(order.subtotal),
+              discountAmount: Number(order.discountAmount),
+              couponDiscount: Number(order.couponDiscount),
+              shippingCost: Number(order.shippingCost),
               paymentMethod: order.paymentMethod,
               paymentStatus: order.paymentStatus,
               status: order.status,
@@ -552,14 +545,9 @@ export const Route = createFileRoute('/api/checkout/create')({
             },
             { status: 200 },
           );
-        } catch (error) {
+        } catch (_error) {
           return Response.json(
-            {
-              error:
-                error instanceof Error
-                  ? error.message
-                  : 'Internal Server Error',
-            },
+            { error: 'Internal Server Error' },
             { status: 500 },
           );
         }

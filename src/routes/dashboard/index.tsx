@@ -55,7 +55,7 @@ const quickLinks = [
     title: 'Browse Shop',
     description: 'Discover new products',
     icon: ShoppingBag,
-    to: '/shop',
+    to: '/shops',
     color: 'text-blue-600',
   },
   {
@@ -197,7 +197,7 @@ function DashboardHome() {
                     Start shopping to see your orders here
                   </p>
                   <Button size='sm' asChild>
-                    <Link to='/shop'>Browse Products</Link>
+                    <Link to='/shops'>Browse Products</Link>
                   </Button>
                 </div>
               ) : (

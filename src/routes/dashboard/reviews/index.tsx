@@ -3,6 +3,7 @@ import { format } from 'date-fns';
 import { Star, Trash2 } from 'lucide-react';
 import { motion } from 'motion/react';
 import { useState } from 'react';
+import { toast } from 'sonner';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -119,7 +120,8 @@ function RouteComponent() {
       await deleteMutation.mutateAsync(deleteId);
       setDeleteId(null);
     } catch {
-      // error handled in service
+      setDeleteId(null);
+      toast.error('Failed to delete review');
     }
   };
 
@@ -169,7 +171,7 @@ function RouteComponent() {
                 You haven't reviewed any products yet
               </p>
               <Button size='sm' asChild>
-                <Link to='/shop'>Browse Products</Link>
+                <Link to='/shops'>Browse Products</Link>
               </Button>
             </CardContent>
           </Card>
@@ -180,7 +182,7 @@ function RouteComponent() {
                 <CardContent className='py-4'>
                   <div className='flex gap-4'>
                     <Link
-                      to='/shop/$slug'
+                      to='/product/$slug'
                       params={{ slug: review.product.slug }}
                       className='shrink-0'
                     >
@@ -200,7 +202,7 @@ function RouteComponent() {
                       <div className='flex items-start justify-between gap-3'>
                         <div>
                           <Link
-                            to='/shop/$slug'
+                            to='/product/$slug'
                             params={{ slug: review.product.slug }}
                             className='text-sm font-medium hover:underline'
                           >

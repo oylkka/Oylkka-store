@@ -7,7 +7,7 @@ export const Route = createFileRoute(
 )({
   server: {
     handlers: {
-      GET: async () => {
+      GET: async ({ params }) => {
         try {
           const authResult = await requireAuth();
           if (authResult.response) return authResult.response;
@@ -15,9 +15,9 @@ export const Route = createFileRoute(
           if (roleResponse) return roleResponse;
 
           const isAdmin =
-            session.user.role === 'ADMIN' ||
-            session.user.role === 'MANAGER' ||
-            session.user.role === 'CUSTOMER_SERVICE';
+            authResult.session.user.role === 'ADMIN' ||
+            authResult.session.user.role === 'MANAGER' ||
+            authResult.session.user.role === 'CUSTOMER_SERVICE';
           if (!isAdmin) {
             return Response.json({ error: 'Forbidden' }, { status: 403 });
           }

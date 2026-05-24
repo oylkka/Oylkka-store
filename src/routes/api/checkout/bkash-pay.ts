@@ -105,7 +105,7 @@ export const Route = createFileRoute('/api/checkout/bkash-pay')({
             process.env.BETTER_AUTH_URL || `http://localhost:3000`;
 
           const result = await createBkashPayment({
-            amount: order.total,
+            amount: Number(order.total),
             orderId: order.id,
             merchantInvoiceNumber: order.orderNumber,
             callbackURL: `${baseUrl}/api/checkout/bkash-callback?orderId=${order.id}`,

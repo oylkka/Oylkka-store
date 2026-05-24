@@ -36,8 +36,8 @@ model Product {
   sku   String   @unique
   brand String?
 
-  price         Float
-  discountPrice Float?
+  price         Decimal @db.Decimal(10, 2)
+  discountPrice Decimal? @db.Decimal(10, 2)
 
   hasVariants Boolean @default(false)
   stock       Int     @default(0)
@@ -129,8 +129,8 @@ model ProductVariant {
   name String
   sku  String @unique
 
-  price         Float
-  discountPrice Float?
+  price         Decimal @db.Decimal(10, 2)
+  discountPrice Decimal? @db.Decimal(10, 2)
 
   stock Int @default(0)
 

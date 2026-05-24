@@ -77,7 +77,7 @@ export const Route = createFileRoute('/api/shop/approve')({
 
           createAuditLog({
             actorId: session.user.id,
-            actorRole: session.user.role,
+            actorRole: session.user.role ?? 'ADMIN',
             action: 'SHOP_APPROVED',
             entity: 'Shop',
             entityId: id,

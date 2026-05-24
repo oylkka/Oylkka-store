@@ -24,21 +24,20 @@ export const Route = createFileRoute(
             select: { name: true, email: true },
           });
 
-          if (!user) {
-            return Response.json({ error: 'User not found' }, { status: 404 });
+          if (user) {
+            sendEmail({
+              to: user.email,
+              subject: 'Your password has been changed',
+              meta: {
+                description: '',
+                link: '',
+                callToActionText: '',
+              },
+              html: passwordResetConfirmationHtml(user.name),
+            });
           }
 
-          sendEmail({
-            to: user.email,
-            subject: 'Your password has been changed',
-            meta: {
-              description: '',
-              link: '',
-              callToActionText: '',
-            },
-            html: passwordResetConfirmationHtml(user.name),
-          });
-
+          // Always return success to prevent email enumeration
           return Response.json({ success: true });
         } catch {
           return Response.json(

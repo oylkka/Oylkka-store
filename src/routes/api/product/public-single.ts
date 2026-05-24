@@ -78,7 +78,9 @@ export const Route = createFileRoute('/api/product/public-single')({
 
           const discountPercent = product.discountPrice
             ? Math.round(
-                ((product.price - product.discountPrice) / product.price) * 100,
+                ((Number(product.price) - Number(product.discountPrice)) /
+                  Number(product.price)) *
+                  100,
               )
             : null;
 

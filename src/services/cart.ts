@@ -1,4 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import axios from 'axios';
 import { toast } from 'sonner';
 import apiClient from '@/lib/api-client';
 import { QUERY_KEYS } from '@/lib/constants';
@@ -82,7 +83,7 @@ export function useAddToCartMutation() {
       queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.CART] });
     },
     onError: (error: unknown) => {
-      const message = apiClient.isAxiosError(error)
+      const message = axios.isAxiosError(error)
         ? (error.response?.data?.error ?? error.message)
         : 'Failed to add to cart';
       toast.error(`Error: ${message}`, { id: 'cart-add' });
@@ -102,7 +103,7 @@ export function useUpdateCartItemMutation() {
       queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.CART] });
     },
     onError: (error: unknown) => {
-      const message = apiClient.isAxiosError(error)
+      const message = axios.isAxiosError(error)
         ? (error.response?.data?.error ?? error.message)
         : 'Failed to update cart';
       toast.error(`Error: ${message}`);
@@ -126,7 +127,7 @@ export function useRemoveCartItemMutation() {
       queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.CART] });
     },
     onError: (error: unknown) => {
-      const message = apiClient.isAxiosError(error)
+      const message = axios.isAxiosError(error)
         ? (error.response?.data?.error ?? error.message)
         : 'Failed to remove item';
       toast.error(`Error: ${message}`, { id: 'cart-remove' });

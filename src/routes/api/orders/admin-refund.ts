@@ -66,74 +66,62 @@ export const Route = createFileRoute('/api/orders/admin-refund')({
             );
           }
 
-          const alreadyRefunded = order.refundAmount ?? 0;
+          const alreadyRefunded = Number(order.refundAmount ?? 0);
           const totalRefunded = alreadyRefunded + body.amount;
 
-          if (totalRefunded > order.total) {
+          if (totalRefunded > Number(order.total)) {
             return Response.json(
               {
-                error: `Refund amount exceeds order total. Already refunded: ৳${alreadyRefunded.toFixed(2)}, remaining: ৳${(order.total - alreadyRefunded).toFixed(2)}`,
+                error: `Refund amount exceeds order total. Already refunded: ৳${alreadyRefunded.toFixed(2)}, remaining: ৳${(Number(order.total) - alreadyRefunded).toFixed(2)}`,
               },
               { status: 400 },
             );
           }
 
-          const isPartial = totalRefunded < order.total;
+          const isPartial = totalRefunded < Number(order.total);
           const newPaymentStatus = isPartial
             ? 'PARTIALLY_REFUNDED'
             : 'REFUNDED';
 
-          // For bKash orders, process the bKash refund first
-          if (
-            order.paymentMethod === 'BKASH' &&
-            order.paymentStatus === 'PAID'
-          ) {
-            const metadata = order.metadata as OrderMetadata | null;
-            const bkashPaymentID = metadata?.bkashPaymentID;
-            const bkashTrxID = metadata?.bkashTrxID;
-            const paymentRef = order.paymentRef;
-
-            if (bkashPaymentID && (bkashTrxID || paymentRef)) {
-              await refundBkashPayment({
-                paymentID: bkashPaymentID,
-                trxID: (bkashTrxID || paymentRef) as string,
-                amount: body.amount,
-                reason: body.reason,
-              });
-            }
-          }
-
-          // For wallet orders, credit the refund back to wallet
-          if (order.paymentMethod === 'WALLET') {
-            let wallet = await prisma.wallet.findUnique({
-              where: { userId: order.customerId },
-            });
-
-            if (!wallet) {
-              wallet = await prisma.wallet.create({
-                data: { userId: order.customerId },
-              });
-            }
-
-            await prisma.wallet.update({
-              where: { id: wallet.id },
-              data: { balance: { increment: body.amount } },
-            });
-
-            await prisma.walletTransaction.create({
-              data: {
-                walletId: wallet.id,
-                type: 'CREDIT',
-                amount: body.amount,
-                reference: 'REFUND',
-                orderId: order.id,
-                description: `Refund for order ${order.orderNumber}: ${body.reason}`,
-              },
-            });
-          }
-
           // Update the order and items in a transaction
+          // For bKash orders, capture payment info before transaction
+          const bkashRefundInfo =
+            order.paymentMethod === 'BKASH' && order.paymentStatus === 'PAID'
+              ? {
+                  metadata: order.metadata as OrderMetadata | null,
+                  paymentRef: order.paymentRef,
+                }
+              : null;
+
           const updated = await prisma.$transaction(async (tx) => {
+            // Wallet refund: credit inside transaction (atomic with order update)
+            if (order.paymentMethod === 'WALLET') {
+              let wallet = await tx.wallet.findUnique({
+                where: { userId: order.customerId },
+              });
+
+              if (!wallet) {
+                wallet = await tx.wallet.create({
+                  data: { userId: order.customerId },
+                });
+              }
+
+              await tx.wallet.update({
+                where: { id: wallet.id },
+                data: { balance: { increment: body.amount } },
+              });
+
+              await tx.walletTransaction.create({
+                data: {
+                  walletId: wallet.id,
+                  type: 'CREDIT',
+                  amount: body.amount,
+                  reference: 'REFUND',
+                  orderId: order.id,
+                  description: `Refund for order ${order.orderNumber}: ${body.reason}`,
+                },
+              });
+            }
             const updatedOrder = await tx.order.update({
               where: { id: body.orderId },
               data: {
@@ -141,7 +129,9 @@ export const Route = createFileRoute('/api/orders/admin-refund')({
                 refundAmount: totalRefunded,
                 refundReason: body.reason,
                 refundedAt: new Date(),
-                ...(totalRefunded >= order.total ? { status: 'REFUNDED' } : {}),
+                ...(totalRefunded >= Number(order.total)
+                  ? { status: 'REFUNDED' }
+                  : {}),
               },
               include: {
                 items: {
@@ -176,7 +166,7 @@ export const Route = createFileRoute('/api/orders/admin-refund')({
                 where: { id: { in: body.itemIds } },
                 data: { fulfillmentStatus: 'REFUNDED' },
               });
-            } else if (totalRefunded >= order.total) {
+            } else if (totalRefunded >= Number(order.total)) {
               // Full refund — mark all items as refunded
               await tx.orderItem.updateMany({
                 where: { orderId: body.orderId },
@@ -186,6 +176,23 @@ export const Route = createFileRoute('/api/orders/admin-refund')({
 
             return updatedOrder;
           });
+
+          // bKash refund: process AFTER transaction succeeds (avoids charging card without DB update)
+          if (bkashRefundInfo) {
+            const metadata = bkashRefundInfo.metadata;
+            const bkashPaymentID = metadata?.bkashPaymentID;
+            const bkashTrxID = metadata?.bkashTrxID;
+            const paymentRef = bkashRefundInfo.paymentRef;
+
+            if (bkashPaymentID && (bkashTrxID || paymentRef)) {
+              await refundBkashPayment({
+                paymentID: bkashPaymentID,
+                trxID: (bkashTrxID || paymentRef) as string,
+                amount: body.amount,
+                reason: body.reason,
+              });
+            }
+          }
 
           const metadata = updated.metadata as OrderMetadata | null;
 
@@ -230,11 +237,11 @@ export const Route = createFileRoute('/api/orders/admin-refund')({
               paymentStatus: updated.paymentStatus,
               paymentMethod: updated.paymentMethod,
               paymentRef: updated.paymentRef,
-              total: updated.total,
-              subtotal: updated.subtotal,
-              shippingCost: updated.shippingCost,
-              discountAmount: updated.discountAmount,
-              couponDiscount: updated.couponDiscount,
+              total: Number(updated.total),
+              subtotal: Number(updated.subtotal),
+              shippingCost: Number(updated.shippingCost),
+              discountAmount: Number(updated.discountAmount),
+              couponDiscount: Number(updated.couponDiscount),
               couponCode: updated.couponCode,
               customerId: updated.customerId,
               shippingName: updated.shippingName,
@@ -251,7 +258,7 @@ export const Route = createFileRoute('/api/orders/admin-refund')({
               cancelledAt: updated.cancelledAt?.toISOString() ?? null,
               cancelledBy: updated.cancelledBy,
               cancellationReason: updated.cancellationReason,
-              refundAmount: updated.refundAmount,
+              refundAmount: Number(updated.refundAmount),
               refundReason: updated.refundReason,
               refundedAt: updated.refundedAt?.toISOString() ?? null,
               currency: updated.currency,
@@ -264,9 +271,11 @@ export const Route = createFileRoute('/api/orders/admin-refund')({
                 variantName: item.variantName,
                 imageUrl: item.imageUrl,
                 quantity: item.quantity,
-                unitPrice: item.unitPrice,
-                discountPrice: item.discountPrice,
-                total: item.total,
+                unitPrice: Number(item.unitPrice),
+                discountPrice: item.discountPrice
+                  ? Number(item.discountPrice)
+                  : null,
+                total: Number(item.total),
                 fulfillmentStatus: item.fulfillmentStatus,
                 trackingNumber: item.trackingNumber,
                 trackingUrl: item.trackingUrl,
@@ -278,14 +287,9 @@ export const Route = createFileRoute('/api/orders/admin-refund')({
             },
             { status: 200 },
           );
-        } catch (error) {
+        } catch (_error) {
           return Response.json(
-            {
-              error:
-                error instanceof Error
-                  ? error.message
-                  : 'Internal Server Error',
-            },
+            { error: 'Internal Server Error' },
             { status: 500 },
           );
         }

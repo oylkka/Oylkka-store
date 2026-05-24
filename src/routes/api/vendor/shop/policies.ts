@@ -1,6 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { getRequestHeaders } from '@tanstack/react-start/server';
 import { auth } from '@/lib/auth';
+import { validateCsrf } from '@/lib/csrf';
 import { prisma } from '@/lib/db';
 
 export const Route = createFileRoute('/api/vendor/shop/policies')({
@@ -25,9 +26,9 @@ export const Route = createFileRoute('/api/vendor/shop/policies')({
           }
 
           return Response.json({ policies: shop.policies });
-        } catch (error) {
+        } catch (_error) {
           return Response.json(
-            { error: error instanceof Error ? error.message : 'Failed' },
+            { error: 'Internal Server Error' },
             { status: 500 },
           );
         }
@@ -41,6 +42,9 @@ export const Route = createFileRoute('/api/vendor/shop/policies')({
           if (!session?.user) {
             return Response.json({ error: 'Unauthorized' }, { status: 401 });
           }
+
+          const csrfResponse = validateCsrf();
+          if (csrfResponse) return csrfResponse;
 
           const shop = await prisma.shop.findUnique({
             where: { ownerId: session.user.id },
@@ -66,9 +70,9 @@ export const Route = createFileRoute('/api/vendor/shop/policies')({
           });
 
           return Response.json({ policies: updated.policies });
-        } catch (error) {
+        } catch (_error) {
           return Response.json(
-            { error: error instanceof Error ? error.message : 'Failed' },
+            { error: 'Internal Server Error' },
             { status: 500 },
           );
         }

@@ -1,8 +1,10 @@
-import { prisma } from '@/lib/db';
-import transporter from '@/lib/nodemailer';
-
+// 1. Configuration constants must sit at the absolute top
+// This guarantees they are initialized before any functions try to read them.
 const BATCH_SIZE = 10;
 const POLL_INTERVAL = 30_000;
+
+import { prisma } from '@/lib/db';
+import transporter from '@/lib/nodemailer';
 
 export async function queueEmail(
   to: string,

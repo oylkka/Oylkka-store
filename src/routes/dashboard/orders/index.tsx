@@ -1,7 +1,7 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router';
 import { format } from 'date-fns';
 import { Eye, Package, Search } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -101,9 +101,12 @@ function RouteComponent() {
     debouncedSearch || undefined,
   );
 
+  const searchTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
   const handleSearchChange = (value: string) => {
     setSearch(value);
-    setTimeout(() => setDebouncedSearch(value), 300);
+    if (searchTimeoutRef.current) clearTimeout(searchTimeoutRef.current);
+    searchTimeoutRef.current = setTimeout(() => setDebouncedSearch(value), 300);
   };
 
   const handleStatusChange = (newStatus: string) => {

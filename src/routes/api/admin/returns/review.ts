@@ -1,5 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { requireAdmin, requireAuth } from '@/lib/auth-middleware';
+import { validateCsrf } from '@/lib/csrf';
 import { prisma } from '@/lib/db';
 import { orderRefundHtml } from '@/lib/email-templates';
 import { sendEmail } from '@/lib/send-email';
@@ -13,6 +14,10 @@ export const Route = createFileRoute('/api/admin/returns/review')({
           if (authResult.response) return authResult.response;
           const roleResponse = requireAdmin(authResult.session);
           if (roleResponse) return roleResponse;
+          const session = authResult.session;
+
+          const csrfResponse = validateCsrf();
+          if (csrfResponse) return csrfResponse;
 
           const body = await request.json();
           const { returnId, status: newStatus, refundAmount, adminNote } = body;
@@ -67,8 +72,8 @@ export const Route = createFileRoute('/api/admin/returns/review')({
           if (newStatus === 'REFUNDED') {
             const amount =
               refundAmount ??
-              returnRequest.order.total -
-                (returnRequest.order.refundAmount ?? 0);
+              Number(returnRequest.order.total) -
+                Number(returnRequest.order.refundAmount ?? 0);
 
             if (amount <= 0) {
               return Response.json(
@@ -105,8 +110,9 @@ export const Route = createFileRoute('/api/admin/returns/review')({
             }
 
             const newRefundAmount =
-              (returnRequest.order.refundAmount ?? 0) + amount;
-            const fullyRefunded = newRefundAmount >= returnRequest.order.total;
+              Number(returnRequest.order.refundAmount ?? 0) + amount;
+            const fullyRefunded =
+              newRefundAmount >= Number(returnRequest.order.total);
 
             await prisma.order.update({
               where: { id: returnRequest.orderId },
@@ -157,14 +163,9 @@ export const Route = createFileRoute('/api/admin/returns/review')({
           });
 
           return Response.json({ return: updated });
-        } catch (error) {
+        } catch (_error) {
           return Response.json(
-            {
-              error:
-                error instanceof Error
-                  ? error.message
-                  : 'Failed to review return request',
-            },
+            { error: 'Internal Server Error' },
             { status: 500 },
           );
         }

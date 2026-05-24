@@ -1,12 +1,15 @@
 import { createFileRoute } from '@tanstack/react-router';
+import { getRequestHeaders } from '@tanstack/react-start/server';
+import { auth } from '#/lib/auth';
 import { createAuditLog } from '@/lib/audit-log';
 import { requireAdminOrManager, requireAuth } from '@/lib/auth-middleware';
+import { validateCsrf } from '@/lib/csrf';
 import { prisma } from '@/lib/db';
 
 export const Route = createFileRoute('/api/admin/coupons/$id')({
   server: {
     handlers: {
-      POST: async () => {
+      POST: async ({ params }) => {
         try {
           const authResult = await requireAuth();
           if (authResult.response) return authResult.response;
@@ -29,9 +32,9 @@ export const Route = createFileRoute('/api/admin/coupons/$id')({
           }
 
           return Response.json({ coupon });
-        } catch (error) {
+        } catch (_error) {
           return Response.json(
-            { error: error instanceof Error ? error.message : 'Failed' },
+            { error: 'Internal Server Error' },
             { status: 500 },
           );
         }
@@ -47,6 +50,9 @@ export const Route = createFileRoute('/api/admin/coupons/$id')({
           ) {
             return Response.json({ error: 'Unauthorized' }, { status: 401 });
           }
+
+          const csrfResponse = validateCsrf();
+          if (csrfResponse) return csrfResponse;
 
           const existing = await prisma.coupon.findUnique({
             where: { id: params.id },
@@ -181,9 +187,9 @@ export const Route = createFileRoute('/api/admin/coupons/$id')({
           });
 
           return Response.json({ coupon });
-        } catch (error) {
+        } catch (_error) {
           return Response.json(
-            { error: error instanceof Error ? error.message : 'Failed' },
+            { error: 'Internal Server Error' },
             { status: 500 },
           );
         }
@@ -196,6 +202,9 @@ export const Route = createFileRoute('/api/admin/coupons/$id')({
           if (!session?.user || session.user.role !== 'ADMIN') {
             return Response.json({ error: 'Unauthorized' }, { status: 401 });
           }
+
+          const csrfResponse = validateCsrf();
+          if (csrfResponse) return csrfResponse;
 
           const existing = await prisma.coupon.findUnique({
             where: { id: params.id },
@@ -235,9 +244,9 @@ export const Route = createFileRoute('/api/admin/coupons/$id')({
           });
 
           return Response.json({ success: true });
-        } catch (error) {
+        } catch (_error) {
           return Response.json(
-            { error: error instanceof Error ? error.message : 'Failed' },
+            { error: 'Internal Server Error' },
             { status: 500 },
           );
         }

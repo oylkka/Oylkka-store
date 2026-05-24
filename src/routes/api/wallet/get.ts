@@ -2,6 +2,8 @@ import { createFileRoute } from '@tanstack/react-router';
 import { getRequestHeaders } from '@tanstack/react-start/server';
 import { auth } from '@/lib/auth';
 import { prisma } from '@/lib/db';
+import { generalLimiter } from '@/lib/rate-limit';
+import { checkRateLimit } from '@/lib/rate-limit-guard';
 
 export const Route = createFileRoute('/api/wallet/get')({
   server: {
@@ -14,6 +16,9 @@ export const Route = createFileRoute('/api/wallet/get')({
           if (!session?.user) {
             return Response.json({ error: 'Unauthorized' }, { status: 401 });
           }
+
+          const rateLimitResponse = await checkRateLimit(generalLimiter);
+          if (rateLimitResponse) return rateLimitResponse;
 
           let wallet = await prisma.wallet.findUnique({
             where: { userId: session.user.id },
@@ -35,14 +40,9 @@ export const Route = createFileRoute('/api/wallet/get')({
           }
 
           return Response.json(wallet, { status: 200 });
-        } catch (error) {
+        } catch (_error) {
           return Response.json(
-            {
-              error:
-                error instanceof Error
-                  ? error.message
-                  : 'Internal Server Error',
-            },
+            { error: 'Internal Server Error' },
             { status: 500 },
           );
         }

@@ -1,4 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import axios from 'axios';
 import { toast } from 'sonner';
 import apiClient from '@/lib/api-client';
 import { QUERY_KEYS } from '@/lib/constants';
@@ -103,9 +104,10 @@ export function useApproveShopMutation() {
     onSuccess: () => {
       toast.success('Shop approved successfully!', { id: 'shop-approve' });
       queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.SHOPS] });
+      queryClient.invalidateQueries({ queryKey: ['shop'] });
     },
     onError: (error: unknown) => {
-      const message = apiClient.isAxiosError(error)
+      const message = axios.isAxiosError(error)
         ? (error.response?.data?.error ?? error.message)
         : 'Failed to approve shop';
       toast.error(`Error: ${message}`, { id: 'shop-approve' });
@@ -136,9 +138,10 @@ export function useRejectShopMutation() {
     onSuccess: () => {
       toast.success('Shop rejected!', { id: 'shop-reject' });
       queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.SHOPS] });
+      queryClient.invalidateQueries({ queryKey: ['shop'] });
     },
     onError: (error: unknown) => {
-      const message = apiClient.isAxiosError(error)
+      const message = axios.isAxiosError(error)
         ? (error.response?.data?.error ?? error.message)
         : 'Failed to reject shop';
       toast.error(`Error: ${message}`, { id: 'shop-reject' });
@@ -193,9 +196,10 @@ export function useApplyShopMutation() {
         id: 'shop-apply',
       });
       queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.SHOPS] });
+      queryClient.invalidateQueries({ queryKey: ['shop'] });
     },
     onError: (error: unknown) => {
-      const message = apiClient.isAxiosError(error)
+      const message = axios.isAxiosError(error)
         ? (error.response?.data?.error ?? error.message)
         : 'Failed to submit shop application';
       toast.error(`Error: ${message}`, { id: 'shop-apply' });
@@ -245,9 +249,10 @@ export function useUpdateShopMutation() {
     onSuccess: () => {
       toast.success('Shop updated successfully!', { id: 'shop-update' });
       queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.SHOPS] });
+      queryClient.invalidateQueries({ queryKey: ['shop'] });
     },
     onError: (error: unknown) => {
-      const message = apiClient.isAxiosError(error)
+      const message = axios.isAxiosError(error)
         ? (error.response?.data?.error ?? error.message)
         : 'Failed to update shop';
       toast.error(`Error: ${message}`, { id: 'shop-update' });

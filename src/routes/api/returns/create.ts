@@ -2,7 +2,10 @@ import { createFileRoute } from '@tanstack/react-router';
 import { getRequestHeaders } from '@tanstack/react-start/server';
 import { UploadImage } from '@/cloudinary';
 import { auth } from '@/lib/auth';
+import { validateCsrf } from '@/lib/csrf';
 import { prisma } from '@/lib/db';
+import { generalLimiter } from '@/lib/rate-limit';
+import { checkRateLimit } from '@/lib/rate-limit-guard';
 
 export const Route = createFileRoute('/api/returns/create')({
   server: {
@@ -15,6 +18,12 @@ export const Route = createFileRoute('/api/returns/create')({
           if (!session?.user) {
             return Response.json({ error: 'Unauthorized' }, { status: 401 });
           }
+
+          const csrfResponse = validateCsrf();
+          if (csrfResponse) return csrfResponse;
+
+          const rateLimitResponse = await checkRateLimit(generalLimiter);
+          if (rateLimitResponse) return rateLimitResponse;
 
           const formData = await request.formData();
           const orderId = formData.get('orderId') as string;
@@ -159,14 +168,9 @@ export const Route = createFileRoute('/api/returns/create')({
           });
 
           return Response.json({ returnRequest }, { status: 201 });
-        } catch (error) {
+        } catch (_error) {
           return Response.json(
-            {
-              error:
-                error instanceof Error
-                  ? error.message
-                  : 'Failed to create return request',
-            },
+            { error: 'Internal Server Error' },
             { status: 500 },
           );
         }
