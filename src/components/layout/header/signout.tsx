@@ -1,3 +1,5 @@
+import { useRouter } from '@tanstack/react-router';
+import { Power } from 'lucide-react';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -10,8 +12,6 @@ import {
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
-import { useRouter } from '@tanstack/react-router';
-import { Power } from 'lucide-react';
 // 1. Import the server function you showed me
 import { signOut } from '@/lib/auth.functions';
 
