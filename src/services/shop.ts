@@ -227,6 +227,34 @@ type PublicShopListResponse = {
   totalPages: number;
 };
 
+export function useUpdateShopMutation() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (formData: FormData) => {
+      const response = await apiClient.patch<ShopApiResponse>(
+        '/api/shop/update',
+        formData,
+        { headers: { 'Content-Type': 'multipart/form-data' } },
+      );
+      return response.data;
+    },
+    onMutate: () => {
+      toast.loading('Updating shop...', { id: 'shop-update' });
+    },
+    onSuccess: () => {
+      toast.success('Shop updated successfully!', { id: 'shop-update' });
+      queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.SHOPS] });
+    },
+    onError: (error: unknown) => {
+      const message = apiClient.isAxiosError(error)
+        ? (error.response?.data?.error ?? error.message)
+        : 'Failed to update shop';
+      toast.error(`Error: ${message}`, { id: 'shop-update' });
+    },
+  });
+}
+
 export function usePublicShops(params: { page?: number; search?: string }) {
   return useQuery<PublicShopListResponse>({
     queryKey: [QUERY_KEYS.SHOPS, 'public-list', params],

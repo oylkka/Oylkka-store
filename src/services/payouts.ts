@@ -81,6 +81,35 @@ export function useVendorPayouts() {
   });
 }
 
+export type PayoutSchedule = {
+  schedule: {
+    month: string;
+    items: number;
+    totalAmount: number;
+    totalCommission: number;
+    estimatedDate: string;
+  }[];
+  summary: {
+    pendingItems: number;
+    totalPending: number;
+    totalCommission: number;
+    lastPayoutDate: string | null;
+    lastPayoutAmount: number;
+  };
+};
+
+export function useVendorPayoutSchedule() {
+  return useQuery<PayoutSchedule>({
+    queryKey: ['vendor-payouts-schedule'],
+    queryFn: async () => {
+      const r = await apiClient.get<PayoutSchedule>(
+        '/api/vendor/payouts/schedule',
+      );
+      return r.data;
+    },
+  });
+}
+
 export function useVendorPendingPayout() {
   return useQuery<{
     pendingItems: number;

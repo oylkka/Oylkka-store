@@ -17,4 +17,8 @@ export const QUERY_KEYS = {
   VENDOR_CONVERSATIONS: 'vendor-conversations',
   ADMIN_CONVERSATIONS: 'admin-conversations',
   MESSAGES: 'messages',
+  ADMIN_DASHBOARD: 'admin-dashboard',
+  ADMIN_COUPONS: 'admin-coupons',
+  ADMIN_REVIEWS: 'admin-reviews',
+  ADMIN_CUSTOMERS: 'admin-customers',
 };
