@@ -43,6 +43,8 @@ export interface CartWithItems {
     product: {
       id: string;
       price: number;
+      discountPrice?: number | null;
+      freeShipping?: boolean;
       shop?: { id: string } | null;
     };
     variant?: { price?: number; discountPrice?: number } | null;
@@ -91,23 +93,31 @@ export function processVouchers(
   const globalCoupons: string[] = [];
   const shopCoupons = new Map<string, string>();
   const productCoupons = new Map<string, string>();
+  const allCoupons: string[] = [];
+  const categoryCoupons = new Map<string, string>();
+  const userCoupons: string[] = [];
 
   const selectedVouchers: ProcessedVoucher[] = [];
 
   for (const uv of userVouchers) {
     const coupon = uv.coupon;
 
-    // Stacking rules
+    // Stacking rules — check cheap scope limits first before expensive eligibility
+    let stackingBlocked = false;
     if (coupon.scope === 'GLOBAL') {
-      if (globalCoupons.length > 0) continue;
-      globalCoupons.push(coupon.id);
+      if (globalCoupons.length > 0) stackingBlocked = true;
     } else if (coupon.scope === 'SHOP' && coupon.scopeId) {
-      if (shopCoupons.has(coupon.scopeId)) continue;
-      shopCoupons.set(coupon.scopeId, coupon.id);
+      if (shopCoupons.has(coupon.scopeId)) stackingBlocked = true;
     } else if (coupon.scope === 'PRODUCT' && coupon.scopeId) {
-      if (productCoupons.has(coupon.scopeId)) continue;
-      productCoupons.set(coupon.scopeId, coupon.id);
+      if (productCoupons.has(coupon.scopeId)) stackingBlocked = true;
+    } else if (coupon.scope === 'ALL') {
+      if (allCoupons.length > 0) stackingBlocked = true;
+    } else if (coupon.scope === 'CATEGORY' && coupon.scopeId) {
+      if (categoryCoupons.has(coupon.scopeId)) stackingBlocked = true;
+    } else if (coupon.scope === 'USER') {
+      if (userCoupons.length > 0) stackingBlocked = true;
     }
+    if (stackingBlocked) continue;
 
     // Eligibility check
     const error = checkCouponEligibility(coupon, {
@@ -117,6 +127,7 @@ export function processVouchers(
       cartItems: cart.items.map((i) => ({
         productId: i.product.id,
         quantity: i.quantity,
+        shopId: i.product.shop?.id,
       })),
       paymentMethod: options.paymentMethod,
       userAgent: options.userAgent,
@@ -124,6 +135,21 @@ export function processVouchers(
     });
 
     if (error) continue;
+
+    // Mark stacking slot as taken now that eligibility passed
+    if (coupon.scope === 'GLOBAL') {
+      globalCoupons.push(coupon.id);
+    } else if (coupon.scope === 'SHOP' && coupon.scopeId) {
+      shopCoupons.set(coupon.scopeId, coupon.id);
+    } else if (coupon.scope === 'PRODUCT' && coupon.scopeId) {
+      productCoupons.set(coupon.scopeId, coupon.id);
+    } else if (coupon.scope === 'ALL') {
+      allCoupons.push(coupon.id);
+    } else if (coupon.scope === 'CATEGORY' && coupon.scopeId) {
+      categoryCoupons.set(coupon.scopeId, coupon.id);
+    } else if (coupon.scope === 'USER') {
+      userCoupons.push(coupon.id);
+    }
 
     // Compute scoped subtotal
     const effectiveScopeId = coupon.scopeId;
@@ -142,6 +168,8 @@ export function processVouchers(
       productId: item.product.id,
       shopId: item.product.shop?.id ?? undefined,
       price: item.product.price,
+      discountPrice:
+        item.variant?.discountPrice ?? item.product.discountPrice ?? undefined,
       quantity: item.quantity,
     }));
 

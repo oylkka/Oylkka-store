@@ -1,5 +1,5 @@
 import { ScriptOnce } from '@tanstack/react-router';
-import { createContext, useContext, useEffect, useState } from 'react';
+import { createContext, useContext, useEffect, useRef, useState } from 'react';
 
 type Theme = 'dark' | 'light' | 'system';
 
@@ -46,32 +46,32 @@ export function ThemeProvider({
   defaultTheme = 'system',
   storageKey = 'theme',
 }: ThemeProviderProps) {
-  const [theme, setThemeState] = useState<Theme>(defaultTheme);
-  const [mounted, setMounted] = useState(false);
+  const [theme, setThemeState] = useState<Theme>(() => {
+    if (typeof window !== 'undefined') {
+      const stored = localStorage.getItem(storageKey);
+      if (stored === 'light' || stored === 'dark' || stored === 'system')
+        return stored;
+    }
+    return defaultTheme;
+  });
+  const initial = useRef(true);
 
   useEffect(() => {
-    const stored = localStorage.getItem(storageKey);
-    setThemeState(
-      stored === 'light' || stored === 'dark' || stored === 'system'
-        ? stored
-        : defaultTheme,
-    );
-    setMounted(true);
-  }, [defaultTheme, storageKey]);
-
-  useEffect(() => {
-    if (!mounted) return;
+    if (initial.current) {
+      initial.current = false;
+      return;
+    }
     applyTheme(theme);
-  }, [theme, mounted]);
+  }, [theme]);
 
   useEffect(() => {
-    if (!mounted || theme !== 'system') return;
+    if (theme !== 'system') return;
 
     const media = window.matchMedia('(prefers-color-scheme: dark)');
     const onChange = () => applyTheme('system');
     media.addEventListener('change', onChange);
     return () => media.removeEventListener('change', onChange);
-  }, [theme, mounted]);
+  }, [theme]);
 
   const setTheme = (next: Theme) => {
     localStorage.setItem(storageKey, next);

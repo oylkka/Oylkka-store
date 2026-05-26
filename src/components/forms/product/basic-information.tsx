@@ -68,8 +68,9 @@ export function BasicInformationCard({ productId }: BasicInformationCardProps) {
         isUnique: result.isUnique,
         suggestions: result.suggestions || [],
       });
-    } catch {
-      // Silently fail
+    } catch (error) {
+      // biome-ignore lint/suspicious/noConsole: this is fine
+      console.error('Failed to check slug uniqueness:', error);
     } finally {
       setIsCheckingSlug(false);
     }

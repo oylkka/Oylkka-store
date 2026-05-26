@@ -73,13 +73,11 @@ export function useAdminBanners() {
 
 export function useBanner(id: string | undefined) {
   return useQuery<AdminBanner>({
-    queryKey: ['banner', id],
+    queryKey: [QUERY_KEYS.ADMIN_BANNERS, id],
     queryFn: async () => {
-      const response = await apiClient.post<AdminBanner>(
+      const response = await apiClient.get<AdminBanner>(
         '/api/banners/get-single',
-        {
-          id,
-        },
+        { params: { id } },
       );
       return response.data;
     },
@@ -90,8 +88,8 @@ export function useBanner(id: string | undefined) {
 export function useBannerMutation() {
   const queryClient = useQueryClient();
 
-  return useMutation({
-    mutationFn: async (values: BannerFormType) => {
+  return useMutation<CreateBannerResponse, Error, BannerFormType>({
+    mutationFn: async (values) => {
       const formData = new FormData();
 
       formData.append('title', values.title);
@@ -133,7 +131,7 @@ export function useBannerMutation() {
       toast.success('Banner created successfully!', { id: 'banner-mutation' });
       queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.HERO_BANNER] });
       queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.ADMIN_BANNERS] });
-      queryClient.invalidateQueries({ queryKey: ['banner'] });
+      queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.ADMIN_BANNERS] });
     },
     onError: (error: unknown) => {
       const message = axios.isAxiosError(error)
@@ -147,8 +145,8 @@ export function useBannerMutation() {
 export function useDeleteBannerMutation() {
   const queryClient = useQueryClient();
 
-  return useMutation({
-    mutationFn: async (id: string) => {
+  return useMutation<void, Error, string>({
+    mutationFn: async (id) => {
       const response = await apiClient.post('/api/banners/delete', { id });
       return response.data;
     },
@@ -159,7 +157,7 @@ export function useDeleteBannerMutation() {
       toast.success('Banner deleted successfully!', { id: 'delete-banner' });
       queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.ADMIN_BANNERS] });
       queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.HERO_BANNER] });
-      queryClient.invalidateQueries({ queryKey: ['banner'] });
+      queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.ADMIN_BANNERS] });
     },
     onError: (error: unknown) => {
       const message = axios.isAxiosError(error)
@@ -173,8 +171,8 @@ export function useDeleteBannerMutation() {
 export function useEditBannerMutation() {
   const queryClient = useQueryClient();
 
-  return useMutation({
-    mutationFn: async (values: EditBannerFormType & { id: string }) => {
+  return useMutation<void, Error, EditBannerFormType & { id: string }>({
+    mutationFn: async (values) => {
       const formData = new FormData();
 
       formData.append('id', values.id);
@@ -218,7 +216,7 @@ export function useEditBannerMutation() {
       toast.success('Banner updated successfully!', { id: 'edit-banner' });
       queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.ADMIN_BANNERS] });
       queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.HERO_BANNER] });
-      queryClient.invalidateQueries({ queryKey: ['banner'] });
+      queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.ADMIN_BANNERS] });
     },
     onError: (error: unknown) => {
       const message = axios.isAxiosError(error)

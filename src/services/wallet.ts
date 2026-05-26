@@ -1,4 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import axios from 'axios';
 import { toast } from 'sonner';
 import type { TransactionType } from '@/generated/prisma/enums';
 import apiClient from '@/lib/api-client';
@@ -36,8 +37,8 @@ export function useWallet() {
 export function useTopUpMutation() {
   const queryClient = useQueryClient();
 
-  return useMutation({
-    mutationFn: async (amount: number) => {
+  return useMutation<void, Error, number>({
+    mutationFn: async (amount) => {
       const response = await apiClient.post('/api/wallet/top-up', { amount });
       return response.data;
     },
@@ -48,9 +49,11 @@ export function useTopUpMutation() {
       toast.success('Wallet topped up successfully!', { id: 'wallet-topup' });
       queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.WALLET] });
     },
-    onError: (error: { response?: { data?: { error?: string } } }) => {
-      const msg = error.response?.data?.error || 'Failed to top up wallet';
-      toast.error(msg, { id: 'wallet-topup' });
+    onError: (error: unknown) => {
+      const message = axios.isAxiosError(error)
+        ? (error.response?.data?.error ?? error.message)
+        : 'Failed to top up wallet';
+      toast.error(message, { id: 'wallet-topup' });
     },
   });
 }

@@ -1,9 +1,11 @@
 import { createFileRoute, Link } from '@tanstack/react-router';
-import { ArrowLeft, Clock, Eye } from 'lucide-react';
+import { ArrowLeft, Clock, ShoppingBag } from 'lucide-react';
+import { motion } from 'motion/react';
 import { useEffect, useState } from 'react';
 
+import Footer from '@/components/layout/footer';
+import Header from '@/components/layout/header';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
 
 interface RecentProduct {
   id: string;
@@ -17,6 +19,27 @@ interface RecentProduct {
 const STORAGE_KEY = 'oylkka_recently_viewed';
 const MAX_ITEMS = 20;
 
+const EASE: [number, number, number, number] = [0.22, 1, 0.36, 1];
+
+const fadeUp = {
+  hidden: { opacity: 0, y: 20 },
+  show: (delay: number = 0) => ({
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.45, ease: EASE, delay },
+  }),
+};
+
+const stagger = {
+  hidden: {},
+  show: { transition: { staggerChildren: 0.06 } },
+};
+
+const cardVariants = {
+  hidden: { opacity: 0, y: 16 },
+  show: { opacity: 1, y: 0, transition: { duration: 0.38, ease: EASE } },
+};
+
 export const Route = createFileRoute('/shop/recently-viewed')({
   component: RouteComponent,
 });
@@ -24,7 +47,9 @@ export const Route = createFileRoute('/shop/recently-viewed')({
 function getStored(): RecentProduct[] {
   try {
     return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
-  } catch {
+  } catch (error) {
+    // biome-ignore lint/suspicious/noConsole: this is fine
+    console.error('Failed to parse stored recent products:', error);
     return [];
   }
 }
@@ -37,7 +62,10 @@ export function trackProductView(product: Omit<RecentProduct, 'viewedAt'>) {
       STORAGE_KEY,
       JSON.stringify(items.slice(0, MAX_ITEMS)),
     );
-  } catch {}
+  } catch (error) {
+    // biome-ignore lint/suspicious/noConsole: this is fine
+    console.error('Failed to track product view:', error);
+  }
 }
 
 function RouteComponent() {
@@ -53,77 +81,142 @@ function RouteComponent() {
   };
 
   return (
-    <div className='max-w-4xl mx-auto px-4 py-8 space-y-6'>
-      <div className='flex items-center justify-between'>
-        <div className='flex items-center gap-3'>
-          <Button variant='ghost' size='icon' asChild className='shrink-0'>
-            <Link to='/products'>
-              <ArrowLeft className='w-4 h-4' />
-            </Link>
-          </Button>
-          <div>
-            <h1 className='text-2xl font-bold tracking-tight flex items-center gap-2'>
-              <Eye className='w-6 h-6' />
-              Recently Viewed
+    <div className='min-h-screen bg-background'>
+      <Header />
+
+      <div className='border-b border-border'>
+        <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-24'>
+          <motion.div
+            initial='hidden'
+            animate='show'
+            variants={fadeUp}
+            custom={0}
+          >
+            <Button
+              variant='ghost'
+              size='sm'
+              asChild
+              className='mb-8 gap-2 text-primary'
+            >
+              <Link to='/products'>
+                <ArrowLeft className='w-3.5 h-3.5' /> Back to Products
+              </Link>
+            </Button>
+          </motion.div>
+          <motion.div
+            initial='hidden'
+            animate='show'
+            variants={fadeUp}
+            custom={0.08}
+          >
+            <div className='flex items-center gap-3 mb-4'>
+              <div className='h-px w-8 bg-primary' />
+              <span className='text-xs font-semibold tracking-[0.18em] uppercase text-primary'>
+                Recently Viewed
+              </span>
+            </div>
+            <h1 className='text-4xl sm:text-5xl md:text-6xl font-bold leading-[1.05] tracking-tight'>
+              Your{' '}
+              <span className='italic font-bold text-primary'>Recently</span>{' '}
+              Viewed
+              <span className='text-primary'>.</span>
             </h1>
-          </div>
+            <p className='text-sm text-muted-foreground mt-3 max-w-2xl'>
+              Products you've browsed, ready to pick up right where you left
+              off.
+            </p>
+          </motion.div>
         </div>
-        {items.length > 0 && (
-          <Button variant='outline' size='sm' onClick={clear}>
-            Clear History
-          </Button>
-        )}
       </div>
 
-      {items.length === 0 ? (
-        <Card>
-          <CardContent className='flex flex-col items-center justify-center py-16 text-center'>
-            <Clock className='w-10 h-10 text-muted-foreground mb-3' />
-            <p className='text-sm font-semibold'>No recently viewed items</p>
-            <p className='text-sm text-muted-foreground mt-1'>
-              Products you view will appear here.
-            </p>
-            <Button asChild className='mt-4' size='sm'>
-              <Link to='/products'>Browse Products</Link>
-            </Button>
-          </CardContent>
-        </Card>
-      ) : (
-        <div className='grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4'>
-          {items.map((item) => (
-            <Link
-              key={item.id}
-              to='/product/$slug'
-              params={{ slug: item.slug }}
-              className='group'
+      <div className='border-b border-border'>
+        <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-24'>
+          {items.length > 0 && (
+            <motion.div
+              initial='hidden'
+              animate='show'
+              variants={fadeUp}
+              custom={0.12}
+              className='flex justify-end mb-8'
             >
-              <Card className='overflow-hidden hover:shadow-md transition-shadow'>
-                <div className='aspect-square bg-muted'>
-                  {item.image ? (
-                    <img
-                      src={item.image}
-                      alt={item.name}
-                      className='w-full h-full object-cover group-hover:scale-105 transition-transform'
-                    />
-                  ) : (
-                    <div className='w-full h-full flex items-center justify-center text-muted-foreground'>
-                      No image
+              <Button variant='outline' size='sm' onClick={clear}>
+                Clear History
+              </Button>
+            </motion.div>
+          )}
+
+          {items.length === 0 ? (
+            <motion.div
+              initial='hidden'
+              animate='show'
+              variants={fadeUp}
+              custom={0.14}
+              className='flex flex-col items-center justify-center py-20 gap-4 text-center'
+            >
+              <div className='w-16 h-16 rounded-2xl bg-muted flex items-center justify-center'>
+                <Clock className='w-7 h-7 text-muted-foreground' />
+              </div>
+              <div>
+                <p className='text-sm font-semibold'>
+                  No recently viewed items
+                </p>
+                <p className='text-sm text-muted-foreground mt-1 max-w-xs'>
+                  Products you view will appear here.
+                </p>
+              </div>
+              <Button size='sm' asChild className='mt-2'>
+                <Link to='/products'>Browse Products</Link>
+              </Button>
+            </motion.div>
+          ) : (
+            <motion.div
+              initial='hidden'
+              animate='show'
+              variants={stagger}
+              className='grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4'
+            >
+              {items.map((item) => (
+                <motion.div
+                  key={item.id}
+                  variants={cardVariants}
+                  whileHover={{ y: -3 }}
+                  transition={{ type: 'spring', stiffness: 320, damping: 24 }}
+                >
+                  <Link
+                    to='/product/$slug'
+                    params={{ slug: item.slug }}
+                    className='group block rounded-2xl border border-border bg-card overflow-hidden hover:border-primary/30 hover:shadow-lg hover:shadow-black/5 transition-shadow duration-300'
+                  >
+                    <div className='relative overflow-hidden aspect-square bg-muted'>
+                      {item.image ? (
+                        <img
+                          src={item.image}
+                          alt={item.name}
+                          className='w-full h-full object-cover group-hover:scale-105 transition-transform duration-500'
+                        />
+                      ) : (
+                        <div className='w-full h-full flex items-center justify-center text-muted-foreground'>
+                          <ShoppingBag className='w-6 h-6' />
+                        </div>
+                      )}
                     </div>
-                  )}
-                </div>
-                <CardContent className='p-3'>
-                  <p className='text-sm font-medium line-clamp-2'>
-                    {item.name}
-                  </p>
-                  <p className='text-sm font-bold mt-1'>
-                    BDT {item.price.toLocaleString()}
-                  </p>
-                </CardContent>
-              </Card>
-            </Link>
-          ))}
+                    <div className='p-4'>
+                      <h3 className='text-sm font-semibold leading-snug line-clamp-2'>
+                        {item.name}
+                      </h3>
+                      <p className='text-lg font-bold tabular-nums mt-2'>
+                        BDT {item.price.toLocaleString()}
+                      </p>
+                    </div>
+                  </Link>
+                </motion.div>
+              ))}
+            </motion.div>
+          )}
         </div>
-      )}
+      </div>
+
+      <Footer />
     </div>
   );
 }

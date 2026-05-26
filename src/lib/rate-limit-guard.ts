@@ -1,5 +1,15 @@
 import { getRequestHeaders } from '@tanstack/react-start/server';
 
+function getSafeRequestHeaders(): Headers | null {
+  try {
+    return getRequestHeaders();
+  } catch (error) {
+    // biome-ignore lint/suspicious/noConsole: this is fine
+    console.error('Rate limit guard error:', error);
+    return null;
+  }
+}
+
 export async function checkRateLimit(
   limiter: {
     limit: (
@@ -8,10 +18,10 @@ export async function checkRateLimit(
   },
   identifier?: string,
 ): Promise<Response | null> {
-  const headers = getRequestHeaders();
+  const headers = getSafeRequestHeaders();
   const ip =
     identifier ??
-    headers.get('x-forwarded-for')?.split(',')[0]?.trim() ??
+    headers?.get('x-forwarded-for')?.split(',')[0]?.trim() ??
     'unknown';
   const { success, remaining } = await limiter.limit(ip);
 

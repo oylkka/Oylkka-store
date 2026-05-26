@@ -73,6 +73,15 @@ export const ProductApiCreateSchema = z.object({
 
 export const ProductApiEditSchema = ProductApiCreateSchema.partial().extend({
   id: z.string().min(1, 'Product ID is required'),
+  productName: z.string().min(2, 'Product name must be at least 2 characters'),
+  description: z.string().min(10, 'Description must be at least 10 characters'),
+  slug: z
+    .string()
+    .min(1, 'Slug is required')
+    .regex(/^[a-z0-9-]+$/, 'Slug must be lowercase alphanumeric with hyphens'),
+  sku: z.string().min(1, 'SKU is required'),
+  price: z.number().min(0.01, 'Price must be greater than 0'),
+  stock: z.number().int().min(0, 'Stock cannot be negative'),
   keepExistingImage: z.boolean().optional(),
   removedGalleryIds: z.array(z.string()).optional().default([]),
   category: z.string().optional(),

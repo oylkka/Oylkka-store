@@ -1,4 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import axios from 'axios';
 import { toast } from 'sonner';
 import apiClient from '@/lib/api-client';
 import { QUERY_KEYS } from '@/lib/constants';
@@ -39,8 +40,8 @@ export function useWishlist(options?: { enabled?: boolean }) {
 export function useAddToWishlistMutation() {
   const queryClient = useQueryClient();
 
-  return useMutation({
-    mutationFn: async (input: { productId: string; variantId?: string }) => {
+  return useMutation<void, Error, { productId: string; variantId?: string }>({
+    mutationFn: async (input) => {
       const response = await apiClient.post('/api/wishlist/add', input);
       return response.data;
     },
@@ -51,9 +52,11 @@ export function useAddToWishlistMutation() {
       toast.success('Added to wishlist!', { id: 'wishlist-add' });
       queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.WISHLIST] });
     },
-    onError: (error: { response?: { data?: { error?: string } } }) => {
-      const msg = error.response?.data?.error || 'Failed to add to wishlist';
-      toast.error(msg, { id: 'wishlist-add' });
+    onError: (error: unknown) => {
+      const message = axios.isAxiosError(error)
+        ? (error.response?.data?.error ?? error.message)
+        : 'Failed to add to wishlist';
+      toast.error(message, { id: 'wishlist-add' });
     },
   });
 }
@@ -61,8 +64,8 @@ export function useAddToWishlistMutation() {
 export function useRemoveFromWishlistMutation() {
   const queryClient = useQueryClient();
 
-  return useMutation({
-    mutationFn: async (input: { productId: string; variantId?: string }) => {
+  return useMutation<void, Error, { productId: string; variantId?: string }>({
+    mutationFn: async (input) => {
       const response = await apiClient.post('/api/wishlist/remove', input);
       return response.data;
     },
@@ -73,10 +76,11 @@ export function useRemoveFromWishlistMutation() {
       toast.success('Removed from wishlist', { id: 'wishlist-remove' });
       queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.WISHLIST] });
     },
-    onError: (error: { response?: { data?: { error?: string } } }) => {
-      const msg =
-        error.response?.data?.error || 'Failed to remove from wishlist';
-      toast.error(msg, { id: 'wishlist-remove' });
+    onError: (error: unknown) => {
+      const message = axios.isAxiosError(error)
+        ? (error.response?.data?.error ?? error.message)
+        : 'Failed to remove from wishlist';
+      toast.error(message, { id: 'wishlist-remove' });
     },
   });
 }

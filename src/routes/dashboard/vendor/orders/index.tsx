@@ -1,7 +1,7 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router';
 import { format } from 'date-fns';
 import { Eye, Package, Search } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -56,12 +56,19 @@ function RouteComponent() {
   const [search, setSearch] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
 
+  const searchTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
   useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const s = params.get('status') || '';
-    if (STATUS_TABS.some((t) => t.value === s)) {
-      setStatus(s);
-    }
+    const handler = () => {
+      const params = new URLSearchParams(window.location.search);
+      const s = params.get('status') || '';
+      if (STATUS_TABS.some((t) => t.value === s)) {
+        setStatus(s);
+      }
+    };
+    handler();
+    window.addEventListener('popstate', handler);
+    return () => window.removeEventListener('popstate', handler);
   }, []);
 
   const { data: items, isLoading } = useVendorOrders(
@@ -71,7 +78,8 @@ function RouteComponent() {
 
   const handleSearchChange = (value: string) => {
     setSearch(value);
-    setTimeout(() => setDebouncedSearch(value), 300);
+    if (searchTimeoutRef.current) clearTimeout(searchTimeoutRef.current);
+    searchTimeoutRef.current = setTimeout(() => setDebouncedSearch(value), 300);
   };
 
   const handleStatusChange = (newStatus: string) => {

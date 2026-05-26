@@ -5,6 +5,7 @@ import { validateCsrf } from '@/lib/csrf';
 import { prisma } from '@/lib/db';
 import { orderCancellationHtml } from '@/lib/email-templates';
 import { sendEmail } from '@/lib/send-email';
+import { incrementStock, incrementVariantStock } from '@/lib/stock';
 
 export const Route = createFileRoute('/api/orders/admin-cancel')({
   server: {
@@ -88,16 +89,13 @@ export const Route = createFileRoute('/api/orders/admin-cancel')({
             // Restore stock only if it was previously decremented
             if (order.status !== 'PENDING') {
               for (const item of order.items) {
-                await tx.product.update({
-                  where: { id: item.productId },
-                  data: { stock: { increment: item.quantity } },
-                });
-
+                await incrementStock(tx, item.productId, item.quantity);
                 if (item.variantId) {
-                  await tx.productVariant.update({
-                    where: { id: item.variantId },
-                    data: { stock: { increment: item.quantity } },
-                  });
+                  await incrementVariantStock(
+                    tx,
+                    item.variantId,
+                    item.quantity,
+                  );
                 }
               }
             }
@@ -110,7 +108,8 @@ export const Route = createFileRoute('/api/orders/admin-cancel')({
             entity: 'Order',
             entityId: body.orderId,
             details: { reason: body.reason, orderNumber: order.orderNumber },
-          }).catch(() => {});
+            // biome-ignore lint/suspicious/noConsole: this is fine
+          }).catch((err) => console.error('Failed to create audit log:', err));
 
           sendEmail({
             to: order.shippingEmail,
@@ -131,7 +130,10 @@ export const Route = createFileRoute('/api/orders/admin-cancel')({
                 quantity: i.quantity,
               })),
             ),
-          });
+          }).catch((err) =>
+            // biome-ignore lint/suspicious/noConsole: this is fine
+            console.error('Failed to send cancellation email:', err),
+          );
 
           return Response.json({ success: true }, { status: 200 });
         } catch (_error) {

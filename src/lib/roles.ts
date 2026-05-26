@@ -1,4 +1,4 @@
-export const UserRole = {
+export const USER_ROLES = {
   ADMIN: 'ADMIN',
   MANAGER: 'MANAGER',
   VENDOR: 'VENDOR',
@@ -6,4 +6,4 @@ export const UserRole = {
   USER: 'USER',
 } as const;
 
-export type UserRole = (typeof UserRole)[keyof typeof UserRole];
+export type UserRole = (typeof USER_ROLES)[keyof typeof USER_ROLES];

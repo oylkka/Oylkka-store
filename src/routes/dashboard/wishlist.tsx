@@ -1,4 +1,4 @@
-import { createFileRoute, useNavigate } from '@tanstack/react-router';
+import { createFileRoute, Link, useNavigate } from '@tanstack/react-router';
 import { Heart, ShoppingBag, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -49,7 +49,7 @@ function WishlistPage() {
             </p>
           </div>
           <Button size='sm' asChild className='mt-2'>
-            <a href='/products'>Browse Products</a>
+            <Link to='/products'>Browse Products</Link>
           </Button>
         </div>
       )}

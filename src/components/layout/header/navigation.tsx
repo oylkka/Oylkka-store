@@ -109,8 +109,9 @@ export default function Navigation() {
           {navItems.map((item, index) => (
             <Link
               key={item.href}
-              // 2. 'href' becomes 'to'
               to={item.href}
+              params={{} as never}
+              search={{} as never}
               className={cn(
                 'focus-visible:ring-primary rounded-full outline-none focus-visible:ring-2',
                 'transition-colors duration-300',

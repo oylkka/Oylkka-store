@@ -1,5 +1,8 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import axios from 'axios';
+import { toast } from 'sonner';
 import apiClient from '@/lib/api-client';
+import { QUERY_KEYS } from '@/lib/constants';
 
 type PayoutItem = {
   id: string;
@@ -28,7 +31,7 @@ type PendingShop = {
 // Admin hooks
 export function useAdminPayouts() {
   return useQuery<PayoutItem[]>({
-    queryKey: ['admin-payouts'],
+    queryKey: [QUERY_KEYS.PAYOUTS],
     queryFn: async () => {
       const r = await apiClient.get<{ payouts: PayoutItem[] }>(
         '/api/admin/payouts/list',
@@ -40,7 +43,7 @@ export function useAdminPayouts() {
 
 export function useAdminPendingPayouts() {
   return useQuery<PendingShop[]>({
-    queryKey: ['admin-payouts-pending'],
+    queryKey: [QUERY_KEYS.PAYOUTS, 'pending'],
     queryFn: async () => {
       const r = await apiClient.get<{ shops: PendingShop[] }>(
         '/api/admin/payouts/pending',
@@ -53,8 +56,12 @@ export function useAdminPendingPayouts() {
 export function useProcessPayoutMutation() {
   const queryClient = useQueryClient();
 
-  return useMutation({
-    mutationFn: async (data: { shopId: string; note?: string }) => {
+  return useMutation<
+    { payout: PayoutItem },
+    Error,
+    { shopId: string; note?: string }
+  >({
+    mutationFn: async (data) => {
       const r = await apiClient.post<{ payout: PayoutItem }>(
         '/api/admin/payouts/process',
         data,
@@ -62,8 +69,16 @@ export function useProcessPayoutMutation() {
       return r.data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['admin-payouts'] });
-      queryClient.invalidateQueries({ queryKey: ['admin-payouts-pending'] });
+      queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.PAYOUTS] });
+      queryClient.invalidateQueries({
+        queryKey: [QUERY_KEYS.PAYOUTS, 'pending'],
+      });
+    },
+    onError: (error: unknown) => {
+      const message = axios.isAxiosError(error)
+        ? (error.response?.data?.error ?? error.message)
+        : 'Failed to process payout';
+      toast.error(`Error: ${message}`);
     },
   });
 }
@@ -71,7 +86,7 @@ export function useProcessPayoutMutation() {
 // Vendor hooks
 export function useVendorPayouts() {
   return useQuery<PayoutItem[]>({
-    queryKey: ['vendor-payouts'],
+    queryKey: [QUERY_KEYS.PAYOUTS, 'vendor'],
     queryFn: async () => {
       const r = await apiClient.get<{ payouts: PayoutItem[] }>(
         '/api/vendor/payouts/list',
@@ -100,7 +115,7 @@ export type PayoutSchedule = {
 
 export function useVendorPayoutSchedule() {
   return useQuery<PayoutSchedule>({
-    queryKey: ['vendor-payouts-schedule'],
+    queryKey: [QUERY_KEYS.PAYOUTS, 'vendor', 'schedule'],
     queryFn: async () => {
       const r = await apiClient.get<PayoutSchedule>(
         '/api/vendor/payouts/schedule',
@@ -116,14 +131,14 @@ export function useVendorPendingPayout() {
     totalPending: number;
     totalCommission: number;
   }>({
-    queryKey: ['vendor-payouts-pending'],
+    queryKey: [QUERY_KEYS.PAYOUTS, 'vendor', 'pending'],
     queryFn: async () => {
-      const r = await apiClient.get('/api/vendor/payouts/pending');
-      return r.data as {
+      const r = await apiClient.get<{
         pendingItems: number;
         totalPending: number;
         totalCommission: number;
-      };
+      }>('/api/vendor/payouts/pending');
+      return r.data;
     },
   });
 }

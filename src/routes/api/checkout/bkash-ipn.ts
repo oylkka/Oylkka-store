@@ -5,7 +5,7 @@ import {
   queryBkashPayment,
 } from '@/lib/bkash';
 import { prisma } from '@/lib/db';
-import { generateInvoicePdf } from '@/lib/invoice-pdf';
+import { enqueueInvoiceGeneration } from '@/lib/invoice-queue';
 import { checkoutLimiter } from '@/lib/rate-limit';
 import { checkRateLimit } from '@/lib/rate-limit-guard';
 import { decrementStock, decrementVariantStock } from '@/lib/stock';
@@ -182,7 +182,10 @@ export const Route = createFileRoute('/api/checkout/bkash-ipn')({
               }
             });
 
-            generateInvoicePdf(order.id);
+            enqueueInvoiceGeneration(order.id).catch((err) =>
+              // biome-ignore lint/suspicious/noConsole: this is fine
+              console.error('Failed to enqueue invoice generation:', err),
+            );
 
             return Response.json(
               { message: 'Payment processed successfully' },

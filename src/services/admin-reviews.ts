@@ -1,4 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import axios from 'axios';
 import { toast } from 'sonner';
 import apiClient from '@/lib/api-client';
 import { QUERY_KEYS } from '@/lib/constants';
@@ -86,16 +87,17 @@ export function useAdminReview(id: string) {
 export function useModerateReviewMutation() {
   const queryClient = useQueryClient();
 
-  return useMutation({
-    mutationFn: async ({
-      id,
-      ...data
-    }: {
+  return useMutation<
+    { review: AdminReview },
+    Error,
+    {
       id: string;
       verified?: boolean;
       reported?: boolean;
       reviewedByAdmin?: boolean;
-    }) => {
+    }
+  >({
+    mutationFn: async ({ id, ...data }) => {
       const r = await apiClient.put<{ review: AdminReview }>(
         `/api/admin/reviews/${id}`,
         data,
@@ -109,10 +111,11 @@ export function useModerateReviewMutation() {
       toast.success('Review moderated', { id: 'moderate-review' });
       queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.ADMIN_REVIEWS] });
     },
-    onError: (error: { response?: { data?: { error?: string } } }) => {
-      toast.error(error.response?.data?.error || 'Failed to moderate review', {
-        id: 'moderate-review',
-      });
+    onError: (error: unknown) => {
+      const message = axios.isAxiosError(error)
+        ? (error.response?.data?.error ?? error.message)
+        : 'Failed to moderate review';
+      toast.error(message, { id: 'moderate-review' });
     },
   });
 }
@@ -120,8 +123,8 @@ export function useModerateReviewMutation() {
 export function useDeleteReviewMutation() {
   const queryClient = useQueryClient();
 
-  return useMutation({
-    mutationFn: async (id: string) => {
+  return useMutation<void, Error, string>({
+    mutationFn: async (id) => {
       await apiClient.delete(`/api/admin/reviews/${id}`);
     },
     onMutate: () => {
@@ -131,10 +134,11 @@ export function useDeleteReviewMutation() {
       toast.success('Review deleted', { id: 'delete-review' });
       queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.ADMIN_REVIEWS] });
     },
-    onError: (error: { response?: { data?: { error?: string } } }) => {
-      toast.error(error.response?.data?.error || 'Failed to delete review', {
-        id: 'delete-review',
-      });
+    onError: (error: unknown) => {
+      const message = axios.isAxiosError(error)
+        ? (error.response?.data?.error ?? error.message)
+        : 'Failed to delete review';
+      toast.error(message, { id: 'delete-review' });
     },
   });
 }

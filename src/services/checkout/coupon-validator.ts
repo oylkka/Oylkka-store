@@ -20,7 +20,7 @@ export interface CouponValidationContext {
   now: Date;
   subtotal: number;
   totalQty: number;
-  cartItems: { productId: string; quantity: number }[];
+  cartItems: { productId: string; quantity: number; shopId?: string }[];
   paymentMethod?: string;
   userAgent?: string;
   customerOrderCount: number;
@@ -90,6 +90,14 @@ export function checkCouponEligibility(
 
       if (scopedQty < coupon.minQuantity) {
         return `Need ${coupon.minQuantity} of this product (${scopedQty} in cart)`;
+      }
+    } else if (coupon.scope === 'SHOP' && coupon.scopeId) {
+      const scopedQty = ctx.cartItems
+        .filter((item) => item.shopId === coupon.scopeId)
+        .reduce((sum, item) => sum + item.quantity, 0);
+
+      if (scopedQty < coupon.minQuantity) {
+        return `Need ${coupon.minQuantity} items from this shop (${scopedQty} in cart)`;
       }
     } else {
       if (ctx.totalQty < coupon.minQuantity) {

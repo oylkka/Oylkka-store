@@ -10,7 +10,7 @@ const BaseCategorySchema = z.object({
 
 export const CategoryFormSchema = BaseCategorySchema.extend({
   image: z
-    .any()
+    .custom<FileList | null>()
     .refine(
       (files) =>
         !files ||
@@ -29,7 +29,7 @@ export const CategoryFormSchema = BaseCategorySchema.extend({
 });
 
 export const EditCategoryFormSchema = BaseCategorySchema.extend({
-  image: z.any().optional(),
+  image: z.custom<FileList | null>().optional(),
   hasExistingImage: z.boolean().optional(),
   keepExistingImage: z.boolean().optional(),
 });

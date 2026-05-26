@@ -23,10 +23,10 @@ export const Route = createFileRoute('/api/banners/edit')({
           // biome-ignore lint: error
           const data: Record<string, any> = {};
           for (const [key, value] of formData.entries()) {
-            if (value instanceof File) {
+            if (typeof value !== 'string') {
               data[key] = value;
             } else if (key === 'startDate' || key === 'endDate') {
-              data[key] = value ? new Date(value as string) : undefined;
+              data[key] = value ? new Date(value) : undefined;
             } else {
               data[key] = value;
             }

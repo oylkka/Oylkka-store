@@ -1,5 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useQueryClient } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { createFileRoute, redirect, useNavigate } from '@tanstack/react-router';
 import { ArrowLeft, Gift, Loader2, ShoppingCart, Tag, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
@@ -25,9 +25,13 @@ import { Input } from '@/components/ui/input';
 import { SearchableSelect } from '@/components/ui/searchable-select';
 import { Separator } from '@/components/ui/separator';
 import { Skeleton } from '@/components/ui/skeleton';
+import apiClient from '@/lib/api-client';
 import { BD_DISTRICTS } from '@/lib/bd-districts';
 import { QUERY_KEYS } from '@/lib/constants';
+import { useAddresses } from '@/services/address';
 import { useCart } from '@/services/cart';
+import { useAutoApplyVouchers, useMyVouchers } from '@/services/voucher';
+import { useWallet } from '@/services/wallet';
 
 const checkoutSchema = z.object({
   name: z.string().min(1, 'Full name is required'),
@@ -65,6 +69,9 @@ function RouteComponent() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { data: cart, isLoading, isError } = useCart();
+  const { data: vouchersData } = useMyVouchers();
+  const { data: autoApplyData } = useAutoApplyVouchers();
+  const { data: walletData } = useWallet();
   const [paymentMethod, setPaymentMethod] =
     useState<PaymentMethodOption>('BKASH');
   const [isPlacingOrder, setIsPlacingOrder] = useState(false);
@@ -75,24 +82,39 @@ function RouteComponent() {
     description?: string;
   } | null>(null);
   const [isValidatingCoupon, setIsValidatingCoupon] = useState(false);
-  const [walletBalance, setWalletBalance] = useState<number | undefined>();
-  const [myVouchers, setMyVouchers] = useState<
-    {
-      id: string;
-      coupon: {
-        id: string;
-        code: string;
-        description: string | null;
-        type: string;
-        value: number;
-        freeShipping: boolean;
-        shippingDiscount: number | null;
-      };
-    }[]
-  >([]);
   const [selectedVoucherIds, setSelectedVoucherIds] = useState<Set<string>>(
     new Set(),
   );
+
+  const myVouchers = (vouchersData ?? []).map((v) => ({
+    id: v.id,
+    coupon: {
+      id: v.coupon.id,
+      code: v.coupon.code,
+      description: v.coupon.description,
+      type: v.coupon.discountType,
+      value: v.coupon.discountValue,
+      freeShipping: v.coupon.freeShipping,
+      shippingDiscount: v.coupon.shippingDiscount,
+    },
+  }));
+
+  const walletBalance = walletData?.balance;
+  const { data: savedAddresses } = useAddresses();
+
+  useEffect(() => {
+    if (!autoApplyData) return;
+    const vouchers = Array.isArray(autoApplyData)
+      ? autoApplyData
+      : ((
+          autoApplyData as { vouchers?: { id: string; isCollected: boolean }[] }
+        ).vouchers ?? []);
+    for (const v of vouchers) {
+      if (v.isCollected) {
+        setSelectedVoucherIds((prev) => new Set(prev).add(v.id));
+      }
+    }
+  }, [autoApplyData]);
 
   const {
     register,
@@ -116,40 +138,65 @@ function RouteComponent() {
 
   const formValues = watch();
 
-  useEffect(() => {
-    const controller = new AbortController();
+  const subtotal =
+    cart?.items.reduce((sum, item) => {
+      const price = item.savedPrice ?? item.product.price;
+      return sum + (price ?? 0) * item.quantity;
+    }, 0) ?? 0;
 
-    fetch('/api/vouchers/my', { signal: controller.signal })
-      .then((r) => r.json())
-      .then((data) => {
-        if (data.vouchers) setMyVouchers(data.vouchers);
-      })
-      .catch(() => {});
-
-    fetch('/api/vouchers/auto-apply', { signal: controller.signal })
-      .then((r) => r.json())
-      .then((data) => {
-        if (data.vouchers) {
-          for (const v of data.vouchers) {
-            if (v.isCollected) {
-              setSelectedVoucherIds((prev) => new Set(prev).add(v.id));
-            }
+  const { data: discountPreview } = useQuery({
+    queryKey: [
+      'discount-preview',
+      [...selectedVoucherIds].sort().join(','),
+      paymentMethod,
+      subtotal,
+    ],
+    queryFn: async () => {
+      if (!cart) throw new Error('Cart not loaded');
+      const res = await apiClient.post<
+        | {
+            baseShipping: number;
+            totalDiscount: number;
+            totalShippingDiscount: number;
+            freeShipping: boolean;
           }
-        }
-      })
-      .catch(() => {});
-
-    fetch('/api/wallet/get', { signal: controller.signal })
-      .then((r) => r.json())
-      .then((data) => {
-        if (data.balance !== undefined) {
-          setWalletBalance(data.balance);
-        }
-      })
-      .catch(() => {});
-
-    return () => controller.abort();
-  }, []);
+        | { error: string }
+      >('/api/checkout/discount-preview', {
+        voucherIds: [...selectedVoucherIds],
+        paymentMethod,
+        cart: {
+          id: cart.id,
+          items: cart.items.map((item) => ({
+            product: {
+              id: item.product.id,
+              price: item.product.price,
+              discountPrice: item.product.discountPrice,
+              freeShipping: item.product.freeShipping,
+              shop: item.product.shop
+                ? { id: item.product.shop.id }
+                : undefined,
+            },
+            variant: item.variant
+              ? {
+                  price: item.variant.price,
+                  discountPrice: item.variant.discountPrice,
+                }
+              : undefined,
+            quantity: item.quantity,
+            savedPrice: item.savedPrice,
+          })),
+        },
+        subtotal,
+      });
+      if (!res.data || 'error' in res.data) {
+        throw new Error(
+          (res.data as { error: string }).error ?? 'Preview failed',
+        );
+      }
+      return res.data;
+    },
+    enabled: !!cart,
+  });
 
   if (isLoading) return <CheckoutSkeleton />;
   if (isError || !cart) return <CheckoutError />;
@@ -158,16 +205,11 @@ function RouteComponent() {
     return null;
   }
 
-  const subtotal = cart.items.reduce((sum, item) => {
-    const price = item.savedPrice ?? item.product.price;
-    return sum + price * item.quantity;
-  }, 0);
-
   const groupedByShop = cart.items.reduce<
     Record<
       string,
       {
-        shop: { id: string; name: string; slug: string; shippingCost: number };
+        shop: NonNullable<(typeof cart.items)[0]['product']['shop']>;
         items: typeof cart.items;
       }
     >
@@ -181,47 +223,17 @@ function RouteComponent() {
     return groups;
   }, {});
 
-  const shippingPerShop = Object.values(groupedByShop).map(
-    ({ shop, items }) => {
-      const hasNonFree = items.some((item) => !item.product.freeShipping);
-      return { shopName: shop.name, cost: hasNonFree ? shop.shippingCost : 0 };
-    },
-  );
-  const baseShipping = shippingPerShop.reduce((sum, s) => sum + s.cost, 0);
+  const totalDiscount =
+    (discountPreview?.totalDiscount ?? 0) +
+    (appliedCoupon?.discountAmount ?? 0);
+  const freeShipping = discountPreview?.freeShipping ?? false;
+  const shippingDiscount = discountPreview?.totalShippingDiscount ?? 0;
+  const baseShipping = discountPreview?.baseShipping ?? 0;
+  const finalShipping = freeShipping
+    ? 0
+    : Math.max(0, baseShipping - shippingDiscount);
 
-  let finalShipping = baseShipping;
-  let totalVoucherDiscount = 0;
-  let voucherShippingDiscount = 0;
-  const hasFreeShippingVoucher = myVouchers.some(
-    (v) => selectedVoucherIds.has(v.id) && v.coupon.freeShipping,
-  );
-
-  if (hasFreeShippingVoucher) {
-    finalShipping = 0;
-  } else {
-    for (const v of myVouchers) {
-      if (selectedVoucherIds.has(v.id) && v.coupon.shippingDiscount) {
-        voucherShippingDiscount += v.coupon.shippingDiscount;
-      }
-    }
-    finalShipping = Math.max(0, baseShipping - voucherShippingDiscount);
-  }
-
-  if (appliedCoupon) {
-    totalVoucherDiscount += appliedCoupon.discountAmount;
-  }
-
-  for (const v of myVouchers) {
-    if (selectedVoucherIds.has(v.id)) {
-      if (v.coupon.type === 'FIXED') {
-        totalVoucherDiscount += v.coupon.value;
-      } else if (v.coupon.type === 'PERCENTAGE') {
-        totalVoucherDiscount += (subtotal * v.coupon.value) / 100;
-      }
-    }
-  }
-
-  const total = subtotal + finalShipping - totalVoucherDiscount;
+  const total = subtotal + finalShipping - totalDiscount;
 
   function toggleVoucher(voucherId: string) {
     setSelectedVoucherIds((prev) => {
@@ -364,6 +376,7 @@ function RouteComponent() {
                   errors={errors}
                   setValue={setValue}
                   formValues={formValues}
+                  savedAddresses={savedAddresses}
                 />
               </div>
 
@@ -412,7 +425,10 @@ function RouteComponent() {
                                 </p>
                               </div>
                               <p className='text-sm font-semibold shrink-0'>
-                                ৳{(price * item.quantity).toLocaleString()}
+                                ৳
+                                {(
+                                  (price ?? 0) * item.quantity
+                                ).toLocaleString()}
                               </p>
                             </div>
                           );
@@ -427,15 +443,15 @@ function RouteComponent() {
                     <div className='flex justify-between'>
                       <span className='text-muted-foreground'>Subtotal</span>
                       <span className='font-medium'>
-                        ৳{subtotal.toLocaleString()}
+                        ৳{(subtotal || 0).toLocaleString()}
                       </span>
                     </div>
 
-                    {totalVoucherDiscount > 0 && (
+                    {totalDiscount > 0 && (
                       <div className='flex justify-between text-green-600'>
                         <span>Discount</span>
                         <span className='font-medium'>
-                          -৳{totalVoucherDiscount.toLocaleString()}
+                          -৳{totalDiscount.toLocaleString()}
                         </span>
                       </div>
                     )}
@@ -443,27 +459,15 @@ function RouteComponent() {
                     <div className='flex justify-between'>
                       <span className='text-muted-foreground'>Shipping</span>
                       <span className='font-medium'>
-                        {shippingPerShop.length > 0 ? (
-                          <span>
-                            ৳{finalShipping.toLocaleString()}
-                            {shippingPerShop.some((s) => s.cost > 0) && (
-                              <span className='text-xs text-muted-foreground ml-1'>
-                                (
-                                {shippingPerShop
-                                  .filter((s) => s.cost > 0)
-                                  .map((s) => s.shopName)
-                                  .join(', ')}
-                                )
-                              </span>
-                            )}
-                          </span>
+                        {finalShipping > 0 ? (
+                          <span>৳{finalShipping.toLocaleString()}</span>
                         ) : (
-                          'Free'
+                          <span className='text-green-600'>Free</span>
                         )}
                       </span>
                     </div>
 
-                    {hasFreeShippingVoucher && baseShipping > 0 && (
+                    {freeShipping && baseShipping > 0 && (
                       <div className='flex justify-between text-green-600'>
                         <span>Shipping Discount (Free)</span>
                         <span className='font-medium'>
@@ -472,11 +476,11 @@ function RouteComponent() {
                       </div>
                     )}
 
-                    {voucherShippingDiscount > 0 && !hasFreeShippingVoucher && (
+                    {shippingDiscount > 0 && !freeShipping && (
                       <div className='flex justify-between text-green-600'>
                         <span>Shipping Discount</span>
                         <span className='font-medium'>
-                          -৳{voucherShippingDiscount.toLocaleString()}
+                          -৳{shippingDiscount.toLocaleString()}
                         </span>
                       </div>
                     )}
@@ -485,7 +489,7 @@ function RouteComponent() {
 
                     <div className='flex justify-between text-base font-semibold'>
                       <span>Total</span>
-                      <span>৳{Math.max(0, total).toLocaleString()}</span>
+                      <span>৳{Math.max(0, total || 0).toLocaleString()}</span>
                     </div>
                   </div>
                 </Card>
@@ -620,15 +624,84 @@ function ShippingAddressForm({
   errors,
   setValue,
   formValues,
+  savedAddresses,
 }: {
   register: ReturnType<typeof useForm<CheckoutFormValues>>['register'];
   errors: ReturnType<typeof useForm<CheckoutFormValues>>['formState']['errors'];
   setValue: ReturnType<typeof useForm<CheckoutFormValues>>['setValue'];
   formValues: CheckoutFormValues;
+  savedAddresses?: {
+    id: string;
+    name: string;
+    phone: string;
+    address: string;
+    upzila: string;
+    district: string;
+    postalCode: string | null;
+    label: string;
+  }[];
 }) {
+  const [selectedAddressId, setSelectedAddressId] = useState<string | null>(
+    null,
+  );
+
+  function handleSelectAddress(id: string) {
+    setSelectedAddressId(id);
+    const addr = savedAddresses?.find((a) => a.id === id);
+    if (!addr) return;
+    setValue('name', addr.name);
+    setValue('phone', addr.phone);
+    setValue('address', addr.address);
+    setValue('upzila', addr.upzila);
+    setValue('district', addr.district);
+    if (addr.postalCode) setValue('postalCode', addr.postalCode);
+  }
+
   return (
     <Card className='rounded-2xl border-border shadow-none p-6'>
       <h2 className='text-lg font-semibold mb-4'>Shipping Address</h2>
+
+      {savedAddresses && savedAddresses.length > 0 && (
+        <div className='mb-4'>
+          <span className='text-sm font-medium text-muted-foreground mb-2 block'>
+            Saved Addresses
+          </span>
+          <div className='space-y-2'>
+            {savedAddresses.map((addr) => (
+              <label
+                key={addr.id}
+                htmlFor={`addr-${addr.id}`}
+                className={`flex items-start gap-3 rounded-xl border p-3 cursor-pointer hover:bg-muted/50 transition-colors ${
+                  selectedAddressId === addr.id
+                    ? 'border-primary bg-primary/5'
+                    : 'border-border'
+                }`}
+              >
+                <input
+                  type='radio'
+                  id={`addr-${addr.id}`}
+                  name='saved-address'
+                  checked={selectedAddressId === addr.id}
+                  onChange={() => handleSelectAddress(addr.id)}
+                  className='mt-1 h-4 w-4 accent-primary'
+                />
+                <div className='flex-1 min-w-0 text-sm'>
+                  <p className='font-medium'>{addr.label}</p>
+                  <p className='text-muted-foreground'>
+                    {addr.name} — {addr.phone}
+                  </p>
+                  <p className='text-muted-foreground'>
+                    {addr.address}, {addr.upzila}, {addr.district}
+                    {addr.postalCode ? ` - ${addr.postalCode}` : ''}
+                  </p>
+                </div>
+              </label>
+            ))}
+          </div>
+          <Separator className='my-4' />
+        </div>
+      )}
+
       <FieldGroup>
         <div className='grid grid-cols-1 gap-4 sm:grid-cols-2'>
           <Field data-invalid={!!errors.name}>

@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import axios from 'axios';
 import { toast } from 'sonner';
-
 import apiClient from '@/lib/api-client';
 import { QUERY_KEYS } from '@/lib/constants';
 
@@ -20,6 +20,8 @@ export type VoucherCoupon = {
   scope: string;
   scopeId: string | null;
   autoApply: boolean;
+  freeShipping: boolean;
+  shippingDiscount: number;
 };
 
 export type UserVoucher = {
@@ -43,8 +45,8 @@ export function useMyVouchers() {
 export function useCollectVoucher() {
   const queryClient = useQueryClient();
 
-  return useMutation({
-    mutationFn: async (couponId: string) => {
+  return useMutation<void, Error, string>({
+    mutationFn: async (couponId) => {
       const response = await apiClient.post('/api/vouchers/collect', {
         couponId,
       });
@@ -56,9 +58,11 @@ export function useCollectVoucher() {
         queryKey: [QUERY_KEYS.VOUCHERS],
       });
     },
-    onError: (error: { response?: { data?: { error?: string } } }) => {
-      const msg = error.response?.data?.error || 'Failed to collect voucher';
-      toast.error(msg);
+    onError: (error: unknown) => {
+      const message = axios.isAxiosError(error)
+        ? (error.response?.data?.error ?? error.message)
+        : 'Failed to collect voucher';
+      toast.error(message);
     },
   });
 }

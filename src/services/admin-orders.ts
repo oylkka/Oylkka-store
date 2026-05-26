@@ -1,4 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import axios from 'axios';
+import { toast } from 'sonner';
 import apiClient from '@/lib/api-client';
 import { QUERY_KEYS } from '@/lib/constants';
 
@@ -149,7 +151,7 @@ export function useAdminFulfillMutation(orderId: string) {
 
   return useMutation<void, Error, FulfillPayload>({
     mutationFn: async (payload) => {
-      await apiClient.post('/api/orders/admin-fulfill', {
+      await apiClient.put('/api/orders/admin-fulfill', {
         orderId,
         ...payload,
       });
@@ -158,6 +160,13 @@ export function useAdminFulfillMutation(orderId: string) {
       queryClient.invalidateQueries({
         queryKey: [QUERY_KEYS.ADMIN_ORDERS],
       });
+      toast.success('Fulfillment status updated');
+    },
+    onError: (error: unknown) => {
+      const message = axios.isAxiosError(error)
+        ? (error.response?.data?.error ?? error.message)
+        : 'Failed to fulfill order';
+      toast.error(`Error: ${message}`);
     },
   });
 }
@@ -173,6 +182,13 @@ export function useAdminCancelOrderMutation() {
       queryClient.invalidateQueries({
         queryKey: [QUERY_KEYS.ADMIN_ORDERS],
       });
+      toast.success('Order cancelled');
+    },
+    onError: (error: unknown) => {
+      const message = axios.isAxiosError(error)
+        ? (error.response?.data?.error ?? error.message)
+        : 'Failed to cancel order';
+      toast.error(`Error: ${message}`);
     },
   });
 }
@@ -192,6 +208,13 @@ export function useAdminRefundMutation() {
       queryClient.invalidateQueries({
         queryKey: [QUERY_KEYS.ADMIN_ORDERS],
       });
+      toast.success('Refund processed');
+    },
+    onError: (error: unknown) => {
+      const message = axios.isAxiosError(error)
+        ? (error.response?.data?.error ?? error.message)
+        : 'Failed to process refund';
+      toast.error(`Error: ${message}`);
     },
   });
 }

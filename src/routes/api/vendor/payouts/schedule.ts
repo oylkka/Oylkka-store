@@ -39,6 +39,7 @@ export const Route = createFileRoute('/api/vendor/payouts/schedule')({
               order: { select: { orderNumber: true } },
             },
             orderBy: { createdAt: 'asc' },
+            take: 1000,
           });
 
           const monthlyBuckets: Record<

@@ -49,7 +49,8 @@ export async function sendOrderConfirmation(orderId: string): Promise<void> {
       }),
     });
   } catch (_error) {
-    // Email failures should never break the order flow
+    // biome-ignore lint/suspicious/noConsole: this is fine
+    console.error('Failed to send order confirmation email:', _error);
   }
 }
 
@@ -107,6 +108,7 @@ export async function sendOrderShippedNotification(
       ),
     });
   } catch (_error) {
-    // Email failures should never break the order flow
+    // biome-ignore lint/suspicious/noConsole: this is fine
+    console.error('Failed to send shipped notification email:', _error);
   }
 }

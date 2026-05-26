@@ -78,11 +78,11 @@ export function useAdminShops(status?: string, search?: string) {
 
 export function useShopDetail(slug: string | undefined) {
   return useQuery<AdminShopResponse>({
-    queryKey: ['shop', slug],
+    queryKey: [QUERY_KEYS.SHOPS, slug],
     queryFn: async () => {
-      const response = await apiClient.post<AdminShopResponse>(
+      const response = await apiClient.get<AdminShopResponse>(
         '/api/shop/get-single',
-        { slug },
+        { params: { slug } },
       );
       return response.data;
     },
@@ -93,8 +93,8 @@ export function useShopDetail(slug: string | undefined) {
 export function useApproveShopMutation() {
   const queryClient = useQueryClient();
 
-  return useMutation({
-    mutationFn: async (id: string) => {
+  return useMutation<void, Error, string>({
+    mutationFn: async (id) => {
       const response = await apiClient.post('/api/shop/approve', { id });
       return response.data;
     },
@@ -104,7 +104,7 @@ export function useApproveShopMutation() {
     onSuccess: () => {
       toast.success('Shop approved successfully!', { id: 'shop-approve' });
       queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.SHOPS] });
-      queryClient.invalidateQueries({ queryKey: ['shop'] });
+      queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.SHOPS] });
     },
     onError: (error: unknown) => {
       const message = axios.isAxiosError(error)
@@ -118,14 +118,8 @@ export function useApproveShopMutation() {
 export function useRejectShopMutation() {
   const queryClient = useQueryClient();
 
-  return useMutation({
-    mutationFn: async ({
-      id,
-      rejectionReason,
-    }: {
-      id: string;
-      rejectionReason: string;
-    }) => {
+  return useMutation<void, Error, { id: string; rejectionReason: string }>({
+    mutationFn: async ({ id, rejectionReason }) => {
       const response = await apiClient.post('/api/shop/reject', {
         id,
         rejectionReason,
@@ -138,7 +132,7 @@ export function useRejectShopMutation() {
     onSuccess: () => {
       toast.success('Shop rejected!', { id: 'shop-reject' });
       queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.SHOPS] });
-      queryClient.invalidateQueries({ queryKey: ['shop'] });
+      queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.SHOPS] });
     },
     onError: (error: unknown) => {
       const message = axios.isAxiosError(error)
@@ -152,8 +146,8 @@ export function useRejectShopMutation() {
 export function useApplyShopMutation() {
   const queryClient = useQueryClient();
 
-  return useMutation({
-    mutationFn: async (values: ShopApplicationFormType) => {
+  return useMutation<ShopApiResponse, Error, ShopApplicationFormType>({
+    mutationFn: async (values) => {
       const formData = new FormData();
 
       formData.append('name', values.name);
@@ -196,7 +190,7 @@ export function useApplyShopMutation() {
         id: 'shop-apply',
       });
       queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.SHOPS] });
-      queryClient.invalidateQueries({ queryKey: ['shop'] });
+      queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.SHOPS] });
     },
     onError: (error: unknown) => {
       const message = axios.isAxiosError(error)
@@ -234,8 +228,8 @@ type PublicShopListResponse = {
 export function useUpdateShopMutation() {
   const queryClient = useQueryClient();
 
-  return useMutation({
-    mutationFn: async (formData: FormData) => {
+  return useMutation<ShopApiResponse, Error, FormData>({
+    mutationFn: async (formData) => {
       const response = await apiClient.patch<ShopApiResponse>(
         '/api/shop/update',
         formData,
@@ -249,7 +243,7 @@ export function useUpdateShopMutation() {
     onSuccess: () => {
       toast.success('Shop updated successfully!', { id: 'shop-update' });
       queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.SHOPS] });
-      queryClient.invalidateQueries({ queryKey: ['shop'] });
+      queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.SHOPS] });
     },
     onError: (error: unknown) => {
       const message = axios.isAxiosError(error)

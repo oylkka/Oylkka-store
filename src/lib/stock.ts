@@ -33,3 +33,25 @@ export async function decrementVariantStock(
     throw new Error(`"${variantName}" is out of stock`);
   }
 }
+
+export async function incrementStock(
+  tx: PrismaTx,
+  productId: string,
+  quantity: number,
+): Promise<void> {
+  await tx.product.update({
+    where: { id: productId },
+    data: { stock: { increment: quantity } },
+  });
+}
+
+export async function incrementVariantStock(
+  tx: PrismaTx,
+  variantId: string,
+  quantity: number,
+): Promise<void> {
+  await tx.productVariant.update({
+    where: { id: variantId },
+    data: { stock: { increment: quantity } },
+  });
+}

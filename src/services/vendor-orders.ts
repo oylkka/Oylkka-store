@@ -1,4 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import axios from 'axios';
+import { toast } from 'sonner';
 import type { FulfillmentStatus } from '@/generated/prisma/enums';
 import apiClient from '@/lib/api-client';
 import { QUERY_KEYS } from '@/lib/constants';
@@ -109,6 +111,13 @@ export function useFulfillItemMutation(orderId: string) {
       queryClient.invalidateQueries({
         queryKey: [QUERY_KEYS.VENDOR_ORDERS],
       });
+      toast.success('Fulfillment status updated');
+    },
+    onError: (error: unknown) => {
+      const message = axios.isAxiosError(error)
+        ? (error.response?.data?.error ?? error.message)
+        : 'Failed to fulfill item';
+      toast.error(`Error: ${message}`);
     },
   });
 }

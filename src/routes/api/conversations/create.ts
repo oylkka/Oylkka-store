@@ -36,7 +36,7 @@ export const Route = createFileRoute('/api/conversations/create')({
           const parsed = createSchema.safeParse(body);
           if (!parsed.success) {
             return Response.json(
-              { error: parsed.error.errors[0]?.message || 'Invalid input' },
+              { error: parsed.error.issues[0]?.message || 'Invalid input' },
               { status: 400 },
             );
           }
@@ -139,7 +139,8 @@ async function sendNewMessageEmail(
         <p>${message.replace(/\n/g, '<br/>')}</p>
       `,
     });
-  } catch {
-    // fire-and-forget
+  } catch (error) {
+    // biome-ignore lint/suspicious/noConsole: this is fine
+    console.error('Failed to send notification email:', error);
   }
 }

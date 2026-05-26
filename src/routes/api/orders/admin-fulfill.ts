@@ -17,7 +17,7 @@ const FULFILLMENT_TRANSITIONS: Record<string, string[]> = {
 export const Route = createFileRoute('/api/orders/admin-fulfill')({
   server: {
     handlers: {
-      POST: async ({ request }) => {
+      PUT: async ({ request }) => {
         try {
           const authResult = await requireAuth();
           if (authResult.response) return authResult.response;
@@ -93,12 +93,37 @@ export const Route = createFileRoute('/api/orders/admin-fulfill')({
               where: { id: body.itemId },
               data: updateData,
             });
+
+            // Restore stock when cancelling
+            if (body.fulfillmentStatus === 'CANCELLED') {
+              const orderItem = await tx.orderItem.findUnique({
+                where: { id: body.itemId },
+                select: { productId: true, variantId: true, quantity: true },
+              });
+              if (orderItem) {
+                await tx.product.update({
+                  where: { id: orderItem.productId },
+                  data: { stock: { increment: orderItem.quantity } },
+                });
+                if (orderItem.variantId) {
+                  await tx.productVariant.update({
+                    where: { id: orderItem.variantId },
+                    data: { stock: { increment: orderItem.quantity } },
+                  });
+                }
+              }
+            }
+
             return result;
           });
 
           // Fire-and-forget: send shipping notification email after successful update
           if (body.fulfillmentStatus === 'SHIPPED') {
-            sendOrderShippedNotification(body.orderId, body.itemId);
+            sendOrderShippedNotification(body.orderId, body.itemId).catch(
+              (err) =>
+                // biome-ignore lint/suspicious/noConsole: this is fine
+                console.error('Failed to send shipped notification:', err),
+            );
           }
 
           createAuditLog({
@@ -112,7 +137,8 @@ export const Route = createFileRoute('/api/orders/admin-fulfill')({
               newStatus: body.fulfillmentStatus,
               trackingNumber: body.trackingNumber,
             },
-          }).catch(() => {});
+            // biome-ignore lint/suspicious/noConsole: this is fine
+          }).catch((err) => console.error('Failed to create audit log:', err));
 
           return Response.json(
             {

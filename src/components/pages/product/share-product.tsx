@@ -25,8 +25,9 @@ export function ShareProduct({ slug }: ShareProductProps) {
       await navigator.clipboard.writeText(url);
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
-    } catch {
-      // fallback
+    } catch (error) {
+      // biome-ignore lint/suspicious/noConsole: this is fine
+      console.error('Failed to copy share link:', error);
     }
   };
 

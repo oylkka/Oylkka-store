@@ -116,7 +116,7 @@ export default function UserDropDown({ user }: UserDropDownProps) {
 
           <DropdownMenuItem asChild>
             <Link
-              to='/chat'
+              to='/dashboard/messages'
               className='flex w-full cursor-pointer items-center justify-between'
             >
               <div className='flex items-center gap-2'>
@@ -133,7 +133,7 @@ export default function UserDropDown({ user }: UserDropDownProps) {
 
           <DropdownMenuItem asChild>
             <Link
-              to='/dashboard/profile/edit-profile'
+              to='/dashboard/my-account'
               className='flex w-full cursor-pointer items-center'
             >
               <Settings className='text-primary/70 mr-2 h-4 w-4' />
@@ -143,7 +143,7 @@ export default function UserDropDown({ user }: UserDropDownProps) {
 
           <DropdownMenuItem asChild>
             <Link
-              to='/dashboard/profile'
+              to='/dashboard/my-account'
               className='flex w-full cursor-pointer items-center'
             >
               <UserIcon className='text-primary/70 mr-2 h-4 w-4' />

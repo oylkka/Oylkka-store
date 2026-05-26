@@ -5,13 +5,13 @@ import { prisma } from '@/lib/db';
 export const Route = createFileRoute('/api/product/get-single')({
   server: {
     handlers: {
-      POST: async ({ request }) => {
+      GET: async ({ request }) => {
         try {
           const authResult = await requireAuth();
           if (authResult.response) return authResult.response;
           const session = authResult.session;
 
-          const { id } = await request.json();
+          const id = new URL(request.url).searchParams.get('id');
 
           if (!id) {
             return Response.json(

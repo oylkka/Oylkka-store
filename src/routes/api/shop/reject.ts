@@ -95,8 +95,15 @@ export const Route = createFileRoute('/api/shop/reject')({
                   shop.name,
                   rejectionReason.trim(),
                 ),
-              });
-            });
+              }).catch((err) =>
+                // biome-ignore lint/suspicious/noConsole: this is fine
+                console.error('Failed to send rejection email:', err),
+              );
+            })
+            .catch((err) =>
+              // biome-ignore lint/suspicious/noConsole: this is fine
+              console.error('Failed to look up shop owner:', err),
+            );
 
           return Response.json(
             { message: 'Shop rejected', shop: updated },

@@ -30,8 +30,11 @@ model User {
   shopFollows        ShopFollow[]
   addresses          UserAddress[]
   productReports     ProductReport[]
-  conversations      Conversation[] // as customer
-  messages           Message[]     // as sender
+  conversations      Conversation[]   // as customer
+  messages           Message[]       // as sender
+  questions          ProductQuestion[]
+  answeredQuestions  ProductQuestion[] @relation("answeredByUser")
+  bkashTokens        BkashToken[]
 
   @@map("user")
 }

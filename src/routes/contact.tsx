@@ -41,9 +41,9 @@ const contactInfo = [
   {
     icon: MapPin,
     label: 'Address',
-    value: '123 Commerce St, Shopping City, Bangladesh',
+    value: '123 Business Rd, Dhaka, Bangladesh',
   },
-  { icon: PhoneCall, label: 'Phone', value: '+1 (234) 567-8900' },
+  { icon: PhoneCall, label: 'Phone', value: '+880 1700-000000' },
   { icon: Mail, label: 'Email', value: 'support@oylkka.com' },
   { icon: Clock, label: 'Hours', value: 'Mon-Fri: 9AM - 6PM' },
 ];

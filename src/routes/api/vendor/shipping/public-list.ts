@@ -21,7 +21,7 @@ export const Route = createFileRoute('/api/vendor/shipping/public-list')({
             where: {
               shopId,
               isActive: true,
-              districts: { has: district },
+              districts: { some: { district } },
             },
           });
 

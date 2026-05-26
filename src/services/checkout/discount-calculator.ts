@@ -2,6 +2,7 @@ export interface DiscountCartItem {
   productId: string;
   shopId?: string;
   price: number;
+  discountPrice?: number;
   quantity: number;
 }
 
@@ -104,14 +105,16 @@ export function calculateDiscount(
       const freeBatches = Math.floor(totalScopedQty / coupon.bogoBuyQty);
       const maxFreeItems = freeBatches * coupon.bogoFreeQty;
 
-      const sortedByPrice = [...scopedItems].sort((a, b) => a.price - b.price);
+      const sortedByPrice = [...scopedItems].sort(
+        (a, b) => (a.discountPrice ?? a.price) - (b.discountPrice ?? b.price),
+      );
 
       let remainingFree = maxFreeItems;
       let totalFreeValue = 0;
       for (const item of sortedByPrice) {
         if (remainingFree <= 0) break;
         const take = Math.min(remainingFree, item.quantity);
-        totalFreeValue += take * item.price;
+        totalFreeValue += take * (item.discountPrice ?? item.price);
         remainingFree -= take;
       }
 

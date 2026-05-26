@@ -22,6 +22,7 @@ const SORT_OPTIONS: { value: ProductSortOption; label: string }[] = [
 ];
 
 function RouteComponent() {
+  const { search: searchQuery } = Route.useSearch() as { search?: string };
   const [sort, setSort] = useState<ProductSortOption>('newest');
   const [page, setPage] = useState(1);
   const [activeCategory, setActiveCategory] = useState<string | undefined>();
@@ -31,6 +32,7 @@ function RouteComponent() {
     page,
     limit: 20,
     category: activeCategory,
+    search: searchQuery,
   });
   const { data: categories } = usePublicCategories();
 
@@ -161,9 +163,11 @@ function RouteComponent() {
             <div>
               <p className='text-sm font-semibold'>No products found</p>
               <p className='text-sm text-muted-foreground mt-1 max-w-xs'>
-                {activeCategory
-                  ? 'No products in this category yet. Try a different filter.'
-                  : 'No products available yet. Check back soon!'}
+                {searchQuery
+                  ? `No results for "${searchQuery}". Try a different search term.`
+                  : activeCategory
+                    ? 'No products in this category yet. Try a different filter.'
+                    : 'No products available yet. Check back soon!'}
               </p>
             </div>
             <Button size='sm' asChild className='mt-2'>

@@ -11,6 +11,7 @@ model AuditLog {
 
   createdAt DateTime @default(now())
 
+  @@unique([actorId, action, entity, entityId])
   @@index([actorId])
   @@index([action])
   @@index([entity, entityId])

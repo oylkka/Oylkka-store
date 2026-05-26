@@ -154,7 +154,10 @@ export const Route = createFileRoute('/api/admin/returns/review')({
                 returnRequest.details || 'Return refund',
                 returnRequest.order.paymentMethod || 'CASH_ON_DELIVERY',
               ),
-            });
+            }).catch((err) =>
+              // biome-ignore lint/suspicious/noConsole: this is fine
+              console.error('Failed to send return refund email:', err),
+            );
           }
 
           const updated = await prisma.returnRequest.update({

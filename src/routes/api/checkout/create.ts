@@ -5,10 +5,14 @@ import { sendOrderConfirmation } from '@/actions/send-order-email';
 import { auth } from '@/lib/auth';
 import { validateCsrf } from '@/lib/csrf';
 import { prisma } from '@/lib/db';
-import { generateInvoicePdf } from '@/lib/invoice-pdf';
+import { enqueueInvoiceGeneration } from '@/lib/invoice-queue';
 import { checkoutLimiter } from '@/lib/rate-limit';
 import { checkRateLimit } from '@/lib/rate-limit-guard';
 import { decrementStock, decrementVariantStock } from '@/lib/stock';
+import type {
+  CartWithItems,
+  VoucherWithCoupon,
+} from '@/services/checkout/voucher-processor';
 import {
   applyShippingDiscounts,
   processVouchers,
@@ -64,7 +68,7 @@ export const Route = createFileRoute('/api/checkout/create')({
 
           const parsed = checkoutSchema.safeParse(body);
           if (!parsed.success) {
-            const firstError = parsed.error.errors[0];
+            const firstError = parsed.error.issues[0];
             return Response.json(
               { error: firstError?.message || 'Invalid input' },
               { status: 400 },
@@ -222,7 +226,7 @@ export const Route = createFileRoute('/api/checkout/create')({
                   where: {
                     shopId,
                     isActive: true,
-                    districts: { has: shippingDistrict },
+                    districts: { some: { district: shippingDistrict } },
                   },
                   select: { baseCost: true, perItem: true, freeAbove: true },
                 });
@@ -253,7 +257,7 @@ export const Route = createFileRoute('/api/checkout/create')({
 
           const selectedVouchers = parsed.data.voucherIds?.length
             ? processVouchers(
-                await prisma.userVoucher.findMany({
+                (await prisma.userVoucher.findMany({
                   where: {
                     id: { in: parsed.data.voucherIds },
                     userId: session.user.id,
@@ -264,8 +268,8 @@ export const Route = createFileRoute('/api/checkout/create')({
                       include: { tiers: { orderBy: { minQuantity: 'asc' } } },
                     },
                   },
-                }),
-                cart,
+                })) as unknown as VoucherWithCoupon[],
+                cart as unknown as CartWithItems,
                 subtotal,
                 {
                   paymentMethod: parsed.data.paymentMethod,
@@ -286,7 +290,11 @@ export const Route = createFileRoute('/api/checkout/create')({
             sumVoucherTotals(selectedVouchers);
           const cappedCouponDiscount = Math.min(totalCouponDiscount, subtotal);
 
-          const tax = 0;
+          const taxRate = Number(process.env.TAX_RATE ?? 0) / 100;
+          const tax =
+            Math.round(
+              (subtotal - totalDiscount - cappedCouponDiscount) * taxRate * 100,
+            ) / 100;
           const total =
             subtotal -
             totalDiscount -
@@ -350,7 +358,7 @@ export const Route = createFileRoute('/api/checkout/create')({
                 metadata: {
                   appliedVouchers: appliedVouchersData,
                   cashbackAmount: totalCashback,
-                } as OrderMetadata,
+                } as unknown as OrderMetadata,
                 items: {
                   create: cart.items.map((item) => {
                     const unitPrice = Number(
@@ -366,8 +374,9 @@ export const Route = createFileRoute('/api/checkout/create')({
                     const discountPrice =
                       savedPrice < unitPrice ? savedPrice : null;
                     const lineTotal = savedPrice * item.quantity;
-                    const commissionRate =
-                      item.product.shop?.commissionRate ?? 10;
+                    const commissionRate = Number(
+                      item.product.shop?.commissionRate ?? 10,
+                    );
                     const commissionAmount = (lineTotal * commissionRate) / 100;
                     const vendorAmount = lineTotal - commissionAmount;
 
@@ -519,8 +528,16 @@ export const Route = createFileRoute('/api/checkout/create')({
             parsed.data.paymentMethod === 'CASH_ON_DELIVERY' ||
             parsed.data.paymentMethod === 'WALLET'
           ) {
-            sendOrderConfirmation(order.id);
-            generateInvoicePdf(order.id);
+            Promise.all([
+              sendOrderConfirmation(order.id).catch((e) => {
+                // biome-ignore lint/suspicious/noConsole: this is fine
+                console.error('Failed to send order confirmation:', e);
+              }),
+              enqueueInvoiceGeneration(order.id).catch((e) => {
+                // biome-ignore lint/suspicious/noConsole: this is fine
+                console.error('Failed to enqueue invoice generation:', e);
+              }),
+            ]);
           }
 
           return Response.json(
@@ -547,7 +564,7 @@ export const Route = createFileRoute('/api/checkout/create')({
           );
         } catch (_error) {
           return Response.json(
-            { error: 'Internal Server Error' },
+            { error: 'Failed to place order. Please try again.' },
             { status: 500 },
           );
         }

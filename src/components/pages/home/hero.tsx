@@ -140,7 +140,11 @@ export default function HeroSection() {
                   >
                     {slide.primaryActionText && slide.primaryActionLink && (
                       <Button asChild>
-                        <Link to={slide.primaryActionLink}>
+                        <Link
+                          to={slide.primaryActionLink}
+                          params={{} as never}
+                          search={{} as never}
+                        >
                           {slide.primaryActionText}
                         </Link>
                       </Button>
@@ -151,7 +155,11 @@ export default function HeroSection() {
                         variant='outline'
                         className='border-white/20 bg-white/10 text-white hover:bg-white/20'
                       >
-                        <Link to={slide.secondaryActionLink}>
+                        <Link
+                          to={slide.secondaryActionLink}
+                          params={{} as never}
+                          search={{} as never}
+                        >
                           {slide.secondaryActionText}
                         </Link>
                       </Button>

@@ -15,6 +15,7 @@ export const Route = createFileRoute('/api/product/public-list')({
           );
           const categorySlug = url.searchParams.get('category') || undefined;
           const hasDiscount = url.searchParams.get('hasDiscount') === 'true';
+          const search = url.searchParams.get('search')?.trim() || undefined;
 
           let categoryId: string | undefined;
           if (categorySlug) {
@@ -35,14 +36,32 @@ export const Route = createFileRoute('/api/product/public-list')({
                 ? { price: 'desc' }
                 : { createdAt: 'desc' };
 
-          const where: {
-            status: string;
-            categoryId?: string;
-            discountPrice?: { not: null };
-          } = {
-            status: 'PUBLISHED',
+          const searchFilter = search
+            ? {
+                OR: [
+                  {
+                    productName: {
+                      contains: search,
+                      mode: 'insensitive' as const,
+                    },
+                  },
+                  {
+                    description: {
+                      contains: search,
+                      mode: 'insensitive' as const,
+                    },
+                  },
+                  { brand: { contains: search, mode: 'insensitive' as const } },
+                  { tags: { has: search } },
+                ],
+              }
+            : {};
+
+          const where = {
+            status: 'PUBLISHED' as const,
             ...(categoryId ? { categoryId } : {}),
             ...(hasDiscount ? { discountPrice: { not: null } } : {}),
+            ...searchFilter,
           };
 
           const [products, total] = await Promise.all([

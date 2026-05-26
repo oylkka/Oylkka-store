@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import apiClient from '@/lib/api-client';
+import { QUERY_KEYS } from '@/lib/constants';
 
 export type VendorAnalytics = {
   stats: {
@@ -25,7 +26,7 @@ export type VendorAnalytics = {
 
 export function useVendorAnalytics() {
   return useQuery<VendorAnalytics>({
-    queryKey: ['vendor-analytics'],
+    queryKey: [QUERY_KEYS.VENDOR_ANALYTICS],
     queryFn: async () => {
       const r = await apiClient.get<VendorAnalytics>(
         '/api/vendor/analytics/overview',

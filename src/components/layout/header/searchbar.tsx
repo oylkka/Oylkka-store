@@ -32,7 +32,7 @@ export default function SearchBar({
   const onSubmit = (data: z.infer<typeof FormSchema>) => {
     navigate({
       to: '/products',
-      search: { search: encodeURIComponent(data.search) },
+      search: { search: data.search },
     });
     onSearchSubmit?.();
   };

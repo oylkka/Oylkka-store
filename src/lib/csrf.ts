@@ -5,13 +5,24 @@ function isTrusted(url: string | null, trustedOrigin: string): boolean {
   try {
     const parsed = new URL(url);
     return parsed.origin === trustedOrigin;
-  } catch {
+  } catch (error) {
+    // biome-ignore lint/suspicious/noConsole: this is fine
+    console.error('CSRF validation error:', error);
     return url === trustedOrigin || url.startsWith(`${trustedOrigin}/`);
   }
 }
 
 export function validateCsrf(): Response | null {
-  const headers = getRequestHeaders();
+  let headers: Headers | null;
+  try {
+    headers = getRequestHeaders();
+  } catch (error) {
+    // biome-ignore lint/suspicious/noConsole: this is fine
+    console.error('CSRF header parse error:', error);
+    headers = null;
+  }
+
+  if (!headers) return null;
   const origin = headers.get('origin');
   const referer = headers.get('referer');
 

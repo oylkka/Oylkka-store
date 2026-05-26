@@ -252,6 +252,8 @@ function DashboardHome() {
                     <Link
                       key={link.to}
                       to={link.to}
+                      params={{} as never}
+                      search={{} as never}
                       className='flex items-center gap-3 p-4 rounded-lg border hover:bg-muted/50 transition-colors'
                     >
                       <div className='w-10 h-10 rounded-lg bg-muted flex items-center justify-center'>

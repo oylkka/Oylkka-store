@@ -36,6 +36,7 @@ import { Route as DashboardMyAccountRouteImport } from './routes/dashboard/my-ac
 import { Route as DashboardFollowedShopsRouteImport } from './routes/dashboard/followed-shops'
 import { Route as DashboardAddressesRouteImport } from './routes/dashboard/addresses'
 import { Route as CheckoutConfirmationRouteImport } from './routes/checkout/confirmation'
+import { Route as BlogSlugRouteImport } from './routes/blog.$slug'
 import { Route as AuthVerifyRouteImport } from './routes/auth/verify'
 import { Route as AuthSignupRouteImport } from './routes/auth/signup'
 import { Route as AuthSigninRouteImport } from './routes/auth/signin'
@@ -64,6 +65,7 @@ import { Route as ApiVouchersMyRouteImport } from './routes/api/vouchers/my'
 import { Route as ApiVouchersCollectRouteImport } from './routes/api/vouchers/collect'
 import { Route as ApiVouchersAutoApplyRouteImport } from './routes/api/vouchers/auto-apply'
 import { Route as ApiUploadMessageRouteImport } from './routes/api/upload/message'
+import { Route as ApiUploadAvatarRouteImport } from './routes/api/upload/avatar'
 import { Route as ApiShopUpdateRouteImport } from './routes/api/shop/update'
 import { Route as ApiShopRejectRouteImport } from './routes/api/shop/reject'
 import { Route as ApiShopPublicSingleRouteImport } from './routes/api/shop/public-single'
@@ -107,6 +109,7 @@ import { Route as ApiConversationsCreateRouteImport } from './routes/api/convers
 import { Route as ApiConversationsConversationIdRouteImport } from './routes/api/conversations/$conversationId'
 import { Route as ApiContentGetRouteImport } from './routes/api/content/get'
 import { Route as ApiCheckoutValidateCouponRouteImport } from './routes/api/checkout/validate-coupon'
+import { Route as ApiCheckoutDiscountPreviewRouteImport } from './routes/api/checkout/discount-preview'
 import { Route as ApiCheckoutCreateRouteImport } from './routes/api/checkout/create'
 import { Route as ApiCheckoutBkashPayRouteImport } from './routes/api/checkout/bkash-pay'
 import { Route as ApiCheckoutBkashIpnRouteImport } from './routes/api/checkout/bkash-ipn'
@@ -188,6 +191,7 @@ import { Route as ApiVendorPayoutsScheduleRouteImport } from './routes/api/vendo
 import { Route as ApiVendorPayoutsPendingRouteImport } from './routes/api/vendor/payouts/pending'
 import { Route as ApiVendorPayoutsListRouteImport } from './routes/api/vendor/payouts/list'
 import { Route as ApiVendorOrdersListRouteImport } from './routes/api/vendor/orders/list'
+import { Route as ApiVendorOrdersCancelRouteImport } from './routes/api/vendor/orders/cancel'
 import { Route as ApiVendorOrdersOrderIdRouteImport } from './routes/api/vendor/orders/$orderId'
 import { Route as ApiVendorConversationsListRouteImport } from './routes/api/vendor/conversations/list'
 import { Route as ApiVendorConversationsConversationIdRouteImport } from './routes/api/vendor/conversations/$conversationId'
@@ -357,6 +361,11 @@ const CheckoutConfirmationRoute = CheckoutConfirmationRouteImport.update({
   path: '/confirmation',
   getParentRoute: () => CheckoutRoute,
 } as any)
+const BlogSlugRoute = BlogSlugRouteImport.update({
+  id: '/$slug',
+  path: '/$slug',
+  getParentRoute: () => BlogRoute,
+} as any)
 const AuthVerifyRoute = AuthVerifyRouteImport.update({
   id: '/auth/verify',
   path: '/auth/verify',
@@ -499,6 +508,11 @@ const ApiVouchersAutoApplyRoute = ApiVouchersAutoApplyRouteImport.update({
 const ApiUploadMessageRoute = ApiUploadMessageRouteImport.update({
   id: '/api/upload/message',
   path: '/api/upload/message',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiUploadAvatarRoute = ApiUploadAvatarRouteImport.update({
+  id: '/api/upload/avatar',
+  path: '/api/upload/avatar',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiShopUpdateRoute = ApiShopUpdateRouteImport.update({
@@ -721,6 +735,12 @@ const ApiCheckoutValidateCouponRoute =
   ApiCheckoutValidateCouponRouteImport.update({
     id: '/api/checkout/validate-coupon',
     path: '/api/checkout/validate-coupon',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiCheckoutDiscountPreviewRoute =
+  ApiCheckoutDiscountPreviewRouteImport.update({
+    id: '/api/checkout/discount-preview',
+    path: '/api/checkout/discount-preview',
     getParentRoute: () => rootRouteImport,
   } as any)
 const ApiCheckoutCreateRoute = ApiCheckoutCreateRouteImport.update({
@@ -1172,6 +1192,11 @@ const ApiVendorOrdersListRoute = ApiVendorOrdersListRouteImport.update({
   path: '/api/vendor/orders/list',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiVendorOrdersCancelRoute = ApiVendorOrdersCancelRouteImport.update({
+  id: '/api/vendor/orders/cancel',
+  path: '/api/vendor/orders/cancel',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiVendorOrdersOrderIdRoute = ApiVendorOrdersOrderIdRouteImport.update({
   id: '/api/vendor/orders/$orderId',
   path: '/api/vendor/orders/$orderId',
@@ -1350,7 +1375,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/dashboard': typeof DashboardRouteRouteWithChildren
   '/about': typeof AboutRoute
-  '/blog': typeof BlogRoute
+  '/blog': typeof BlogRouteWithChildren
   '/cart': typeof CartRoute
   '/checkout': typeof CheckoutRouteWithChildren
   '/compare': typeof CompareRoute
@@ -1372,6 +1397,7 @@ export interface FileRoutesByFullPath {
   '/auth/signin': typeof AuthSigninRoute
   '/auth/signup': typeof AuthSignupRoute
   '/auth/verify': typeof AuthVerifyRoute
+  '/blog/$slug': typeof BlogSlugRoute
   '/checkout/confirmation': typeof CheckoutConfirmationRoute
   '/dashboard/addresses': typeof DashboardAddressesRoute
   '/dashboard/followed-shops': typeof DashboardFollowedShopsRoute
@@ -1415,6 +1441,7 @@ export interface FileRoutesByFullPath {
   '/api/checkout/bkash-ipn': typeof ApiCheckoutBkashIpnRoute
   '/api/checkout/bkash-pay': typeof ApiCheckoutBkashPayRoute
   '/api/checkout/create': typeof ApiCheckoutCreateRoute
+  '/api/checkout/discount-preview': typeof ApiCheckoutDiscountPreviewRoute
   '/api/checkout/validate-coupon': typeof ApiCheckoutValidateCouponRoute
   '/api/content/get': typeof ApiContentGetRoute
   '/api/conversations/$conversationId': typeof ApiConversationsConversationIdRoute
@@ -1458,6 +1485,7 @@ export interface FileRoutesByFullPath {
   '/api/shop/public-single': typeof ApiShopPublicSingleRoute
   '/api/shop/reject': typeof ApiShopRejectRoute
   '/api/shop/update': typeof ApiShopUpdateRoute
+  '/api/upload/avatar': typeof ApiUploadAvatarRoute
   '/api/upload/message': typeof ApiUploadMessageRoute
   '/api/vouchers/auto-apply': typeof ApiVouchersAutoApplyRoute
   '/api/vouchers/collect': typeof ApiVouchersCollectRoute
@@ -1507,6 +1535,7 @@ export interface FileRoutesByFullPath {
   '/api/vendor/conversations/$conversationId': typeof ApiVendorConversationsConversationIdRoute
   '/api/vendor/conversations/list': typeof ApiVendorConversationsListRoute
   '/api/vendor/orders/$orderId': typeof ApiVendorOrdersOrderIdRoute
+  '/api/vendor/orders/cancel': typeof ApiVendorOrdersCancelRoute
   '/api/vendor/orders/list': typeof ApiVendorOrdersListRoute
   '/api/vendor/payouts/list': typeof ApiVendorPayoutsListRoute
   '/api/vendor/payouts/pending': typeof ApiVendorPayoutsPendingRoute
@@ -1563,7 +1592,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
-  '/blog': typeof BlogRoute
+  '/blog': typeof BlogRouteWithChildren
   '/cart': typeof CartRoute
   '/checkout': typeof CheckoutRouteWithChildren
   '/compare': typeof CompareRoute
@@ -1583,6 +1612,7 @@ export interface FileRoutesByTo {
   '/auth/signin': typeof AuthSigninRoute
   '/auth/signup': typeof AuthSignupRoute
   '/auth/verify': typeof AuthVerifyRoute
+  '/blog/$slug': typeof BlogSlugRoute
   '/checkout/confirmation': typeof CheckoutConfirmationRoute
   '/dashboard/addresses': typeof DashboardAddressesRoute
   '/dashboard/followed-shops': typeof DashboardFollowedShopsRoute
@@ -1623,6 +1653,7 @@ export interface FileRoutesByTo {
   '/api/checkout/bkash-ipn': typeof ApiCheckoutBkashIpnRoute
   '/api/checkout/bkash-pay': typeof ApiCheckoutBkashPayRoute
   '/api/checkout/create': typeof ApiCheckoutCreateRoute
+  '/api/checkout/discount-preview': typeof ApiCheckoutDiscountPreviewRoute
   '/api/checkout/validate-coupon': typeof ApiCheckoutValidateCouponRoute
   '/api/content/get': typeof ApiContentGetRoute
   '/api/conversations/$conversationId': typeof ApiConversationsConversationIdRoute
@@ -1666,6 +1697,7 @@ export interface FileRoutesByTo {
   '/api/shop/public-single': typeof ApiShopPublicSingleRoute
   '/api/shop/reject': typeof ApiShopRejectRoute
   '/api/shop/update': typeof ApiShopUpdateRoute
+  '/api/upload/avatar': typeof ApiUploadAvatarRoute
   '/api/upload/message': typeof ApiUploadMessageRoute
   '/api/vouchers/auto-apply': typeof ApiVouchersAutoApplyRoute
   '/api/vouchers/collect': typeof ApiVouchersCollectRoute
@@ -1715,6 +1747,7 @@ export interface FileRoutesByTo {
   '/api/vendor/conversations/$conversationId': typeof ApiVendorConversationsConversationIdRoute
   '/api/vendor/conversations/list': typeof ApiVendorConversationsListRoute
   '/api/vendor/orders/$orderId': typeof ApiVendorOrdersOrderIdRoute
+  '/api/vendor/orders/cancel': typeof ApiVendorOrdersCancelRoute
   '/api/vendor/orders/list': typeof ApiVendorOrdersListRoute
   '/api/vendor/payouts/list': typeof ApiVendorPayoutsListRoute
   '/api/vendor/payouts/pending': typeof ApiVendorPayoutsPendingRoute
@@ -1773,7 +1806,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/dashboard': typeof DashboardRouteRouteWithChildren
   '/about': typeof AboutRoute
-  '/blog': typeof BlogRoute
+  '/blog': typeof BlogRouteWithChildren
   '/cart': typeof CartRoute
   '/checkout': typeof CheckoutRouteWithChildren
   '/compare': typeof CompareRoute
@@ -1795,6 +1828,7 @@ export interface FileRoutesById {
   '/auth/signin': typeof AuthSigninRoute
   '/auth/signup': typeof AuthSignupRoute
   '/auth/verify': typeof AuthVerifyRoute
+  '/blog/$slug': typeof BlogSlugRoute
   '/checkout/confirmation': typeof CheckoutConfirmationRoute
   '/dashboard/addresses': typeof DashboardAddressesRoute
   '/dashboard/followed-shops': typeof DashboardFollowedShopsRoute
@@ -1838,6 +1872,7 @@ export interface FileRoutesById {
   '/api/checkout/bkash-ipn': typeof ApiCheckoutBkashIpnRoute
   '/api/checkout/bkash-pay': typeof ApiCheckoutBkashPayRoute
   '/api/checkout/create': typeof ApiCheckoutCreateRoute
+  '/api/checkout/discount-preview': typeof ApiCheckoutDiscountPreviewRoute
   '/api/checkout/validate-coupon': typeof ApiCheckoutValidateCouponRoute
   '/api/content/get': typeof ApiContentGetRoute
   '/api/conversations/$conversationId': typeof ApiConversationsConversationIdRoute
@@ -1881,6 +1916,7 @@ export interface FileRoutesById {
   '/api/shop/public-single': typeof ApiShopPublicSingleRoute
   '/api/shop/reject': typeof ApiShopRejectRoute
   '/api/shop/update': typeof ApiShopUpdateRoute
+  '/api/upload/avatar': typeof ApiUploadAvatarRoute
   '/api/upload/message': typeof ApiUploadMessageRoute
   '/api/vouchers/auto-apply': typeof ApiVouchersAutoApplyRoute
   '/api/vouchers/collect': typeof ApiVouchersCollectRoute
@@ -1930,6 +1966,7 @@ export interface FileRoutesById {
   '/api/vendor/conversations/$conversationId': typeof ApiVendorConversationsConversationIdRoute
   '/api/vendor/conversations/list': typeof ApiVendorConversationsListRoute
   '/api/vendor/orders/$orderId': typeof ApiVendorOrdersOrderIdRoute
+  '/api/vendor/orders/cancel': typeof ApiVendorOrdersCancelRoute
   '/api/vendor/orders/list': typeof ApiVendorOrdersListRoute
   '/api/vendor/payouts/list': typeof ApiVendorPayoutsListRoute
   '/api/vendor/payouts/pending': typeof ApiVendorPayoutsPendingRoute
@@ -2011,6 +2048,7 @@ export interface FileRouteTypes {
     | '/auth/signin'
     | '/auth/signup'
     | '/auth/verify'
+    | '/blog/$slug'
     | '/checkout/confirmation'
     | '/dashboard/addresses'
     | '/dashboard/followed-shops'
@@ -2054,6 +2092,7 @@ export interface FileRouteTypes {
     | '/api/checkout/bkash-ipn'
     | '/api/checkout/bkash-pay'
     | '/api/checkout/create'
+    | '/api/checkout/discount-preview'
     | '/api/checkout/validate-coupon'
     | '/api/content/get'
     | '/api/conversations/$conversationId'
@@ -2097,6 +2136,7 @@ export interface FileRouteTypes {
     | '/api/shop/public-single'
     | '/api/shop/reject'
     | '/api/shop/update'
+    | '/api/upload/avatar'
     | '/api/upload/message'
     | '/api/vouchers/auto-apply'
     | '/api/vouchers/collect'
@@ -2146,6 +2186,7 @@ export interface FileRouteTypes {
     | '/api/vendor/conversations/$conversationId'
     | '/api/vendor/conversations/list'
     | '/api/vendor/orders/$orderId'
+    | '/api/vendor/orders/cancel'
     | '/api/vendor/orders/list'
     | '/api/vendor/payouts/list'
     | '/api/vendor/payouts/pending'
@@ -2222,6 +2263,7 @@ export interface FileRouteTypes {
     | '/auth/signin'
     | '/auth/signup'
     | '/auth/verify'
+    | '/blog/$slug'
     | '/checkout/confirmation'
     | '/dashboard/addresses'
     | '/dashboard/followed-shops'
@@ -2262,6 +2304,7 @@ export interface FileRouteTypes {
     | '/api/checkout/bkash-ipn'
     | '/api/checkout/bkash-pay'
     | '/api/checkout/create'
+    | '/api/checkout/discount-preview'
     | '/api/checkout/validate-coupon'
     | '/api/content/get'
     | '/api/conversations/$conversationId'
@@ -2305,6 +2348,7 @@ export interface FileRouteTypes {
     | '/api/shop/public-single'
     | '/api/shop/reject'
     | '/api/shop/update'
+    | '/api/upload/avatar'
     | '/api/upload/message'
     | '/api/vouchers/auto-apply'
     | '/api/vouchers/collect'
@@ -2354,6 +2398,7 @@ export interface FileRouteTypes {
     | '/api/vendor/conversations/$conversationId'
     | '/api/vendor/conversations/list'
     | '/api/vendor/orders/$orderId'
+    | '/api/vendor/orders/cancel'
     | '/api/vendor/orders/list'
     | '/api/vendor/payouts/list'
     | '/api/vendor/payouts/pending'
@@ -2433,6 +2478,7 @@ export interface FileRouteTypes {
     | '/auth/signin'
     | '/auth/signup'
     | '/auth/verify'
+    | '/blog/$slug'
     | '/checkout/confirmation'
     | '/dashboard/addresses'
     | '/dashboard/followed-shops'
@@ -2476,6 +2522,7 @@ export interface FileRouteTypes {
     | '/api/checkout/bkash-ipn'
     | '/api/checkout/bkash-pay'
     | '/api/checkout/create'
+    | '/api/checkout/discount-preview'
     | '/api/checkout/validate-coupon'
     | '/api/content/get'
     | '/api/conversations/$conversationId'
@@ -2519,6 +2566,7 @@ export interface FileRouteTypes {
     | '/api/shop/public-single'
     | '/api/shop/reject'
     | '/api/shop/update'
+    | '/api/upload/avatar'
     | '/api/upload/message'
     | '/api/vouchers/auto-apply'
     | '/api/vouchers/collect'
@@ -2568,6 +2616,7 @@ export interface FileRouteTypes {
     | '/api/vendor/conversations/$conversationId'
     | '/api/vendor/conversations/list'
     | '/api/vendor/orders/$orderId'
+    | '/api/vendor/orders/cancel'
     | '/api/vendor/orders/list'
     | '/api/vendor/payouts/list'
     | '/api/vendor/payouts/pending'
@@ -2626,7 +2675,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   DashboardRouteRoute: typeof DashboardRouteRouteWithChildren
   AboutRoute: typeof AboutRoute
-  BlogRoute: typeof BlogRoute
+  BlogRoute: typeof BlogRouteWithChildren
   CartRoute: typeof CartRoute
   CheckoutRoute: typeof CheckoutRouteWithChildren
   CompareRoute: typeof CompareRoute
@@ -2676,6 +2725,7 @@ export interface RootRouteChildren {
   ApiCheckoutBkashIpnRoute: typeof ApiCheckoutBkashIpnRoute
   ApiCheckoutBkashPayRoute: typeof ApiCheckoutBkashPayRoute
   ApiCheckoutCreateRoute: typeof ApiCheckoutCreateRoute
+  ApiCheckoutDiscountPreviewRoute: typeof ApiCheckoutDiscountPreviewRoute
   ApiCheckoutValidateCouponRoute: typeof ApiCheckoutValidateCouponRoute
   ApiContentGetRoute: typeof ApiContentGetRoute
   ApiConversationsConversationIdRoute: typeof ApiConversationsConversationIdRoute
@@ -2719,6 +2769,7 @@ export interface RootRouteChildren {
   ApiShopPublicSingleRoute: typeof ApiShopPublicSingleRoute
   ApiShopRejectRoute: typeof ApiShopRejectRoute
   ApiShopUpdateRoute: typeof ApiShopUpdateRoute
+  ApiUploadAvatarRoute: typeof ApiUploadAvatarRoute
   ApiUploadMessageRoute: typeof ApiUploadMessageRoute
   ApiVouchersAutoApplyRoute: typeof ApiVouchersAutoApplyRoute
   ApiVouchersCollectRoute: typeof ApiVouchersCollectRoute
@@ -2759,6 +2810,7 @@ export interface RootRouteChildren {
   ApiVendorConversationsConversationIdRoute: typeof ApiVendorConversationsConversationIdRoute
   ApiVendorConversationsListRoute: typeof ApiVendorConversationsListRoute
   ApiVendorOrdersOrderIdRoute: typeof ApiVendorOrdersOrderIdRoute
+  ApiVendorOrdersCancelRoute: typeof ApiVendorOrdersCancelRoute
   ApiVendorOrdersListRoute: typeof ApiVendorOrdersListRoute
   ApiVendorPayoutsListRoute: typeof ApiVendorPayoutsListRoute
   ApiVendorPayoutsPendingRoute: typeof ApiVendorPayoutsPendingRoute
@@ -2964,6 +3016,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CheckoutConfirmationRouteImport
       parentRoute: typeof CheckoutRoute
     }
+    '/blog/$slug': {
+      id: '/blog/$slug'
+      path: '/$slug'
+      fullPath: '/blog/$slug'
+      preLoaderRoute: typeof BlogSlugRouteImport
+      parentRoute: typeof BlogRoute
+    }
     '/auth/verify': {
       id: '/auth/verify'
       path: '/auth/verify'
@@ -3158,6 +3217,13 @@ declare module '@tanstack/react-router' {
       path: '/api/upload/message'
       fullPath: '/api/upload/message'
       preLoaderRoute: typeof ApiUploadMessageRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/upload/avatar': {
+      id: '/api/upload/avatar'
+      path: '/api/upload/avatar'
+      fullPath: '/api/upload/avatar'
+      preLoaderRoute: typeof ApiUploadAvatarRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/shop/update': {
@@ -3459,6 +3525,13 @@ declare module '@tanstack/react-router' {
       path: '/api/checkout/validate-coupon'
       fullPath: '/api/checkout/validate-coupon'
       preLoaderRoute: typeof ApiCheckoutValidateCouponRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/checkout/discount-preview': {
+      id: '/api/checkout/discount-preview'
+      path: '/api/checkout/discount-preview'
+      fullPath: '/api/checkout/discount-preview'
+      preLoaderRoute: typeof ApiCheckoutDiscountPreviewRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/checkout/create': {
@@ -4028,6 +4101,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiVendorOrdersListRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/vendor/orders/cancel': {
+      id: '/api/vendor/orders/cancel'
+      path: '/api/vendor/orders/cancel'
+      fullPath: '/api/vendor/orders/cancel'
+      preLoaderRoute: typeof ApiVendorOrdersCancelRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/vendor/orders/$orderId': {
       id: '/api/vendor/orders/$orderId'
       path: '/api/vendor/orders/$orderId'
@@ -4486,6 +4566,16 @@ const DashboardRouteRouteWithChildren = DashboardRouteRoute._addFileChildren(
   DashboardRouteRouteChildren,
 )
 
+interface BlogRouteChildren {
+  BlogSlugRoute: typeof BlogSlugRoute
+}
+
+const BlogRouteChildren: BlogRouteChildren = {
+  BlogSlugRoute: BlogSlugRoute,
+}
+
+const BlogRouteWithChildren = BlogRoute._addFileChildren(BlogRouteChildren)
+
 interface CheckoutRouteChildren {
   CheckoutConfirmationRoute: typeof CheckoutConfirmationRoute
 }
@@ -4514,7 +4604,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   DashboardRouteRoute: DashboardRouteRouteWithChildren,
   AboutRoute: AboutRoute,
-  BlogRoute: BlogRoute,
+  BlogRoute: BlogRouteWithChildren,
   CartRoute: CartRoute,
   CheckoutRoute: CheckoutRouteWithChildren,
   CompareRoute: CompareRoute,
@@ -4565,6 +4655,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiCheckoutBkashIpnRoute: ApiCheckoutBkashIpnRoute,
   ApiCheckoutBkashPayRoute: ApiCheckoutBkashPayRoute,
   ApiCheckoutCreateRoute: ApiCheckoutCreateRoute,
+  ApiCheckoutDiscountPreviewRoute: ApiCheckoutDiscountPreviewRoute,
   ApiCheckoutValidateCouponRoute: ApiCheckoutValidateCouponRoute,
   ApiContentGetRoute: ApiContentGetRoute,
   ApiConversationsConversationIdRoute: ApiConversationsConversationIdRoute,
@@ -4608,6 +4699,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiShopPublicSingleRoute: ApiShopPublicSingleRoute,
   ApiShopRejectRoute: ApiShopRejectRoute,
   ApiShopUpdateRoute: ApiShopUpdateRoute,
+  ApiUploadAvatarRoute: ApiUploadAvatarRoute,
   ApiUploadMessageRoute: ApiUploadMessageRoute,
   ApiVouchersAutoApplyRoute: ApiVouchersAutoApplyRoute,
   ApiVouchersCollectRoute: ApiVouchersCollectRoute,
@@ -4650,6 +4742,7 @@ const rootRouteChildren: RootRouteChildren = {
     ApiVendorConversationsConversationIdRoute,
   ApiVendorConversationsListRoute: ApiVendorConversationsListRoute,
   ApiVendorOrdersOrderIdRoute: ApiVendorOrdersOrderIdRoute,
+  ApiVendorOrdersCancelRoute: ApiVendorOrdersCancelRoute,
   ApiVendorOrdersListRoute: ApiVendorOrdersListRoute,
   ApiVendorPayoutsListRoute: ApiVendorPayoutsListRoute,
   ApiVendorPayoutsPendingRoute: ApiVendorPayoutsPendingRoute,

@@ -18,6 +18,7 @@ export const Route = createFileRoute('/api/admin/payouts/pending')({
               name: true,
               commissionRate: true,
             },
+            take: 200,
           });
 
           const result = [];
@@ -32,6 +33,7 @@ export const Route = createFileRoute('/api/admin/payouts/pending')({
                 id: true,
                 vendorAmount: true,
               },
+              take: 500,
             });
 
             if (items.length > 0) {

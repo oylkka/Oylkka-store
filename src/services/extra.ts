@@ -1,6 +1,8 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import axios from 'axios';
 import { toast } from 'sonner';
 import apiClient from '@/lib/api-client';
+import { QUERY_KEYS } from '@/lib/constants';
 
 // --- ShopFollow ---
 type ShopFollowItem = {
@@ -12,7 +14,7 @@ type ShopFollowItem = {
 
 export function useFollowedShops() {
   return useQuery<ShopFollowItem[]>({
-    queryKey: ['followed-shops'],
+    queryKey: [QUERY_KEYS.FOLLOWED_SHOPS],
     queryFn: async () => {
       const r = await apiClient.get<{ follows: ShopFollowItem[] }>(
         '/api/shop/follow/list',
@@ -33,83 +35,36 @@ export function useToggleFollowMutation() {
       return r.data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['followed-shops'] });
+      queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.FOLLOWED_SHOPS] });
     },
-  });
-}
-
-// --- UserAddress ---
-export type UserAddress = {
-  id: string;
-  userId: string;
-  label: string;
-  name: string;
-  phone: string;
-  address: string;
-  upzila: string;
-  district: string;
-  postalCode: string | null;
-  isDefault: boolean;
-  createdAt: string;
-};
-
-export function useAddresses() {
-  return useQuery<UserAddress[]>({
-    queryKey: ['addresses'],
-    queryFn: async () => {
-      const r = await apiClient.get<{ addresses: UserAddress[] }>(
-        '/api/addresses/list',
-      );
-      return r.data.addresses;
-    },
-  });
-}
-
-export function useCreateAddressMutation() {
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: async (data: Partial<UserAddress>) => {
-      const r = await apiClient.post<{ address: UserAddress }>(
-        '/api/addresses/create',
-        data,
-      );
-      return r.data;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['addresses'] });
-      toast.success('Address added');
-    },
-  });
-}
-
-export function useUpdateAddressMutation() {
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: async (data: Partial<UserAddress> & { id: string }) => {
-      const r = await apiClient.put<{ address: UserAddress }>(
-        '/api/addresses/edit',
-        data,
-      );
-      return r.data;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['addresses'] });
-      toast.success('Address updated');
-    },
-  });
-}
-
-export function useDeleteAddressMutation() {
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: async (id: string) => {
-      await apiClient.delete('/api/addresses/delete', { params: { id } });
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['addresses'] });
-      toast.success('Address deleted');
+    onError: (error: unknown) => {
+      const message = axios.isAxiosError(error)
+        ? (error.response?.data?.error ?? error.message)
+        : 'Failed to toggle follow';
+      toast.error(`Error: ${message}`);
     },
   });
 }
 
 // --- ProductReport ---
+export function useReportProductMutation() {
+  return useMutation({
+    mutationFn: async (data: {
+      productId: string;
+      reason: string;
+      details?: string;
+    }) => {
+      const r = await apiClient.post<{ report: unknown }>(
+        '/api/product/report/create',
+        data,
+      );
+      return r.data;
+    },
+    onError: (error: unknown) => {
+      const message = axios.isAxiosError(error)
+        ? (error.response?.data?.error ?? error.message)
+        : 'Failed to submit report';
+      toast.error(`Error: ${message}`);
+    },
+  });
+}

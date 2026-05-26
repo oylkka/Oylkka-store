@@ -1,6 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { getRequestHeaders } from '@tanstack/react-start/server';
 import { createAuditLog } from '@/lib/audit-log';
+import { auth } from '@/lib/auth';
 import { requireAdminOrManager, requireAuth } from '@/lib/auth-middleware';
 import { prisma } from '@/lib/db';
 

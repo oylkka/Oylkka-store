@@ -33,3 +33,10 @@ globalThis.getComputedStyle = dom.window.getComputedStyle;
 globalThis.matchMedia = dom.window.matchMedia;
 globalThis.CSS = dom.window.CSS;
 globalThis.VisualViewport = dom.window.VisualViewport;
+
+globalThis.requestAnimationFrame = (cb: FrameRequestCallback) => {
+  return setTimeout(() => cb(Date.now()), 0) as unknown as number;
+};
+globalThis.cancelAnimationFrame = (id: number) => {
+  clearTimeout(id);
+};

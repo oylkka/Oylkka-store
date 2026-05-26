@@ -3,7 +3,6 @@ model ShippingZone {
   shopId    String
   shop      Shop     @relation(fields: [shopId], references: [id], onDelete: Cascade)
   name      String
-  districts String[]
   baseCost  Decimal @db.Decimal(10, 2)
   perItem   Decimal @default(0) @db.Decimal(10, 2)
   freeAbove Decimal? @db.Decimal(10, 2)
@@ -12,6 +11,19 @@ model ShippingZone {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  districts ShippingZoneDistrict[]
+
   @@index([shopId])
   @@map("shipping_zone")
+}
+
+model ShippingZoneDistrict {
+  id       String       @id @default(cuid())
+  zoneId   String
+  zone     ShippingZone @relation(fields: [zoneId], references: [id], onDelete: Cascade)
+  district String
+
+  @@unique([zoneId, district])
+  @@index([district])
+  @@map("shipping_zone_district")
 }

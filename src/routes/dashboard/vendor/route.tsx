@@ -1,4 +1,5 @@
 import { createFileRoute, Outlet, redirect } from '@tanstack/react-router';
+import { RouteErrorBoundary } from '@/components/error-boundary';
 
 export const Route = createFileRoute('/dashboard/vendor')({
   beforeLoad: ({ context }) => {
@@ -7,6 +8,7 @@ export const Route = createFileRoute('/dashboard/vendor')({
     }
     return { user: context.user };
   },
+  errorComponent: RouteErrorBoundary,
   component: RouteComponent,
 });
 

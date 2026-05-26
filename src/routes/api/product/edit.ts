@@ -36,13 +36,13 @@ export const Route = createFileRoute('/api/product/edit')({
           for (const [key, value] of formData.entries()) {
             if (key === 'productImages') {
               if (!data.productImages) data.productImages = [];
-              (data.productImages as File[]).push(value as File);
+              (data.productImages as File[]).push(value as unknown as File);
             } else if (key.startsWith('variantImage_')) {
               if (!data.variantImages) data.variantImages = {};
               const variantId = key.replace('variantImage_', '');
               (data.variantImages as Record<string, File>)[variantId] =
-                value as File;
-            } else if (value instanceof File) {
+                value as unknown as File;
+            } else if (typeof value !== 'string') {
               if (key === 'gallery') {
                 if (!data.gallery) data.gallery = [];
                 (data.gallery as File[]).push(value);
@@ -71,13 +71,17 @@ export const Route = createFileRoute('/api/product/edit')({
             ) {
               try {
                 data[key] = JSON.parse(value as string);
-              } catch {
+              } catch (error) {
+                // biome-ignore lint/suspicious/noConsole: this is fine
+                console.error('Failed to parse JSON field:', error);
                 data[key] = undefined;
               }
             } else if (key === 'removedGalleryIds') {
               try {
                 data[key] = JSON.parse(value as string);
-              } catch {
+              } catch (error) {
+                // biome-ignore lint/suspicious/noConsole: this is fine
+                console.error('Failed to parse removed gallery IDs:', error);
                 data[key] = [];
               }
             } else if (key === 'tags') {
@@ -175,7 +179,7 @@ export const Route = createFileRoute('/api/product/edit')({
           const nameChanged = v.productName !== existing.productName;
           let slug = existing.slug;
           if (nameChanged) {
-            const baseSlug = slugify(v.productName);
+            const baseSlug = slugify(v.productName ?? '');
             if (!baseSlug) {
               return Response.json(
                 { error: 'Invalid product name — unable to generate slug' },
@@ -375,7 +379,8 @@ export const Route = createFileRoute('/api/product/edit')({
               status:
                 (v.status as
                   | 'DRAFT'
-                  | 'ACTIVE'
+                  | 'PUBLISHED'
+                  | 'REJECTED'
                   | 'ARCHIVED'
                   | 'OUT_OF_STOCK') ?? existing.status,
               featured: v.featured ?? existing.featured,

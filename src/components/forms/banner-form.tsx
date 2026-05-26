@@ -93,7 +93,7 @@ export function BannerForm(props: BannerFormProps) {
     reset,
     formState: { errors },
   } = useForm<FormData>({
-    resolver: zodResolver(schema),
+    resolver: zodResolver(schema) as never,
     defaultValues: (isEdit
       ? props.defaultValues
       : {

@@ -29,14 +29,23 @@ export const Route = createFileRoute('/api/checkout/validate-coupon')({
           const csrfResponse = validateCsrf();
           if (csrfResponse) return csrfResponse;
 
+          type CartItemInput = {
+            productId?: string;
+            product?: {
+              id?: string;
+              shopId?: string;
+              price?: number;
+              discountPrice?: number;
+            };
+            quantity: number;
+            shopId?: string;
+            price?: number;
+          };
+
           const body: {
             code: string;
             subtotal: number;
-            cartItems?: {
-              productId: string;
-              quantity: number;
-              shopId?: string;
-            }[];
+            cartItems?: CartItemInput[];
             paymentMethod?: string;
             platform?: string;
           } = await request.json();
@@ -62,7 +71,7 @@ export const Route = createFileRoute('/api/checkout/validate-coupon')({
             );
           }
 
-          const cartItems =
+          const rawCartItems =
             body.cartItems ||
             (
               await prisma.cart.findUnique({
@@ -71,7 +80,12 @@ export const Route = createFileRoute('/api/checkout/validate-coupon')({
                   items: {
                     include: {
                       product: {
-                        select: { id: true, shopId: true, price: true },
+                        select: {
+                          id: true,
+                          shopId: true,
+                          price: true,
+                          discountPrice: true,
+                        },
                       },
                     },
                   },
@@ -79,6 +93,17 @@ export const Route = createFileRoute('/api/checkout/validate-coupon')({
               })
             )?.items ||
             [];
+
+          const normalizeCartItem = (i: (typeof rawCartItems)[number]) => ({
+            productId: ('productId' in i ? i.productId : i.product?.id) ?? '',
+            quantity: i.quantity,
+            shopId: ('shopId' in i ? i.shopId : i.product?.shopId) ?? undefined,
+            price: Number('price' in i ? i.price : (i.product?.price ?? 0)),
+            discountPrice:
+              'discountPrice' in i ? Number(i.discountPrice) : undefined,
+          });
+
+          const cartItems = rawCartItems.map(normalizeCartItem);
 
           const totalQty = cartItems.reduce(
             (sum, item) => sum + item.quantity,
@@ -93,20 +118,29 @@ export const Route = createFileRoute('/api/checkout/validate-coupon')({
           }
 
           // Check basic eligibility
-          const eligibility = checkCouponEligibility(coupon, {
-            now: new Date(),
-            subtotal: body.subtotal,
-            totalQty,
-            cartItems: cartItems.map((i) => ({
-              productId: i.product.id,
-              quantity: i.quantity,
-            })),
-            paymentMethod: body.paymentMethod,
-            userAgent: headers.get('user-agent') || undefined,
-            customerOrderCount: await prisma.order.count({
-              where: { customerId: session.user.id },
-            }),
-          });
+          const eligibility = checkCouponEligibility(
+            {
+              ...coupon,
+              minOrderAmount: coupon.minOrderAmount
+                ? Number(coupon.minOrderAmount)
+                : null,
+            } as unknown as Parameters<typeof checkCouponEligibility>[0],
+            {
+              now: new Date(),
+              subtotal: body.subtotal,
+              totalQty,
+              cartItems: cartItems.map((i) => ({
+                productId: i.productId,
+                quantity: i.quantity,
+                shopId: i.shopId,
+              })),
+              paymentMethod: body.paymentMethod,
+              userAgent: headers.get('user-agent') || undefined,
+              customerOrderCount: await prisma.order.count({
+                where: { customerId: session.user.id },
+              }),
+            },
+          );
 
           if (eligibility) {
             return Response.json(
@@ -137,14 +171,26 @@ export const Route = createFileRoute('/api/checkout/validate-coupon')({
 
           // Calculate discount
           const discountItems: DiscountCartItem[] = cartItems.map((item) => ({
-            productId: item.product.id,
-            shopId: item.product.shopId ?? undefined,
-            price: Number(item.product.price),
+            productId: item.productId,
+            shopId: item.shopId,
+            price: Number(item.price),
+            discountPrice: item.discountPrice ?? undefined,
             quantity: item.quantity,
           }));
 
           const result = calculateDiscount(
-            coupon,
+            {
+              ...coupon,
+              value: Number(coupon.value),
+              maxDiscount: coupon.maxDiscount
+                ? Number(coupon.maxDiscount)
+                : null,
+              tiers: coupon.tiers.map((t) => ({
+                ...t,
+                value: Number(t.value),
+                type: t.type ?? undefined,
+              })),
+            } as unknown as Parameters<typeof calculateDiscount>[0],
             discountItems,
             body.subtotal,
             totalQty,

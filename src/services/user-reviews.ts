@@ -1,4 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import axios from 'axios';
 import { toast } from 'sonner';
 import apiClient from '@/lib/api-client';
 import { QUERY_KEYS } from '@/lib/constants';
@@ -30,7 +31,7 @@ type MyReviewsResponse = {
 
 export function useMyReviews(page: number = 1) {
   return useQuery<MyReviewsResponse>({
-    queryKey: [QUERY_KEYS.ORDERS, 'my-reviews', page],
+    queryKey: [QUERY_KEYS.MY_REVIEWS, page],
     queryFn: async () => {
       const r = await apiClient.get<MyReviewsResponse>(
         `/api/reviews/my/list?page=${page}&limit=10`,
@@ -43,16 +44,12 @@ export function useMyReviews(page: number = 1) {
 export function useUpdateReviewMutation() {
   const queryClient = useQueryClient();
 
-  return useMutation({
-    mutationFn: async ({
-      id,
-      ...data
-    }: {
-      id: string;
-      rating?: number;
-      title?: string;
-      content?: string;
-    }) => {
+  return useMutation<
+    void,
+    Error,
+    { id: string; rating?: number; title?: string; content?: string }
+  >({
+    mutationFn: async ({ id, ...data }) => {
       const r = await apiClient.put(`/api/reviews/my/${id}`, data);
       return r.data;
     },
@@ -65,10 +62,11 @@ export function useUpdateReviewMutation() {
         queryKey: [QUERY_KEYS.ORDERS, 'my-reviews'],
       });
     },
-    onError: (error: { response?: { data?: { error?: string } } }) => {
-      toast.error(error.response?.data?.error || 'Failed to update review', {
-        id: 'update-review',
-      });
+    onError: (error: unknown) => {
+      const message = axios.isAxiosError(error)
+        ? (error.response?.data?.error ?? error.message)
+        : 'Failed to update review';
+      toast.error(message, { id: 'update-review' });
     },
   });
 }
@@ -76,8 +74,8 @@ export function useUpdateReviewMutation() {
 export function useDeleteReviewMutation() {
   const queryClient = useQueryClient();
 
-  return useMutation({
-    mutationFn: async (id: string) => {
+  return useMutation<void, Error, string>({
+    mutationFn: async (id) => {
       await apiClient.delete(`/api/reviews/my/${id}`);
     },
     onMutate: () => {
@@ -86,13 +84,14 @@ export function useDeleteReviewMutation() {
     onSuccess: () => {
       toast.success('Review deleted', { id: 'delete-review' });
       queryClient.invalidateQueries({
-        queryKey: [QUERY_KEYS.ORDERS, 'my-reviews'],
+        queryKey: [QUERY_KEYS.MY_REVIEWS],
       });
     },
-    onError: (error: { response?: { data?: { error?: string } } }) => {
-      toast.error(error.response?.data?.error || 'Failed to delete review', {
-        id: 'delete-review',
-      });
+    onError: (error: unknown) => {
+      const message = axios.isAxiosError(error)
+        ? (error.response?.data?.error ?? error.message)
+        : 'Failed to delete review';
+      toast.error(message, { id: 'delete-review' });
     },
   });
 }

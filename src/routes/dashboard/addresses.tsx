@@ -26,7 +26,7 @@ import {
   useCreateAddressMutation,
   useDeleteAddressMutation,
   useUpdateAddressMutation,
-} from '@/services/extra';
+} from '@/services/address';
 
 const EASE: [number, number, number, number] = [0.22, 1, 0.36, 1];
 

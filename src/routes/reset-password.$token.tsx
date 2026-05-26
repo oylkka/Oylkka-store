@@ -73,9 +73,9 @@ function RouteComponent() {
             'This reset link is invalid or expired. Please request a new one.',
           );
         } else if (message.includes('password')) {
-          setError(resetError.message);
+          setError(resetError.message ?? null);
         } else {
-          setError(resetError.message || 'Failed to reset password.');
+          setError(resetError.message ?? 'Failed to reset password.');
         }
         return;
       }

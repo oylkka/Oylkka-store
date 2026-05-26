@@ -1,7 +1,8 @@
 import { getRequestHeaders } from '@tanstack/react-start/server';
 
 import { auth } from '@/lib/auth';
-import { type UserRole, UserRole as UserRoleEnum } from '@/lib/roles';
+import type { UserRole } from '@/lib/roles';
+import { USER_ROLES } from '@/lib/roles';
 
 type Session = Awaited<ReturnType<typeof auth.api.getSession>>;
 
@@ -33,20 +34,20 @@ export function requireRole(
 }
 
 export function requireAdmin(session: NonNullable<Session>): Response | null {
-  return requireRole(session, UserRoleEnum.ADMIN);
+  return requireRole(session, USER_ROLES.ADMIN);
 }
 
 export function requireStaff(session: NonNullable<Session>): Response | null {
   return requireRole(
     session,
-    UserRoleEnum.ADMIN,
-    UserRoleEnum.MANAGER,
-    UserRoleEnum.CUSTOMER_SERVICE,
+    USER_ROLES.ADMIN,
+    USER_ROLES.MANAGER,
+    USER_ROLES.CUSTOMER_SERVICE,
   );
 }
 
 export function requireAdminOrManager(
   session: NonNullable<Session>,
 ): Response | null {
-  return requireRole(session, UserRoleEnum.ADMIN, UserRoleEnum.MANAGER);
+  return requireRole(session, USER_ROLES.ADMIN, USER_ROLES.MANAGER);
 }

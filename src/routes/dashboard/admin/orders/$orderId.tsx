@@ -424,9 +424,9 @@ function RouteComponent() {
             <div className='space-y-2'>
               <label htmlFor='refund-amount' className='text-sm font-medium'>
                 Refund Amount (max ৳
-                {(order.total - (order.refundAmount ?? 0)).toLocaleString(
-                  'en-BD',
-                )}
+                {(
+                  (order.total ?? 0) - (order.refundAmount ?? 0)
+                ).toLocaleString('en-BD')}
                 )
               </label>
               <Input

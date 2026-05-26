@@ -16,6 +16,10 @@ export function cn(...inputs: ClassValue[]) {
  * that word. If the name consists of multiple words, it returns the uppercase initials of the first
  * and last words.
  */
+/**
+ * Strips null, undefined, and empty-string values from a form data object.
+ * Returns a partial object containing only the non-empty values.
+ */
 export function cleanFormData<T extends Record<string, unknown>>(
   data: T,
 ): Partial<T> {

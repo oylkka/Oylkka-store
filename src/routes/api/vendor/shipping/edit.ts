@@ -61,7 +61,6 @@ export const Route = createFileRoute('/api/vendor/shipping/edit')({
             where: { id },
             data: {
               ...(typeof name === 'string' && { name }),
-              ...(Array.isArray(districts) && { districts }),
               ...(typeof baseCost === 'number' && { baseCost }),
               ...(typeof perItem === 'number' && { perItem }),
               ...(typeof freeAbove === 'number' && { freeAbove }),
@@ -69,10 +68,22 @@ export const Route = createFileRoute('/api/vendor/shipping/edit')({
               ...(typeof estDays === 'string' && { estDays }),
               ...(estDays === null && { estDays: null }),
               ...(typeof isActive === 'boolean' && { isActive }),
+              ...(Array.isArray(districts) && {
+                districts: {
+                  deleteMany: {},
+                  create: districts.map((d: string) => ({ district: d })),
+                },
+              }),
             },
+            include: { districts: { select: { district: true } } },
           });
 
-          return Response.json({ zone });
+          return Response.json({
+            zone: {
+              ...zone,
+              districts: zone.districts.map((d) => d.district),
+            },
+          });
         } catch (_error) {
           return Response.json(
             { error: 'Internal Server Error' },

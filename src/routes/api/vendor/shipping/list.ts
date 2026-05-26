@@ -26,9 +26,15 @@ export const Route = createFileRoute('/api/vendor/shipping/list')({
           const zones = await prisma.shippingZone.findMany({
             where: { shopId: shop.id },
             orderBy: { createdAt: 'desc' },
+            include: { districts: { select: { district: true } } },
           });
 
-          return Response.json({ zones });
+          return Response.json({
+            zones: zones.map((zone) => ({
+              ...zone,
+              districts: zone.districts.map((d) => d.district),
+            })),
+          });
         } catch (error) {
           return Response.json(
             {

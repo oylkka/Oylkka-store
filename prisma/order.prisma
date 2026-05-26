@@ -1,6 +1,6 @@
 model Order {
   id          String @id @default(cuid())
-  orderNumber String @unique @default(cuid())
+  orderNumber String @unique
 
   customerId String
   customer   User   @relation(fields: [customerId], references: [id], onDelete: Restrict)
@@ -48,6 +48,7 @@ model Order {
   invoice Invoice?
   returnRequests ReturnRequest[]
   conversations  Conversation[]
+  bkashTokens    BkashToken[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -146,7 +147,7 @@ model Coupon {
   firstOrderOnly       Boolean @default(false)
   repeatPurchaseOnly   Boolean @default(false)
   requiredPaymentMethod String?
-  platformRestriction  String  @default("ALL")
+  platformRestriction  PlatformRestriction  @default(ALL)
 
   autoApply Boolean @default(false)
 
@@ -239,10 +240,29 @@ model CouponUsage {
   @@map("coupon_usage")
 }
 
+model InvoiceQueue {
+  id         String              @id @default(cuid())
+  orderId    String
+  status     InvoiceQueueStatus  @default(PENDING)
+  retryCount Int                 @default(0)
+  maxRetries Int                 @default(3)
+  error      String?
+  createdAt  DateTime            @default(now())
+  processedAt DateTime?
+
+  @@index([status, createdAt])
+  @@map("invoice_queue")
+}
+
 model BkashToken {
   id        String   @id @default(cuid())
   token     String
   expiresAt DateTime
+
+  orderId String?
+  order   Order? @relation(fields: [orderId], references: [id])
+  userId  String?
+  user    User?  @relation(fields: [userId], references: [id])
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

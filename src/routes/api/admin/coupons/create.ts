@@ -110,7 +110,7 @@ export const Route = createFileRoute('/api/admin/coupons/create')({
 
           await createAuditLog({
             actorId: session.user.id,
-            actorRole: session.user.role,
+            actorRole: session.user.role ?? 'USER',
             action: 'COUPON_CREATED',
             entity: 'Coupon',
             entityId: coupon.id,

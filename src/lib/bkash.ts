@@ -142,6 +142,7 @@ export async function executeBkashPayment(
   }
 
   const token = await getGrantToken();
+
   const config = getConfig();
 
   const response = await fetch(`${config.baseUrl}/tokenized/checkout/execute`, {
@@ -183,6 +184,7 @@ export async function refundBkashPayment(params: {
   }
 
   const token = await getGrantToken();
+
   const config = getConfig();
 
   const response = await fetch(
@@ -216,6 +218,9 @@ export async function refundBkashPayment(params: {
 export async function queryBkashPayment(
   paymentID: string,
 ): Promise<Record<string, unknown>> {
+  if (!isConfigured()) {
+    throw new Error('bKash is not configured');
+  }
   const token = await getGrantToken();
   const config = getConfig();
 

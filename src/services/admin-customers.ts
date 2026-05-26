@@ -1,4 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import axios from 'axios';
 import { toast } from 'sonner';
 import apiClient from '@/lib/api-client';
 import { QUERY_KEYS } from '@/lib/constants';
@@ -7,6 +8,7 @@ export type AdminCustomer = {
   id: string;
   name: string;
   email: string;
+  emailVerified: boolean;
   role: string;
   banned: boolean;
   banReason: string | null;
@@ -103,10 +105,11 @@ export function useBanCustomerMutation() {
       toast.success('Customer updated', { id: 'ban-customer' });
       queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.ADMIN_CUSTOMERS] });
     },
-    onError: (error: { response?: { data?: { error?: string } } }) => {
-      toast.error(error.response?.data?.error || 'Failed to update customer', {
-        id: 'ban-customer',
-      });
+    onError: (error: unknown) => {
+      const message = axios.isAxiosError(error)
+        ? (error.response?.data?.error ?? error.message)
+        : 'Failed to update customer';
+      toast.error(message, { id: 'ban-customer' });
     },
   });
 }
@@ -129,10 +132,11 @@ export function useUpdateCustomerRoleMutation() {
       toast.success('Role updated', { id: 'role-customer' });
       queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.ADMIN_CUSTOMERS] });
     },
-    onError: (error: { response?: { data?: { error?: string } } }) => {
-      toast.error(error.response?.data?.error || 'Failed to update role', {
-        id: 'role-customer',
-      });
+    onError: (error: unknown) => {
+      const message = axios.isAxiosError(error)
+        ? (error.response?.data?.error ?? error.message)
+        : 'Failed to update role';
+      toast.error(message, { id: 'role-customer' });
     },
   });
 }

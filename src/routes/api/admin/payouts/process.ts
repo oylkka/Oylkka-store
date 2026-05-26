@@ -104,7 +104,8 @@ export const Route = createFileRoute('/api/admin/payouts/process')({
               items.length,
               note || null,
             ),
-          });
+            // biome-ignore lint/suspicious/noConsole: this is fine
+          }).catch((err) => console.error('Failed to send payout email:', err));
 
           return Response.json({ payout: full }, { status: 201 });
         } catch (_error) {

@@ -89,11 +89,16 @@ function RouteComponent() {
   const [debouncedSearch, setDebouncedSearch] = useState('');
 
   useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const s = params.get('status') || '';
-    if (STATUS_TABS.some((t) => t.value === s)) {
-      setStatus(s);
-    }
+    const handler = () => {
+      const params = new URLSearchParams(window.location.search);
+      const s = params.get('status') || '';
+      if (STATUS_TABS.some((t) => t.value === s)) {
+        setStatus(s);
+      }
+    };
+    handler();
+    window.addEventListener('popstate', handler);
+    return () => window.removeEventListener('popstate', handler);
   }, []);
 
   const { data: orders, isLoading } = useMyOrders(

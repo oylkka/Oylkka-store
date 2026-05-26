@@ -41,7 +41,9 @@ type ProductVariantPickerProps = {
 function getColorName(color: string): string {
   try {
     return namer(color).ntc[0]?.name ?? color;
-  } catch {
+  } catch (error) {
+    // biome-ignore lint/suspicious/noConsole: this is fine
+    console.error('Failed to get color name:', error);
     return color;
   }
 }

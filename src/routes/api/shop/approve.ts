@@ -100,8 +100,15 @@ export const Route = createFileRoute('/api/shop/approve')({
                   callToActionText: '',
                 },
                 html: vendorApprovalHtml(owner.name, shop.name),
-              });
-            });
+              }).catch((err) =>
+                // biome-ignore lint/suspicious/noConsole: this is fine
+                console.error('Failed to send approval email:', err),
+              );
+            })
+            .catch((err) =>
+              // biome-ignore lint/suspicious/noConsole: this is fine
+              console.error('Failed to look up shop owner:', err),
+            );
 
           return Response.json(
             { message: 'Shop approved successfully', shop: updated },

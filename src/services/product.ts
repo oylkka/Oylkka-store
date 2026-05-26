@@ -152,13 +152,17 @@ export function useCategoryProducts(slug: string | undefined) {
   });
 }
 
-export function useAllProducts(params: {
-  sort?: ProductSortOption;
-  page?: number;
-  limit?: number;
-  category?: string;
-  hasDiscount?: boolean;
-}) {
+export function useAllProducts(
+  params: {
+    sort?: ProductSortOption;
+    page?: number;
+    limit?: number;
+    category?: string;
+    hasDiscount?: boolean;
+    search?: string;
+  },
+  queryOptions?: { enabled?: boolean },
+) {
   return useQuery<ProductListResponse>({
     queryKey: [QUERY_KEYS.PUBLIC_PRODUCTS, 'list', params],
     queryFn: async () => {
@@ -168,6 +172,7 @@ export function useAllProducts(params: {
       );
       return response.data;
     },
+    ...(queryOptions ?? {}),
   });
 }
 
@@ -270,14 +275,12 @@ export function useProductQuestions(productId: string, page: number = 1) {
 export function useAskQuestionMutation() {
   const queryClient = useQueryClient();
 
-  return useMutation({
-    mutationFn: async ({
-      productId,
-      question,
-    }: {
-      productId: string;
-      question: string;
-    }) => {
+  return useMutation<
+    PublicQuestion,
+    Error,
+    { productId: string; question: string }
+  >({
+    mutationFn: async ({ productId, question }) => {
       const response = await apiClient.post<PublicQuestion>(
         '/api/product/public-questions',
         { productId, question },
@@ -329,9 +332,9 @@ export function useProduct(id: string | undefined) {
   return useQuery<VendorProduct>({
     queryKey: [QUERY_KEYS.PRODUCTS, id],
     queryFn: async () => {
-      const response = await apiClient.post<VendorProduct>(
+      const response = await apiClient.get<VendorProduct>(
         '/api/product/get-single',
-        { id },
+        { params: { id } },
       );
       return response.data;
     },
@@ -354,8 +357,8 @@ export function useVendorCategories() {
 export function useDeleteProductMutation() {
   const queryClient = useQueryClient();
 
-  return useMutation({
-    mutationFn: async (id: string) => {
+  return useMutation<void, Error, string>({
+    mutationFn: async (id) => {
       const response = await apiClient.post('/api/product/delete', { id });
       return response.data;
     },
@@ -381,8 +384,8 @@ export function useDeleteProductMutation() {
 export function useCreateProduct() {
   const queryClient = useQueryClient();
 
-  return useMutation({
-    mutationFn: async (formData: FormData) => {
+  return useMutation<CreateProductResponse, Error, FormData>({
+    mutationFn: async (formData) => {
       const response = await apiClient.post<CreateProductResponse>(
         '/api/product/create',
         formData,
@@ -391,7 +394,14 @@ export function useCreateProduct() {
       return response.data;
     },
     onSuccess: () => {
+      toast.success('Product created successfully!');
       queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.PRODUCTS] });
+    },
+    onError: (error: unknown) => {
+      const message = axios.isAxiosError(error)
+        ? (error.response?.data?.error ?? error.message)
+        : 'Failed to create product';
+      toast.error(`Error: ${message}`);
     },
   });
 }
@@ -399,7 +409,7 @@ export function useCreateProduct() {
 export function useUpdateProduct({ productId }: { productId: string }) {
   const queryClient = useQueryClient();
 
-  return useMutation({
+  return useMutation<CreateProductResponse, Error, FormData>({
     mutationFn: async (formData: FormData) => {
       formData.append('id', productId);
       const response = await apiClient.post<CreateProductResponse>(
@@ -410,10 +420,17 @@ export function useUpdateProduct({ productId }: { productId: string }) {
       return response.data;
     },
     onSuccess: () => {
+      toast.success('Product updated successfully!');
       queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.PRODUCTS] });
       queryClient.invalidateQueries({
         queryKey: [QUERY_KEYS.PRODUCTS, productId],
       });
+    },
+    onError: (error: unknown) => {
+      const message = axios.isAxiosError(error)
+        ? (error.response?.data?.error ?? error.message)
+        : 'Failed to update product';
+      toast.error(`Error: ${message}`);
     },
   });
 }
@@ -421,8 +438,8 @@ export function useUpdateProduct({ productId }: { productId: string }) {
 export function useAdminUpdateProduct({ productId }: { productId: string }) {
   const queryClient = useQueryClient();
 
-  return useMutation({
-    mutationFn: async (formData: FormData) => {
+  return useMutation<CreateProductResponse, Error, FormData>({
+    mutationFn: async (formData) => {
       formData.append('id', productId);
       const response = await apiClient.post<CreateProductResponse>(
         '/api/product/edit',
@@ -432,10 +449,17 @@ export function useAdminUpdateProduct({ productId }: { productId: string }) {
       return response.data;
     },
     onSuccess: () => {
+      toast.success('Product updated successfully!');
       queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.PRODUCTS] });
       queryClient.invalidateQueries({
         queryKey: [QUERY_KEYS.PRODUCTS, productId],
       });
+    },
+    onError: (error: unknown) => {
+      const message = axios.isAxiosError(error)
+        ? (error.response?.data?.error ?? error.message)
+        : 'Failed to update product';
+      toast.error(`Error: ${message}`);
     },
   });
 }

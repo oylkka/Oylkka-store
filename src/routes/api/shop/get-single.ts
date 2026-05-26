@@ -5,14 +5,14 @@ import { prisma } from '@/lib/db';
 export const Route = createFileRoute('/api/shop/get-single')({
   server: {
     handlers: {
-      POST: async ({ request }) => {
+      GET: async ({ request }) => {
         try {
           const authResult = await requireAuth();
           if (authResult.response) return authResult.response;
           const roleResponse = requireAdminOrManager(authResult.session);
           if (roleResponse) return roleResponse;
 
-          const { slug } = (await request.json()) as { slug: string };
+          const slug = new URL(request.url).searchParams.get('slug');
 
           if (!slug) {
             return Response.json(

@@ -92,7 +92,7 @@ export function ShopForm(props: ShopFormProps) {
     reset,
     formState: { errors },
   } = useForm<FormValues>({
-    resolver: zodResolver(schema),
+    resolver: zodResolver(schema) as never,
     defaultValues: (isEdit
       ? props.defaultValues
       : {

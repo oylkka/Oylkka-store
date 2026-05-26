@@ -64,8 +64,9 @@ export default function VariantList({
           return capitalizeColorName(names.roygbiv[0].name);
         if (names.pantone?.length > 0)
           return capitalizeColorName(names.pantone[0].name);
-      } catch {
-        // fall through
+      } catch (error) {
+        // biome-ignore lint/suspicious/noConsole: this is fine
+        console.error('Failed to parse color name:', error);
       }
     }
     return colorValue;

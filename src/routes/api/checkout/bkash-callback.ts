@@ -2,7 +2,7 @@ import { createFileRoute } from '@tanstack/react-router';
 import { sendOrderConfirmation } from '@/actions/send-order-email';
 import { executeBkashPayment } from '@/lib/bkash';
 import { prisma } from '@/lib/db';
-import { generateInvoicePdf } from '@/lib/invoice-pdf';
+import { enqueueInvoiceGeneration } from '@/lib/invoice-queue';
 import { checkoutLimiter } from '@/lib/rate-limit';
 import { checkRateLimit } from '@/lib/rate-limit-guard';
 import { decrementStock, decrementVariantStock } from '@/lib/stock';
@@ -187,8 +187,14 @@ export const Route = createFileRoute('/api/checkout/bkash-callback')({
             });
 
             // Fire-and-forget: send order confirmation email + generate invoice
-            sendOrderConfirmation(order.id);
-            generateInvoicePdf(order.id);
+            sendOrderConfirmation(order.id).catch((e) => {
+              // biome-ignore lint/suspicious/noConsole: this is fine
+              console.error('Failed to send order confirmation:', e);
+            });
+            enqueueInvoiceGeneration(order.id).catch((e) => {
+              // biome-ignore lint/suspicious/noConsole: this is fine
+              console.error('Failed to enqueue invoice generation:', e);
+            });
 
             return Response.redirect(
               `${baseUrl}/checkout/confirmation?orderId=${order.id}`,

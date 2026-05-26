@@ -327,7 +327,9 @@ export async function generateInvoicePdf(
     });
 
     return uploadResult.secure_url;
-  } catch {
+  } catch (error) {
+    // biome-ignore lint/suspicious/noConsole: this is fine
+    console.error('Failed to generate invoice PDF:', error);
     return null;
   }
 }

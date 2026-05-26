@@ -1,6 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { getRequestHeaders } from '@tanstack/react-start/server';
 import { UploadImage } from '@/cloudinary';
+import type { ReturnReason } from '@/generated/prisma/enums';
 import { auth } from '@/lib/auth';
 import { validateCsrf } from '@/lib/csrf';
 import { prisma } from '@/lib/db';
@@ -56,7 +57,9 @@ export const Route = createFileRoute('/api/returns/create')({
           if (rawItemIds) {
             try {
               itemIds = JSON.parse(rawItemIds);
-            } catch {
+            } catch (error) {
+              // biome-ignore lint/suspicious/noConsole: this is fine
+              console.error('Failed to parse item IDs JSON:', error);
               itemIds = rawItemIds
                 .split(',')
                 .map((s) => s.trim())
@@ -160,7 +163,7 @@ export const Route = createFileRoute('/api/returns/create')({
               itemIds,
               customerId: session.user.id,
               shopId: shopIds[0],
-              reason: reason as never,
+              reason: reason as ReturnReason,
               details,
               images: imageUrls,
               resolution,

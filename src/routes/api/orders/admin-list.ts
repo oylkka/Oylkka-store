@@ -31,8 +31,23 @@ export const Route = createFileRoute('/api/orders/admin-list')({
 
           const where: Prisma.OrderWhereInput = {};
 
-          if (status) where.status = status;
-          if (paymentStatus) where.paymentStatus = paymentStatus;
+          if (status)
+            where.status = status as
+              | 'PENDING'
+              | 'CONFIRMED'
+              | 'PROCESSING'
+              | 'SHIPPED'
+              | 'DELIVERED'
+              | 'CANCELLED'
+              | 'REFUNDED'
+              | 'PARTIALLY_REFUNDED';
+          if (paymentStatus)
+            where.paymentStatus = paymentStatus as
+              | 'PENDING'
+              | 'PAID'
+              | 'FAILED'
+              | 'REFUNDED'
+              | 'PARTIALLY_REFUNDED';
 
           if (search) {
             where.orderNumber = { contains: search, mode: 'insensitive' };

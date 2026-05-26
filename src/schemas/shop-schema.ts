@@ -14,8 +14,8 @@ const BaseShopSchema = z.object({
   postalCode: z.string().optional(),
 });
 
-const imageValidation = z
-  .any()
+const logoImageValidation = z
+  .custom<FileList | null>()
   .refine(
     (files) =>
       !files ||
@@ -32,14 +32,32 @@ const imageValidation = z
     { message: 'Image size must not exceed 500KB' },
   );
 
+const bannerImageValidation = z
+  .custom<FileList | null>()
+  .refine(
+    (files) =>
+      !files ||
+      files.length === 0 ||
+      (files instanceof FileList &&
+        ['image/jpeg', 'image/png', 'image/webp'].includes(files[0]?.type)),
+    { message: 'Image must be JPEG, PNG, or WEBP' },
+  )
+  .refine(
+    (files) =>
+      !files ||
+      files.length === 0 ||
+      (files instanceof FileList && files[0]?.size <= 2_097_152),
+    { message: 'Image size must not exceed 2MB' },
+  );
+
 export const ShopApplicationFormSchema = BaseShopSchema.extend({
-  logo: imageValidation,
-  banner: imageValidation,
+  logo: logoImageValidation,
+  banner: bannerImageValidation,
 });
 
 export const EditShopFormSchema = BaseShopSchema.extend({
-  logo: z.any().optional(),
-  banner: z.any().optional(),
+  logo: z.custom<FileList | null>().optional(),
+  banner: z.custom<FileList | null>().optional(),
   hasExistingLogo: z.boolean().optional(),
   keepExistingLogo: z.boolean().optional(),
   hasExistingBanner: z.boolean().optional(),

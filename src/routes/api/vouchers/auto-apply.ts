@@ -38,7 +38,11 @@ export const Route = createFileRoute('/api/vouchers/auto-apply')({
           }
 
           const shopIds = [
-            ...new Set(cart.items.map((i) => i.product.shopId).filter(Boolean)),
+            ...new Set(
+              cart.items
+                .map((i) => i.product.shopId)
+                .filter((id): id is string => id !== null),
+            ),
           ];
           const productIds = cart.items.map((i) => i.product.id);
           const subtotal = cart.items.reduce(
@@ -61,9 +65,9 @@ export const Route = createFileRoute('/api/vouchers/auto-apply')({
               AND: [
                 {
                   OR: [
-                    { scope: 'GLOBAL' },
-                    { scope: 'SHOP', scopeId: { in: shopIds } },
-                    { scope: 'PRODUCT', scopeId: { in: productIds } },
+                    { scope: 'GLOBAL' as const },
+                    { scope: 'SHOP' as const, scopeId: { in: shopIds } },
+                    { scope: 'PRODUCT' as const, scopeId: { in: productIds } },
                   ],
                 },
                 {

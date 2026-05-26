@@ -50,7 +50,7 @@ describe('SkuService.suggestSku', () => {
 
   it('handles multi-word category (uses first char of each word)', () => {
     expect(SkuService.suggestSku('Home & Garden', 'Plant Pot')).toBe(
-      'H&G-PLA001',
+      'HG-PLA001',
     );
   });
 
@@ -73,11 +73,11 @@ describe('SkuService.suggestSku', () => {
   });
 
   it('handles empty category', () => {
-    expect(SkuService.suggestSku('', 'Product')).toBe('-PRO001');
+    expect(SkuService.suggestSku('', 'Product')).toBe('GEN-PRO001');
   });
 
   it('handles empty product name', () => {
-    expect(SkuService.suggestSku('Category', '')).toBe('C-001');
+    expect(SkuService.suggestSku('Category', '')).toBe('C-PRD001');
   });
 });
 

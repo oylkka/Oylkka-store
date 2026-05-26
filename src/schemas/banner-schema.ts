@@ -36,7 +36,7 @@ const BaseBannerSchema = z.object({
   description: z.string().optional(),
   bannerTag: z.enum(['PROMO', 'INFO', 'ANNOUNCEMENT']).optional(),
   alignment: z.enum(['LEFT', 'CENTER', 'RIGHT'], {
-    required_error: 'Please select an alignment',
+    error: 'Please select an alignment',
   }),
   primaryActionText: z.string().optional(),
   primaryActionLink: z
@@ -49,7 +49,7 @@ const BaseBannerSchema = z.object({
     .optional()
     .refine(httpUrl, 'URL must start with http:// or https://'),
   bannerPosition: z.enum(['HOME_TOP', 'HOME_BOTTOM', 'SIDEBAR'], {
-    required_error: 'Please select a position',
+    error: 'Please select a position',
   }),
   startDate: z.coerce.date().optional(),
   endDate: z.coerce.date().optional(),
@@ -59,7 +59,7 @@ const BaseBannerSchema = z.object({
 
 export const BannerFormSchema = BaseBannerSchema.extend({
   image: z
-    .any()
+    .custom<FileList | null>()
     .refine(
       (files) =>
         files &&
@@ -92,7 +92,7 @@ export const BannerFormSchema = BaseBannerSchema.extend({
 // ─── Edit schema (client-side, image optional) ──────────────────────────────
 
 export const EditBannerFormSchema = BaseBannerSchema.extend({
-  image: z.any().optional(),
+  image: z.custom<FileList | null>().optional(),
   hasExistingImage: z.boolean().optional(),
   keepExistingImage: z.boolean().optional(),
 })

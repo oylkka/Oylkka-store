@@ -275,8 +275,7 @@ export const ProductFormSchema = z
   .refine(
     (data) => {
       if (data.status !== 'PUBLISHED') return true;
-      if (data.hasVariants && data.variants && data.variants.length > 0)
-        return true;
+      if (data.variants && data.variants.length > 0) return true;
       return data.stock >= 1;
     },
     {

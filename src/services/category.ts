@@ -67,11 +67,11 @@ export function usePublicCategories() {
 
 export function useCategory(id: string | undefined) {
   return useQuery<AdminCategory>({
-    queryKey: ['category', id],
+    queryKey: [QUERY_KEYS.CATEGORIES, id],
     queryFn: async () => {
-      const response = await apiClient.post<AdminCategory>(
+      const response = await apiClient.get<AdminCategory>(
         '/api/categories/get-single',
-        { id },
+        { params: { id } },
       );
       return response.data;
     },
@@ -82,8 +82,8 @@ export function useCategory(id: string | undefined) {
 export function useCreateCategoryMutation() {
   const queryClient = useQueryClient();
 
-  return useMutation({
-    mutationFn: async (values: CategoryFormType) => {
+  return useMutation<CategoryResponse, Error, CategoryFormType>({
+    mutationFn: async (values) => {
       const formData = new FormData();
 
       formData.append('name', values.name);
@@ -114,7 +114,7 @@ export function useCreateCategoryMutation() {
         id: 'category-create',
       });
       queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.CATEGORIES] });
-      queryClient.invalidateQueries({ queryKey: ['category'] });
+      queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.CATEGORIES] });
     },
     onError: (error: unknown) => {
       const message = axios.isAxiosError(error)
@@ -128,8 +128,12 @@ export function useCreateCategoryMutation() {
 export function useEditCategoryMutation() {
   const queryClient = useQueryClient();
 
-  return useMutation({
-    mutationFn: async (values: EditCategoryFormType & { id: string }) => {
+  return useMutation<
+    CategoryResponse,
+    Error,
+    EditCategoryFormType & { id: string }
+  >({
+    mutationFn: async (values) => {
       const formData = new FormData();
 
       formData.append('id', values.id);
@@ -166,7 +170,7 @@ export function useEditCategoryMutation() {
         id: 'category-edit',
       });
       queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.CATEGORIES] });
-      queryClient.invalidateQueries({ queryKey: ['category'] });
+      queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.CATEGORIES] });
     },
     onError: (error: unknown) => {
       const message = axios.isAxiosError(error)
@@ -180,8 +184,8 @@ export function useEditCategoryMutation() {
 export function useDeleteCategoryMutation() {
   const queryClient = useQueryClient();
 
-  return useMutation({
-    mutationFn: async (id: string) => {
+  return useMutation<void, Error, string>({
+    mutationFn: async (id) => {
       const response = await apiClient.post('/api/categories/delete', { id });
       return response.data;
     },
@@ -193,7 +197,7 @@ export function useDeleteCategoryMutation() {
         id: 'category-delete',
       });
       queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.CATEGORIES] });
-      queryClient.invalidateQueries({ queryKey: ['category'] });
+      queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.CATEGORIES] });
     },
     onError: (error: unknown) => {
       const message = axios.isAxiosError(error)

@@ -236,8 +236,8 @@ function RouteComponent() {
                       }
                     />
                     <Tooltip
-                      formatter={(value: number) => [
-                        `BDT ${value.toLocaleString()}`,
+                      formatter={(...args: unknown[]) => [
+                        `BDT ${Number(args[0] || 0).toLocaleString()}`,
                         'Revenue',
                       ]}
                       labelFormatter={(label) => {

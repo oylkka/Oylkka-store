@@ -37,7 +37,7 @@ export const Route = createFileRoute('/api/messages/contact-vendor')({
           const parsed = contactSchema.safeParse(body);
 
           if (!parsed.success) {
-            const firstError = parsed.error.errors[0];
+            const firstError = parsed.error.issues[0];
             return Response.json(
               { error: firstError?.message || 'Invalid input' },
               { status: 400 },

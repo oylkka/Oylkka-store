@@ -5,7 +5,7 @@ import {
   requireRole,
   requireStaff,
 } from '@/lib/auth-middleware';
-import { UserRole } from '@/lib/roles';
+import { USER_ROLES } from '@/lib/roles';
 
 function makeSession(role: string) {
   return {
@@ -38,18 +38,18 @@ function makeSession(role: string) {
 
 describe('requireRole', () => {
   it('returns null when role matches', () => {
-    expect(requireRole(makeSession('ADMIN'), UserRole.ADMIN)).toBeNull();
+    expect(requireRole(makeSession('ADMIN'), USER_ROLES.ADMIN)).toBeNull();
   });
 
   it('returns 403 when role does not match', () => {
-    const response = requireRole(makeSession('USER'), UserRole.ADMIN);
+    const response = requireRole(makeSession('USER'), USER_ROLES.ADMIN);
     expect(response).not.toBeNull();
     expect(response?.status).toBe(403);
   });
 
   it('returns null when any of multiple roles match', () => {
     expect(
-      requireRole(makeSession('MANAGER'), UserRole.ADMIN, UserRole.MANAGER),
+      requireRole(makeSession('MANAGER'), USER_ROLES.ADMIN, USER_ROLES.MANAGER),
     ).toBeNull();
   });
 });

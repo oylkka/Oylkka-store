@@ -34,7 +34,7 @@ export const Route = createFileRoute('/api/shop/update')({
 
           const data: Record<string, unknown> = {};
           for (const [key, value] of formData.entries()) {
-            data[key] = value instanceof File ? value : value;
+            data[key] = value;
           }
 
           const textFields = { ...data };

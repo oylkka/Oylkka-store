@@ -145,7 +145,8 @@ async function sendMessageNotification(
         callToActionText: 'View Messages',
       },
     });
-  } catch {
-    // fire-and-forget
+  } catch (error) {
+    // biome-ignore lint/suspicious/noConsole: this is fine
+    console.error('Failed to send new message notification:', error);
   }
 }

@@ -1,6 +1,8 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import axios from 'axios';
 import { toast } from 'sonner';
 import apiClient from '@/lib/api-client';
+import { QUERY_KEYS } from '@/lib/constants';
 
 export type ShopPolicies = {
   shippingPolicy?: string;
@@ -10,7 +12,7 @@ export type ShopPolicies = {
 
 export function useShopPolicies() {
   return useQuery<{ policies: ShopPolicies | null }>({
-    queryKey: ['shop-policies'],
+    queryKey: [QUERY_KEYS.SHOP_POLICIES],
     queryFn: async () => {
       const r = await apiClient.get<{ policies: ShopPolicies | null }>(
         '/api/vendor/shop/policies',
@@ -36,12 +38,13 @@ export function useUpdatePoliciesMutation() {
     },
     onSuccess: () => {
       toast.success('Policies saved', { id: 'save-policies' });
-      queryClient.invalidateQueries({ queryKey: ['shop-policies'] });
+      queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.SHOP_POLICIES] });
     },
-    onError: (error: { response?: { data?: { error?: string } } }) => {
-      toast.error(error.response?.data?.error || 'Failed to save policies', {
-        id: 'save-policies',
-      });
+    onError: (error: unknown) => {
+      const message = axios.isAxiosError(error)
+        ? (error.response?.data?.error ?? error.message)
+        : 'Failed to save policies';
+      toast.error(message, { id: 'save-policies' });
     },
   });
 }

@@ -39,7 +39,7 @@ function RouteComponent() {
 
   const subtotal = cart.items.reduce((sum, item) => {
     const price = item.savedPrice ?? item.product.price;
-    return sum + price * item.quantity;
+    return sum + (price ?? 0) * item.quantity;
   }, 0);
 
   const groupedByShop = cart.items.reduce<
@@ -149,7 +149,7 @@ function RouteComponent() {
                         </div>
 
                         <p className='text-sm font-semibold w-20 text-right tabular-nums'>
-                          ৳{(price * item.quantity).toLocaleString()}
+                          ৳ {((price ?? 0) * item.quantity).toLocaleString()}
                         </p>
 
                         <Button

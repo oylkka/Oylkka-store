@@ -1,5 +1,8 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import axios from 'axios';
+import { toast } from 'sonner';
 import apiClient from '@/lib/api-client';
+import { QUERY_KEYS } from '@/lib/constants';
 
 export type ShippingZone = {
   id: string;
@@ -17,7 +20,7 @@ export type ShippingZone = {
 
 export function useShippingZones() {
   return useQuery<ShippingZone[]>({
-    queryKey: ['shipping-zones'],
+    queryKey: [QUERY_KEYS.SHIPPING_ZONES],
     queryFn: async () => {
       const response = await apiClient.get<{ zones: ShippingZone[] }>(
         '/api/vendor/shipping/list',
@@ -46,7 +49,13 @@ export function useCreateShippingZoneMutation() {
       return response.data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['shipping-zones'] });
+      queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.SHIPPING_ZONES] });
+    },
+    onError: (error: unknown) => {
+      const message = axios.isAxiosError(error)
+        ? (error.response?.data?.error ?? error.message)
+        : 'Failed to create shipping zone';
+      toast.error(`Error: ${message}`);
     },
   });
 }
@@ -63,7 +72,13 @@ export function useUpdateShippingZoneMutation() {
       return response.data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['shipping-zones'] });
+      queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.SHIPPING_ZONES] });
+    },
+    onError: (error: unknown) => {
+      const message = axios.isAxiosError(error)
+        ? (error.response?.data?.error ?? error.message)
+        : 'Failed to update shipping zone';
+      toast.error(`Error: ${message}`);
     },
   });
 }
@@ -79,7 +94,13 @@ export function useDeleteShippingZoneMutation() {
       return response.data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['shipping-zones'] });
+      queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.SHIPPING_ZONES] });
+    },
+    onError: (error: unknown) => {
+      const message = axios.isAxiosError(error)
+        ? (error.response?.data?.error ?? error.message)
+        : 'Failed to delete shipping zone';
+      toast.error(`Error: ${message}`);
     },
   });
 }

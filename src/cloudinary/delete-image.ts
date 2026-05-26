@@ -1,3 +1,4 @@
+'use server';
 import cloudinary from './cloudinary';
 
 export const DeleteImage = async (publicId: string): Promise<void> => {

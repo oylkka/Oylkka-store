@@ -61,15 +61,26 @@ export const Route = createFileRoute('/api/vendor/shipping/create')({
             data: {
               shopId: shop.id,
               name,
-              districts,
               baseCost,
               perItem: typeof perItem === 'number' ? perItem : 0,
               freeAbove: typeof freeAbove === 'number' ? freeAbove : null,
               estDays: typeof estDays === 'string' ? estDays : null,
+              districts: {
+                create: districts.map((d: string) => ({ district: d })),
+              },
             },
+            include: { districts: { select: { district: true } } },
           });
 
-          return Response.json({ zone }, { status: 201 });
+          return Response.json(
+            {
+              zone: {
+                ...zone,
+                districts: zone.districts.map((d) => d.district),
+              },
+            },
+            { status: 201 },
+          );
         } catch (_error) {
           return Response.json(
             { error: 'Internal Server Error' },

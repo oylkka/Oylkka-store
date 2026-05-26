@@ -91,6 +91,9 @@ export const auth = betterAuth({
                   callToActionText: '',
                 },
                 html: welcomeHtml(currentUser.name),
+              }).catch((err) => {
+                // biome-ignore lint/suspicious/noConsole: this is fine
+                console.error('Failed to send welcome email', err);
               });
             }
           }

@@ -41,6 +41,7 @@ model Product {
 
   hasVariants Boolean @default(false)
   stock       Int     @default(0)
+  lowStockAlert Int     @default(5)
 
   condition            ProductCondition
   conditionDescription String?
@@ -156,11 +157,13 @@ model ProductQuestion {
   product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
 
   userId   String
+  user     User   @relation(fields: [userId], references: [id], onDelete: Cascade)
   question String
 
   answer     String?
   answeredAt DateTime?
   answeredBy String?
+  answeredByUser User? @relation(name: "answeredByUser", fields: [answeredBy], references: [id])
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

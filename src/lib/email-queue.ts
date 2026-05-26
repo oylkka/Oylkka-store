@@ -4,6 +4,7 @@ const BATCH_SIZE = 10;
 const POLL_INTERVAL = 30_000;
 
 import { prisma } from '@/lib/db';
+import { logError } from '@/lib/logger';
 import transporter from '@/lib/nodemailer';
 
 export async function queueEmail(
@@ -15,7 +16,7 @@ export async function queueEmail(
     data: { to, subject, html },
   });
 
-  processEmailQueue().catch(() => {});
+  processEmailQueue().catch((err) => logError('email-queue', err));
 
   return entry.id;
 }
@@ -58,14 +59,15 @@ export async function processEmailQueue(): Promise<void> {
         });
       }
     }
-  } catch {
-    // Queue processing errors should never crash the server
+  } catch (error) {
+    // biome-ignore lint/suspicious/noConsole: this is fine
+    console.error('Failed to send email from queue:', error);
   }
 }
 
 export function startEmailQueueProcessor(): ReturnType<typeof setInterval> {
-  processEmailQueue().catch(() => {});
+  processEmailQueue().catch((err) => logError('email-queue', err));
   return setInterval(() => {
-    processEmailQueue().catch(() => {});
+    processEmailQueue().catch((err) => logError('email-queue', err));
   }, POLL_INTERVAL);
 }

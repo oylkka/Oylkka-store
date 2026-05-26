@@ -34,7 +34,10 @@ export const Route = createFileRoute(
                 callToActionText: '',
               },
               html: passwordResetConfirmationHtml(user.name),
-            });
+            }).catch((err) =>
+              // biome-ignore lint/suspicious/noConsole: this is fine
+              console.error('Failed to send password reset confirmation:', err),
+            );
           }
 
           // Always return success to prevent email enumeration

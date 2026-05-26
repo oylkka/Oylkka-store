@@ -4,6 +4,7 @@ import BreadCrumb from '#/components/layout/dashboard/breadcrumb';
 import Footer from '#/components/layout/footer';
 import Header from '#/components/layout/header';
 import { SidebarInset, SidebarProvider } from '#/components/ui/sidebar';
+import { RouteErrorBoundary } from '@/components/error-boundary';
 
 export const Route = createFileRoute('/dashboard')({
   beforeLoad: ({ context }) => {
@@ -12,6 +13,7 @@ export const Route = createFileRoute('/dashboard')({
     }
     return { user: context.user };
   },
+  errorComponent: RouteErrorBoundary,
   component: RouteComponent,
 });
 

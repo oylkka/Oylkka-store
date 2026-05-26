@@ -4,7 +4,6 @@ import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import {
   createRootRoute,
   HeadContent,
-  Link,
   Outlet,
   Scripts,
 } from '@tanstack/react-router';
@@ -14,6 +13,7 @@ import { Toaster } from '#/components/ui/sonner';
 import { TooltipProvider } from '#/components/ui/tooltip';
 import { ThemeProvider } from '#/context/theme-provider';
 import { RouteErrorBoundary } from '@/components/error-boundary';
+import { NotFound } from '@/components/not-found';
 import { getSession } from '@/lib/auth.functions';
 import appCss from '../styles.css?url';
 
@@ -55,15 +55,7 @@ export const Route = createRootRoute({
       { rel: 'icon', type: 'image/svg+xml', href: '/favicon.svg' },
     ],
   }),
-  notFoundComponent: () => (
-    <div className='flex min-h-screen flex-col items-center justify-center gap-4'>
-      <h1 className='text-4xl font-bold'>404</h1>
-      <p className='text-muted-foreground'>Page not found</p>
-      <Link to='/' className='text-primary underline-offset-4 hover:underline'>
-        Go home
-      </Link>
-    </div>
-  ),
+  notFoundComponent: NotFound,
   errorComponent: RouteErrorBoundary,
   shellComponent: RootDocument,
   component: RootComponent,

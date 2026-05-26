@@ -1,6 +1,6 @@
-import { createFileRoute } from '@tanstack/react-router';
+import { createFileRoute, useRouter } from '@tanstack/react-router';
 import { Camera, Loader2, Save, User } from 'lucide-react';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -21,8 +21,11 @@ export const Route = createFileRoute('/dashboard/my-account')({
 
 function MyAccountPage() {
   const { user } = Route.useRouteContext();
+  const router = useRouter();
   const [name, setName] = useState(user.name ?? '');
   const [isSaving, setIsSaving] = useState(false);
+  const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   async function handleSave() {
     const trimmed = name.trim();
@@ -78,11 +81,61 @@ function MyAccountPage() {
               </div>
               <button
                 type='button'
-                className='absolute inset-0 flex items-center justify-center rounded-full bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer'
-                onClick={() => toast.info('Avatar upload coming soon')}
+                className='absolute inset-0 flex items-center justify-center rounded-full bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer disabled:opacity-50'
+                disabled={isUploadingAvatar}
+                onClick={() => fileInputRef.current?.click()}
               >
-                <Camera className='h-5 w-5 text-white' />
+                {isUploadingAvatar ? (
+                  <Loader2 className='h-5 w-5 text-white animate-spin' />
+                ) : (
+                  <Camera className='h-5 w-5 text-white' />
+                )}
               </button>
+              <input
+                ref={fileInputRef}
+                type='file'
+                accept='image/jpeg,image/png,image/webp'
+                className='hidden'
+                onChange={async (e) => {
+                  const file = e.target.files?.[0];
+                  if (!file) return;
+
+                  if (file.size > 2 * 1024 * 1024) {
+                    toast.error('Image must be under 2MB');
+                    return;
+                  }
+
+                  setIsUploadingAvatar(true);
+                  try {
+                    const formData = new FormData();
+                    formData.append('image', file);
+                    const res = await fetch('/api/upload/avatar', {
+                      method: 'POST',
+                      body: formData,
+                    });
+                    if (!res.ok) {
+                      const err = await res.json();
+                      throw new Error(err.error ?? 'Upload failed');
+                    }
+                    const { imageUrl } = await res.json();
+                    const { error } = await updateUser({ image: imageUrl });
+                    if (error) throw new Error(error.message);
+                    toast.success('Avatar updated');
+                    router.invalidate();
+                  } catch (err) {
+                    toast.error(
+                      err instanceof Error
+                        ? err.message
+                        : 'Failed to upload avatar',
+                    );
+                  } finally {
+                    setIsUploadingAvatar(false);
+                    if (fileInputRef.current) {
+                      fileInputRef.current.value = '';
+                    }
+                  }
+                }}
+              />
             </div>
             <div>
               <p className='text-sm font-medium'>{user.name}</p>

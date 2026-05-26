@@ -198,7 +198,7 @@ export const Route = createFileRoute('/api/orders/admin-refund')({
 
           createAuditLog({
             actorId: session.user.id,
-            actorRole: session.user.role,
+            actorRole: session.user.role ?? 'ADMIN',
             action: 'ORDER_REFUNDED',
             entity: 'Order',
             entityId: body.orderId,
@@ -208,7 +208,8 @@ export const Route = createFileRoute('/api/orders/admin-refund')({
               itemIds: body.itemIds,
               orderNumber: order.orderNumber,
             },
-          }).catch(() => {});
+            // biome-ignore lint/suspicious/noConsole: this is fine
+          }).catch((err) => console.error('Failed to create audit log:', err));
 
           sendEmail({
             to: order.shippingEmail,
@@ -227,7 +228,8 @@ export const Route = createFileRoute('/api/orders/admin-refund')({
               body.reason,
               order.paymentMethod || 'CASH_ON_DELIVERY',
             ),
-          });
+            // biome-ignore lint/suspicious/noConsole: this is fine
+          }).catch((err) => console.error('Failed to send refund email:', err));
 
           return Response.json(
             {

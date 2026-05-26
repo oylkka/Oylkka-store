@@ -173,6 +173,15 @@ enum EmailStatus {
   FAILED
 }
 
+// --- Invoice Queue ---
+
+enum InvoiceQueueStatus {
+  PENDING
+  PROCESSING
+  COMPLETED
+  FAILED
+}
+
 enum ReturnReason {
   DEFECTIVE
   WRONG_ITEM

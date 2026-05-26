@@ -1,4 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import axios from 'axios';
+import { toast } from 'sonner';
 import apiClient from '@/lib/api-client';
 import { QUERY_KEYS } from '@/lib/constants';
 
@@ -116,6 +118,12 @@ export function useSendMessageMutation() {
         queryKey: [QUERY_KEYS.CONVERSATIONS],
       });
     },
+    onError: (error: unknown) => {
+      const message = axios.isAxiosError(error)
+        ? (error.response?.data?.error ?? error.message)
+        : 'Failed to send message';
+      toast.error(`Error: ${message}`);
+    },
   });
 }
 
@@ -143,6 +151,12 @@ export function useMarkAsReadMutation() {
       queryClient.invalidateQueries({
         queryKey: [QUERY_KEYS.VENDOR_CONVERSATIONS],
       });
+    },
+    onError: (error: unknown) => {
+      const message = axios.isAxiosError(error)
+        ? (error.response?.data?.error ?? error.message)
+        : 'Failed to mark as read';
+      toast.error(`Error: ${message}`);
     },
   });
 }
@@ -211,6 +225,36 @@ export function useAdminSendMessageMutation() {
         queryKey: [QUERY_KEYS.ADMIN_CONVERSATIONS],
       });
     },
+    onError: (error: unknown) => {
+      const message = axios.isAxiosError(error)
+        ? (error.response?.data?.error ?? error.message)
+        : 'Failed to send message';
+      toast.error(`Error: ${message}`);
+    },
+  });
+}
+
+export function useAdminCloseConversationMutation() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (data: {
+      conversationId: string;
+      status: 'OPEN' | 'CLOSED';
+    }) => {
+      const r = await apiClient.post('/api/admin/conversations/close', data);
+      return r.data as { success: true };
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: [QUERY_KEYS.ADMIN_CONVERSATIONS],
+      });
+    },
+    onError: (error: unknown) => {
+      const message = axios.isAxiosError(error)
+        ? (error.response?.data?.error ?? error.message)
+        : 'Failed to close conversation';
+      toast.error(`Error: ${message}`);
+    },
   });
 }
 
@@ -223,6 +267,12 @@ export function useUploadMessageImageMutation() {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
       return response.data as { imageUrl: string; imagePublicId: string };
+    },
+    onError: (error: unknown) => {
+      const message = axios.isAxiosError(error)
+        ? (error.response?.data?.error ?? error.message)
+        : 'Failed to upload image';
+      toast.error(`Error: ${message}`);
     },
   });
 }

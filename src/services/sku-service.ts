@@ -7,8 +7,10 @@ const isValidSku = (sku: string): boolean => {
 const suggestSku = (categoryName: string, productName: string): string => {
   const prefix = categoryName
     .split(/[\s-]+/)
+    .filter(Boolean)
     .map((w) => w.charAt(0).toUpperCase())
     .join('')
+    .replace(/[^A-Z0-9]/g, '')
     .slice(0, 4);
 
   const suffix = productName
@@ -16,7 +18,7 @@ const suggestSku = (categoryName: string, productName: string): string => {
     .toUpperCase()
     .slice(0, 3);
 
-  return `${prefix}-${suffix}001`;
+  return `${prefix || 'GEN'}-${suffix || 'PRD'}001`;
 };
 
 const sanitizeSku = (sku: string): string => {

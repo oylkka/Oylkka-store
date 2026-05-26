@@ -99,7 +99,7 @@ export function CategoryForm(props: CategoryFormProps) {
     reset,
     formState: { errors },
   } = useForm<FormValues>({
-    resolver: zodResolver(schema),
+    resolver: zodResolver(schema) as never,
     defaultValues: (isEdit
       ? props.defaultValues
       : {
@@ -131,7 +131,7 @@ export function CategoryForm(props: CategoryFormProps) {
       await editMutation.mutateAsync({
         ...values,
         featured: values.featured ?? false,
-        order: values.order ?? 0,
+        order: Number(values.order ?? 0),
         id: props.categoryId,
         keepExistingImage: keepImage,
       });
@@ -139,7 +139,7 @@ export function CategoryForm(props: CategoryFormProps) {
       await createMutation.mutateAsync({
         ...values,
         featured: values.featured ?? false,
-        order: values.order ?? 0,
+        order: Number(values.order ?? 0),
       });
       reset();
       if (imagePreview) {

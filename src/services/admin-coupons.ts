@@ -1,4 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import axios from 'axios';
 import { toast } from 'sonner';
 import apiClient from '@/lib/api-client';
 import { QUERY_KEYS } from '@/lib/constants';
@@ -92,11 +93,39 @@ export function useAdminCoupon(id: string) {
   });
 }
 
+export type CouponFormValues = {
+  code: string;
+  description?: string | null;
+  type: string;
+  value: number;
+  scope: string;
+  scopeId?: string | null;
+  minOrderAmount?: number | null;
+  maxDiscount?: number | null;
+  minQuantity?: number | null;
+  freeShipping?: boolean;
+  shippingDiscount?: number | null;
+  bogoBuyQty?: number | null;
+  bogoFreeQty?: number | null;
+  maxUses?: number;
+  maxUsesPerUser?: number;
+  maxClaimCount?: number;
+  firstOrderOnly?: boolean;
+  repeatPurchaseOnly?: boolean;
+  requiredPaymentMethod?: string | null;
+  platformRestriction?: string;
+  autoApply?: boolean;
+  startsAt?: string | null;
+  expiresAt?: string | null;
+  isActive?: boolean;
+  tiers?: Array<{ minQuantity: number; value: number; type?: string }>;
+};
+
 export function useCreateCouponMutation() {
   const queryClient = useQueryClient();
 
-  return useMutation({
-    mutationFn: async (data: Record<string, unknown>) => {
+  return useMutation<{ coupon: Coupon }, Error, CouponFormValues>({
+    mutationFn: async (data) => {
       const r = await apiClient.post<{ coupon: Coupon }>(
         '/api/admin/coupons/create',
         data,
@@ -110,10 +139,11 @@ export function useCreateCouponMutation() {
       toast.success('Coupon created', { id: 'create-coupon' });
       queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.ADMIN_COUPONS] });
     },
-    onError: (error: { response?: { data?: { error?: string } } }) => {
-      toast.error(error.response?.data?.error || 'Failed to create coupon', {
-        id: 'create-coupon',
-      });
+    onError: (error: unknown) => {
+      const message = axios.isAxiosError(error)
+        ? (error.response?.data?.error ?? error.message)
+        : 'Failed to create coupon';
+      toast.error(message, { id: 'create-coupon' });
     },
   });
 }
@@ -121,11 +151,12 @@ export function useCreateCouponMutation() {
 export function useUpdateCouponMutation() {
   const queryClient = useQueryClient();
 
-  return useMutation({
-    mutationFn: async ({
-      id,
-      ...data
-    }: { id: string } & Record<string, unknown>) => {
+  return useMutation<
+    { coupon: Coupon },
+    Error,
+    { id: string } & Partial<CouponFormValues>
+  >({
+    mutationFn: async ({ id, ...data }) => {
       const r = await apiClient.put<{ coupon: Coupon }>(
         `/api/admin/coupons/${id}`,
         data,
@@ -139,10 +170,11 @@ export function useUpdateCouponMutation() {
       toast.success('Coupon updated', { id: 'update-coupon' });
       queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.ADMIN_COUPONS] });
     },
-    onError: (error: { response?: { data?: { error?: string } } }) => {
-      toast.error(error.response?.data?.error || 'Failed to update coupon', {
-        id: 'update-coupon',
-      });
+    onError: (error: unknown) => {
+      const message = axios.isAxiosError(error)
+        ? (error.response?.data?.error ?? error.message)
+        : 'Failed to update coupon';
+      toast.error(message, { id: 'update-coupon' });
     },
   });
 }
@@ -150,8 +182,8 @@ export function useUpdateCouponMutation() {
 export function useDeleteCouponMutation() {
   const queryClient = useQueryClient();
 
-  return useMutation({
-    mutationFn: async (id: string) => {
+  return useMutation<void, Error, string>({
+    mutationFn: async (id) => {
       await apiClient.delete(`/api/admin/coupons/${id}`);
     },
     onMutate: () => {
@@ -161,10 +193,11 @@ export function useDeleteCouponMutation() {
       toast.success('Coupon deleted', { id: 'delete-coupon' });
       queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.ADMIN_COUPONS] });
     },
-    onError: (error: { response?: { data?: { error?: string } } }) => {
-      toast.error(error.response?.data?.error || 'Failed to delete coupon', {
-        id: 'delete-coupon',
-      });
+    onError: (error: unknown) => {
+      const message = axios.isAxiosError(error)
+        ? (error.response?.data?.error ?? error.message)
+        : 'Failed to delete coupon';
+      toast.error(message, { id: 'delete-coupon' });
     },
   });
 }

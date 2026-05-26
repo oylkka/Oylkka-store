@@ -99,7 +99,7 @@ export function ProductCard({ product }: ProductCardProps) {
 
           <div className='flex items-baseline gap-2'>
             <span className='text-base font-bold tabular-nums'>
-              ৳{(product.discountPrice || product.price).toLocaleString()}
+              ৳{(product.discountPrice ?? product.price).toLocaleString()}
             </span>
             {product.discountPrice && (
               <span className='text-sm text-muted-foreground line-through tabular-nums'>
