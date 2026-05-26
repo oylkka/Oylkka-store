@@ -60,7 +60,7 @@ const features = [
 const shopLinks = [
   { label: 'All Products', to: '/products' },
   { label: 'Categories', to: '/categories' },
-  { label: 'Special Offers', to: '/offers' },
+  { label: 'Special Offers', to: '/deals' },
   { label: 'New Arrivals', to: '/new-arrivals' },
   { label: 'Bestsellers', to: '/bestsellers' },
   { label: 'FAQs', to: '/faq' },
@@ -71,7 +71,7 @@ const companyLinks = [
   { label: 'Contact', to: '/contact' },
   { label: 'Blog', to: '/blog' },
   { label: 'Careers', to: '/careers' },
-  { label: 'Privacy Policy', to: '/privacy-policy' },
+  { label: 'Privacy Policy', to: '/privacy' },
   { label: 'Terms & Conditions', to: '/terms' },
 ];
 
