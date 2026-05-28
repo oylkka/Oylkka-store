@@ -39,6 +39,7 @@
     "color-namer": "^1.4.0",
     "date-fns": "^4.1.0",
     "dotenv": "^17.4.2",
+    "embla-carousel-autoplay": "^8.6.0",
     "embla-carousel-react": "^8.6.0",
     "i18next": "^26.2.0",
     "i18next-browser-languagedetector": "^8.2.1",
