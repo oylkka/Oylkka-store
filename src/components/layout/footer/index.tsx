@@ -1,19 +1,18 @@
 import { Link } from '@tanstack/react-router';
-import { motion, useInView } from 'framer-motion';
 import {
+  BadgeCheck,
   ChevronRight,
   Clock,
-  Gift,
-  Headphones,
-  Heart,
   Mail,
   MapPin,
   PhoneCall,
+  RefreshCw,
   Send,
   ShieldCheck,
   ShoppingBag,
   Truck,
 } from 'lucide-react';
+import { motion, useInView } from 'motion/react';
 import { useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -34,27 +33,11 @@ const stagger = {
   show: { transition: { staggerChildren: 0.06 } },
 };
 
-const features = [
-  {
-    icon: Truck,
-    title: 'Free Shipping',
-    desc: 'On orders over ৳2000',
-  },
-  {
-    icon: ShieldCheck,
-    title: 'Secure Payment',
-    desc: '100% protected',
-  },
-  {
-    icon: Headphones,
-    title: '24/7 Support',
-    desc: 'Dedicated assistance',
-  },
-  {
-    icon: Gift,
-    title: 'Special Offers',
-    desc: 'Save up to 25%',
-  },
+const trustBadges = [
+  { icon: ShieldCheck, label: 'Secure Payment', sub: 'SSL encrypted checkout' },
+  { icon: BadgeCheck, label: 'Verified Vendors', sub: '100% vetted sellers' },
+  { icon: RefreshCw, label: 'Easy Returns', sub: '7-day return policy' },
+  { icon: Truck, label: 'Fast Delivery', sub: 'Nationwide coverage' },
 ];
 
 const shopLinks = [
@@ -91,7 +74,7 @@ const contacts = [
 ];
 
 const NavLinks = ({ links }: { links: { label: string; to: string }[] }) => (
-  <ul className='space-y-4'>
+  <ul className='space-y-2.5'>
     {links.map((link) => (
       <li key={link.label}>
         <Link
@@ -154,7 +137,7 @@ function NewsletterSection({ inView }: { inView: boolean }) {
             </p>
           </motion.div>
           <motion.div variants={fadeUp} custom={0.08}>
-            <div className='flex flex-col gap-3 sm:flex-row'>
+            <div className='flex gap-2 md:gap-3 flex-row'>
               <div className='group relative flex-1'>
                 <Input
                   type='email'
@@ -167,7 +150,7 @@ function NewsletterSection({ inView }: { inView: boolean }) {
                 className='h-11 gap-2 whitespace-nowrap px-6 transition-transform duration-200 hover:scale-[1.02]'
               >
                 <Send className='h-4 w-4' />
-                Subscribe
+                <span className='hidden md:block'>Subscribe</span>
               </Button>
             </div>
           </motion.div>
@@ -177,31 +160,29 @@ function NewsletterSection({ inView }: { inView: boolean }) {
   );
 }
 
-function FeaturesSection({ inView }: { inView: boolean }) {
+function TrustBadgeStrip({ inView }: { inView: boolean }) {
   return (
-    <div className='relative border-b border-border'>
-      <div className='container py-6'>
+    <div className='border-b border-border'>
+      <div className='container'>
         <motion.div
           initial='hidden'
           animate={inView ? 'show' : 'hidden'}
           variants={stagger}
-          className='grid grid-cols-2 gap-6 md:grid-cols-4'
+          className='grid grid-cols-2 divide-x divide-y divide-border md:grid-cols-4 md:divide-y-0'
         >
-          {features.map((feature) => (
+          {trustBadges.map(({ icon: Icon, label, sub }) => (
             <motion.div
-              key={feature.title}
+              key={label}
               variants={fadeUp}
               custom={0}
-              whileHover={{ y: -2 }}
-              transition={{ type: 'spring', stiffness: 320, damping: 24 }}
-              className='flex items-center gap-3 rounded-xl bg-muted/20 p-3 transition-colors duration-200 hover:bg-muted/30'
+              className='flex items-center gap-3 px-5 py-5'
             >
-              <div className='flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10 text-primary'>
-                <feature.icon className='h-5 w-5' />
+              <div className='flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-primary/10'>
+                <Icon className='h-4.5 w-4.5 text-primary' />
               </div>
               <div>
-                <p className='text-sm font-medium'>{feature.title}</p>
-                <p className='text-xs text-muted-foreground'>{feature.desc}</p>
+                <p className='text-sm font-semibold'>{label}</p>
+                <p className='mt-0.5 text-xs text-muted-foreground'>{sub}</p>
               </div>
             </motion.div>
           ))}
@@ -226,9 +207,9 @@ function SocialIcon({
       target='_blank'
       rel='noopener noreferrer'
       aria-label={label}
-      whileHover={{ rotate: 8, scale: 1.1 }}
+      whileHover={{ y: -2 }}
       transition={{ type: 'spring', stiffness: 320, damping: 18 }}
-      className='flex h-10 w-10 items-center justify-center rounded-full bg-muted text-muted-foreground transition-colors duration-200 hover:bg-primary hover:text-white'
+      className='flex h-8 w-8 items-center justify-center rounded-xl border border-border text-muted-foreground transition-all duration-200 hover:border-primary/30 hover:bg-primary/5 hover:text-primary'
     >
       {children}
     </motion.a>
@@ -243,7 +224,7 @@ export default function Footer() {
     <footer className='relative overflow-hidden bg-background text-foreground'>
       <div ref={sectionRef} className='relative'>
         <NewsletterSection inView={inView} />
-        <FeaturesSection inView={inView} />
+        <TrustBadgeStrip inView={inView} />
       </div>
 
       <div className='relative container py-16'>
@@ -259,12 +240,10 @@ export default function Footer() {
             className='col-span-2 lg:col-span-2'
           >
             <Link to='/' className='mb-6 flex items-center gap-2.5'>
-              <div className='flex h-10 w-10 items-center justify-center rounded-xl bg-primary text-white'>
-                <ShoppingBag className='h-5 w-5' />
+              <div className='flex h-8 w-8 items-center justify-center rounded-xl bg-primary'>
+                <ShoppingBag className='h-4 w-4 text-primary-foreground' />
               </div>
-              <span className='text-2xl font-extrabold tracking-tight md:text-3xl'>
-                <span className='text-primary'>Oyl</span>kka
-              </span>
+              <span className='text-lg font-bold tracking-tight'>Oylkka</span>
             </Link>
             <p className='mb-6 max-w-xs text-sm leading-relaxed text-muted-foreground'>
               Discover quality products at unbeatable prices. We&apos;re
@@ -356,72 +335,9 @@ export default function Footer() {
             <EyebrowHeader label='Company' />
             <NavLinks links={companyLinks} />
           </motion.div>
-
-          <motion.div
-            variants={fadeUp}
-            custom={0.14}
-            className='col-span-2 lg:col-span-1'
-          >
+          <motion.div variants={fadeUp} custom={0.14}>
             <EyebrowHeader label='Support' />
             <NavLinks links={supportLinks} />
-            <div className='mt-6 rounded-xl bg-muted/30 p-4'>
-              <h5 className='mb-3 text-sm font-medium'>Download Our App</h5>
-              <p className='mb-4 text-xs text-muted-foreground'>
-                Shop on the go with our mobile app
-              </p>
-              <div className='flex flex-wrap w-full gap-2'>
-                <Button
-                  variant='outline'
-                  size='sm'
-                  className='h-10 border-border md:w-full bg-muted/50 text-xs text-muted-foreground transition-all duration-200 hover:bg-muted hover:text-foreground hover:scale-[1.02]'
-                >
-                  <svg
-                    className='mr-2 h-4 w-4'
-                    viewBox='0 0 24 24'
-                    fill='none'
-                    xmlns='http://www.w3.org/2000/svg'
-                    aria-hidden='true'
-                  >
-                    <path
-                      d='M12.954 11.616L15.911 8.659L6.36 3.29C5.727 2.923 5.176 2.93 4.759 3.233L12.954 11.616Z'
-                      fill='currentColor'
-                    />
-                    <path
-                      d='M16.415 15.045L19.489 13.247C20.029 12.931 20.029 12.069 19.489 11.753L16.415 9.955L13.211 13.159L16.415 15.045Z'
-                      fill='currentColor'
-                    />
-                    <path
-                      d='M4.759 20.767C5.176 21.07 5.727 21.077 6.36 20.71L15.911 15.341L12.954 12.384L4.759 20.767Z'
-                      fill='currentColor'
-                    />
-                    <path
-                      d='M4.447 3.525C4.264 3.845 4.167 4.286 4.167 4.833V19.167C4.167 19.714 4.264 20.155 4.447 20.475L12.642 12.092L4.447 3.525Z'
-                      fill='currentColor'
-                    />
-                  </svg>
-                  Play Store
-                </Button>
-                <Button
-                  variant='outline'
-                  size='sm'
-                  className='h-10 border-border md:w-full bg-muted/50 text-xs text-muted-foreground transition-all duration-200 hover:bg-muted hover:text-foreground hover:scale-[1.02]'
-                >
-                  <svg
-                    className='mr-2 h-4 w-4'
-                    viewBox='0 0 24 24'
-                    fill='none'
-                    xmlns='http://www.w3.org/2000/svg'
-                    aria-hidden='true'
-                  >
-                    <path
-                      d='M16.741 19.356C16.082 20.0374 15.3137 19.9917 14.5714 19.7088C13.7943 19.4202 13.0743 19.4087 12.2514 19.7088C11.1943 20.0946 10.6514 19.9145 10.0629 19.356C6.97717 16.1231 7.56003 11.0802 11.1943 10.8831C12.1657 10.9345 12.8343 11.3774 13.3886 11.4231C14.2114 11.2373 14.9943 10.7831 15.8971 10.8545C17.0057 10.9545 17.8229 11.4288 18.3429 12.2802C15.5314 13.8802 16.1657 17.4574 18.7429 18.3888C18.3429 18.7545 17.9029 19.1088 17.4171 19.4659L16.741 19.356ZM12.9714 10.7717C12.8114 8.83452 14.3771 7.28595 16.1943 7.14309C16.4343 9.37167 14.1829 11.0002 12.9714 10.7717Z'
-                      fill='currentColor'
-                    />
-                  </svg>
-                  App Store
-                </Button>
-              </div>
-            </div>
           </motion.div>
         </motion.div>
       </div>
@@ -435,7 +351,6 @@ export default function Footer() {
               transition={{ duration: 0.45, ease: EASE, delay: 0.3 }}
               className='flex items-center gap-2 text-xs text-muted-foreground'
             >
-              <Heart className='h-3.5 w-3.5 text-primary' />
               &copy; {new Date().getFullYear()} Oylkka. All rights reserved.
             </motion.p>
             <motion.div

@@ -65,8 +65,8 @@ export default function Header({ navigation = true }: HeaderProps) {
             {/* Removed MobileSearch component */}
 
             <div className='flex items-center gap-2'>
-              {/* Desktop Theme Switcher */}
-              <div className='hidden md:block'>
+              {/* Theme Switcher */}
+              <div>
                 <ModeToggle />
               </div>
               {user && <Cart />}
