@@ -14,6 +14,7 @@ import { Route as TermsRouteImport } from './routes/terms'
 import { Route as SizeGuideRouteImport } from './routes/size-guide'
 import { Route as ShippingRouteImport } from './routes/shipping'
 import { Route as ReturnsRouteImport } from './routes/returns'
+import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as ProductsRouteImport } from './routes/products'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as NewArrivalsRouteImport } from './routes/new-arrivals'
@@ -35,7 +36,6 @@ import { Route as ShopsIndexRouteImport } from './routes/shops/index'
 import { Route as DashboardIndexRouteImport } from './routes/dashboard/index'
 import { Route as ShopRecentlyViewedRouteImport } from './routes/shop.recently-viewed'
 import { Route as ShopSlugRouteImport } from './routes/shop.$slug'
-import { Route as ResetPasswordTokenRouteImport } from './routes/reset-password.$token'
 import { Route as ProductSlugRouteImport } from './routes/product.$slug'
 import { Route as DashboardWishlistRouteImport } from './routes/dashboard/wishlist'
 import { Route as DashboardWalletRouteImport } from './routes/dashboard/wallet'
@@ -138,6 +138,7 @@ import { Route as ApiBannersDeleteRouteImport } from './routes/api/banners/delet
 import { Route as ApiBannersAdminListRouteImport } from './routes/api/banners/admin-list'
 import { Route as ApiBannersAddRouteImport } from './routes/api/banners/add'
 import { Route as ApiAuthSendPasswordResetConfirmationRouteImport } from './routes/api/auth/send-password-reset-confirmation'
+import { Route as ApiAuthCheckEmailRouteImport } from './routes/api/auth/check-email'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 import { Route as ApiAdminAuditLogsRouteImport } from './routes/api/admin/audit-logs'
 import { Route as ApiAddressesListRouteImport } from './routes/api/addresses/list'
@@ -258,6 +259,11 @@ const ReturnsRoute = ReturnsRouteImport.update({
   path: '/returns',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ResetPasswordRoute = ResetPasswordRouteImport.update({
+  id: '/reset-password',
+  path: '/reset-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ProductsRoute = ProductsRouteImport.update({
   id: '/products',
   path: '/products',
@@ -361,11 +367,6 @@ const ShopRecentlyViewedRoute = ShopRecentlyViewedRouteImport.update({
 const ShopSlugRoute = ShopSlugRouteImport.update({
   id: '/shop/$slug',
   path: '/shop/$slug',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ResetPasswordTokenRoute = ResetPasswordTokenRouteImport.update({
-  id: '/reset-password/$token',
-  path: '/reset-password/$token',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ProductSlugRoute = ProductSlugRouteImport.update({
@@ -892,6 +893,11 @@ const ApiAuthSendPasswordResetConfirmationRoute =
     path: '/api/auth/send-password-reset-confirmation',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiAuthCheckEmailRoute = ApiAuthCheckEmailRouteImport.update({
+  id: '/api/auth/check-email',
+  path: '/api/auth/check-email',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
   id: '/api/auth/$',
   path: '/api/auth/$',
@@ -1431,6 +1437,7 @@ export interface FileRoutesByFullPath {
   '/new-arrivals': typeof NewArrivalsRoute
   '/privacy': typeof PrivacyRoute
   '/products': typeof ProductsRouteWithChildren
+  '/reset-password': typeof ResetPasswordRoute
   '/returns': typeof ReturnsRoute
   '/shipping': typeof ShippingRoute
   '/size-guide': typeof SizeGuideRoute
@@ -1454,7 +1461,6 @@ export interface FileRoutesByFullPath {
   '/dashboard/wallet': typeof DashboardWalletRoute
   '/dashboard/wishlist': typeof DashboardWishlistRoute
   '/product/$slug': typeof ProductSlugRoute
-  '/reset-password/$token': typeof ResetPasswordTokenRoute
   '/shop/$slug': typeof ShopSlugRoute
   '/shop/recently-viewed': typeof ShopRecentlyViewedRoute
   '/dashboard/': typeof DashboardIndexRoute
@@ -1469,6 +1475,7 @@ export interface FileRoutesByFullPath {
   '/api/addresses/list': typeof ApiAddressesListRoute
   '/api/admin/audit-logs': typeof ApiAdminAuditLogsRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
+  '/api/auth/check-email': typeof ApiAuthCheckEmailRoute
   '/api/auth/send-password-reset-confirmation': typeof ApiAuthSendPasswordResetConfirmationRoute
   '/api/banners/add': typeof ApiBannersAddRoute
   '/api/banners/admin-list': typeof ApiBannersAdminListRoute
@@ -1655,6 +1662,7 @@ export interface FileRoutesByTo {
   '/new-arrivals': typeof NewArrivalsRoute
   '/privacy': typeof PrivacyRoute
   '/products': typeof ProductsRouteWithChildren
+  '/reset-password': typeof ResetPasswordRoute
   '/returns': typeof ReturnsRoute
   '/shipping': typeof ShippingRoute
   '/size-guide': typeof SizeGuideRoute
@@ -1676,7 +1684,6 @@ export interface FileRoutesByTo {
   '/dashboard/wallet': typeof DashboardWalletRoute
   '/dashboard/wishlist': typeof DashboardWishlistRoute
   '/product/$slug': typeof ProductSlugRoute
-  '/reset-password/$token': typeof ResetPasswordTokenRoute
   '/shop/$slug': typeof ShopSlugRoute
   '/shop/recently-viewed': typeof ShopRecentlyViewedRoute
   '/dashboard': typeof DashboardIndexRoute
@@ -1688,6 +1695,7 @@ export interface FileRoutesByTo {
   '/api/addresses/list': typeof ApiAddressesListRoute
   '/api/admin/audit-logs': typeof ApiAdminAuditLogsRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
+  '/api/auth/check-email': typeof ApiAuthCheckEmailRoute
   '/api/auth/send-password-reset-confirmation': typeof ApiAuthSendPasswordResetConfirmationRoute
   '/api/banners/add': typeof ApiBannersAddRoute
   '/api/banners/admin-list': typeof ApiBannersAdminListRoute
@@ -1876,6 +1884,7 @@ export interface FileRoutesById {
   '/new-arrivals': typeof NewArrivalsRoute
   '/privacy': typeof PrivacyRoute
   '/products': typeof ProductsRouteWithChildren
+  '/reset-password': typeof ResetPasswordRoute
   '/returns': typeof ReturnsRoute
   '/shipping': typeof ShippingRoute
   '/size-guide': typeof SizeGuideRoute
@@ -1899,7 +1908,6 @@ export interface FileRoutesById {
   '/dashboard/wallet': typeof DashboardWalletRoute
   '/dashboard/wishlist': typeof DashboardWishlistRoute
   '/product/$slug': typeof ProductSlugRoute
-  '/reset-password/$token': typeof ResetPasswordTokenRoute
   '/shop/$slug': typeof ShopSlugRoute
   '/shop/recently-viewed': typeof ShopRecentlyViewedRoute
   '/dashboard/': typeof DashboardIndexRoute
@@ -1914,6 +1922,7 @@ export interface FileRoutesById {
   '/api/addresses/list': typeof ApiAddressesListRoute
   '/api/admin/audit-logs': typeof ApiAdminAuditLogsRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
+  '/api/auth/check-email': typeof ApiAuthCheckEmailRoute
   '/api/auth/send-password-reset-confirmation': typeof ApiAuthSendPasswordResetConfirmationRoute
   '/api/banners/add': typeof ApiBannersAddRoute
   '/api/banners/admin-list': typeof ApiBannersAdminListRoute
@@ -2103,6 +2112,7 @@ export interface FileRouteTypes {
     | '/new-arrivals'
     | '/privacy'
     | '/products'
+    | '/reset-password'
     | '/returns'
     | '/shipping'
     | '/size-guide'
@@ -2126,7 +2136,6 @@ export interface FileRouteTypes {
     | '/dashboard/wallet'
     | '/dashboard/wishlist'
     | '/product/$slug'
-    | '/reset-password/$token'
     | '/shop/$slug'
     | '/shop/recently-viewed'
     | '/dashboard/'
@@ -2141,6 +2150,7 @@ export interface FileRouteTypes {
     | '/api/addresses/list'
     | '/api/admin/audit-logs'
     | '/api/auth/$'
+    | '/api/auth/check-email'
     | '/api/auth/send-password-reset-confirmation'
     | '/api/banners/add'
     | '/api/banners/admin-list'
@@ -2327,6 +2337,7 @@ export interface FileRouteTypes {
     | '/new-arrivals'
     | '/privacy'
     | '/products'
+    | '/reset-password'
     | '/returns'
     | '/shipping'
     | '/size-guide'
@@ -2348,7 +2359,6 @@ export interface FileRouteTypes {
     | '/dashboard/wallet'
     | '/dashboard/wishlist'
     | '/product/$slug'
-    | '/reset-password/$token'
     | '/shop/$slug'
     | '/shop/recently-viewed'
     | '/dashboard'
@@ -2360,6 +2370,7 @@ export interface FileRouteTypes {
     | '/api/addresses/list'
     | '/api/admin/audit-logs'
     | '/api/auth/$'
+    | '/api/auth/check-email'
     | '/api/auth/send-password-reset-confirmation'
     | '/api/banners/add'
     | '/api/banners/admin-list'
@@ -2547,6 +2558,7 @@ export interface FileRouteTypes {
     | '/new-arrivals'
     | '/privacy'
     | '/products'
+    | '/reset-password'
     | '/returns'
     | '/shipping'
     | '/size-guide'
@@ -2570,7 +2582,6 @@ export interface FileRouteTypes {
     | '/dashboard/wallet'
     | '/dashboard/wishlist'
     | '/product/$slug'
-    | '/reset-password/$token'
     | '/shop/$slug'
     | '/shop/recently-viewed'
     | '/dashboard/'
@@ -2585,6 +2596,7 @@ export interface FileRouteTypes {
     | '/api/addresses/list'
     | '/api/admin/audit-logs'
     | '/api/auth/$'
+    | '/api/auth/check-email'
     | '/api/auth/send-password-reset-confirmation'
     | '/api/banners/add'
     | '/api/banners/admin-list'
@@ -2773,6 +2785,7 @@ export interface RootRouteChildren {
   NewArrivalsRoute: typeof NewArrivalsRoute
   PrivacyRoute: typeof PrivacyRoute
   ProductsRoute: typeof ProductsRouteWithChildren
+  ResetPasswordRoute: typeof ResetPasswordRoute
   ReturnsRoute: typeof ReturnsRoute
   ShippingRoute: typeof ShippingRoute
   SizeGuideRoute: typeof SizeGuideRoute
@@ -2785,7 +2798,6 @@ export interface RootRouteChildren {
   AuthSignupRoute: typeof AuthSignupRoute
   AuthVerifyRoute: typeof AuthVerifyRoute
   ProductSlugRoute: typeof ProductSlugRoute
-  ResetPasswordTokenRoute: typeof ResetPasswordTokenRoute
   ShopSlugRoute: typeof ShopSlugRoute
   ShopRecentlyViewedRoute: typeof ShopRecentlyViewedRoute
   ShopsIndexRoute: typeof ShopsIndexRoute
@@ -2795,6 +2807,7 @@ export interface RootRouteChildren {
   ApiAddressesListRoute: typeof ApiAddressesListRoute
   ApiAdminAuditLogsRoute: typeof ApiAdminAuditLogsRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
+  ApiAuthCheckEmailRoute: typeof ApiAuthCheckEmailRoute
   ApiAuthSendPasswordResetConfirmationRoute: typeof ApiAuthSendPasswordResetConfirmationRoute
   ApiBannersAddRoute: typeof ApiBannersAddRoute
   ApiBannersAdminListRoute: typeof ApiBannersAdminListRoute
@@ -2953,6 +2966,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ReturnsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/reset-password': {
+      id: '/reset-password'
+      path: '/reset-password'
+      fullPath: '/reset-password'
+      preLoaderRoute: typeof ResetPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/products': {
       id: '/products'
       path: '/products'
@@ -3098,13 +3118,6 @@ declare module '@tanstack/react-router' {
       path: '/shop/$slug'
       fullPath: '/shop/$slug'
       preLoaderRoute: typeof ShopSlugRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/reset-password/$token': {
-      id: '/reset-password/$token'
-      path: '/reset-password/$token'
-      fullPath: '/reset-password/$token'
-      preLoaderRoute: typeof ResetPasswordTokenRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/product/$slug': {
@@ -3819,6 +3832,13 @@ declare module '@tanstack/react-router' {
       path: '/api/auth/send-password-reset-confirmation'
       fullPath: '/api/auth/send-password-reset-confirmation'
       preLoaderRoute: typeof ApiAuthSendPasswordResetConfirmationRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/auth/check-email': {
+      id: '/api/auth/check-email'
+      path: '/api/auth/check-email'
+      fullPath: '/api/auth/check-email'
+      preLoaderRoute: typeof ApiAuthCheckEmailRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/auth/$': {
@@ -4758,6 +4778,7 @@ const rootRouteChildren: RootRouteChildren = {
   NewArrivalsRoute: NewArrivalsRoute,
   PrivacyRoute: PrivacyRoute,
   ProductsRoute: ProductsRouteWithChildren,
+  ResetPasswordRoute: ResetPasswordRoute,
   ReturnsRoute: ReturnsRoute,
   ShippingRoute: ShippingRoute,
   SizeGuideRoute: SizeGuideRoute,
@@ -4770,7 +4791,6 @@ const rootRouteChildren: RootRouteChildren = {
   AuthSignupRoute: AuthSignupRoute,
   AuthVerifyRoute: AuthVerifyRoute,
   ProductSlugRoute: ProductSlugRoute,
-  ResetPasswordTokenRoute: ResetPasswordTokenRoute,
   ShopSlugRoute: ShopSlugRoute,
   ShopRecentlyViewedRoute: ShopRecentlyViewedRoute,
   ShopsIndexRoute: ShopsIndexRoute,
@@ -4780,6 +4800,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiAddressesListRoute: ApiAddressesListRoute,
   ApiAdminAuditLogsRoute: ApiAdminAuditLogsRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
+  ApiAuthCheckEmailRoute: ApiAuthCheckEmailRoute,
   ApiAuthSendPasswordResetConfirmationRoute:
     ApiAuthSendPasswordResetConfirmationRoute,
   ApiBannersAddRoute: ApiBannersAddRoute,

@@ -25,7 +25,8 @@ import {
 } from 'lucide-react';
 import { AnimatePresence, motion } from 'motion/react';
 import { useState } from 'react';
-import { Button } from '@/components/ui/button';
+import { Button } from '#/components/ui/button';
+// import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import {
   Sheet,
@@ -170,7 +171,7 @@ export default function MobileMenu() {
         <SheetContent
           side='left'
           showCloseButton={false}
-          className='flex w-[300px] flex-col border-r bg-background p-0 sm:w-[400px]'
+          className='flex w-75 flex-col border-r bg-background p-0 sm:w-100'
           onOpenAutoFocus={(event) => event.preventDefault()}
         >
           {/* Header */}

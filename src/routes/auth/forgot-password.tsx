@@ -38,7 +38,10 @@ function RouteComponent() {
 
     setIsLoading(true);
     try {
-      const { error } = await requestPasswordReset({ email });
+      const { error } = await requestPasswordReset({
+        email,
+        redirectTo: '/reset-password',
+      });
 
       if (error) {
         toast.error('Failed to send reset email', {

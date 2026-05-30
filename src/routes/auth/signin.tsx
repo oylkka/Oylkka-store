@@ -98,9 +98,9 @@ function RouteComponent() {
       }
 
       toast.success('Welcome back!', {
-        description: 'Redirecting you to your Profile...',
+        description: 'Redirecting you to Dashboard...',
       });
-      navigate({ to: '/dashboard/my-account' });
+      navigate({ to: '/dashboard' });
     } catch (err) {
       toast.error('Unexpected error', {
         description: 'An unexpected error occurred. Please try again.',
@@ -117,7 +117,7 @@ function RouteComponent() {
     try {
       await signIn.social({
         provider,
-        callbackURL: '/dashboard/my-account',
+        callbackURL: '/dashboard',
         errorCallbackURL: '/auth/error',
       });
       toast.success(

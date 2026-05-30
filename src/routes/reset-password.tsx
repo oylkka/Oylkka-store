@@ -4,7 +4,7 @@ import {
   redirect,
   useNavigate,
 } from '@tanstack/react-router';
-import { Eye, EyeOff } from 'lucide-react';
+import { AlertTriangle, Eye, EyeOff } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
 import Footer from '#/components/layout/footer';
@@ -20,10 +20,11 @@ import {
 import { Input } from '@/components/ui/input';
 import { resetPassword } from '@/lib/auth-client';
 
-export const Route = createFileRoute('/reset-password/$token')({
+export const Route = createFileRoute('/reset-password')({
   validateSearch: (
     search: Record<string, string | undefined>,
-  ): { email?: string } => ({
+  ): { token?: string; email?: string } => ({
+    token: search.token,
     email: search.email,
   }),
   beforeLoad: ({ context }) => {
@@ -36,8 +37,7 @@ export const Route = createFileRoute('/reset-password/$token')({
 
 function RouteComponent() {
   const navigate = useNavigate();
-  const { token } = Route.useParams();
-  const { email } = Route.useSearch();
+  const { token, email } = Route.useSearch();
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -98,6 +98,34 @@ function RouteComponent() {
     } finally {
       setIsLoading(false);
     }
+  }
+
+  if (!token) {
+    return (
+      <>
+        <Header />
+        <div className='container flex min-h-[calc(100vh-var(--header-height)-var(--footer-height))] items-center justify-center py-12'>
+          <Card className='w-full max-w-md'>
+            <CardContent className='flex flex-col items-center gap-4 p-8 text-center'>
+              <div className='flex h-16 w-16 items-center justify-center rounded-full bg-amber-100 dark:bg-amber-900/20'>
+                <AlertTriangle className='h-8 w-8 text-amber-600 dark:text-amber-400' />
+              </div>
+              <h1 className='text-2xl font-bold'>Invalid Link</h1>
+              <p className='text-muted-foreground text-balance text-sm'>
+                This reset link is invalid or has expired.
+              </p>
+              <Button size='lg' asChild>
+                <Link to='/auth/forgot-password'>Request a new reset link</Link>
+              </Button>
+              <Button variant='outline' size='lg' asChild>
+                <Link to='/auth/signin'>Back to sign in</Link>
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
+        <Footer />
+      </>
+    );
   }
 
   return (

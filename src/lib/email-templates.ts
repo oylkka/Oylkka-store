@@ -494,6 +494,37 @@ export function welcomeHtml(name: string): string {
   `);
 }
 
+export function existingAccountHtml(
+  name: string | undefined,
+  provider: string,
+): string {
+  return baseWrapper(`
+    ${eyebrow('Account Already Exists')}
+
+    <h1 style="font-size: 24px; font-weight: 700; letter-spacing: -0.02em; margin: 0 0 8px; color: ${BRAND.foreground};">
+      You already have an account<span style="color: ${BRAND.primary};">.</span>
+    </h1>
+
+    <p style="font-size: 14px; line-height: 1.6; color: ${BRAND.mutedForeground}; margin: 0 0 24px;">
+      Hi ${name || 'there'}, we noticed someone tried to create a new account with this email address. You're already signed up via <strong>${provider}</strong>.
+    </p>
+
+    <p style="font-size: 14px; line-height: 1.6; color: ${BRAND.mutedForeground}; margin: 0 0 24px;">
+      If this was you, please sign in using your ${provider} account. If you didn't try to create an account, you can ignore this email.
+    </p>
+
+    <table cellpadding="0" cellspacing="0" style="margin: 0 auto;">
+      <tr>
+        <td style="background: ${BRAND.primary}; border-radius: 8px; text-align: center;">
+          <a href="${process.env.BETTER_AUTH_URL || 'http://localhost:3000'}/auth/signin" style="display: inline-block; padding: 12px 28px; color: #ffffff !important; text-decoration: none; font-size: 14px; font-weight: 600; border-radius: 8px;">
+            Sign In
+          </a>
+        </td>
+      </tr>
+    </table>
+  `);
+}
+
 export function payoutProcessedHtml(
   shopName: string,
   amount: number,

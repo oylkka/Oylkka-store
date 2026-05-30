@@ -3,7 +3,7 @@ import { prismaAdapter } from 'better-auth/adapters/prisma';
 import { admin } from 'better-auth/plugins';
 import { tanstackStartCookies } from 'better-auth/tanstack-start';
 import { DeleteImage } from '@/cloudinary';
-import { welcomeHtml } from '@/lib/email-templates';
+import { existingAccountHtml, welcomeHtml } from '@/lib/email-templates';
 import { sendEmail } from '@/lib/send-email';
 import { prisma } from './db';
 
@@ -140,6 +140,30 @@ export const auth = betterAuth({
           callToActionText: 'Reset Password',
         },
       });
+    },
+    onExistingUserSignUp: async ({ user }) => {
+      try {
+        const googleAccount = await prisma.account.findFirst({
+          where: { userId: user.id, providerId: 'google' },
+          select: { id: true },
+        });
+
+        const provider = googleAccount ? 'Google' : 'email/password';
+
+        await sendEmail({
+          to: user.email,
+          subject: 'You already have an Oylkka account',
+          meta: {
+            description: `We noticed someone tried to create a new account with this email. You're already signed up via ${provider}.`,
+            link: `${process.env.BETTER_AUTH_URL || 'http://localhost:3000'}/auth/signin`,
+            callToActionText: 'Sign In',
+          },
+          html: existingAccountHtml(user.name || undefined, provider),
+        });
+      } catch (err) {
+        // biome-ignore lint/suspicious/noConsole: this is fine
+        console.error('Failed to send existing account notification', err);
+      }
     },
   },
 

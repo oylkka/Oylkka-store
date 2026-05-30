@@ -67,6 +67,38 @@ function RouteComponent() {
   async function onSubmit(values: SignupFormValues) {
     setIsLoading(true);
     try {
+      // --- Pre-check: is this email already taken? ---
+      const checkRes = await fetch('/api/auth/check-email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: values.email }),
+      });
+      const checkData = await checkRes.json();
+
+      if (checkData.exists) {
+        if (checkData.provider === 'google') {
+          toast.error('Google account found', {
+            description:
+              'This email is linked to a Google account. Sign in with Google instead.',
+          });
+          setError('email', {
+            type: 'manual',
+            message: 'Linked to a Google account — sign in with Google',
+          });
+        } else {
+          toast.error('Email already registered', {
+            description:
+              'An account with this email already exists. Please sign in.',
+          });
+          setError('email', {
+            type: 'manual',
+            message: 'Email already registered',
+          });
+        }
+        return;
+      }
+
+      // --- Proceed with Better Auth signup ---
       const { error } = await signUp.email({
         name: values.name,
         email: values.email,
@@ -106,8 +138,9 @@ function RouteComponent() {
         return;
       }
 
-      toast.success('Account created!', {
-        description: 'Check your email to verify your account.',
+      toast.success('Verification email sent', {
+        description:
+          'If this is a new account, check your inbox for a verification link.',
       });
       navigate({ to: '/auth/signin' });
     } catch (err) {
@@ -126,7 +159,7 @@ function RouteComponent() {
     try {
       await signIn.social({
         provider,
-        callbackURL: '/dashboard/my-account',
+        callbackURL: '/dashboard',
         errorCallbackURL: '/auth/error',
       });
       toast.success(

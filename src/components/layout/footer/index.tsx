@@ -2,10 +2,6 @@ import { Link } from '@tanstack/react-router';
 import {
   BadgeCheck,
   ChevronRight,
-  Clock,
-  Mail,
-  MapPin,
-  PhoneCall,
   RefreshCw,
   Send,
   ShieldCheck,
@@ -14,8 +10,8 @@ import {
 } from 'lucide-react';
 import { motion, useInView } from 'motion/react';
 import { useRef } from 'react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import { Button } from '#/components/ui/button';
+import { Input } from '#/components/ui/input';
 
 const EASE: [number, number, number, number] = [0.22, 1, 0.36, 1];
 
@@ -64,13 +60,6 @@ const supportLinks = [
   { label: 'Returns & Exchanges', to: '/returns' },
   { label: 'Order Tracking', to: '/tracking' },
   { label: 'Size Guide', to: '/size-guide' },
-];
-
-const contacts = [
-  { icon: MapPin, text: '123 Commerce St, Shopping City' },
-  { icon: PhoneCall, text: '+1 (234) 567-8900' },
-  { icon: Mail, text: 'support@oylkka.com' },
-  { icon: Clock, text: 'Mon-Fri: 9AM - 6PM' },
 ];
 
 const NavLinks = ({ links }: { links: { label: string; to: string }[] }) => (
@@ -250,19 +239,7 @@ export default function Footer() {
               committed to providing exceptional shopping experiences with fast
               shipping, secure checkout, and premium customer support.
             </p>
-            <div className='mb-8 space-y-1'>
-              {contacts.map((contact) => (
-                <div
-                  key={contact.text}
-                  className='flex items-center gap-3 text-sm text-muted-foreground transition-colors duration-200 hover:text-foreground'
-                >
-                  <div className='flex h-8 w-8 items-center justify-center rounded-full bg-muted'>
-                    <contact.icon className='h-4 w-4 text-primary' />
-                  </div>
-                  <span>{contact.text}</span>
-                </div>
-              ))}
-            </div>
+
             <div>
               <p className='mb-3 text-sm font-medium'>Follow Us</p>
               <div className='flex items-center gap-3'>

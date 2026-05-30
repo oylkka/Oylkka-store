@@ -1,17 +1,8 @@
-import { zodResolver } from '@hookform/resolvers/zod';
 import { useNavigate } from '@tanstack/react-router';
 import { Search, X } from 'lucide-react';
-import { Controller, useForm } from 'react-hook-form';
-import { z } from 'zod';
-import { Field, FieldError } from '@/components/ui/field';
+import { type FormEvent, useEffect, useState } from 'react';
 import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
-
-const FormSchema = z.object({
-  search: z.string().min(2, {
-    message: 'Search must be at least 2 characters.',
-  }),
-});
 
 interface SearchBarProps {
   className?: string;
@@ -23,61 +14,46 @@ export default function SearchBar({
   onSearchSubmit,
 }: SearchBarProps) {
   const navigate = useNavigate();
+  const [searchValue, setSearchValue] = useState('');
 
-  const form = useForm<z.infer<typeof FormSchema>>({
-    resolver: zodResolver(FormSchema),
-    defaultValues: { search: '' },
-  });
+  // Sync initial value from URL on mount so the bar reflects an active search query
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const search = new URLSearchParams(window.location.search).get('search');
+    if (search) setSearchValue(search);
+  }, []);
 
-  const onSubmit = (data: z.infer<typeof FormSchema>) => {
-    navigate({
-      to: '/products',
-      search: { search: data.search },
-    });
+  const handleSubmit = (e: FormEvent) => {
+    e.preventDefault();
+    const params: Record<string, string> = {};
+    if (searchValue.trim()) params.search = searchValue.trim();
+    navigate({ to: '/products', search: params });
     onSearchSubmit?.();
   };
 
   return (
-    <div className='relative w-full'>
-      <form onSubmit={form.handleSubmit(onSubmit)} className='w-full'>
-        <Controller
-          name='search'
-          control={form.control}
-          render={({ field, fieldState }) => (
-            <Field data-invalid={fieldState.invalid}>
-              <div className='relative flex w-full'>
-                <Input
-                  {...field}
-                  id={field.name}
-                  placeholder='Search products...'
-                  aria-invalid={fieldState.invalid}
-                  className={cn(
-                    'border-border/50 bg-background focus-visible:border-primary/50 focus-visible:ring-primary/30 h-10 rounded-full pr-10 pl-10 shadow-sm transition-all focus-visible:ring-1 focus-visible:ring-offset-0 md:min-w-max',
-                    className,
-                  )}
-                  autoComplete='off'
-                />
-                <Search
-                  className='text-muted-foreground group-focus-within:text-primary absolute top-1/2 left-3 -translate-y-1/2 transition-colors'
-                  size={18}
-                />
-                {field.value?.length > 0 && (
-                  <button
-                    type='button'
-                    className='text-muted-foreground hover:bg-muted hover:text-foreground absolute top-1/2 right-3 -translate-y-1/2 rounded-full p-0.5 transition-colors'
-                    onClick={() => form.setValue('search', '')}
-                  >
-                    <X size={16} />
-                    <span className='sr-only'>Clear search</span>
-                  </button>
-                )}
-              </div>
-              {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-            </Field>
-          )}
+    <form onSubmit={handleSubmit} className={cn('relative w-full', className)}>
+      <div className='relative flex w-full rounded-xl border border-border bg-background focus-within:ring-2 focus-within:ring-primary/30 overflow-hidden transition-shadow'>
+        <Search className='pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground' />
+        <Input
+          value={searchValue}
+          onChange={(e) => setSearchValue(e.target.value)}
+          placeholder='Search products...'
+          className='border-0 rounded-xl pl-9 h-10 bg-transparent shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 placeholder:text-muted-foreground/60'
+          autoComplete='off'
         />
-      </form>
-    </div>
+        {searchValue && (
+          <button
+            type='button'
+            onClick={() => setSearchValue('')}
+            className='absolute right-2 top-1/2 -translate-y-1/2 flex items-center justify-center w-5 h-5 rounded-full text-muted-foreground hover:text-foreground hover:bg-muted transition-colors'
+          >
+            <X size={14} />
+            <span className='sr-only'>Clear search</span>
+          </button>
+        )}
+      </div>
+    </form>
   );
 }
 
