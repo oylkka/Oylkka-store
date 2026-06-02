@@ -55,10 +55,6 @@ const VariantSchema = z.object({
     .nullable(),
 });
 
-const AttributesSchema = z
-  .record(z.string(), z.union([z.string(), z.array(z.string())]))
-  .optional();
-
 // NEW — normalized attribute value schema (Phase 2)
 export const ProductAttributeValueSchema = z.object({
   id: z.string().optional(),
@@ -83,6 +79,14 @@ export const ExtendedAttributeOptionSchema = z.object({
 // Extended attributes accepts either the old format (string | string[]) or the new format (with value objects)
 export const ExtendedAttributesSchema = z
   .record(z.string(), ExtendedAttributeOptionSchema)
+  .optional();
+
+// Accepts both old format (string | string[]) and new extended format (with value objects)
+const AttributesSchema = z
+  .union([
+    z.record(z.string(), z.union([z.string(), z.array(z.string())])),
+    z.record(z.string(), ExtendedAttributeOptionSchema),
+  ])
   .optional();
 
 const DimensionsSchema = z

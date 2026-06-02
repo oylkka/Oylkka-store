@@ -37,7 +37,7 @@ type VariantAttributeValue = {
   };
 };
 
-type Variant = {
+export type Variant = {
   id: string;
   name: string;
   sku: string;
@@ -95,17 +95,22 @@ export function ProductVariantPicker({
     return variants.find((v) => variantMatchesSelection(v, selected)) ?? null;
   }, [selected, variants, variantMatchesSelection]);
 
-  const displayPrice =
-    currentVariant?.discountPrice ??
-    currentVariant?.price ??
-    baseDiscountPrice ??
-    basePrice;
-  const displayOriginalPrice =
-    currentVariant?.price && currentVariant.discountPrice
+  const displayPrice = currentVariant
+    ? currentVariant.discountPrice && currentVariant.discountPrice > 0
+      ? currentVariant.discountPrice
+      : currentVariant.price
+    : baseDiscountPrice && baseDiscountPrice > 0
+      ? baseDiscountPrice
+      : basePrice;
+
+  const displayOriginalPrice = currentVariant
+    ? currentVariant.discountPrice && currentVariant.discountPrice > 0
       ? currentVariant.price
-      : !currentVariant && baseDiscountPrice
-        ? basePrice
-        : null;
+      : null
+    : baseDiscountPrice && baseDiscountPrice > 0
+      ? basePrice
+      : null;
+
   const displayStock = currentVariant?.stock ?? null;
   const missingAttributes = attributeOptions.filter(
     (opt) => !selected[opt.name],
@@ -282,7 +287,7 @@ export function ProductVariantPicker({
             <span className='text-lg font-bold tabular-nums'>
               ৳{displayPrice.toLocaleString()}
             </span>
-            {displayOriginalPrice && (
+            {displayOriginalPrice !== null && (
               <span className='text-sm text-muted-foreground line-through tabular-nums'>
                 ৳{displayOriginalPrice.toLocaleString()}
               </span>

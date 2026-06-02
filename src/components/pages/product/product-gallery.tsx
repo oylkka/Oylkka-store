@@ -151,7 +151,7 @@ export function ProductGallery({
       <Carousel className='w-full'>
         <CarouselContent>
           {images.map((img, i) => (
-            <CarouselItem key={img.id} className='basis-1/5 pl-2'>
+            <CarouselItem key={img.id} className='basis-1/5 pl-4'>
               <button
                 type='button'
                 onClick={() => setActive(i)}

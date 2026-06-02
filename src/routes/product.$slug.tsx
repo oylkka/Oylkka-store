@@ -27,7 +27,10 @@ import { ProductGallery } from '@/components/pages/product/product-gallery';
 import { ProductInfo } from '@/components/pages/product/product-info';
 import { ProductQuestions } from '@/components/pages/product/product-questions';
 import { ProductRelated } from '@/components/pages/product/product-related';
-import { ProductVariantPicker } from '@/components/pages/product/product-variant-picker';
+import {
+  ProductVariantPicker,
+  type Variant,
+} from '@/components/pages/product/product-variant-picker';
 import { ProductVendorCard } from '@/components/pages/product/product-vendor-card';
 import { ProductReviews } from '@/components/pages/product/review';
 import { StockStatus } from '@/components/pages/product/stock-status';
@@ -118,11 +121,7 @@ function RouteComponent() {
   const { user } = Route.useRouteContext();
   const { data: product, isLoading, isError } = usePublicProduct(slug);
   const [quantity, setQuantity] = useState(1);
-  const [selectedVariant, setSelectedVariant] = useState<{
-    id: string;
-    price: number;
-    stock: number;
-  } | null>(null);
+  const [selectedVariant, setSelectedVariant] = useState<Variant | null>(null);
   const addToCart = useAddToCartMutation();
   const addToWishlist = useAddToWishlistMutation();
   const removeFromWishlist = useRemoveFromWishlistMutation();
@@ -209,6 +208,34 @@ function RouteComponent() {
   if (isLoading) return <PdpSkeleton />;
   if (isError || !product) return <PdpNotFound />;
 
+  const displayPrice = selectedVariant
+    ? selectedVariant.discountPrice && selectedVariant.discountPrice > 0
+      ? selectedVariant.discountPrice
+      : selectedVariant.price
+    : product.discountPrice && product.discountPrice > 0
+      ? product.discountPrice
+      : product.price;
+
+  const displayOriginalPrice = selectedVariant
+    ? selectedVariant.discountPrice && selectedVariant.discountPrice > 0
+      ? selectedVariant.price
+      : null
+    : product.discountPrice && product.discountPrice > 0
+      ? product.price
+      : null;
+
+  const displayDiscountPercent = selectedVariant
+    ? selectedVariant.discountPrice &&
+      selectedVariant.discountPrice > 0 &&
+      selectedVariant.price > 0
+      ? Math.round(
+          ((selectedVariant.price - selectedVariant.discountPrice) /
+            selectedVariant.price) *
+            100,
+        )
+      : null
+    : product.discountPercent;
+
   const currentStock = selectedVariant?.stock ?? product.stock;
 
   const trustItems = [
@@ -256,7 +283,7 @@ function RouteComponent() {
               </BreadcrumbItem>
               <BreadcrumbSeparator />
               <BreadcrumbItem>
-                <BreadcrumbPage className='truncate max-w-[160px] font-medium text-foreground'>
+                <BreadcrumbPage className='truncate max-w-40 font-medium text-foreground'>
                   {product.productName}
                 </BreadcrumbPage>
               </BreadcrumbItem>
@@ -277,7 +304,7 @@ function RouteComponent() {
             <ProductGallery
               images={displayedImages}
               productName={product.productName}
-              discountPercent={product.discountPercent}
+              discountPercent={displayDiscountPercent}
             />
           </motion.div>
 
@@ -288,13 +315,18 @@ function RouteComponent() {
             custom={0.1}
             className='flex flex-col gap-6'
           >
-            <ProductInfo product={product} />
+            <ProductInfo
+              product={product}
+              currentPrice={displayPrice}
+              currentOriginalPrice={displayOriginalPrice}
+              currentDiscountPercent={displayDiscountPercent}
+            />
 
             {product.hasVariants && product.attributeOptions.length > 0 && (
               <div className='rounded-2xl border border-border bg-card p-5'>
                 <ProductVariantPicker
                   attributeOptions={product.attributeOptions}
-                  variants={product.variants}
+                  variants={product.variants as unknown as Variant[]}
                   basePrice={product.price}
                   baseDiscountPrice={product.discountPrice}
                   onVariantChange={setSelectedVariant}
@@ -340,21 +372,19 @@ function RouteComponent() {
                 <div className='space-y-1'>
                   <div className='flex items-baseline gap-3'>
                     <span className='text-3xl font-bold tabular-nums text-foreground'>
-                      ৳
-                      {(
-                        product.discountPrice ?? product.price
-                      ).toLocaleString()}
+                      ৳{displayPrice.toLocaleString()}
                     </span>
-                    {product.discountPrice && (
+                    {displayOriginalPrice !== null && (
                       <span className='text-lg text-muted-foreground line-through tabular-nums'>
-                        ৳{product.price.toLocaleString()}
+                        ৳{displayOriginalPrice.toLocaleString()}
                       </span>
                     )}
-                    {product.discountPercent && (
-                      <span className='text-xs font-bold bg-red-500/10 text-red-500 px-2.5 py-1 rounded-full border border-red-500/20'>
-                        Save {product.discountPercent}%
-                      </span>
-                    )}
+                    {displayDiscountPercent !== null &&
+                      displayDiscountPercent > 0 && (
+                        <span className='text-xs font-bold bg-red-500/10 text-red-500 px-2.5 py-1 rounded-full border border-red-500/20'>
+                          Save {displayDiscountPercent}%
+                        </span>
+                      )}
                   </div>
                   <p className='text-xs text-muted-foreground'>
                     Inclusive of all taxes

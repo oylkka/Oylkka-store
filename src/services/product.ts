@@ -479,7 +479,7 @@ export function useCreateProduct() {
       return response.data;
     },
     onSuccess: () => {
-      toast.success('Product created successfully!');
+      // Toast handled by form-layer (product-form-provider.tsx) to avoid duplicates
       queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.PRODUCTS] });
     },
     onError: (error: unknown) => {
@@ -505,7 +505,7 @@ export function useUpdateProduct({ productId }: { productId: string }) {
       return response.data;
     },
     onSuccess: () => {
-      toast.success('Product updated successfully!');
+      // Toast handled by form-layer (product-form-provider.tsx) to avoid duplicates
       queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.PRODUCTS] });
       queryClient.invalidateQueries({
         queryKey: [QUERY_KEYS.PRODUCTS, productId],
@@ -534,7 +534,7 @@ export function useAdminUpdateProduct({ productId }: { productId: string }) {
       return response.data;
     },
     onSuccess: () => {
-      toast.success('Product updated successfully!');
+      // Toast handled by form-layer (product-form-provider.tsx) to avoid duplicates
       queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.PRODUCTS] });
       queryClient.invalidateQueries({
         queryKey: [QUERY_KEYS.PRODUCTS, productId],

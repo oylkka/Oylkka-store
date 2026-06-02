@@ -104,6 +104,7 @@ const ProductVariantSchema = z
           .transform((val) => (val === '' ? 0 : Number.parseFloat(val))),
       ])
       .optional()
+      .nullable()
       .default(0),
     stock: z
       .number()

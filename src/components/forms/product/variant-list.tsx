@@ -334,7 +334,9 @@ export default function VariantList({
                           updateVariantField(
                             index,
                             'discountPrice',
-                            Number.parseFloat(e.target.value) || 0,
+                            e.target.value === ''
+                              ? null
+                              : Number.parseFloat(e.target.value),
                           )
                         }
                         className='mt-1'

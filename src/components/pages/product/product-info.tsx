@@ -9,6 +9,9 @@ import { StockStatus } from './stock-status';
 
 type ProductInfoProps = {
   product: PublicProduct;
+  currentPrice?: number;
+  currentOriginalPrice?: number | null;
+  currentDiscountPercent?: number | null;
 };
 
 function isHexColor(value: string): boolean {
@@ -19,7 +22,12 @@ function isColorAttr(name: string) {
   return name.toLowerCase() === 'color' || name.toLowerCase() === 'colour';
 }
 
-export function ProductInfo({ product }: ProductInfoProps) {
+export function ProductInfo({
+  product,
+  currentPrice,
+  currentOriginalPrice,
+  currentDiscountPercent,
+}: ProductInfoProps) {
   const avgRating =
     product._count.reviews > 0
       ? Object.entries(product.ratingBreakdown).reduce(
@@ -45,6 +53,22 @@ export function ProductInfo({ product }: ProductInfoProps) {
   ].filter(Boolean).length;
 
   const showAttrs = significantAttrs > 0;
+
+  const displayPrice =
+    currentPrice ||
+    (product.discountPrice && product.discountPrice > 0
+      ? product.discountPrice
+      : product.price);
+  const displayOriginalPrice =
+    currentOriginalPrice !== undefined
+      ? currentOriginalPrice
+      : product.discountPrice && product.discountPrice > 0
+        ? product.price
+        : null;
+  const displayDiscountPercent =
+    currentDiscountPercent !== undefined
+      ? currentDiscountPercent
+      : product.discountPercent;
 
   return (
     <div className='space-y-5'>
@@ -95,16 +119,16 @@ export function ProductInfo({ product }: ProductInfoProps) {
       {/* ── Price ── */}
       <div className='flex items-baseline gap-3'>
         <span className='text-2xl font-bold tabular-nums'>
-          ৳{(product.discountPrice ?? product.price).toLocaleString()}
+          ৳{displayPrice.toLocaleString()}
         </span>
-        {product.discountPrice && (
+        {displayOriginalPrice !== null && (
           <span className='text-lg text-muted-foreground line-through tabular-nums'>
-            ৳{product.price.toLocaleString()}
+            ৳{displayOriginalPrice.toLocaleString()}
           </span>
         )}
-        {product.discountPercent && (
+        {displayDiscountPercent && (
           <span className='text-xs font-bold bg-destructive/10 text-destructive px-2 py-0.5 rounded-md'>
-            -{product.discountPercent}%
+            -{displayDiscountPercent}%
           </span>
         )}
       </div>
