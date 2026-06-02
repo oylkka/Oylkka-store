@@ -514,7 +514,7 @@ function RouteComponent() {
                         )}
                       </div>
                     </div>
-                    <div className='space-y-3 text-sm text-muted-foreground leading-relaxed ml-[52px]'>
+                    <div className='space-y-3 text-sm text-muted-foreground leading-relaxed ml-13'>
                       <p>
                         Orders are processed within 1-2 business days. Standard
                         shipping takes 5-7 business days. Express shipping is
@@ -558,7 +558,7 @@ function RouteComponent() {
                         </p>
                       </div>
                     </div>
-                    <div className='space-y-3 text-sm text-muted-foreground leading-relaxed ml-[52px]'>
+                    <div className='space-y-3 text-sm text-muted-foreground leading-relaxed ml-13'>
                       <p>
                         We accept returns within 30 days of delivery. Items must
                         be unused and in their original packaging.

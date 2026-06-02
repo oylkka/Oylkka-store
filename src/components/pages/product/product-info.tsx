@@ -150,7 +150,7 @@ export function ProductInfo({
           {product.hasVariants &&
             product.attributeOptions.map((attr) => (
               <div key={attr.id} className='flex items-start gap-3'>
-                <span className='text-xs text-muted-foreground font-medium min-w-[72px] pt-0.5'>
+                <span className='text-xs text-muted-foreground font-medium min-w-18 pt-0.5'>
                   {attr.name}
                 </span>
                 <div className='flex flex-wrap gap-1.5'>
@@ -238,7 +238,7 @@ export function ProductInfo({
           {product.weight && (
             <div className='flex items-center gap-3'>
               <Weight className='w-3.5 h-3.5 text-muted-foreground shrink-0' />
-              <span className='text-xs text-muted-foreground min-w-[72px]'>
+              <span className='text-xs text-muted-foreground min-w-18'>
                 Weight
               </span>
               <span className='text-xs font-medium text-foreground'>
@@ -251,7 +251,7 @@ export function ProductInfo({
           {hasDimensions && (
             <div className='flex items-center gap-3'>
               <Ruler className='w-3.5 h-3.5 text-muted-foreground shrink-0' />
-              <span className='text-xs text-muted-foreground min-w-[72px]'>
+              <span className='text-xs text-muted-foreground min-w-18'>
                 Dimensions
               </span>
               <span className='text-xs font-medium text-foreground'>
@@ -295,7 +295,7 @@ export function ProductInfo({
 function AttrRow({ label, value }: { label: string; value: string }) {
   return (
     <div className='flex items-center gap-3'>
-      <span className='text-xs text-muted-foreground font-medium min-w-[72px]'>
+      <span className='text-xs text-muted-foreground font-medium min-w-18'>
         {label}
       </span>
       <span className='text-xs font-medium text-foreground'>{value}</span>

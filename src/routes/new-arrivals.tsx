@@ -96,7 +96,7 @@ function NewArrivalsPage() {
                 </p>
               </div>
               <Button size='sm' asChild className='mt-2'>
-                <Link href='/products'>Browse All Products</Link>
+                <Link to='/products'>Browse All Products</Link>
               </Button>
             </div>
           </motion.div>

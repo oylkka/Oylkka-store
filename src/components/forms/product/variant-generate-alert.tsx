@@ -84,19 +84,28 @@ export default function VariantGenerateAlert() {
   }
 
   const calculateVariantCount = () => {
+    const getCount = (attrData: unknown) => {
+      if (!attrData) return 0;
+      if (Array.isArray(attrData)) return attrData.length;
+      if (
+        typeof attrData === 'object' &&
+        attrData !== null &&
+        'values' in attrData
+      ) {
+        const data = attrData as { values?: unknown[] };
+        return data.values?.length || 0;
+      }
+      return 0;
+    };
+
     if (attributeHierarchy.primary && attributes[attributeHierarchy.primary]) {
-      const primaryCount = Array.isArray(attributes[attributeHierarchy.primary])
-        ? attributes[attributeHierarchy.primary].length
-        : 1;
+      const primaryCount = getCount(attributes[attributeHierarchy.primary]);
 
       if (attributeHierarchy.secondary.length > 0) {
         const secondaryCount = attributeHierarchy.secondary.reduce(
           (acc, attr) => {
             if (!attributes[attr]) return acc;
-            return (
-              acc *
-              (Array.isArray(attributes[attr]) ? attributes[attr].length : 1)
-            );
+            return acc * getCount(attributes[attr]);
           },
           1,
         );
@@ -105,10 +114,10 @@ export default function VariantGenerateAlert() {
       return primaryCount;
     }
 
-    return Object.values(attributes).reduce(
-      (acc, values) => acc * (Array.isArray(values) ? values.length : 1),
-      1,
-    );
+    const attrValues = Object.values(attributes);
+    if (attrValues.length === 0) return 0;
+
+    return attrValues.reduce((acc, values) => acc * getCount(values), 1);
   };
 
   return (

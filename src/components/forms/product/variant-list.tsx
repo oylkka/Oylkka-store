@@ -41,7 +41,7 @@ interface VariantListProps {
     name: string;
     sku: string;
     price: number;
-    discountPrice?: number;
+    discountPrice?: number | null;
     stock: number;
     attributes: Record<string, string>;
     image?: File | string | null;
