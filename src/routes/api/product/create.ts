@@ -234,6 +234,57 @@ export const Route = createFileRoute('/api/product/create')({
             | Record<string, File>
             | undefined;
 
+          // Detect attribute format (old: Record<string, string|string[]>, new: Record<string, {values,isVariantDefining,displayOrder}>)
+          const isNewAttributeFormat =
+            attributes &&
+            Object.keys(attributes).length > 0 &&
+            typeof Object.values(attributes)[0] === 'object' &&
+            !Array.isArray(Object.values(attributes)[0]);
+
+          // Normalize attributes to common structure
+          const normalizedAttributes = attributes
+            ? Object.entries(attributes).map(([name, value]) => {
+                if (isNewAttributeFormat) {
+                  const entry = value as unknown as {
+                    values: Array<{
+                      value: string;
+                      slug: string;
+                      displayOrder?: number;
+                      imageUrl?: string | null;
+                      imagePublicId?: string | null;
+                      metadata?: Record<string, unknown> | null;
+                    }>;
+                    isVariantDefining?: boolean;
+                    displayOrder?: number;
+                  };
+                  return {
+                    name,
+                    values: entry.values.map((v) => v.value),
+                    isVariantDefining: entry.isVariantDefining ?? true,
+                    displayOrder: entry.displayOrder ?? 0,
+                    attributeValues: entry.values.map((v) => ({
+                      value: v.value,
+                      slug: v.slug,
+                      displayOrder: v.displayOrder ?? 0,
+                      imageUrl: v.imageUrl ?? null,
+                      imagePublicId: v.imagePublicId ?? null,
+                      ...(v.metadata != null
+                        ? // biome-ignore lint/suspicious/noExplicitAny: Prisma JSON types are strict
+                          { metadata: v.metadata as any }
+                        : {}),
+                    })),
+                  };
+                }
+                return {
+                  name,
+                  values: Array.isArray(value) ? value : [value as string],
+                  isVariantDefining: true,
+                  displayOrder: 0,
+                  attributeValues: null,
+                };
+              })
+            : [];
+
           const product = await prisma.product.create({
             data: {
               productName: textFields.productName as string,
@@ -287,22 +338,6 @@ export const Route = createFileRoute('/api/product/create')({
               shopId: shop.id,
               createdBy: session.user.id,
 
-              // Create attribute options
-              ...(attributes && Object.keys(attributes).length > 0
-                ? {
-                    attributeOptions: {
-                      create: Object.entries(attributes).map(
-                        ([name, values]) => ({
-                          name,
-                          values: Array.isArray(values)
-                            ? values
-                            : [values as string],
-                        }),
-                      ),
-                    },
-                  }
-                : {}),
-
               // Create variants
               ...(variants && variants.length > 0
                 ? {
@@ -334,6 +369,33 @@ export const Route = createFileRoute('/api/product/create')({
                             attributes: attrRecord,
                             imageUrl: variantImageUrl,
                             imagePublicId: variantImagePublicId,
+                            // Phase 4 — Store uploaded image as variant image record
+                            ...(variantImageUrl
+                              ? {
+                                  variantImages: {
+                                    create: {
+                                      imageUrl: variantImageUrl,
+                                      imagePublicId: variantImagePublicId ?? '',
+                                      altText: variant.name,
+                                      order: 0,
+                                    },
+                                  },
+                                }
+                              : {}),
+                            // Phase 1 — Variant Enrichment fields
+                            status: variant.status ?? 'ACTIVE',
+                            barcode: variant.barcode ?? null,
+                            weight: variant.weight ?? null,
+                            weightUnit: variant.weightUnit ?? 'kg',
+                            dimensionLength: variant.dimensionLength ?? null,
+                            dimensionWidth: variant.dimensionWidth ?? null,
+                            dimensionHeight: variant.dimensionHeight ?? null,
+                            dimensionUnit: variant.dimensionUnit ?? 'cm',
+                            freeShipping: variant.freeShipping ?? false,
+                            reservedStock: variant.reservedStock ?? 0,
+                            lowStockAlert: variant.lowStockAlert ?? null,
+                            availableAt: variant.availableAt ?? null,
+                            slug: variant.slug ?? null,
                           };
                         }),
                       ),
@@ -349,8 +411,100 @@ export const Route = createFileRoute('/api/product/create')({
             },
           });
 
+          // Create attribute options with dual-write (separate from product create for clarity)
+          if (normalizedAttributes.length > 0) {
+            for (const attr of normalizedAttributes) {
+              await prisma.productAttributeOption.create({
+                data: {
+                  productId: product.id,
+                  name: attr.name,
+                  values: attr.values,
+                  isVariantDefining: attr.isVariantDefining,
+                  displayOrder: attr.displayOrder,
+                  ...(attr.attributeValues
+                    ? {
+                        attributeValues: {
+                          // biome-ignore lint/suspicious/noExplicitAny: Prisma JSON types are strict; the shape is correct
+                          create: attr.attributeValues as any,
+                        },
+                      }
+                    : {}),
+                },
+              });
+            }
+          }
+
+          // Phase 3 — Create ProductVariantAttribute join rows
+          if (
+            variants &&
+            variants.length > 0 &&
+            normalizedAttributes.length > 0
+          ) {
+            const options = await prisma.productAttributeOption.findMany({
+              where: { productId: product.id },
+              include: { attributeValues: true },
+            });
+            const optionByName = new Map(options.map((o) => [o.name, o]));
+
+            for (const variant of product.variants) {
+              const attrRecord = variant.attributes as Record<string, string>;
+              if (!attrRecord) continue;
+
+              for (const [attrName, attrValue] of Object.entries(attrRecord)) {
+                const option = optionByName.get(attrName);
+                if (!option) continue;
+
+                const attrVal = option.attributeValues.find(
+                  (av) => av.value === attrValue,
+                );
+                if (!attrVal) continue;
+
+                await prisma.productVariantAttribute.create({
+                  data: {
+                    variantId: variant.id,
+                    attributeValueId: attrVal.id,
+                  },
+                });
+              }
+            }
+          }
+
+          // Re-fetch product with attribute options included
+          const productWithOptions = await prisma.product.findUnique({
+            where: { id: product.id },
+            include: {
+              images: { orderBy: { order: 'asc' } },
+              category: true,
+              variants: {
+                include: {
+                  variantImages: {
+                    orderBy: { order: 'asc' },
+                  },
+                  attributeValues: {
+                    select: {
+                      attributeValue: {
+                        select: {
+                          id: true,
+                          value: true,
+                          slug: true,
+                          optionId: true,
+                        },
+                      },
+                    },
+                  },
+                },
+              },
+              attributeOptions: {
+                include: { attributeValues: true },
+              },
+            },
+          });
+
           return Response.json(
-            { message: 'Product created successfully', product },
+            {
+              message: 'Product created successfully',
+              product: productWithOptions,
+            },
             { status: 200 },
           );
         } catch (error) {

@@ -5,7 +5,11 @@ import { prisma } from '@/lib/db';
 import { enqueueInvoiceGeneration } from '@/lib/invoice-queue';
 import { checkoutLimiter } from '@/lib/rate-limit';
 import { checkRateLimit } from '@/lib/rate-limit-guard';
-import { decrementStock, decrementVariantStock } from '@/lib/stock';
+import {
+  decrementStock,
+  decrementVariantStock,
+  releaseReservedStock,
+} from '@/lib/stock';
 
 export const Route = createFileRoute('/api/checkout/bkash-callback')({
   server: {
@@ -25,6 +29,24 @@ export const Route = createFileRoute('/api/checkout/bkash-callback')({
 
           if (status === 'cancel' || status === 'failure') {
             if (orderIdParam) {
+              // Release reserved stock before marking failed
+              const order = await prisma.order.findUnique({
+                where: { id: orderIdParam },
+                include: { items: true },
+              });
+              if (order) {
+                for (const item of order.items) {
+                  if (item.variantId) {
+                    await releaseReservedStock(
+                      prisma as unknown as Parameters<
+                        typeof releaseReservedStock
+                      >[0],
+                      item.variantId,
+                      item.quantity,
+                    ).catch(() => {});
+                  }
+                }
+              }
               await prisma.order
                 .update({
                   where: { id: orderIdParam },
@@ -109,7 +131,7 @@ export const Route = createFileRoute('/api/checkout/bkash-callback')({
                 },
               });
 
-              // Atomic stock decrement (race-condition-safe)
+              // Atomic stock decrement + reserved stock release (race-condition-safe)
               for (const item of order.items) {
                 await decrementStock(
                   tx,
@@ -125,6 +147,8 @@ export const Route = createFileRoute('/api/checkout/bkash-callback')({
                     item.quantity,
                     item.variantName || 'variant',
                   );
+                  // Release the reservation that was made during checkout/create
+                  await releaseReservedStock(tx, item.variantId, item.quantity);
                 }
               }
 
@@ -201,10 +225,19 @@ export const Route = createFileRoute('/api/checkout/bkash-callback')({
             );
           }
 
-          // Payment failed — mark order as FAILED
-          await prisma.order.update({
-            where: { id: order.id },
-            data: { paymentStatus: 'FAILED' },
+          // Payment failed — mark order as FAILED and release reserved stock
+          await prisma.$transaction(async (tx) => {
+            if (order) {
+              for (const item of order.items) {
+                if (item.variantId) {
+                  await releaseReservedStock(tx, item.variantId, item.quantity);
+                }
+              }
+            }
+            await tx.order.update({
+              where: { id: order.id },
+              data: { paymentStatus: 'FAILED' },
+            });
           });
 
           return Response.redirect(

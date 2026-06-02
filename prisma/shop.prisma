@@ -44,10 +44,10 @@ model Shop {
   ownerId String @unique
   owner   User   @relation(fields: [ownerId], references: [id], onDelete: Restrict)
 
-  products      Product[]      @relation("ShopProducts")
-  orderItems    OrderItem[]
-  payouts       Payout[]
-  shippingZones ShippingZone[]
+  products       Product[]       @relation("ShopProducts")
+  orderItems     OrderItem[]
+  payouts        Payout[]
+  shippingZones  ShippingZone[]
   returnRequests ReturnRequest[]
   shopFollows    ShopFollow[]
   conversations  Conversation[]
@@ -65,7 +65,7 @@ model Payout {
   shopId String
   shop   Shop   @relation(fields: [shopId], references: [id], onDelete: Restrict)
 
-  amount    Decimal @db.Decimal(10, 2)
+  amount    Decimal      @db.Decimal(10, 2)
   currency  String       @default("BDT")
   status    PayoutStatus @default(PENDING)
   reference String?

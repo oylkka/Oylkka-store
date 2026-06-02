@@ -1,6 +1,6 @@
 import namer from 'color-namer';
 import { Minus, Plus, Ruler } from 'lucide-react';
-import { useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -17,6 +17,24 @@ type AttributeOption = {
   id: string;
   name: string;
   values: string[];
+  attributeValues?: Array<{
+    id: string;
+    value: string;
+    slug: string;
+    displayOrder: number;
+    imageUrl: string | null;
+    imagePublicId: string | null;
+    metadata: Record<string, unknown> | null;
+  }>;
+};
+
+type VariantAttributeValue = {
+  attributeValue: {
+    id: string;
+    value: string;
+    slug: string;
+    optionId: string;
+  };
 };
 
 type Variant = {
@@ -28,6 +46,7 @@ type Variant = {
   stock: number;
   attributes: Record<string, string>;
   imageUrl: string | null;
+  attributeValues: VariantAttributeValue[];
 };
 
 type ProductVariantPickerProps = {
@@ -58,15 +77,23 @@ export function ProductVariantPicker({
   const [selected, setSelected] = useState<Record<string, string>>({});
   const [quantity, setQuantity] = useState(1);
 
+  const variantMatchesSelection = useCallback(
+    (v: Variant, selection: Record<string, string>) =>
+      attributeOptions.every((opt) =>
+        v.attributeValues.some(
+          (av) =>
+            av.attributeValue.optionId === opt.id &&
+            av.attributeValue.value === selection[opt.name],
+        ),
+      ),
+    [attributeOptions],
+  );
+
   const currentVariant = useMemo(() => {
     const keys = Object.keys(selected);
     if (keys.length === 0 || keys.some((k) => !selected[k])) return null;
-    return (
-      variants.find((v) =>
-        keys.every((k) => v.attributes[k] === selected[k]),
-      ) ?? null
-    );
-  }, [selected, variants]);
+    return variants.find((v) => variantMatchesSelection(v, selected)) ?? null;
+  }, [selected, variants, variantMatchesSelection]);
 
   const displayPrice =
     currentVariant?.discountPrice ??
@@ -92,16 +119,20 @@ export function ProductVariantPicker({
       const next = { ...prev, [attrName]: value };
       const allSelected = attributeOptions.every((opt) => next[opt.name]);
       if (allSelected) {
-        const match = variants.find((v) =>
-          attributeOptions.every(
-            (opt) => v.attributes[opt.name] === next[opt.name],
-          ),
-        );
-        onVariantChange?.(match ?? null);
+        const match =
+          variants.find((v) => variantMatchesSelection(v, next)) ?? null;
+        onVariantChange?.(match);
       }
       return next;
     });
     setQuantity(1);
+  };
+
+  const findAttrValue = (
+    attr: AttributeOption,
+    value: string,
+  ): NonNullable<AttributeOption['attributeValues']>[number] | undefined => {
+    return attr.attributeValues?.find((av) => av.value === value);
   };
 
   return (
@@ -121,12 +152,19 @@ export function ProductVariantPicker({
             <div className='flex flex-wrap gap-3'>
               {attr.values.map((value) => {
                 const disabled = !variants.some(
-                  (v) => v.attributes[attr.name] === value && v.stock > 0,
+                  (v) =>
+                    v.attributeValues.some(
+                      (av) =>
+                        av.attributeValue.optionId === attr.id &&
+                        av.attributeValue.value === value,
+                    ) && v.stock > 0,
                 );
+                const av = findAttrValue(attr, value);
                 return (
                   <ColorSwatch
                     key={value}
                     color={value}
+                    imageUrl={av?.imageUrl}
                     isSelected={selected[attr.name] === value}
                     onClick={() => handleSelect(attr.name, value)}
                     label={getColorName(value)}
@@ -147,7 +185,12 @@ export function ProductVariantPicker({
                 {attr.values.map((value) => {
                   const isActive = selected[attr.name] === value;
                   const disabled = !variants.some(
-                    (v) => v.attributes[attr.name] === value && v.stock > 0,
+                    (v) =>
+                      v.attributeValues.some(
+                        (av) =>
+                          av.attributeValue.optionId === attr.id &&
+                          av.attributeValue.value === value,
+                      ) && v.stock > 0,
                   );
                   return (
                     <button
@@ -176,7 +219,12 @@ export function ProductVariantPicker({
               {attr.values.map((value) => {
                 const isActive = selected[attr.name] === value;
                 const disabled = !variants.some(
-                  (v) => v.attributes[attr.name] === value && v.stock > 0,
+                  (v) =>
+                    v.attributeValues.some(
+                      (av) =>
+                        av.attributeValue.optionId === attr.id &&
+                        av.attributeValue.value === value,
+                    ) && v.stock > 0,
                 );
                 return (
                   <button

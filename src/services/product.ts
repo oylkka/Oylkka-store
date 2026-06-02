@@ -44,6 +44,46 @@ export type VendorProduct = {
   createdAt: string;
   updatedAt: string;
   _count: { reviews: number; orderItems: number };
+  variants: Array<{
+    id: string;
+    name: string;
+    sku: string;
+    price: number;
+    discountPrice: number | null;
+    stock: number;
+    attributes: Record<string, string>;
+    imageUrl: string | null;
+    variantImages: Array<{
+      id: string;
+      imageUrl: string;
+      imagePublicId: string;
+      altText: string | null;
+      order: number;
+    }>;
+    status: string;
+    reservedStock: number;
+    lowStockAlert: number | null;
+    barcode: string | null;
+    weight: number | null;
+    weightUnit: string;
+    dimensionLength: number | null;
+    dimensionWidth: number | null;
+    dimensionHeight: number | null;
+    dimensionUnit: string;
+    freeShipping: boolean;
+    availableAt: string | null;
+    slug: string | null;
+    attributeValues: Array<{
+      attributeValue: {
+        id: string;
+        value: string;
+        slug: string;
+        optionId: string;
+        imageUrl: string | null;
+        imagePublicId: string | null;
+      };
+    }>;
+  }>;
 };
 
 type VendorCategory = {
@@ -118,8 +158,53 @@ export type PublicProduct = {
     stock: number;
     attributes: Record<string, string>;
     imageUrl: string | null;
+    variantImages: Array<{
+      id: string;
+      imageUrl: string;
+      imagePublicId: string;
+      altText: string | null;
+      order: number;
+    }>;
+    status: string;
+    reservedStock: number;
+    lowStockAlert: number | null;
+    barcode: string | null;
+    weight: number | null;
+    weightUnit: string;
+    dimensionLength: number | null;
+    dimensionWidth: number | null;
+    dimensionHeight: number | null;
+    dimensionUnit: string;
+    freeShipping: boolean;
+    availableAt: string | null;
+    slug: string | null;
+    attributeValues: Array<{
+      attributeValue: {
+        id: string;
+        value: string;
+        slug: string;
+        optionId: string;
+        imageUrl: string | null;
+        imagePublicId: string | null;
+      };
+    }>;
   }[];
-  attributeOptions: { id: string; name: string; values: string[] }[];
+  attributeOptions: {
+    id: string;
+    name: string;
+    values: string[];
+    isVariantDefining: boolean;
+    displayOrder: number;
+    attributeValues: Array<{
+      id: string;
+      value: string;
+      slug: string;
+      displayOrder: number;
+      imageUrl: string | null;
+      imagePublicId: string | null;
+      metadata: Record<string, unknown> | null;
+    }>;
+  }[];
   category: { id: string; name: string; slug: string };
   shop: {
     id: string;

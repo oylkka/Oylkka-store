@@ -33,4 +33,5 @@ export const QUERY_KEYS = {
   ADMIN_SETTINGS: 'admin-settings',
   ADMIN_REPORTS: 'admin-reports',
   CONTENT_BLOCKS: 'content-blocks',
+  ADMIN_GLOBAL_ATTRIBUTES: 'admin-global-attributes',
 };

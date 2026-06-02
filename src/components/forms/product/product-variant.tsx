@@ -58,8 +58,16 @@ export default function ProductVariant() {
     const options: Record<string, string[]> = {};
     if (attributes && typeof attributes === 'object') {
       Object.entries(attributes).forEach(([key, value]) => {
-        if (Array.isArray(value)) options[key] = value;
-        else if (typeof value === 'string') options[key] = [value];
+        if (Array.isArray(value)) {
+          // Old format: flat string[]
+          options[key] = value;
+        } else if (value && typeof value === 'object' && 'values' in value) {
+          // New extended format: { values: [{ value, slug, ... }], ... }
+          options[key] =
+            (value as { values: Array<{ value: string }> }).values.map(
+              (v) => v.value,
+            ) || [];
+        }
       });
     }
     return options;
@@ -193,6 +201,11 @@ export default function ProductVariant() {
               stock: 10,
               attributes: allAttributes,
               image: null,
+              status: 'ACTIVE',
+              weightUnit: 'kg',
+              dimensionUnit: 'cm',
+              freeShipping: false,
+              reservedStock: 0,
             });
           }
         });
@@ -221,6 +234,11 @@ export default function ProductVariant() {
             stock: 10,
             attributes: allAttributes,
             image: null,
+            status: 'ACTIVE',
+            weightUnit: 'kg',
+            dimensionUnit: 'cm',
+            freeShipping: false,
+            reservedStock: 0,
           });
         }
       }
@@ -310,7 +328,71 @@ export default function ProductVariant() {
         stock: 10,
         attributes: combo,
         image: null,
+        status: 'ACTIVE',
+        weightUnit: 'kg',
+        dimensionUnit: 'cm',
+        freeShipping: false,
+        reservedStock: 0,
       });
+    });
+  };
+
+  // Build a price modifier lookup: { attributeName: { displayValue_lowercase: modifier } }
+  const priceModifierMap = useMemo(() => {
+    const map: Record<string, Record<string, number | null>> = {};
+    if (attributes && typeof attributes === 'object') {
+      Object.entries(attributes).forEach(([key, value]) => {
+        if (value && typeof value === 'object' && 'values' in value) {
+          const attrValues = (
+            value as {
+              values: Array<{
+                value: string;
+                priceModifier?: number | null;
+              }>;
+            }
+          ).values;
+          map[key] = {};
+          for (const v of attrValues) {
+            if (v.priceModifier != null) {
+              map[key][v.value.toLowerCase()] = v.priceModifier;
+            }
+          }
+        }
+      });
+    }
+    return map;
+  }, [attributes]);
+
+  // Check if any attribute value has a price modifier set
+  const hasPriceModifiers = useMemo(
+    () =>
+      Object.values(priceModifierMap).some((values) =>
+        Object.values(values).some((mod) => mod != null && mod !== 0),
+      ),
+    [priceModifierMap],
+  );
+
+  const applyPriceModifiers = () => {
+    if (!productPrice || variants.length === 0) return;
+
+    const basePrice =
+      typeof productPrice === 'number'
+        ? productPrice
+        : Number.parseFloat(productPrice || '0');
+
+    variants.forEach((variant, index) => {
+      if (!variant.attributes) return;
+
+      let totalModifier = 0;
+      Object.entries(variant.attributes).forEach(([attrKey, attrValue]) => {
+        const modifier = priceModifierMap[attrKey]?.[attrValue.toLowerCase()];
+        if (modifier != null) {
+          totalModifier += modifier;
+        }
+      });
+
+      const newPrice = Math.round((basePrice + totalModifier) * 100) / 100;
+      update(index, { ...variants[index], price: newPrice });
     });
   };
 
@@ -328,7 +410,17 @@ export default function ProductVariant() {
 
         <div className='mb-6 flex items-center justify-between'>
           <h3 className='text-lg font-medium'>Product Variants</h3>
-          <div>
+          <div className='flex items-center gap-2'>
+            {hasPriceModifiers && variants.length > 0 && (
+              <Button
+                type='button'
+                variant='outline'
+                onClick={applyPriceModifiers}
+                title={`Recalculate all variant prices: base $${typeof productPrice === 'number' ? productPrice.toFixed(2) : '0.00'} + sum of attribute value modifiers`}
+              >
+                Apply Price Modifiers
+              </Button>
+            )}
             <Button
               type='button'
               onClick={generateAllVariants}
@@ -357,6 +449,8 @@ export default function ProductVariant() {
           }
           onRemove={remove}
           hasAttributes={hasAttributes}
+          basePrice={typeof productPrice === 'number' ? productPrice : 0}
+          priceModifierMap={priceModifierMap}
         />
       </CardContent>
     </Card>

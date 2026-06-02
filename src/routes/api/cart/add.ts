@@ -67,6 +67,8 @@ export const Route = createFileRoute('/api/cart/add')({
               select: {
                 id: true,
                 stock: true,
+                status: true,
+                reservedStock: true,
                 price: true,
                 discountPrice: true,
               },
@@ -79,7 +81,18 @@ export const Route = createFileRoute('/api/cart/add')({
               );
             }
 
-            if (variant.stock < 1) {
+            if (
+              variant.status === 'DISABLED' ||
+              variant.status === 'DISCONTINUED'
+            ) {
+              return Response.json(
+                { error: 'Variant is not available' },
+                { status: 400 },
+              );
+            }
+
+            const available = variant.stock - variant.reservedStock;
+            if (available < 1) {
               return Response.json(
                 { error: 'Variant is out of stock' },
                 { status: 400 },

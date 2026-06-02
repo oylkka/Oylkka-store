@@ -69,18 +69,57 @@ const COLOR_NAME_TO_HEX: Record<string, string> = {
   Silver: '#C0C0C0',
   Gold: '#FFD700',
   Beige: '#F5F5DC',
-};
+} as const;
 
 const COMMON_COLORS = [
-  '#000000',
-  '#FFFFFF',
   '#FF0000',
   '#0000FF',
   '#008000',
+  '#000000',
+  '#FFFFFF',
+  '#FFFF00',
   '#FFA500',
   '#800080',
-  '#FFFF00',
+  '#808080',
 ];
+
+function toSlug(value: string): string {
+  return value
+    .toLowerCase()
+    .replace(/[^\w\s-]/g, '')
+    .replace(/[\s_]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .substring(0, 64);
+}
+
+type AttributeValueEntry = {
+  value: string;
+  slug: string;
+  displayOrder: number;
+  priceModifier?: number | null;
+};
+
+function getEntryValues(entry: unknown): Array<AttributeValueEntry> {
+  if (Array.isArray(entry)) {
+    // Old format: flat string[]
+    return entry.map((val, i) => ({
+      value: val,
+      slug: toSlug(val),
+      displayOrder: i,
+      priceModifier: undefined,
+    }));
+  }
+  if (entry && typeof entry === 'object' && 'values' in entry) {
+    return (
+      (
+        entry as {
+          values: Array<AttributeValueEntry>;
+        }
+      ).values ?? []
+    );
+  }
+  return [];
+}
 
 export function ProductAttributes() {
   const { setValue, watch } = useFormContext<ProductFormValues>();
@@ -98,12 +137,46 @@ export function ProductAttributes() {
   const rawAttributes = watch('attributes');
   const attributesRecord = useMemo(() => rawAttributes ?? {}, [rawAttributes]);
 
+  function mergeEntry(
+    entry: unknown,
+    values: Array<AttributeValueEntry>,
+  ): {
+    values: typeof values;
+    isVariantDefining: boolean;
+    displayOrder: number;
+  } {
+    if (
+      entry &&
+      typeof entry === 'object' &&
+      !Array.isArray(entry) &&
+      'values' in entry
+    ) {
+      const ext = entry as {
+        isVariantDefining?: boolean;
+        displayOrder?: number;
+      };
+      return {
+        isVariantDefining: ext.isVariantDefining ?? true,
+        displayOrder: ext.displayOrder ?? 0,
+        values,
+      };
+    }
+    return { values, isVariantDefining: true, displayOrder: 0 };
+  }
+
   const addAttribute = (type: string) => {
     if (attributeTypes.includes(type)) return;
     setAttributeTypes((prev) => [...prev, type]);
     setValue(
       'attributes',
-      { ...attributesRecord, [type]: [] },
+      {
+        ...attributesRecord,
+        [type]: {
+          values: [],
+          isVariantDefining: true,
+          displayOrder: attributeTypes.length,
+        },
+      },
       { shouldValidate: true },
     );
   };
@@ -140,18 +213,27 @@ export function ProductAttributes() {
         (newValue.startsWith('#') ? newValue : `#${newValue}`);
     }
 
-    const currentValues = attributesRecord[attrType] || [];
-    if (Array.isArray(currentValues) && currentValues.includes(finalValue))
-      return;
+    const currentEntry = attributesRecord[attrType] ?? {
+      values: [],
+      isVariantDefining: true,
+      displayOrder: attributeTypes.indexOf(attrType),
+    };
+    const currentValues = getEntryValues(currentEntry);
+    if (currentValues.some((v) => v.value === finalValue)) return;
 
     setValue(
       'attributes',
       {
         ...attributesRecord,
-        [attrType]: [
-          ...(Array.isArray(currentValues) ? currentValues : []),
-          finalValue,
-        ],
+        [attrType]: mergeEntry(currentEntry, [
+          ...currentValues,
+          {
+            value: finalValue,
+            slug: toSlug(finalValue),
+            displayOrder: currentValues.length,
+            priceModifier: undefined,
+          },
+        ]),
       },
       { shouldValidate: true },
     );
@@ -159,33 +241,73 @@ export function ProductAttributes() {
   };
 
   const addMultipleAttributeValues = (attrType: string, values: string[]) => {
-    const currentValues = attributesRecord[attrType] || [];
-    const newVals = values.filter((v) => !currentValues.includes(v));
+    const currentEntry = attributesRecord[attrType] ?? {
+      values: [],
+      isVariantDefining: true,
+      displayOrder: attributeTypes.indexOf(attrType),
+    };
+    const currentValues = getEntryValues(currentEntry);
+
+    const existingValuesSet = new Set(currentValues.map((v) => v.value));
+    const newVals = values.filter((v) => !existingValuesSet.has(v));
     if (newVals.length === 0) return;
+
+    const startOrder = currentValues.length;
+    const newValueObjects = newVals.map((val, i) => ({
+      value: val,
+      slug: toSlug(val),
+      displayOrder: startOrder + i,
+      priceModifier: undefined,
+    }));
 
     setValue(
       'attributes',
       {
         ...attributesRecord,
-        [attrType]: [
-          ...(Array.isArray(currentValues) ? currentValues : []),
-          ...newVals,
-        ],
+        [attrType]: mergeEntry(currentEntry, [
+          ...currentValues,
+          ...newValueObjects,
+        ]),
+      },
+      { shouldValidate: true },
+    );
+  };
+
+  const updateAttributeValuePriceModifier = (
+    attrType: string,
+    index: number,
+    priceModifier: number | null,
+  ) => {
+    const currentEntry = attributesRecord[attrType];
+    if (!currentEntry) return;
+    const currentValues = getEntryValues(currentEntry);
+    const newValues = currentValues.map((v, i) =>
+      i === index ? { ...v, priceModifier } : v,
+    );
+    setValue(
+      'attributes',
+      {
+        ...attributesRecord,
+        [attrType]: mergeEntry(currentEntry, newValues),
       },
       { shouldValidate: true },
     );
   };
 
   const removeAttributeValue = (attrType: string, index: number) => {
-    const currentValues = attributesRecord[attrType] || [];
-    if (!Array.isArray(currentValues)) return;
+    const currentEntry = attributesRecord[attrType];
+    if (!currentEntry) return;
+    const currentValues = getEntryValues(currentEntry);
     const newValues = [...currentValues];
     newValues.splice(index, 1);
     setValue(
       'attributes',
       {
         ...attributesRecord,
-        [attrType]: newValues.length > 0 ? newValues : [],
+        [attrType]: mergeEntry(
+          currentEntry,
+          newValues.length > 0 ? newValues : [],
+        ),
       },
       { shouldValidate: true },
     );
@@ -225,11 +347,11 @@ export function ProductAttributes() {
 
   const renderAttributeValue = (
     attrType: string,
-    value: string,
+    item: AttributeValueEntry,
     index: number,
   ) => {
     const isColor =
-      attrType.toLowerCase() === 'color' && /^#[0-9A-F]{6}$/i.test(value);
+      attrType.toLowerCase() === 'color' && /^#[0-9A-F]{6}$/i.test(item.value);
     return (
       <div
         key={index}
@@ -241,12 +363,35 @@ export function ProductAttributes() {
         {isColor && (
           <div
             className='h-4 w-4 rounded-sm ring-1 ring-gray-200 ring-inset'
-            style={{ backgroundColor: value }}
+            style={{ backgroundColor: item.value }}
           />
         )}
         <span className='text-sm font-medium'>
-          {isColor ? `${getColorName(value) || value} (${value})` : value}
+          {isColor
+            ? `${getColorName(item.value) || item.value} (${item.value})`
+            : item.value}
         </span>
+
+        {/* Price modifier input (Phase 6 — Matrix Pricing) */}
+        <div className='flex items-center gap-1'>
+          <span className='text-muted-foreground text-xs'>+$</span>
+          <Input
+            type='number'
+            step='0.01'
+            placeholder='0'
+            value={item.priceModifier ?? ''}
+            onChange={(e) => {
+              const val = e.target.value;
+              updateAttributeValuePriceModifier(
+                attrType,
+                index,
+                val === '' ? null : Number.parseFloat(val),
+              );
+            }}
+            className='h-6 w-16 text-xs'
+          />
+        </div>
+
         <Button
           type='button'
           variant='ghost'
@@ -517,11 +662,10 @@ export function ProductAttributes() {
 
               <div className='mt-6'>
                 <FieldLabel>Values</FieldLabel>
-                {attributesRecord[attrType]?.length > 0 ? (
+                {getEntryValues(attributesRecord[attrType]).length > 0 ? (
                   <div className='mt-2 flex flex-wrap gap-2'>
-                    {(attributesRecord[attrType] as string[]).map(
-                      (val: string, idx: number) =>
-                        renderAttributeValue(attrType, val, idx),
+                    {getEntryValues(attributesRecord[attrType]).map(
+                      (val, idx) => renderAttributeValue(attrType, val, idx),
                     )}
                   </div>
                 ) : (

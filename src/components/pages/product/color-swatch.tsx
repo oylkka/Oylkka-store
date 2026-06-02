@@ -7,6 +7,7 @@ type ColorSwatchProps = {
   onClick: () => void;
   label?: string;
   disabled?: boolean;
+  imageUrl?: string | null;
 };
 
 function isLightColor(hex: string): boolean {
@@ -23,6 +24,7 @@ export function ColorSwatch({
   onClick,
   label,
   disabled = false,
+  imageUrl,
 }: ColorSwatchProps) {
   const dark = !isLightColor(color);
 
@@ -31,13 +33,17 @@ export function ColorSwatch({
       <button
         type='button'
         className={cn(
-          'relative h-10 w-10 rounded-full border-2 transition-all',
+          'relative h-10 w-10 rounded-full border-2 transition-all bg-cover bg-center',
           isSelected ? 'ring-primary ring-2 ring-offset-2' : 'ring-offset-0',
           disabled
             ? 'cursor-not-allowed opacity-50'
             : 'cursor-pointer hover:opacity-90',
         )}
-        style={{ backgroundColor: color }}
+        style={
+          imageUrl
+            ? { backgroundImage: `url(${imageUrl})` }
+            : { backgroundColor: color }
+        }
         onClick={onClick}
         disabled={disabled}
         aria-label={label ?? color}
@@ -47,7 +53,7 @@ export function ColorSwatch({
             <Check
               className={cn(
                 'h-5 w-5 drop-shadow-md',
-                dark ? 'text-white' : 'text-black',
+                imageUrl ? 'text-white' : dark ? 'text-white' : 'text-black',
               )}
             />
           </div>

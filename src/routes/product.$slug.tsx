@@ -18,7 +18,7 @@ import {
   Truck,
 } from 'lucide-react';
 import { motion } from 'motion/react';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { toast } from 'sonner';
 import Footer from '@/components/layout/footer';
 import Header from '@/components/layout/header';
@@ -130,6 +130,44 @@ function RouteComponent() {
     enabled: !!user,
   });
 
+  // Phase 4 — Image inheritance resolution
+  const displayedImages = useMemo(() => {
+    if (!product) return [];
+    if (!selectedVariant) return product.images;
+
+    const variant = product.variants.find((v) => v.id === selectedVariant.id);
+    if (!variant) return product.images;
+
+    // 1. Variant has its own images
+    if (variant.variantImages && variant.variantImages.length > 0) {
+      return variant.variantImages.map((img) => ({
+        id: img.id,
+        imageUrl: img.imageUrl,
+        altText: img.altText,
+        order: img.order,
+      }));
+    }
+
+    // 2. Check attribute values for images (e.g., "Red" swatch with an image)
+    if (variant.attributeValues) {
+      for (const av of variant.attributeValues) {
+        if (av.attributeValue.imageUrl) {
+          return [
+            {
+              id: av.attributeValue.id,
+              imageUrl: av.attributeValue.imageUrl,
+              altText: null,
+              order: 0,
+            },
+          ];
+        }
+      }
+    }
+
+    // 3. Fall back to product images
+    return product.images;
+  }, [selectedVariant, product]);
+
   useEffect(() => {
     if (product) {
       trackProductView({
@@ -237,7 +275,7 @@ function RouteComponent() {
             className='lg:sticky lg:top-24 lg:self-start'
           >
             <ProductGallery
-              images={product.images}
+              images={displayedImages}
               productName={product.productName}
               discountPercent={product.discountPercent}
             />

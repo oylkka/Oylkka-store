@@ -71,6 +71,14 @@ enum PayoutStatus {
 
 // --- Product ---
 
+enum VariantStatus {
+  ACTIVE
+  DISABLED
+  PRE_ORDER
+  OUT_OF_STOCK
+  DISCONTINUED
+}
+
 enum ProductStatus {
   DRAFT
   PUBLISHED

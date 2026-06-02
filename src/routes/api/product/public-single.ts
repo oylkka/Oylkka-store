@@ -31,10 +31,53 @@ export const Route = createFileRoute('/api/product/public-single')({
                   stock: true,
                   attributes: true,
                   imageUrl: true,
+                  variantImages: {
+                    select: {
+                      id: true,
+                      imageUrl: true,
+                      imagePublicId: true,
+                      altText: true,
+                      order: true,
+                    },
+                    orderBy: { order: 'asc' },
+                  },
+                  attributeValues: {
+                    select: {
+                      attributeValue: {
+                        select: {
+                          id: true,
+                          value: true,
+                          slug: true,
+                          optionId: true,
+                          imageUrl: true,
+                          imagePublicId: true,
+                        },
+                      },
+                    },
+                  },
                 },
               },
               attributeOptions: {
-                select: { id: true, name: true, values: true },
+                select: {
+                  id: true,
+                  name: true,
+                  values: true,
+                  isVariantDefining: true,
+                  displayOrder: true,
+                  attributeValues: {
+                    select: {
+                      id: true,
+                      value: true,
+                      slug: true,
+                      displayOrder: true,
+                      imageUrl: true,
+                      imagePublicId: true,
+                      metadata: true,
+                    },
+                    orderBy: { displayOrder: 'asc' },
+                  },
+                },
+                orderBy: { displayOrder: 'asc' },
               },
               shop: {
                 select: {

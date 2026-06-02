@@ -2,6 +2,14 @@ import { z } from 'zod';
 
 import { SkuService } from '@/services/sku-service';
 
+const VariantStatusEnum = z.enum([
+  'ACTIVE',
+  'DISABLED',
+  'PRE_ORDER',
+  'OUT_OF_STOCK',
+  'DISCONTINUED',
+]);
+
 const ProductConditionEnum = z.enum([
   'NEW',
   'USED',
@@ -48,23 +56,29 @@ const DimensionsSchema = z
     },
   );
 
-const AttributesSchema = z
-  .record(z.string(), z.union([z.string(), z.array(z.string())]))
-  .optional()
-  .refine(
-    (attrs) =>
-      !attrs ||
-      Object.entries(attrs).every(([key, val]) => {
-        if (key.trim() === '') return false;
-        if (typeof val === 'string') return val.trim() !== '';
-        return (
-          Array.isArray(val) &&
-          val.length > 0 &&
-          val.every((v) => v.trim() !== '')
-        );
-      }),
-    { message: 'Attributes must have non-empty keys and values' },
-  );
+const ProductAttributeValueSchema = z.object({
+  id: z.string().optional(),
+  value: z.string().min(1, { message: 'Attribute value is required' }),
+  slug: z
+    .string()
+    .min(1)
+    .regex(/^[a-z0-9-]+$/, 'Slug must be lowercase alphanumeric with hyphens'),
+  displayOrder: z.number().int().min(0).default(0),
+  imageUrl: z.string().optional().nullable(),
+  imagePublicId: z.string().optional().nullable(),
+  metadata: z.record(z.string(), z.unknown()).optional().nullable(),
+  priceModifier: z.number().optional().nullable(),
+});
+
+const ExtendedAttributeOptionSchema = z.object({
+  values: z.array(ProductAttributeValueSchema),
+  isVariantDefining: z.boolean().default(true),
+  displayOrder: z.number().int().min(0).default(0),
+});
+
+const ExtendedAttributesSchema = z
+  .record(z.string(), ExtendedAttributeOptionSchema)
+  .optional();
 
 const VariantAttributesSchema = z
   .record(z.string(), z.string())
@@ -97,6 +111,25 @@ const ProductVariantSchema = z
       .min(0, { message: 'Stock cannot be negative' }),
     attributes: VariantAttributesSchema,
     image: z.any().optional().nullable(),
+
+    // NEW
+    status: VariantStatusEnum.default('ACTIVE'),
+    barcode: z.string().optional().nullable(),
+    weight: z.number().min(0).optional().nullable(),
+    weightUnit: z.enum(['kg', 'g', 'lb', 'oz']).default('kg'),
+    dimensionLength: z.number().min(0).optional().nullable(),
+    dimensionWidth: z.number().min(0).optional().nullable(),
+    dimensionHeight: z.number().min(0).optional().nullable(),
+    dimensionUnit: z.enum(['cm', 'in', 'm']).default('cm'),
+    freeShipping: z.boolean().default(false),
+    reservedStock: z.number().int().min(0).default(0),
+    lowStockAlert: z.number().int().min(1).optional().nullable(),
+    availableAt: z.string().optional().nullable(),
+    slug: z
+      .string()
+      .regex(/^[a-z0-9-]+$/)
+      .optional()
+      .nullable(),
   })
   .refine(
     (data) => {
@@ -190,7 +223,7 @@ export const ProductFormSchema = z
       .min(1, { message: 'At least one product image is required' })
       .optional()
       .default([]),
-    attributes: AttributesSchema.optional(),
+    attributes: ExtendedAttributesSchema,
     variants: z.array(ProductVariantSchema).optional().default([]),
 
     metaTitle: z.string().optional(),

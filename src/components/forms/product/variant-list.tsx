@@ -5,6 +5,13 @@ import { useMemo } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { Separator } from '@/components/ui/separator';
 import {
   Tooltip,
@@ -12,6 +19,21 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '@/components/ui/tooltip';
+
+const VARIANT_STATUS_OPTIONS = [
+  { value: 'ACTIVE', label: 'Active' },
+  { value: 'DISABLED', label: 'Disabled' },
+  { value: 'PRE_ORDER', label: 'Pre-order' },
+  { value: 'OUT_OF_STOCK', label: 'Out of Stock' },
+  { value: 'DISCONTINUED', label: 'Discontinued' },
+] as const;
+
+const WEIGHT_UNIT_OPTIONS = [
+  { value: 'kg', label: 'kg' },
+  { value: 'g', label: 'g' },
+  { value: 'lb', label: 'lb' },
+  { value: 'oz', label: 'oz' },
+] as const;
 
 interface VariantListProps {
   variants: Array<{
@@ -23,10 +45,16 @@ interface VariantListProps {
     stock: number;
     attributes: Record<string, string>;
     image?: File | string | null;
+    status?: string;
+    barcode?: string | null;
+    weight?: number | null;
+    weightUnit?: string;
   }>;
   onUpdate: (index: number, value: Record<string, unknown>) => void;
   onRemove: (index: number) => void;
   hasAttributes: boolean;
+  basePrice?: number;
+  priceModifierMap?: Record<string, Record<string, number | null>>;
 }
 
 export default function VariantList({
@@ -34,6 +62,8 @@ export default function VariantList({
   onUpdate,
   onRemove,
   hasAttributes,
+  basePrice = 0,
+  priceModifierMap = {},
 }: VariantListProps) {
   const handleVariantImageUpload = (
     e: React.ChangeEvent<HTMLInputElement>,
@@ -260,6 +290,40 @@ export default function VariantList({
                         }
                         className='mt-1'
                       />
+                      {variant.attributes &&
+                        Object.keys(priceModifierMap).length > 0 &&
+                        (() => {
+                          let totalModifier = 0;
+                          const parts: string[] = [];
+                          Object.entries(variant.attributes).forEach(
+                            ([attrKey, attrValue]) => {
+                              const mod =
+                                priceModifierMap[attrKey]?.[
+                                  attrValue.toLowerCase()
+                                ];
+                              if (mod != null && mod !== 0) {
+                                totalModifier += mod;
+                                parts.push(
+                                  `${mod > 0 ? '+' : ''}$${mod.toFixed(2)} (${attrValue})`,
+                                );
+                              }
+                            },
+                          );
+                          if (totalModifier !== 0) {
+                            return (
+                              <p className='text-muted-foreground mt-1 text-xs'>
+                                Base ${Number(basePrice).toFixed(2)}
+                                {parts.join(' ')} = $
+                                {(
+                                  Math.round(
+                                    (basePrice + totalModifier) * 100,
+                                  ) / 100
+                                ).toFixed(2)}
+                              </p>
+                            );
+                          }
+                          return null;
+                        })()}
                     </div>
                     <div>
                       <span className='text-sm text-gray-500'>Discount:</span>
@@ -290,6 +354,92 @@ export default function VariantList({
                         }
                         className='mt-1'
                       />
+                    </div>
+                  </div>
+
+                  {/* Phase 1 — Variant Enrichment fields */}
+                  <div className='mb-4 grid grid-cols-2 gap-4 md:grid-cols-4'>
+                    <div>
+                      <span className='text-muted-foreground text-sm'>
+                        Status:
+                      </span>
+                      <Select
+                        value={variant.status ?? 'ACTIVE'}
+                        onValueChange={(val) =>
+                          updateVariantField(index, 'status', val)
+                        }
+                      >
+                        <SelectTrigger className='mt-1'>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {VARIANT_STATUS_OPTIONS.map((opt) => (
+                            <SelectItem key={opt.value} value={opt.value}>
+                              {opt.label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div>
+                      <span className='text-muted-foreground text-sm'>
+                        Barcode:
+                      </span>
+                      <Input
+                        value={variant.barcode ?? ''}
+                        onChange={(e) =>
+                          updateVariantField(
+                            index,
+                            'barcode',
+                            e.target.value || null,
+                          )
+                        }
+                        placeholder='EAN / UPC / ISBN'
+                        className='mt-1'
+                      />
+                    </div>
+                    <div>
+                      <span className='text-muted-foreground text-sm'>
+                        Weight:
+                      </span>
+                      <Input
+                        type='number'
+                        min={0}
+                        step={0.01}
+                        value={variant.weight ?? ''}
+                        onChange={(e) =>
+                          updateVariantField(
+                            index,
+                            'weight',
+                            e.target.value
+                              ? Number.parseFloat(e.target.value)
+                              : null,
+                          )
+                        }
+                        className='mt-1'
+                      />
+                    </div>
+                    <div>
+                      <span className='text-muted-foreground text-sm'>
+                        Weight Unit:
+                      </span>
+                      <Select
+                        value={variant.weightUnit ?? 'kg'}
+                        onValueChange={(val) =>
+                          updateVariantField(index, 'weightUnit', val)
+                        }
+                      >
+                        <SelectTrigger className='mt-1'>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {WEIGHT_UNIT_OPTIONS.map((opt) => (
+                            <SelectItem key={opt.value} value={opt.value}>
+                              {opt.label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
                     </div>
                   </div>
 

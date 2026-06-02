@@ -8,7 +8,11 @@ import { prisma } from '@/lib/db';
 import { enqueueInvoiceGeneration } from '@/lib/invoice-queue';
 import { checkoutLimiter } from '@/lib/rate-limit';
 import { checkRateLimit } from '@/lib/rate-limit-guard';
-import { decrementStock, decrementVariantStock } from '@/lib/stock';
+import {
+  decrementStock,
+  decrementVariantStock,
+  releaseReservedStock,
+} from '@/lib/stock';
 
 export const Route = createFileRoute('/api/checkout/bkash-ipn')({
   server: {
@@ -105,7 +109,7 @@ export const Route = createFileRoute('/api/checkout/bkash-ipn')({
                 },
               });
 
-              // Atomic stock decrement (race-condition-safe)
+              // Atomic stock decrement + reserved stock release (race-condition-safe)
               for (const item of order.items) {
                 await decrementStock(
                   tx,
@@ -121,6 +125,8 @@ export const Route = createFileRoute('/api/checkout/bkash-ipn')({
                     item.quantity,
                     item.variantName || 'variant',
                   );
+                  // Release the reservation that was made during checkout/create
+                  await releaseReservedStock(tx, item.variantId, item.quantity);
                 }
               }
 

@@ -36,11 +36,11 @@ model Product {
   sku   String   @unique
   brand String?
 
-  price         Decimal @db.Decimal(10, 2)
+  price         Decimal  @db.Decimal(10, 2)
   discountPrice Decimal? @db.Decimal(10, 2)
 
-  hasVariants Boolean @default(false)
-  stock       Int     @default(0)
+  hasVariants   Boolean @default(false)
+  stock         Int     @default(0)
   lowStockAlert Int     @default(5)
 
   condition            ProductCondition
@@ -57,8 +57,9 @@ model Product {
 
   images ProductImage[]
 
-  variants         ProductVariant[]
-  attributeOptions ProductAttributeOption[]
+  variants              ProductVariant[]
+  attributeOptions      ProductAttributeOption[]
+  globalAttributeValues ProductGlobalAttributeValue[]
 
   metaTitle       String?
   metaDescription String?
@@ -80,8 +81,8 @@ model Product {
 
   views Int @default(0)
 
-  createdAt  DateTime    @default(now())
-  updatedAt  DateTime    @updatedAt
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
   orderItems    OrderItem[]
   conversations Conversation[]
 
@@ -109,6 +110,29 @@ model ProductImage {
   @@map("product_image")
 }
 
+model ProductAttributeValue {
+  id       String                 @id @default(cuid())
+  optionId String
+  option   ProductAttributeOption @relation(fields: [optionId], references: [id], onDelete: Cascade)
+
+  value        String
+  slug         String
+  displayOrder Int    @default(0)
+
+  // Metadata
+  imageUrl      String?
+  imagePublicId String?
+  metadata      Json?
+
+  // Price modifier for Matrix Pricing (Phase 6)
+  priceModifier            Decimal?                  @db.Decimal(10, 2)
+  productVariantAttributes ProductVariantAttribute[]
+
+  @@unique([optionId, slug])
+  @@index([optionId])
+  @@map("product_attribute_value")
+}
+
 model ProductAttributeOption {
   id        String  @id @default(cuid())
   productId String
@@ -116,6 +140,11 @@ model ProductAttributeOption {
 
   name   String
   values String[]
+
+  isVariantDefining Boolean @default(true)
+  displayOrder      Int     @default(0)
+
+  attributeValues ProductAttributeValue[]
 
   @@unique([productId, name])
   @@index([productId])
@@ -130,7 +159,7 @@ model ProductVariant {
   name String
   sku  String @unique
 
-  price         Decimal @db.Decimal(10, 2)
+  price         Decimal  @db.Decimal(10, 2)
   discountPrice Decimal? @db.Decimal(10, 2)
 
   stock Int @default(0)
@@ -140,7 +169,34 @@ model ProductVariant {
   imageUrl      String?
   imagePublicId String?
 
+  // NEW — inventory control
+  status        VariantStatus @default(ACTIVE)
+  reservedStock Int           @default(0)
+  lowStockAlert Int?
+  barcode       String?
+
+  // NEW — shipping per variant (critical for multivendor)
+  weight          Float?
+  weightUnit      String  @default("kg")
+  dimensionLength Float?
+  dimensionWidth  Float?
+  dimensionHeight Float?
+  dimensionUnit   String  @default("cm")
+  freeShipping    Boolean @default(false)
+
+  // NEW — pre-order support
+  availableAt DateTime?
+
+  // NEW — optional SEO slug (e.g., "red-large" for /product/t-shirt/red-large)
+  slug String?
+
   cartItems CartItem[]
+
+  // Phase 3 — Referential Integrity Join
+  attributeValues ProductVariantAttribute[]
+
+  // Phase 4 — Multi-Image Variants
+  variantImages ProductVariantImage[]
 
   createdAt     DateTime       @default(now())
   updatedAt     DateTime       @updatedAt
@@ -149,6 +205,90 @@ model ProductVariant {
 
   @@index([productId])
   @@map("product_variant")
+}
+
+model ProductVariantAttribute {
+  id        String         @id @default(cuid())
+  variantId String
+  variant   ProductVariant @relation(fields: [variantId], references: [id], onDelete: Cascade)
+
+  attributeValueId String
+  attributeValue   ProductAttributeValue @relation(fields: [attributeValueId], references: [id])
+
+  @@unique([variantId, attributeValueId])
+  @@index([attributeValueId])
+  @@index([variantId])
+  @@map("product_variant_attribute")
+}
+
+// ──────────────────────────────────────────────
+// Phase 5 — Global Attribute Taxonomy
+// ──────────────────────────────────────────────
+
+model GlobalAttribute {
+  id           String @id @default(cuid())
+  name         String
+  slug         String @unique
+  displayOrder Int    @default(0)
+
+  values       GlobalAttributeValue[]
+  productLinks ProductGlobalAttributeValue[]
+
+  @@map("global_attribute")
+}
+
+model GlobalAttributeValue {
+  id          String          @id @default(cuid())
+  attributeId String
+  attribute   GlobalAttribute @relation(fields: [attributeId], references: [id], onDelete: Cascade)
+
+  value String
+  slug  String
+
+  // Structured metadata (e.g. {"hex": "#FF0000"} for color)
+  metadata Json?
+
+  productLinks ProductGlobalAttributeValue[]
+
+  @@unique([attributeId, slug])
+  @@index([attributeId])
+  @@map("global_attribute_value")
+}
+
+model ProductGlobalAttributeValue {
+  id        String  @id @default(cuid())
+  productId String
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  globalAttributeId String
+  globalAttribute   GlobalAttribute @relation(fields: [globalAttributeId], references: [id])
+
+  // References the local ProductAttributeValue
+  localValueId String
+
+  // References the GlobalAttributeValue this local value maps to
+  globalValueId String
+  globalValue   GlobalAttributeValue @relation(fields: [globalValueId], references: [id])
+
+  @@unique([productId, globalAttributeId, localValueId])
+  @@index([globalAttributeId])
+  @@index([globalValueId])
+  @@index([productId])
+  @@map("product_global_attribute_value")
+}
+
+model ProductVariantImage {
+  id        String         @id @default(cuid())
+  variantId String
+  variant   ProductVariant @relation(fields: [variantId], references: [id], onDelete: Cascade)
+
+  imageUrl      String
+  imagePublicId String
+  altText       String?
+  order         Int     @default(0)
+
+  @@index([variantId])
+  @@map("product_variant_image")
 }
 
 model ProductQuestion {
@@ -160,10 +300,10 @@ model ProductQuestion {
   user     User   @relation(fields: [userId], references: [id], onDelete: Cascade)
   question String
 
-  answer     String?
-  answeredAt DateTime?
-  answeredBy String?
-  answeredByUser User? @relation(name: "answeredByUser", fields: [answeredBy], references: [id])
+  answer         String?
+  answeredAt     DateTime?
+  answeredBy     String?
+  answeredByUser User?     @relation(name: "answeredByUser", fields: [answeredBy], references: [id])
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

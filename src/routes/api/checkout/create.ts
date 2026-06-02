@@ -8,7 +8,12 @@ import { prisma } from '@/lib/db';
 import { enqueueInvoiceGeneration } from '@/lib/invoice-queue';
 import { checkoutLimiter } from '@/lib/rate-limit';
 import { checkRateLimit } from '@/lib/rate-limit-guard';
-import { decrementStock, decrementVariantStock } from '@/lib/stock';
+import {
+  decrementStock,
+  decrementVariantStock,
+  releaseReservedStock,
+  reserveStock,
+} from '@/lib/stock';
 import type {
   CartWithItems,
   VoucherWithCoupon,
@@ -123,6 +128,50 @@ export const Route = createFileRoute('/api/checkout/create')({
             return Response.json({ error: 'Cart is empty' }, { status: 400 });
           }
 
+          // --- For bKash: reserve stock before proceeding ---
+          const reservedVariants: Array<{
+            variantId: string;
+            quantity: number;
+          }> = [];
+          if (parsed.data.paymentMethod === 'BKASH') {
+            try {
+              for (const item of cart.items) {
+                if (item.variant) {
+                  await reserveStock(
+                    prisma as unknown as Parameters<typeof reserveStock>[0],
+                    item.variant.id,
+                    item.quantity,
+                    item.variant.name,
+                  );
+                  reservedVariants.push({
+                    variantId: item.variant.id,
+                    quantity: item.quantity,
+                  });
+                }
+              }
+            } catch (error) {
+              // Release any successfully reserved stock before bailing
+              for (const r of reservedVariants) {
+                await releaseReservedStock(
+                  prisma as unknown as Parameters<
+                    typeof releaseReservedStock
+                  >[0],
+                  r.variantId,
+                  r.quantity,
+                ).catch(() => {});
+              }
+              return Response.json(
+                {
+                  error:
+                    error instanceof Error
+                      ? error.message
+                      : 'Insufficient stock',
+                },
+                { status: 400 },
+              );
+            }
+          }
+
           // --- Price re-validation: check if prices changed since adding to cart ---
           const priceChangedItems: string[] = [];
           for (const item of cart.items) {
@@ -141,6 +190,18 @@ export const Route = createFileRoute('/api/checkout/create')({
           }
 
           if (priceChangedItems.length > 0) {
+            // Release reserved stock for bKash
+            if (parsed.data.paymentMethod === 'BKASH') {
+              for (const r of reservedVariants) {
+                await releaseReservedStock(
+                  prisma as unknown as Parameters<
+                    typeof releaseReservedStock
+                  >[0],
+                  r.variantId,
+                  r.quantity,
+                ).catch(() => {});
+              }
+            }
             return Response.json(
               {
                 error: `Prices have changed for: ${priceChangedItems.join(', ')}. Please review your cart and try again.`,
@@ -317,251 +378,271 @@ export const Route = createFileRoute('/api/checkout/create')({
             bogoApplied: v.bogoApplied,
           }));
 
-          const order = await prisma.$transaction(async (tx) => {
-            const created = await tx.order.create({
-              data: {
-                orderNumber,
-                customerId: session.user.id,
-                shippingName: parsed.data.shippingName,
-                shippingEmail: parsed.data.shippingEmail,
-                shippingPhone: parsed.data.shippingPhone,
-                shippingAddress: parsed.data.shippingAddress,
-                shippingUpzila: parsed.data.shippingUpzila,
-                shippingDistrict: parsed.data.shippingDistrict,
-                shippingPostalCode: parsed.data.shippingPostalCode ?? null,
-                shippingComment: parsed.data.shippingComment ?? null,
-                subtotal,
-                discountAmount: totalDiscount,
-                couponCode:
-                  selectedVouchers.map((v) => v.code).join(',') || null,
-                couponDiscount:
-                  cappedCouponDiscount > 0 ? cappedCouponDiscount : null,
-                shippingCost: finalShipping,
-                tax,
-                total,
-                currency: 'BDT',
-                paymentMethod: parsed.data.paymentMethod,
-                paymentStatus:
-                  parsed.data.paymentMethod === 'WALLET' ? 'PAID' : 'PENDING',
-                paidAt:
-                  parsed.data.paymentMethod === 'WALLET' ? new Date() : null,
-                status:
-                  parsed.data.paymentMethod === 'CASH_ON_DELIVERY' ||
-                  parsed.data.paymentMethod === 'WALLET'
-                    ? 'CONFIRMED'
-                    : 'PENDING',
-                confirmedAt:
-                  parsed.data.paymentMethod === 'CASH_ON_DELIVERY' ||
-                  parsed.data.paymentMethod === 'WALLET'
-                    ? new Date()
-                    : null,
-                metadata: {
-                  appliedVouchers: appliedVouchersData,
-                  cashbackAmount: totalCashback,
-                } as unknown as OrderMetadata,
-                items: {
-                  create: cart.items.map((item) => {
-                    const unitPrice = Number(
-                      item.variant?.discountPrice ??
-                        item.variant?.price ??
-                        item.product.discountPrice ??
-                        item.product.price,
-                    );
-                    const savedPrice =
-                      item.savedPrice != null
-                        ? Number(item.savedPrice)
-                        : unitPrice;
-                    const discountPrice =
-                      savedPrice < unitPrice ? savedPrice : null;
-                    const lineTotal = savedPrice * item.quantity;
-                    const commissionRate = Number(
-                      item.product.shop?.commissionRate ?? 10,
-                    );
-                    const commissionAmount = (lineTotal * commissionRate) / 100;
-                    const vendorAmount = lineTotal - commissionAmount;
+          try {
+            const order = await prisma.$transaction(async (tx) => {
+              const created = await tx.order.create({
+                data: {
+                  orderNumber,
+                  customerId: session.user.id,
+                  shippingName: parsed.data.shippingName,
+                  shippingEmail: parsed.data.shippingEmail,
+                  shippingPhone: parsed.data.shippingPhone,
+                  shippingAddress: parsed.data.shippingAddress,
+                  shippingUpzila: parsed.data.shippingUpzila,
+                  shippingDistrict: parsed.data.shippingDistrict,
+                  shippingPostalCode: parsed.data.shippingPostalCode ?? null,
+                  shippingComment: parsed.data.shippingComment ?? null,
+                  subtotal,
+                  discountAmount: totalDiscount,
+                  couponCode:
+                    selectedVouchers.map((v) => v.code).join(',') || null,
+                  couponDiscount:
+                    cappedCouponDiscount > 0 ? cappedCouponDiscount : null,
+                  shippingCost: finalShipping,
+                  tax,
+                  total,
+                  currency: 'BDT',
+                  paymentMethod: parsed.data.paymentMethod,
+                  paymentStatus:
+                    parsed.data.paymentMethod === 'WALLET' ? 'PAID' : 'PENDING',
+                  paidAt:
+                    parsed.data.paymentMethod === 'WALLET' ? new Date() : null,
+                  status:
+                    parsed.data.paymentMethod === 'CASH_ON_DELIVERY' ||
+                    parsed.data.paymentMethod === 'WALLET'
+                      ? 'CONFIRMED'
+                      : 'PENDING',
+                  confirmedAt:
+                    parsed.data.paymentMethod === 'CASH_ON_DELIVERY' ||
+                    parsed.data.paymentMethod === 'WALLET'
+                      ? new Date()
+                      : null,
+                  metadata: {
+                    appliedVouchers: appliedVouchersData,
+                    cashbackAmount: totalCashback,
+                  } as unknown as OrderMetadata,
+                  items: {
+                    create: cart.items.map((item) => {
+                      const unitPrice = Number(
+                        item.variant?.discountPrice ??
+                          item.variant?.price ??
+                          item.product.discountPrice ??
+                          item.product.price,
+                      );
+                      const savedPrice =
+                        item.savedPrice != null
+                          ? Number(item.savedPrice)
+                          : unitPrice;
+                      const discountPrice =
+                        savedPrice < unitPrice ? savedPrice : null;
+                      const lineTotal = savedPrice * item.quantity;
+                      const commissionRate = Number(
+                        item.product.shop?.commissionRate ?? 10,
+                      );
+                      const commissionAmount =
+                        (lineTotal * commissionRate) / 100;
+                      const vendorAmount = lineTotal - commissionAmount;
 
-                    return {
-                      shopId: item.product.shop?.id ?? '',
-                      productId: item.product.id,
-                      variantId: item.variant?.id ?? null,
-                      productName: item.product.productName,
-                      variantName: item.variant?.name ?? null,
-                      imageUrl:
-                        item.product.images[0]?.imageUrl ??
-                        item.variant?.imageUrl ??
-                        null,
-                      quantity: item.quantity,
-                      unitPrice,
-                      discountPrice,
-                      total: lineTotal,
-                      commissionRate,
-                      commissionAmount,
-                      vendorAmount,
-                    };
-                  }),
+                      return {
+                        shopId: item.product.shop?.id ?? '',
+                        productId: item.product.id,
+                        variantId: item.variant?.id ?? null,
+                        productName: item.product.productName,
+                        variantName: item.variant?.name ?? null,
+                        imageUrl:
+                          item.product.images[0]?.imageUrl ??
+                          item.variant?.imageUrl ??
+                          null,
+                        quantity: item.quantity,
+                        unitPrice,
+                        discountPrice,
+                        total: lineTotal,
+                        commissionRate,
+                        commissionAmount,
+                        vendorAmount,
+                      };
+                    }),
+                  },
                 },
-              },
-              include: { items: true },
+                include: { items: true },
+              });
+
+              // For COD and WALLET: immediate side effects (stock, cart, vouchers, cashback)
+              // For BKASH these happen after payment confirmation in bkash-callback.ts
+              if (
+                parsed.data.paymentMethod === 'CASH_ON_DELIVERY' ||
+                parsed.data.paymentMethod === 'WALLET'
+              ) {
+                // Wallet payment: atomic balance check + debit (race-condition-safe)
+                if (parsed.data.paymentMethod === 'WALLET') {
+                  const result = await tx.wallet.updateMany({
+                    where: { userId: session.user.id, balance: { gte: total } },
+                    data: { balance: { decrement: total } },
+                  });
+
+                  if (result.count === 0) {
+                    const wallet = await tx.wallet.findUnique({
+                      where: { userId: session.user.id },
+                    });
+                    const balance = wallet?.balance ?? 0;
+                    throw new Error(
+                      `Insufficient wallet balance. Your balance: ৳${Number(balance).toFixed(2)}, required: ৳${Number(total).toFixed(2)}`,
+                    );
+                  }
+
+                  const wallet = await tx.wallet.findUnique({
+                    where: { userId: session.user.id },
+                  });
+
+                  if (!wallet) throw new Error('Wallet not found after debit');
+
+                  await tx.walletTransaction.create({
+                    data: {
+                      walletId: wallet.id,
+                      type: 'DEBIT',
+                      amount: total,
+                      reference: 'ORDER_PAYMENT',
+                      orderId: created.id,
+                      description: `Payment for order ${orderNumber}`,
+                    },
+                  });
+                }
+
+                // Atomic stock decrement (race-condition-safe)
+                for (const item of cart.items) {
+                  await decrementStock(
+                    tx,
+                    item.product.id,
+                    item.quantity,
+                    item.product.productName,
+                  );
+
+                  if (item.variant) {
+                    await decrementVariantStock(
+                      tx,
+                      item.variant.id,
+                      item.quantity,
+                      item.variant.name,
+                    );
+                  }
+                }
+
+                // Clear cart
+                await tx.cartItem.deleteMany({
+                  where: { cartId: cart.id },
+                });
+
+                // Create CouponUsage + mark UserVoucher used
+                for (const v of selectedVouchers) {
+                  await tx.couponUsage.create({
+                    data: {
+                      couponId: v.couponId,
+                      userId: session.user.id,
+                      orderId: created.id,
+                    },
+                  });
+
+                  await tx.coupon.update({
+                    where: { id: v.couponId },
+                    data: { usedCount: { increment: 1 } },
+                  });
+
+                  await tx.userVoucher.update({
+                    where: { id: v.id },
+                    data: { usedAt: now, orderId: created.id },
+                  });
+                }
+
+                // Handle cashback
+                if (totalCashback > 0) {
+                  let wallet = await tx.wallet.findUnique({
+                    where: { userId: session.user.id },
+                  });
+
+                  if (!wallet) {
+                    wallet = await tx.wallet.create({
+                      data: { userId: session.user.id },
+                    });
+                  }
+
+                  await tx.wallet.update({
+                    where: { id: wallet.id },
+                    data: { balance: { increment: totalCashback } },
+                  });
+
+                  await tx.walletTransaction.create({
+                    data: {
+                      walletId: wallet.id,
+                      type: 'CREDIT',
+                      amount: totalCashback,
+                      reference: 'CASHBACK',
+                      orderId: created.id,
+                      description: `Cashback from vouchers: ${selectedVouchers.map((v) => v.code).join(', ')}`,
+                    },
+                  });
+                }
+              }
+
+              return created;
             });
 
-            // For COD and WALLET: immediate side effects (stock, cart, vouchers, cashback)
-            // For BKASH these happen after payment confirmation in bkash-callback.ts
+            // Fire-and-forget: send order confirmation email + generate invoice for confirmed orders
             if (
               parsed.data.paymentMethod === 'CASH_ON_DELIVERY' ||
               parsed.data.paymentMethod === 'WALLET'
             ) {
-              // Wallet payment: atomic balance check + debit (race-condition-safe)
-              if (parsed.data.paymentMethod === 'WALLET') {
-                const result = await tx.wallet.updateMany({
-                  where: { userId: session.user.id, balance: { gte: total } },
-                  data: { balance: { decrement: total } },
-                });
-
-                if (result.count === 0) {
-                  const wallet = await tx.wallet.findUnique({
-                    where: { userId: session.user.id },
-                  });
-                  const balance = wallet?.balance ?? 0;
-                  throw new Error(
-                    `Insufficient wallet balance. Your balance: ৳${Number(balance).toFixed(2)}, required: ৳${Number(total).toFixed(2)}`,
-                  );
-                }
-
-                const wallet = await tx.wallet.findUnique({
-                  where: { userId: session.user.id },
-                });
-
-                if (!wallet) throw new Error('Wallet not found after debit');
-
-                await tx.walletTransaction.create({
-                  data: {
-                    walletId: wallet.id,
-                    type: 'DEBIT',
-                    amount: total,
-                    reference: 'ORDER_PAYMENT',
-                    orderId: created.id,
-                    description: `Payment for order ${orderNumber}`,
-                  },
-                });
-              }
-
-              // Atomic stock decrement (race-condition-safe)
-              for (const item of cart.items) {
-                await decrementStock(
-                  tx,
-                  item.product.id,
-                  item.quantity,
-                  item.product.productName,
-                );
-
-                if (item.variant) {
-                  await decrementVariantStock(
-                    tx,
-                    item.variant.id,
-                    item.quantity,
-                    item.variant.name,
-                  );
-                }
-              }
-
-              // Clear cart
-              await tx.cartItem.deleteMany({
-                where: { cartId: cart.id },
-              });
-
-              // Create CouponUsage + mark UserVoucher used
-              for (const v of selectedVouchers) {
-                await tx.couponUsage.create({
-                  data: {
-                    couponId: v.couponId,
-                    userId: session.user.id,
-                    orderId: created.id,
-                  },
-                });
-
-                await tx.coupon.update({
-                  where: { id: v.couponId },
-                  data: { usedCount: { increment: 1 } },
-                });
-
-                await tx.userVoucher.update({
-                  where: { id: v.id },
-                  data: { usedAt: now, orderId: created.id },
-                });
-              }
-
-              // Handle cashback
-              if (totalCashback > 0) {
-                let wallet = await tx.wallet.findUnique({
-                  where: { userId: session.user.id },
-                });
-
-                if (!wallet) {
-                  wallet = await tx.wallet.create({
-                    data: { userId: session.user.id },
-                  });
-                }
-
-                await tx.wallet.update({
-                  where: { id: wallet.id },
-                  data: { balance: { increment: totalCashback } },
-                });
-
-                await tx.walletTransaction.create({
-                  data: {
-                    walletId: wallet.id,
-                    type: 'CREDIT',
-                    amount: totalCashback,
-                    reference: 'CASHBACK',
-                    orderId: created.id,
-                    description: `Cashback from vouchers: ${selectedVouchers.map((v) => v.code).join(', ')}`,
-                  },
-                });
-              }
+              Promise.all([
+                sendOrderConfirmation(order.id).catch((e) => {
+                  // biome-ignore lint/suspicious/noConsole: this is fine
+                  console.error('Failed to send order confirmation:', e);
+                }),
+                enqueueInvoiceGeneration(order.id).catch((e) => {
+                  // biome-ignore lint/suspicious/noConsole: this is fine
+                  console.error('Failed to enqueue invoice generation:', e);
+                }),
+              ]);
             }
 
-            return created;
-          });
-
-          // Fire-and-forget: send order confirmation email + generate invoice for confirmed orders
-          if (
-            parsed.data.paymentMethod === 'CASH_ON_DELIVERY' ||
-            parsed.data.paymentMethod === 'WALLET'
-          ) {
-            Promise.all([
-              sendOrderConfirmation(order.id).catch((e) => {
-                // biome-ignore lint/suspicious/noConsole: this is fine
-                console.error('Failed to send order confirmation:', e);
-              }),
-              enqueueInvoiceGeneration(order.id).catch((e) => {
-                // biome-ignore lint/suspicious/noConsole: this is fine
-                console.error('Failed to enqueue invoice generation:', e);
-              }),
-            ]);
+            return Response.json(
+              {
+                orderId: order.id,
+                orderNumber: order.orderNumber,
+                total: Number(order.total),
+                subtotal: Number(order.subtotal),
+                discountAmount: Number(order.discountAmount),
+                couponDiscount: Number(order.couponDiscount),
+                shippingCost: Number(order.shippingCost),
+                paymentMethod: order.paymentMethod,
+                paymentStatus: order.paymentStatus,
+                status: order.status,
+                appliedVouchers: selectedVouchers.map((v) => ({
+                  code: v.code,
+                  discountAmount: v.discountAmount,
+                  shippingDiscount: v.shippingDiscount,
+                  freeShipping: v.freeShipping,
+                  cashbackAmount: v.cashbackAmount,
+                })),
+              },
+              { status: 200 },
+            );
+          } catch (_error) {
+            // On failure, release reserved stock for bKash
+            if (parsed.data.paymentMethod === 'BKASH') {
+              for (const r of reservedVariants) {
+                await releaseReservedStock(
+                  prisma as unknown as Parameters<
+                    typeof releaseReservedStock
+                  >[0],
+                  r.variantId,
+                  r.quantity,
+                ).catch(() => {});
+              }
+            }
+            return Response.json(
+              { error: 'Failed to place order. Please try again.' },
+              { status: 500 },
+            );
           }
-
-          return Response.json(
-            {
-              orderId: order.id,
-              orderNumber: order.orderNumber,
-              total: Number(order.total),
-              subtotal: Number(order.subtotal),
-              discountAmount: Number(order.discountAmount),
-              couponDiscount: Number(order.couponDiscount),
-              shippingCost: Number(order.shippingCost),
-              paymentMethod: order.paymentMethod,
-              paymentStatus: order.paymentStatus,
-              status: order.status,
-              appliedVouchers: selectedVouchers.map((v) => ({
-                code: v.code,
-                discountAmount: v.discountAmount,
-                shippingDiscount: v.shippingDiscount,
-                freeShipping: v.freeShipping,
-                cashbackAmount: v.cashbackAmount,
-              })),
-            },
-            { status: 200 },
-          );
         } catch (_error) {
           return Response.json(
             { error: 'Failed to place order. Please try again.' },

@@ -18,6 +18,14 @@ export const ProductStatusEnum = z.enum([
   'OUT_OF_STOCK',
 ]);
 
+export const VariantStatusEnum = z.enum([
+  'ACTIVE',
+  'DISABLED',
+  'PRE_ORDER',
+  'OUT_OF_STOCK',
+  'DISCONTINUED',
+]);
+
 const VariantSchema = z.object({
   id: z.string().optional(),
   name: z.string().min(1, 'Variant name is required'),
@@ -26,10 +34,55 @@ const VariantSchema = z.object({
   discountPrice: z.number().min(0).optional().nullable(),
   stock: z.number().int().min(0, 'Stock cannot be negative'),
   attributes: z.record(z.string(), z.string()),
+
+  // NEW
+  status: VariantStatusEnum.default('ACTIVE'),
+  barcode: z.string().optional().nullable(),
+  weight: z.number().min(0).optional().nullable(),
+  weightUnit: z.enum(['kg', 'g', 'lb', 'oz']).default('kg'),
+  dimensionLength: z.number().min(0).optional().nullable(),
+  dimensionWidth: z.number().min(0).optional().nullable(),
+  dimensionHeight: z.number().min(0).optional().nullable(),
+  dimensionUnit: z.enum(['cm', 'in', 'm']).default('cm'),
+  freeShipping: z.boolean().default(false),
+  reservedStock: z.number().int().min(0).default(0),
+  lowStockAlert: z.number().int().min(1).optional().nullable(),
+  availableAt: z.string().datetime().optional().nullable(),
+  slug: z
+    .string()
+    .regex(/^[a-z0-9-]+$/)
+    .optional()
+    .nullable(),
 });
 
 const AttributesSchema = z
   .record(z.string(), z.union([z.string(), z.array(z.string())]))
+  .optional();
+
+// NEW — normalized attribute value schema (Phase 2)
+export const ProductAttributeValueSchema = z.object({
+  id: z.string().optional(),
+  value: z.string().min(1, 'Attribute value is required'),
+  slug: z
+    .string()
+    .min(1)
+    .regex(/^[a-z0-9-]+$/, 'Slug must be lowercase alphanumeric with hyphens'),
+  displayOrder: z.number().int().min(0).default(0),
+  imageUrl: z.string().optional().nullable(),
+  imagePublicId: z.string().optional().nullable(),
+  metadata: z.record(z.string(), z.unknown()).optional().nullable(),
+  priceModifier: z.number().optional().nullable(),
+});
+
+export const ExtendedAttributeOptionSchema = z.object({
+  values: z.array(ProductAttributeValueSchema),
+  isVariantDefining: z.boolean().default(true),
+  displayOrder: z.number().int().min(0).default(0),
+});
+
+// Extended attributes accepts either the old format (string | string[]) or the new format (with value objects)
+export const ExtendedAttributesSchema = z
+  .record(z.string(), ExtendedAttributeOptionSchema)
   .optional();
 
 const DimensionsSchema = z
