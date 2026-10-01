@@ -1,0 +1,36 @@
+name: Upstash Keepalive
+
+# Upstash archives free-tier databases after a period of inactivity, and
+# archival is what takes the REST URL offline. This job writes a real key so the
+# database is never considered idle.
+#
+# Note: because this repo is public, GitHub disables scheduled workflows after
+# 60 days without repository activity. If a run stops appearing, re-enable the
+# workflow from the Actions tab.
+
+on:
+  schedule:
+    # Deliberately off the hour. GitHub warns that schedules are delayed and
+    # sometimes dropped during high-load periods at the top of the hour.
+    - cron: '17 9 */7 * *'
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+jobs:
+  keepalive:
+    name: Ping Upstash Redis
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Write keepalive key
+        run: bun run scripts/upstash-keepalive.ts
+        env:
+          UPSTASH_REDIS_REST_URL: ${{ secrets.UPSTASH_REDIS_REST_URL }}
+          UPSTASH_REDIS_REST_TOKEN: ${{ secrets.UPSTASH_REDIS_REST_TOKEN }}

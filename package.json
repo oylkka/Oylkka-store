@@ -11,6 +11,7 @@
     "preview": "vite preview",
     "test": "bun test --preload=./src/test/jsdom-setup.ts",
     "test:components": "bun test --preload=./src/test/jsdom-setup.ts src/components",
+    "upstash:keepalive": "bun run scripts/upstash-keepalive.ts",
     "check": "biome check . --write"
   },
   "dependencies": {

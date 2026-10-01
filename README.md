@@ -42,8 +42,8 @@ Copy `.env` from your team or set the following:
 | `BKASH_APP_SECRET` | bKash merchant app secret |
 | `GOOGLE_CLIENT_ID` | Google OAuth client ID |
 | `GOOGLE_CLIENT_SECRET` | Google OAuth client secret |
-| `UPSTASH_REDIS_URL` | Upstash Redis URL |
-| `UPSTASH_REDIS_TOKEN` | Upstash Redis token |
+| `UPSTASH_REDIS_REST_URL` | Upstash Redis REST URL |
+| `UPSTASH_REDIS_REST_TOKEN` | Upstash Redis REST token |
 | `CLOUDINARY_CLOUD_NAME` | Cloudinary cloud name |
 | `CLOUDINARY_API_KEY` | Cloudinary API key |
 | `CLOUDINARY_API_SECRET` | Cloudinary API secret |
@@ -86,7 +86,51 @@ src/
 | `bun run preview` | Preview production build |
 | `bun test` | Run unit tests |
 | `bun run test:components` | Run component tests (jsdom) |
+| `bun run upstash:keepalive` | Write the Upstash keepalive key (CI uses this) |
 | `bun run check` | Lint and format with Biome |
+
+## Rate Limiting
+
+Redis is used for rate limiting only — sessions and queues live in Postgres.
+Each limiter is a 60 second sliding window keyed by IP, in
+`src/lib/rate-limit.ts`.
+
+### Redis outage behaviour
+
+If Upstash is unreachable, `SafeRatelimit` catches the failure and falls back to
+an in-process sliding window (`src/lib/rate-limit-fallback.ts`) with the same
+limit and window. Rate limiting stays enforced instead of taking down every
+route that calls `checkRateLimit` — which includes all of `/api/auth` and the
+bKash checkout callbacks.
+
+The fallback is per-process, so running multiple instances multiplies the
+effective limit while it is active. Treat it as a degraded mode, not a
+replacement for Redis.
+
+If `UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN` are unset, no client
+is constructed and the fallback is used unconditionally. That is what makes
+local development work without Upstash credentials.
+
+### Upstash Keepalive
+
+Upstash archives free-tier databases after a period of inactivity, which takes
+the REST URL offline. `.github/workflows/upstash-keepalive.yml` writes a real
+key (`SET upstash:keepalive ... EX 1209600`) every 7 days so the database is
+never considered idle. A bare `PING` may not count as activity.
+
+It runs from GitHub Actions rather than the app itself, so it still fires when
+the app is down or scaled to zero.
+
+Required repository secrets: `UPSTASH_REDIS_REST_URL`,
+`UPSTASH_REDIS_REST_TOKEN`.
+
+Two things to know:
+
+- The workflow can also be triggered manually from the Actions tab. Do that once
+  after setup to confirm it goes green.
+- Because this repo is public, GitHub disables scheduled workflows after 60 days
+  without repository activity. If runs stop appearing, re-enable the workflow
+  from the Actions tab.
 
 ## Deployment
 
