@@ -154,8 +154,7 @@ export const Route = createFileRoute('/api/checkout/create')({
           // A suspended or unapproved vendor's products must not be
           // purchasable, even if they are still PUBLISHED (MONEY-21).
           const blockedItem = cart.items.find(
-            (item) =>
-              !item.product.shop || item.product.shop.status !== 'ACTIVE',
+            (item) => item.product.shop?.status !== 'ACTIVE',
           );
           if (blockedItem) {
             return Response.json(

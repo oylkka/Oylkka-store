@@ -34,7 +34,7 @@ export const Route = createFileRoute('/api/product/create')({
             where: { ownerId: session.user.id },
           });
 
-          if (!shop || shop.status !== 'ACTIVE') {
+          if (shop?.status !== 'ACTIVE') {
             return Response.json(
               { error: 'You need an active shop to create products' },
               { status: 403 },

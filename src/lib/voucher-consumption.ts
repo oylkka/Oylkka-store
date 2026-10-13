@@ -115,7 +115,7 @@ export async function settleCodDeliveredVouchers(
       where: { id: orderId },
       select: { customerId: true, paymentMethod: true, metadata: true },
     });
-    if (!order || order.paymentMethod !== 'CASH_ON_DELIVERY') return;
+    if (order?.paymentMethod !== 'CASH_ON_DELIVERY') return;
 
     const metadata = (order.metadata ?? {}) as OrderMetadata & {
       vouchersSettledAt?: string;

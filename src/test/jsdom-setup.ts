@@ -11,6 +11,7 @@ globalThis.navigator = dom.window.navigator;
 globalThis.HTMLElement = dom.window.HTMLElement;
 globalThis.HTMLButtonElement = dom.window.HTMLButtonElement;
 globalThis.HTMLDivElement = dom.window.HTMLDivElement;
+globalThis.HTMLFormElement = dom.window.HTMLFormElement;
 globalThis.Node = dom.window.Node;
 globalThis.Element = dom.window.Element;
 globalThis.Event = dom.window.Event;

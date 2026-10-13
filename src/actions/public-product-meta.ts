@@ -23,7 +23,7 @@ export type PublicProductMeta = {
 } | null;
 
 export const getPublicProductMeta = createServerFn({ method: 'GET' })
-  .inputValidator((data: unknown) => SlugSchema.parse(data))
+  .validator((data: unknown) => SlugSchema.parse(data))
   .handler(async ({ data }): Promise<PublicProductMeta> => {
     const { slug } = data;
 

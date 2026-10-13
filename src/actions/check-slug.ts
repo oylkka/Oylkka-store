@@ -9,7 +9,7 @@ const CheckSlugSchema = z.object({
 });
 
 export const checkSlugUnique = createServerFn({ method: 'POST' })
-  .inputValidator((data: unknown) => CheckSlugSchema.parse(data))
+  .validator((data: unknown) => CheckSlugSchema.parse(data))
   .handler(async ({ data }) => {
     const { slug, productId } = data;
 

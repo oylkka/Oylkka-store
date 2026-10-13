@@ -209,6 +209,9 @@ function RouteComponent() {
                         'Revenue',
                       ]}
                       labelFormatter={(label) => {
+                        if (typeof label !== 'string' || !label.includes('-')) {
+                          return label;
+                        }
                         const [y, m] = label.split('-');
                         const months = [
                           'January',

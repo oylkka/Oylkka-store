@@ -124,7 +124,7 @@ interface DateTimeInput {
   value?: Date;
   format: DateTimeFormatDefaults;
   placeholders?: InputPlaceholders;
-  onChange?: Options['onChangeDate'];
+  onChange?: (date: Date | undefined) => void;
   dtOptions?: Options;
   className?: string;
 }
@@ -146,14 +146,14 @@ export const DatetimePicker = forwardRef<HTMLDivElement, DateTimeInput>(
     ref,
   ) => {
     const handleDateChange = useCallback(
-      (nextDate: Date | undefined) => {
-        onChange?.(nextDate);
+      (nextDate: Date | null) => {
+        onChange?.(nextDate ?? undefined);
       },
       [onChange],
     );
     const timescape = useTimescape({
       date: value,
-      onChangeDate: handleDateChange,
+      onDateChange: handleDateChange,
       ...dtOptions,
     });
     return (

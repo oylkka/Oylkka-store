@@ -46,6 +46,10 @@ export function TwoFactorCard({ enabled }: { enabled: boolean }) {
         toast.error(error?.message || 'Could not start 2FA setup');
         return;
       }
+      if (data.method !== 'totp') {
+        toast.error('Unsupported two-factor method');
+        return;
+      }
       setTotpURI(data.totpURI);
       setBackupCodes(data.backupCodes ?? []);
       setStep('confirm');

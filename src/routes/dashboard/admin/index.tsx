@@ -242,6 +242,9 @@ function RouteComponent() {
                         'Revenue',
                       ]}
                       labelFormatter={(label) => {
+                        if (typeof label !== 'string') {
+                          return label;
+                        }
                         const d = new Date(label);
                         return d.toLocaleDateString('en-US', {
                           month: 'short',
