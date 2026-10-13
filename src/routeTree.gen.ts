@@ -15,7 +15,6 @@ import { Route as BestsellersRouteImport } from './routes/bestsellers'
 import { Route as CartRouteImport } from './routes/cart'
 import { Route as CategoriesRouteImport } from './routes/categories'
 import { Route as CheckoutRouteImport } from './routes/checkout'
-import { Route as CompareRouteImport } from './routes/compare'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as DashboardRouteRouteImport } from './routes/dashboard/route'
 import { Route as DealsRouteImport } from './routes/deals'
@@ -108,7 +107,6 @@ import { Route as ApiProductGetSingleRouteImport } from './routes/api/product/ge
 import { Route as ApiProductHelpfulVoteRouteImport } from './routes/api/product/helpful-vote'
 import { Route as ApiProductPublicBestsellersRouteImport } from './routes/api/product/public-bestsellers'
 import { Route as ApiProductPublicByCategoryRouteImport } from './routes/api/product/public-by-category'
-import { Route as ApiProductPublicCompareRouteImport } from './routes/api/product/public-compare'
 import { Route as ApiProductPublicListRouteImport } from './routes/api/product/public-list'
 import { Route as ApiProductPublicQuestionsRouteImport } from './routes/api/product/public-questions'
 import { Route as ApiProductPublicRecentRouteImport } from './routes/api/product/public-recent'
@@ -288,11 +286,6 @@ const CategoriesRoute = CategoriesRouteImport.update({
 const CheckoutRoute = CheckoutRouteImport.update({
   id: '/checkout',
   path: '/checkout',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const CompareRoute = CompareRouteImport.update({
-  id: '/compare',
-  path: '/compare',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ContactRoute = ContactRouteImport.update({
@@ -765,11 +758,6 @@ const ApiProductPublicByCategoryRoute =
     path: '/api/product/public-by-category',
     getParentRoute: () => rootRouteImport,
   } as any)
-const ApiProductPublicCompareRoute = ApiProductPublicCompareRouteImport.update({
-  id: '/api/product/public-compare',
-  path: '/api/product/public-compare',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const ApiProductPublicListRoute = ApiProductPublicListRouteImport.update({
   id: '/api/product/public-list',
   path: '/api/product/public-list',
@@ -1600,7 +1588,6 @@ export interface FileRoutesByFullPath {
   '/cart': typeof CartRoute
   '/categories': typeof CategoriesRoute
   '/checkout': typeof CheckoutRouteWithChildren
-  '/compare': typeof CompareRoute
   '/contact': typeof ContactRoute
   '/deals': typeof DealsRoute
   '/faq': typeof FaqRoute
@@ -1696,7 +1683,6 @@ export interface FileRoutesByFullPath {
   '/api/product/helpful-vote': typeof ApiProductHelpfulVoteRoute
   '/api/product/public-bestsellers': typeof ApiProductPublicBestsellersRoute
   '/api/product/public-by-category': typeof ApiProductPublicByCategoryRoute
-  '/api/product/public-compare': typeof ApiProductPublicCompareRoute
   '/api/product/public-list': typeof ApiProductPublicListRoute
   '/api/product/public-questions': typeof ApiProductPublicQuestionsRoute
   '/api/product/public-recent': typeof ApiProductPublicRecentRoute
@@ -1851,7 +1837,6 @@ export interface FileRoutesByTo {
   '/cart': typeof CartRoute
   '/categories': typeof CategoriesRoute
   '/checkout': typeof CheckoutRouteWithChildren
-  '/compare': typeof CompareRoute
   '/contact': typeof ContactRoute
   '/deals': typeof DealsRoute
   '/faq': typeof FaqRoute
@@ -1938,7 +1923,6 @@ export interface FileRoutesByTo {
   '/api/product/helpful-vote': typeof ApiProductHelpfulVoteRoute
   '/api/product/public-bestsellers': typeof ApiProductPublicBestsellersRoute
   '/api/product/public-by-category': typeof ApiProductPublicByCategoryRoute
-  '/api/product/public-compare': typeof ApiProductPublicCompareRoute
   '/api/product/public-list': typeof ApiProductPublicListRoute
   '/api/product/public-questions': typeof ApiProductPublicQuestionsRoute
   '/api/product/public-recent': typeof ApiProductPublicRecentRoute
@@ -2095,7 +2079,6 @@ export interface FileRoutesById {
   '/cart': typeof CartRoute
   '/categories': typeof CategoriesRoute
   '/checkout': typeof CheckoutRouteWithChildren
-  '/compare': typeof CompareRoute
   '/contact': typeof ContactRoute
   '/deals': typeof DealsRoute
   '/faq': typeof FaqRoute
@@ -2191,7 +2174,6 @@ export interface FileRoutesById {
   '/api/product/helpful-vote': typeof ApiProductHelpfulVoteRoute
   '/api/product/public-bestsellers': typeof ApiProductPublicBestsellersRoute
   '/api/product/public-by-category': typeof ApiProductPublicByCategoryRoute
-  '/api/product/public-compare': typeof ApiProductPublicCompareRoute
   '/api/product/public-list': typeof ApiProductPublicListRoute
   '/api/product/public-questions': typeof ApiProductPublicQuestionsRoute
   '/api/product/public-recent': typeof ApiProductPublicRecentRoute
@@ -2349,7 +2331,6 @@ export interface FileRouteTypes {
     | '/cart'
     | '/categories'
     | '/checkout'
-    | '/compare'
     | '/contact'
     | '/deals'
     | '/faq'
@@ -2445,7 +2426,6 @@ export interface FileRouteTypes {
     | '/api/product/helpful-vote'
     | '/api/product/public-bestsellers'
     | '/api/product/public-by-category'
-    | '/api/product/public-compare'
     | '/api/product/public-list'
     | '/api/product/public-questions'
     | '/api/product/public-recent'
@@ -2600,7 +2580,6 @@ export interface FileRouteTypes {
     | '/cart'
     | '/categories'
     | '/checkout'
-    | '/compare'
     | '/contact'
     | '/deals'
     | '/faq'
@@ -2687,7 +2666,6 @@ export interface FileRouteTypes {
     | '/api/product/helpful-vote'
     | '/api/product/public-bestsellers'
     | '/api/product/public-by-category'
-    | '/api/product/public-compare'
     | '/api/product/public-list'
     | '/api/product/public-questions'
     | '/api/product/public-recent'
@@ -2843,7 +2821,6 @@ export interface FileRouteTypes {
     | '/cart'
     | '/categories'
     | '/checkout'
-    | '/compare'
     | '/contact'
     | '/deals'
     | '/faq'
@@ -2939,7 +2916,6 @@ export interface FileRouteTypes {
     | '/api/product/helpful-vote'
     | '/api/product/public-bestsellers'
     | '/api/product/public-by-category'
-    | '/api/product/public-compare'
     | '/api/product/public-list'
     | '/api/product/public-questions'
     | '/api/product/public-recent'
@@ -3096,7 +3072,6 @@ export interface RootRouteChildren {
   CartRoute: typeof CartRoute
   CategoriesRoute: typeof CategoriesRoute
   CheckoutRoute: typeof CheckoutRouteWithChildren
-  CompareRoute: typeof CompareRoute
   ContactRoute: typeof ContactRoute
   DealsRoute: typeof DealsRoute
   FaqRoute: typeof FaqRoute
@@ -3176,7 +3151,6 @@ export interface RootRouteChildren {
   ApiProductHelpfulVoteRoute: typeof ApiProductHelpfulVoteRoute
   ApiProductPublicBestsellersRoute: typeof ApiProductPublicBestsellersRoute
   ApiProductPublicByCategoryRoute: typeof ApiProductPublicByCategoryRoute
-  ApiProductPublicCompareRoute: typeof ApiProductPublicCompareRoute
   ApiProductPublicListRoute: typeof ApiProductPublicListRoute
   ApiProductPublicQuestionsRoute: typeof ApiProductPublicQuestionsRoute
   ApiProductPublicRecentRoute: typeof ApiProductPublicRecentRoute
@@ -3307,13 +3281,6 @@ declare module '@tanstack/react-router' {
       path: '/checkout'
       fullPath: '/checkout'
       preLoaderRoute: typeof CheckoutRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/compare': {
-      id: '/compare'
-      path: '/compare'
-      fullPath: '/compare'
-      preLoaderRoute: typeof CompareRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/contact': {
@@ -3958,13 +3925,6 @@ declare module '@tanstack/react-router' {
       path: '/api/product/public-by-category'
       fullPath: '/api/product/public-by-category'
       preLoaderRoute: typeof ApiProductPublicByCategoryRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/product/public-compare': {
-      id: '/api/product/public-compare'
-      path: '/api/product/public-compare'
-      fullPath: '/api/product/public-compare'
-      preLoaderRoute: typeof ApiProductPublicCompareRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/product/public-list': {
@@ -5316,7 +5276,6 @@ const rootRouteChildren: RootRouteChildren = {
   CartRoute: CartRoute,
   CategoriesRoute: CategoriesRoute,
   CheckoutRoute: CheckoutRouteWithChildren,
-  CompareRoute: CompareRoute,
   ContactRoute: ContactRoute,
   DealsRoute: DealsRoute,
   FaqRoute: FaqRoute,
@@ -5397,7 +5356,6 @@ const rootRouteChildren: RootRouteChildren = {
   ApiProductHelpfulVoteRoute: ApiProductHelpfulVoteRoute,
   ApiProductPublicBestsellersRoute: ApiProductPublicBestsellersRoute,
   ApiProductPublicByCategoryRoute: ApiProductPublicByCategoryRoute,
-  ApiProductPublicCompareRoute: ApiProductPublicCompareRoute,
   ApiProductPublicListRoute: ApiProductPublicListRoute,
   ApiProductPublicQuestionsRoute: ApiProductPublicQuestionsRoute,
   ApiProductPublicRecentRoute: ApiProductPublicRecentRoute,

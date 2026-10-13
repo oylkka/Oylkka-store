@@ -33,7 +33,7 @@ interface RateLimitResult {
  * `limit(identifier)`, so this stays structurally compatible with every call
  * site.
  */
-class SafeRatelimit {
+export class SafeRatelimit {
   constructor(
     private readonly scope: string,
     private readonly limitCount: number,
@@ -79,6 +79,3 @@ export const generalLimiter = build('ratelimit:general', 100);
 export const adminLimiter = build('ratelimit:admin', 60);
 export const newsletterLimiter = build('ratelimit:newsletter', 5);
 export const contactLimiter = build('ratelimit:contact', 5);
-
-/** Whether Upstash credentials were present at boot. Exposed for tests. */
-export const isRedisConfigured = redis !== null;

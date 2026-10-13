@@ -304,34 +304,6 @@ export function useBestsellers(limit = 20) {
   });
 }
 
-type CompareProduct = CategoryProduct & {
-  description: string;
-  sku: string;
-  brand: string | null;
-  condition: string;
-  freeShipping: boolean;
-  tags: string[];
-  discountPercent: number | null;
-};
-
-type CompareResponse = {
-  products: CompareProduct[];
-};
-
-export function useCompareProducts(ids: string[]) {
-  return useQuery<CompareResponse>({
-    queryKey: [QUERY_KEYS.PUBLIC_PRODUCTS, 'compare', ids],
-    queryFn: async () => {
-      const response = await apiClient.get<CompareResponse>(
-        '/api/product/public-compare',
-        { params: { ids: ids.join(',') } },
-      );
-      return response.data;
-    },
-    enabled: ids.length >= 2,
-  });
-}
-
 export type PublicReview = {
   id: string;
   productId: string;

@@ -148,7 +148,6 @@ oylkka/
 │   │   ├── categories.tsx      # /categories (built)
 │   │   ├── checkout.tsx        # /checkout
 │   │   ├── checkout/confirmation.tsx  # /checkout/confirmation
-│   │   ├── compare.tsx         # /compare
 │   │   ├── contact.tsx         # /contact
 │   │   ├── deals.tsx           # /deals
 │   │   ├── faq.tsx             # /faq

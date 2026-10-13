@@ -1,4 +1,5 @@
 import { beforeEach, describe, expect, it } from 'bun:test';
+import { SafeRatelimit } from '@/lib/rate-limit';
 import {
   fallbackBucketCount,
   hitFallback,
@@ -87,34 +88,20 @@ describe('SafeRatelimit without Upstash credentials', () => {
   });
 
   it('limits in-process rather than throwing', async () => {
-    const savedUrl = process.env.UPSTASH_REDIS_REST_URL;
-    const savedToken = process.env.UPSTASH_REDIS_REST_TOKEN;
-    delete process.env.UPSTASH_REDIS_REST_URL;
-    delete process.env.UPSTASH_REDIS_REST_TOKEN;
+    // The module builds its limiters once at import time from whatever
+    // credentials were present then, so deleting env vars and re-importing
+    // cannot reproduce the unconfigured path when another test file has
+    // already cached the module. Constructing the wrapper with a null Redis
+    // client mirrors exactly what `build` does without credentials, keeping
+    // the test deterministic and guaranteeing it never hits the network.
+    const limiter = new SafeRatelimit('ratelimit:auth', 5, null);
 
-    try {
-      const mod = await import('@/lib/rate-limit');
-      // Guards against a cached module reaching the real network.
-      expect(mod.isRedisConfigured).toBe(false);
-
-      // authLimiter allows 5 per window.
-      const results = [];
-      for (let i = 0; i < 6; i++) {
-        results.push(await mod.authLimiter.limit('203.0.113.9'));
-      }
-      expect(results.slice(0, 5).every((r) => r.success)).toBe(true);
-      expect(results[5].success).toBe(false);
-    } finally {
-      if (savedUrl === undefined) {
-        delete process.env.UPSTASH_REDIS_REST_URL;
-      } else {
-        process.env.UPSTASH_REDIS_REST_URL = savedUrl;
-      }
-      if (savedToken === undefined) {
-        delete process.env.UPSTASH_REDIS_REST_TOKEN;
-      } else {
-        process.env.UPSTASH_REDIS_REST_TOKEN = savedToken;
-      }
+    // authLimiter allows 5 per window.
+    const results = [];
+    for (let i = 0; i < 6; i++) {
+      results.push(await limiter.limit('203.0.113.9'));
     }
+    expect(results.slice(0, 5).every((r) => r.success)).toBe(true);
+    expect(results[5].success).toBe(false);
   });
 });

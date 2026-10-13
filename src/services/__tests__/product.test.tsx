@@ -59,21 +59,3 @@ describe('useAllProducts API call', () => {
     });
   });
 });
-
-describe('useCompareProducts API call', () => {
-  it('calls /api/product/public-compare with joined ids', async () => {
-    const get = spyOn(apiClient, 'get').mockResolvedValue({
-      data: { products: mockProducts },
-    });
-
-    const ids = ['1', '2', '3'];
-    const response = await apiClient.get('/api/product/public-compare', {
-      params: { ids: ids.join(',') },
-    });
-
-    expect(get).toHaveBeenCalledWith('/api/product/public-compare', {
-      params: { ids: '1,2,3' },
-    });
-    expect(response.data.products).toEqual(mockProducts);
-  });
-});

@@ -36,7 +36,6 @@ import { ProductVendorCard } from '@/components/pages/product/product-vendor-car
 import { ProductVouchers } from '@/components/pages/product/product-vouchers';
 import { ProductReviews } from '@/components/pages/product/review';
 import { StockStatus } from '@/components/pages/product/stock-status';
-import { CompareButton } from '@/components/pages/shop/compare-button';
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -527,11 +526,6 @@ function RouteComponent() {
                   />
                 </Button>
               </div>
-
-              <CompareButton
-                productId={product.id}
-                className='w-full h-11 rounded-xl'
-              />
 
               {variantInactive && (
                 <p className='text-xs text-red-500'>

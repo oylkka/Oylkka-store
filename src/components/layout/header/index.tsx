@@ -1,5 +1,4 @@
 import { useEffect, useRef, useState } from 'react';
-import { CompareLink } from '@/components/pages/shop/compare-button';
 import { cn } from '@/lib/utils';
 import { Route as RootRoute } from '@/routes/__root';
 import Cart from './cart';
@@ -70,7 +69,6 @@ export default function Header({ navigation = true }: HeaderProps) {
               <div>
                 <ModeToggle />
               </div>
-              <CompareLink />
               {user && <Cart />}
               <UserMenu user={user} />
             </div>
