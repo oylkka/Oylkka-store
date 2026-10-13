@@ -1,5 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { z } from 'zod';
+import type { Prisma } from '@/generated/prisma/client';
 import { requireAdminOrManager, requireAuth } from '@/lib/auth-middleware';
 import { validateCsrf } from '@/lib/csrf';
 import { prisma } from '@/lib/db';
@@ -17,7 +18,10 @@ const ModerationPayloadSchema = z
     message: 'No moderation fields provided',
   });
 
-function appendHistory(existing: unknown, entry: unknown): unknown[] {
+function appendHistory(
+  existing: Prisma.JsonValue | null,
+  entry: Prisma.InputJsonObject,
+): Prisma.InputJsonArray {
   const base = Array.isArray(existing) ? existing : [];
   return [...base, entry];
 }
