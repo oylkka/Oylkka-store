@@ -1,6 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { getRequestHeaders } from '@tanstack/react-start/server';
-import { createAuditLog } from '@/lib/audit-log';
 import { auth } from '@/lib/auth';
 import { validateCsrf } from '@/lib/csrf';
 import { prisma } from '@/lib/db';
@@ -148,23 +147,6 @@ export const Route = createFileRoute('/api/vendor/orders/cancel')({
           const cancelledItems = order.items.filter((i) =>
             changedIds.has(i.id),
           );
-
-          createAuditLog({
-            actorId: session.user.id,
-            actorRole: 'VENDOR',
-            action: 'ORDER_CANCELLED',
-            entity: 'Order',
-            entityId: body.orderId,
-            details: {
-              reason: body.reason,
-              orderNumber: order.orderNumber,
-              shopId: shop.id,
-              itemIds: cancelledItems.map((i) => i.id),
-            },
-          }).catch((e) => {
-            // biome-ignore lint/suspicious/noConsole: this is fine
-            console.error('Failed to create audit log:', e);
-          });
 
           sendEmail({
             to: order.shippingEmail,

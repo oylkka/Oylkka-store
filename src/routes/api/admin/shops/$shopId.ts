@@ -1,6 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router';
 import * as z from 'zod';
-import { createAuditLog } from '@/lib/audit-log';
 import { requireAdmin, requireAuth } from '@/lib/auth-middleware';
 import { validateCsrf } from '@/lib/csrf';
 import { prisma } from '@/lib/db';
@@ -18,7 +17,6 @@ export const Route = createFileRoute('/api/admin/shops/$shopId')({
           if (authResult.response) return authResult.response;
           const roleResponse = requireAdmin(authResult.session);
           if (roleResponse) return roleResponse;
-          const session = authResult.session;
 
           const csrfResponse = validateCsrf();
           if (csrfResponse) return csrfResponse;
@@ -39,7 +37,7 @@ export const Route = createFileRoute('/api/admin/shops/$shopId')({
 
           const shop = await prisma.shop.findUnique({
             where: { id: shopId },
-            select: { id: true, name: true, commissionRate: true },
+            select: { id: true, commissionRate: true },
           });
           if (!shop) {
             return Response.json({ error: 'Shop not found' }, { status: 404 });
@@ -55,15 +53,6 @@ export const Route = createFileRoute('/api/admin/shops/$shopId')({
             where: { id: shopId },
             data: { commissionRate: next },
           });
-
-          createAuditLog({
-            actorId: session.user.id,
-            actorRole: session.user.role ?? 'ADMIN',
-            action: 'SHOP_COMMISSION_CHANGED',
-            entity: 'Shop',
-            entityId: shopId,
-            details: { shopName: shop.name, from: previous, to: next },
-          }).catch(() => {});
 
           return Response.json({ commissionRate: next }, { status: 200 });
         } catch {

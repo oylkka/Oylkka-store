@@ -54,7 +54,6 @@ import { Route as ApiAddressesCreateRouteImport } from './routes/api/addresses/c
 import { Route as ApiAddressesDeleteRouteImport } from './routes/api/addresses/delete'
 import { Route as ApiAddressesEditRouteImport } from './routes/api/addresses/edit'
 import { Route as ApiAddressesListRouteImport } from './routes/api/addresses/list'
-import { Route as ApiAdminAuditLogsRouteImport } from './routes/api/admin/audit-logs'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 import { Route as ApiAuthCheckEmailRouteImport } from './routes/api/auth/check-email'
 import { Route as ApiAuthSendPasswordResetConfirmationRouteImport } from './routes/api/auth/send-password-reset-confirmation'
@@ -142,7 +141,6 @@ import { Route as ApiWishlistAddRouteImport } from './routes/api/wishlist/add'
 import { Route as ApiWishlistListRouteImport } from './routes/api/wishlist/list'
 import { Route as ApiWishlistRemoveRouteImport } from './routes/api/wishlist/remove'
 import { Route as DashboardAdminIndexRouteImport } from './routes/dashboard/admin/index'
-import { Route as DashboardAdminStaffRouteRouteImport } from './routes/dashboard/admin/staff/route'
 import { Route as DashboardBecomeVendorIndexRouteImport } from './routes/dashboard/become-vendor/index'
 import { Route as DashboardBecomeVendorApplyRouteImport } from './routes/dashboard/become-vendor/apply'
 import { Route as DashboardBecomeVendorPendingRouteImport } from './routes/dashboard/become-vendor/pending'
@@ -217,8 +215,6 @@ import { Route as DashboardAdminOrdersOrderIdRouteImport } from './routes/dashbo
 import { Route as DashboardAdminReturnsIndexRouteImport } from './routes/dashboard/admin/returns/index'
 import { Route as DashboardAdminReviewsIndexRouteImport } from './routes/dashboard/admin/reviews/index'
 import { Route as DashboardAdminSettingsIndexRouteImport } from './routes/dashboard/admin/settings/index'
-import { Route as DashboardAdminStaffIndexRouteImport } from './routes/dashboard/admin/staff/index'
-import { Route as DashboardAdminStaffAuditLogsRouteImport } from './routes/dashboard/admin/staff/audit-logs'
 import { Route as DashboardAdminVendorsIndexRouteImport } from './routes/dashboard/admin/vendors/index'
 import { Route as DashboardAdminVendorsDetailRouteImport } from './routes/dashboard/admin/vendors/detail'
 import { Route as DashboardAdminVendorsPayoutsRouteImport } from './routes/dashboard/admin/vendors/payouts'
@@ -468,11 +464,6 @@ const ApiAddressesEditRoute = ApiAddressesEditRouteImport.update({
 const ApiAddressesListRoute = ApiAddressesListRouteImport.update({
   id: '/api/addresses/list',
   path: '/api/addresses/list',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiAdminAuditLogsRoute = ApiAdminAuditLogsRouteImport.update({
-  id: '/api/admin/audit-logs',
-  path: '/api/admin/audit-logs',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
@@ -921,12 +912,6 @@ const DashboardAdminIndexRoute = DashboardAdminIndexRouteImport.update({
   path: '/',
   getParentRoute: () => DashboardAdminRouteRoute,
 } as any)
-const DashboardAdminStaffRouteRoute =
-  DashboardAdminStaffRouteRouteImport.update({
-    id: '/staff',
-    path: '/staff',
-    getParentRoute: () => DashboardAdminRouteRoute,
-  } as any)
 const DashboardBecomeVendorIndexRoute =
   DashboardBecomeVendorIndexRouteImport.update({
     id: '/',
@@ -1328,18 +1313,6 @@ const DashboardAdminSettingsIndexRoute =
     path: '/settings/',
     getParentRoute: () => DashboardAdminRouteRoute,
   } as any)
-const DashboardAdminStaffIndexRoute =
-  DashboardAdminStaffIndexRouteImport.update({
-    id: '/',
-    path: '/',
-    getParentRoute: () => DashboardAdminStaffRouteRoute,
-  } as any)
-const DashboardAdminStaffAuditLogsRoute =
-  DashboardAdminStaffAuditLogsRouteImport.update({
-    id: '/audit-logs',
-    path: '/audit-logs',
-    getParentRoute: () => DashboardAdminStaffRouteRoute,
-  } as any)
 const DashboardAdminVendorsIndexRoute =
   DashboardAdminVendorsIndexRouteImport.update({
     id: '/vendors/',
@@ -1527,7 +1500,6 @@ export interface FileRoutesByFullPath {
   '/shop/$slug': typeof ShopSlugRoute
   '/dashboard/': typeof DashboardIndexRoute
   '/shops/': typeof ShopsIndexRoute
-  '/dashboard/admin/staff': typeof DashboardAdminStaffRouteRouteWithChildren
   '/dashboard/orders/returns': typeof DashboardOrdersReturnsRouteRouteWithChildren
   '/dashboard/vendor/payouts': typeof DashboardVendorPayoutsRouteRouteWithChildren
   '/dashboard/vendor/shipping': typeof DashboardVendorShippingRouteRouteWithChildren
@@ -1535,7 +1507,6 @@ export interface FileRoutesByFullPath {
   '/api/addresses/delete': typeof ApiAddressesDeleteRoute
   '/api/addresses/edit': typeof ApiAddressesEditRoute
   '/api/addresses/list': typeof ApiAddressesListRoute
-  '/api/admin/audit-logs': typeof ApiAdminAuditLogsRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/auth/check-email': typeof ApiAuthCheckEmailRoute
   '/api/auth/send-password-reset-confirmation': typeof ApiAuthSendPasswordResetConfirmationRoute
@@ -1687,7 +1658,6 @@ export interface FileRoutesByFullPath {
   '/dashboard/admin/customers/$id': typeof DashboardAdminCustomersIdRoute
   '/dashboard/admin/messages/$id': typeof DashboardAdminMessagesIdRoute
   '/dashboard/admin/orders/$orderId': typeof DashboardAdminOrdersOrderIdRoute
-  '/dashboard/admin/staff/audit-logs': typeof DashboardAdminStaffAuditLogsRoute
   '/dashboard/admin/vendors/detail': typeof DashboardAdminVendorsDetailRoute
   '/dashboard/admin/vendors/payouts': typeof DashboardAdminVendorsPayoutsRoute
   '/dashboard/orders/returns/$returnId': typeof DashboardOrdersReturnsReturnIdRoute
@@ -1707,7 +1677,6 @@ export interface FileRoutesByFullPath {
   '/dashboard/admin/returns/': typeof DashboardAdminReturnsIndexRoute
   '/dashboard/admin/reviews/': typeof DashboardAdminReviewsIndexRoute
   '/dashboard/admin/settings/': typeof DashboardAdminSettingsIndexRoute
-  '/dashboard/admin/staff/': typeof DashboardAdminStaffIndexRoute
   '/dashboard/admin/vendors/': typeof DashboardAdminVendorsIndexRoute
   '/dashboard/orders/returns/': typeof DashboardOrdersReturnsIndexRoute
   '/dashboard/vendor/orders/': typeof DashboardVendorOrdersIndexRoute
@@ -1762,7 +1731,6 @@ export interface FileRoutesByTo {
   '/api/addresses/delete': typeof ApiAddressesDeleteRoute
   '/api/addresses/edit': typeof ApiAddressesEditRoute
   '/api/addresses/list': typeof ApiAddressesListRoute
-  '/api/admin/audit-logs': typeof ApiAdminAuditLogsRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/auth/check-email': typeof ApiAuthCheckEmailRoute
   '/api/auth/send-password-reset-confirmation': typeof ApiAuthSendPasswordResetConfirmationRoute
@@ -1914,7 +1882,6 @@ export interface FileRoutesByTo {
   '/dashboard/admin/customers/$id': typeof DashboardAdminCustomersIdRoute
   '/dashboard/admin/messages/$id': typeof DashboardAdminMessagesIdRoute
   '/dashboard/admin/orders/$orderId': typeof DashboardAdminOrdersOrderIdRoute
-  '/dashboard/admin/staff/audit-logs': typeof DashboardAdminStaffAuditLogsRoute
   '/dashboard/admin/vendors/detail': typeof DashboardAdminVendorsDetailRoute
   '/dashboard/admin/vendors/payouts': typeof DashboardAdminVendorsPayoutsRoute
   '/dashboard/orders/returns/$returnId': typeof DashboardOrdersReturnsReturnIdRoute
@@ -1934,7 +1901,6 @@ export interface FileRoutesByTo {
   '/dashboard/admin/returns': typeof DashboardAdminReturnsIndexRoute
   '/dashboard/admin/reviews': typeof DashboardAdminReviewsIndexRoute
   '/dashboard/admin/settings': typeof DashboardAdminSettingsIndexRoute
-  '/dashboard/admin/staff': typeof DashboardAdminStaffIndexRoute
   '/dashboard/admin/vendors': typeof DashboardAdminVendorsIndexRoute
   '/dashboard/orders/returns': typeof DashboardOrdersReturnsIndexRoute
   '/dashboard/vendor/orders': typeof DashboardVendorOrdersIndexRoute
@@ -1991,7 +1957,6 @@ export interface FileRoutesById {
   '/shop/$slug': typeof ShopSlugRoute
   '/dashboard/': typeof DashboardIndexRoute
   '/shops/': typeof ShopsIndexRoute
-  '/dashboard/admin/staff': typeof DashboardAdminStaffRouteRouteWithChildren
   '/dashboard/orders/returns': typeof DashboardOrdersReturnsRouteRouteWithChildren
   '/dashboard/vendor/payouts': typeof DashboardVendorPayoutsRouteRouteWithChildren
   '/dashboard/vendor/shipping': typeof DashboardVendorShippingRouteRouteWithChildren
@@ -1999,7 +1964,6 @@ export interface FileRoutesById {
   '/api/addresses/delete': typeof ApiAddressesDeleteRoute
   '/api/addresses/edit': typeof ApiAddressesEditRoute
   '/api/addresses/list': typeof ApiAddressesListRoute
-  '/api/admin/audit-logs': typeof ApiAdminAuditLogsRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/auth/check-email': typeof ApiAuthCheckEmailRoute
   '/api/auth/send-password-reset-confirmation': typeof ApiAuthSendPasswordResetConfirmationRoute
@@ -2151,7 +2115,6 @@ export interface FileRoutesById {
   '/dashboard/admin/customers/$id': typeof DashboardAdminCustomersIdRoute
   '/dashboard/admin/messages/$id': typeof DashboardAdminMessagesIdRoute
   '/dashboard/admin/orders/$orderId': typeof DashboardAdminOrdersOrderIdRoute
-  '/dashboard/admin/staff/audit-logs': typeof DashboardAdminStaffAuditLogsRoute
   '/dashboard/admin/vendors/detail': typeof DashboardAdminVendorsDetailRoute
   '/dashboard/admin/vendors/payouts': typeof DashboardAdminVendorsPayoutsRoute
   '/dashboard/orders/returns/$returnId': typeof DashboardOrdersReturnsReturnIdRoute
@@ -2171,7 +2134,6 @@ export interface FileRoutesById {
   '/dashboard/admin/returns/': typeof DashboardAdminReturnsIndexRoute
   '/dashboard/admin/reviews/': typeof DashboardAdminReviewsIndexRoute
   '/dashboard/admin/settings/': typeof DashboardAdminSettingsIndexRoute
-  '/dashboard/admin/staff/': typeof DashboardAdminStaffIndexRoute
   '/dashboard/admin/vendors/': typeof DashboardAdminVendorsIndexRoute
   '/dashboard/orders/returns/': typeof DashboardOrdersReturnsIndexRoute
   '/dashboard/vendor/orders/': typeof DashboardVendorOrdersIndexRoute
@@ -2229,7 +2191,6 @@ export interface FileRouteTypes {
     | '/shop/$slug'
     | '/dashboard/'
     | '/shops/'
-    | '/dashboard/admin/staff'
     | '/dashboard/orders/returns'
     | '/dashboard/vendor/payouts'
     | '/dashboard/vendor/shipping'
@@ -2237,7 +2198,6 @@ export interface FileRouteTypes {
     | '/api/addresses/delete'
     | '/api/addresses/edit'
     | '/api/addresses/list'
-    | '/api/admin/audit-logs'
     | '/api/auth/$'
     | '/api/auth/check-email'
     | '/api/auth/send-password-reset-confirmation'
@@ -2389,7 +2349,6 @@ export interface FileRouteTypes {
     | '/dashboard/admin/customers/$id'
     | '/dashboard/admin/messages/$id'
     | '/dashboard/admin/orders/$orderId'
-    | '/dashboard/admin/staff/audit-logs'
     | '/dashboard/admin/vendors/detail'
     | '/dashboard/admin/vendors/payouts'
     | '/dashboard/orders/returns/$returnId'
@@ -2409,7 +2368,6 @@ export interface FileRouteTypes {
     | '/dashboard/admin/returns/'
     | '/dashboard/admin/reviews/'
     | '/dashboard/admin/settings/'
-    | '/dashboard/admin/staff/'
     | '/dashboard/admin/vendors/'
     | '/dashboard/orders/returns/'
     | '/dashboard/vendor/orders/'
@@ -2464,7 +2422,6 @@ export interface FileRouteTypes {
     | '/api/addresses/delete'
     | '/api/addresses/edit'
     | '/api/addresses/list'
-    | '/api/admin/audit-logs'
     | '/api/auth/$'
     | '/api/auth/check-email'
     | '/api/auth/send-password-reset-confirmation'
@@ -2616,7 +2573,6 @@ export interface FileRouteTypes {
     | '/dashboard/admin/customers/$id'
     | '/dashboard/admin/messages/$id'
     | '/dashboard/admin/orders/$orderId'
-    | '/dashboard/admin/staff/audit-logs'
     | '/dashboard/admin/vendors/detail'
     | '/dashboard/admin/vendors/payouts'
     | '/dashboard/orders/returns/$returnId'
@@ -2636,7 +2592,6 @@ export interface FileRouteTypes {
     | '/dashboard/admin/returns'
     | '/dashboard/admin/reviews'
     | '/dashboard/admin/settings'
-    | '/dashboard/admin/staff'
     | '/dashboard/admin/vendors'
     | '/dashboard/orders/returns'
     | '/dashboard/vendor/orders'
@@ -2692,7 +2647,6 @@ export interface FileRouteTypes {
     | '/shop/$slug'
     | '/dashboard/'
     | '/shops/'
-    | '/dashboard/admin/staff'
     | '/dashboard/orders/returns'
     | '/dashboard/vendor/payouts'
     | '/dashboard/vendor/shipping'
@@ -2700,7 +2654,6 @@ export interface FileRouteTypes {
     | '/api/addresses/delete'
     | '/api/addresses/edit'
     | '/api/addresses/list'
-    | '/api/admin/audit-logs'
     | '/api/auth/$'
     | '/api/auth/check-email'
     | '/api/auth/send-password-reset-confirmation'
@@ -2852,7 +2805,6 @@ export interface FileRouteTypes {
     | '/dashboard/admin/customers/$id'
     | '/dashboard/admin/messages/$id'
     | '/dashboard/admin/orders/$orderId'
-    | '/dashboard/admin/staff/audit-logs'
     | '/dashboard/admin/vendors/detail'
     | '/dashboard/admin/vendors/payouts'
     | '/dashboard/orders/returns/$returnId'
@@ -2872,7 +2824,6 @@ export interface FileRouteTypes {
     | '/dashboard/admin/returns/'
     | '/dashboard/admin/reviews/'
     | '/dashboard/admin/settings/'
-    | '/dashboard/admin/staff/'
     | '/dashboard/admin/vendors/'
     | '/dashboard/orders/returns/'
     | '/dashboard/vendor/orders/'
@@ -2922,7 +2873,6 @@ export interface RootRouteChildren {
   ApiAddressesDeleteRoute: typeof ApiAddressesDeleteRoute
   ApiAddressesEditRoute: typeof ApiAddressesEditRoute
   ApiAddressesListRoute: typeof ApiAddressesListRoute
-  ApiAdminAuditLogsRoute: typeof ApiAdminAuditLogsRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
   ApiAuthCheckEmailRoute: typeof ApiAuthCheckEmailRoute
   ApiAuthSendPasswordResetConfirmationRoute: typeof ApiAuthSendPasswordResetConfirmationRoute
@@ -3368,13 +3318,6 @@ declare module '@tanstack/react-router' {
       path: '/api/addresses/list'
       fullPath: '/api/addresses/list'
       preLoaderRoute: typeof ApiAddressesListRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/admin/audit-logs': {
-      id: '/api/admin/audit-logs'
-      path: '/api/admin/audit-logs'
-      fullPath: '/api/admin/audit-logs'
-      preLoaderRoute: typeof ApiAdminAuditLogsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/auth/$': {
@@ -3986,13 +3929,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardAdminIndexRouteImport
       parentRoute: typeof DashboardAdminRouteRoute
     }
-    '/dashboard/admin/staff': {
-      id: '/dashboard/admin/staff'
-      path: '/staff'
-      fullPath: '/dashboard/admin/staff'
-      preLoaderRoute: typeof DashboardAdminStaffRouteRouteImport
-      parentRoute: typeof DashboardAdminRouteRoute
-    }
     '/dashboard/become-vendor/': {
       id: '/dashboard/become-vendor/'
       path: '/'
@@ -4511,20 +4447,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardAdminSettingsIndexRouteImport
       parentRoute: typeof DashboardAdminRouteRoute
     }
-    '/dashboard/admin/staff/': {
-      id: '/dashboard/admin/staff/'
-      path: '/'
-      fullPath: '/dashboard/admin/staff/'
-      preLoaderRoute: typeof DashboardAdminStaffIndexRouteImport
-      parentRoute: typeof DashboardAdminStaffRouteRoute
-    }
-    '/dashboard/admin/staff/audit-logs': {
-      id: '/dashboard/admin/staff/audit-logs'
-      path: '/audit-logs'
-      fullPath: '/dashboard/admin/staff/audit-logs'
-      preLoaderRoute: typeof DashboardAdminStaffAuditLogsRouteImport
-      parentRoute: typeof DashboardAdminStaffRouteRoute
-    }
     '/dashboard/admin/vendors/': {
       id: '/dashboard/admin/vendors/'
       path: '/vendors'
@@ -4696,24 +4618,7 @@ declare module '@tanstack/react-router' {
   }
 }
 
-interface DashboardAdminStaffRouteRouteChildren {
-  DashboardAdminStaffAuditLogsRoute: typeof DashboardAdminStaffAuditLogsRoute
-  DashboardAdminStaffIndexRoute: typeof DashboardAdminStaffIndexRoute
-}
-
-const DashboardAdminStaffRouteRouteChildren: DashboardAdminStaffRouteRouteChildren =
-  {
-    DashboardAdminStaffAuditLogsRoute: DashboardAdminStaffAuditLogsRoute,
-    DashboardAdminStaffIndexRoute: DashboardAdminStaffIndexRoute,
-  }
-
-const DashboardAdminStaffRouteRouteWithChildren =
-  DashboardAdminStaffRouteRoute._addFileChildren(
-    DashboardAdminStaffRouteRouteChildren,
-  )
-
 interface DashboardAdminRouteRouteChildren {
-  DashboardAdminStaffRouteRoute: typeof DashboardAdminStaffRouteRouteWithChildren
   DashboardAdminIndexRoute: typeof DashboardAdminIndexRoute
   DashboardAdminBannerAddRoute: typeof DashboardAdminBannerAddRoute
   DashboardAdminBannerEditRoute: typeof DashboardAdminBannerEditRoute
@@ -4739,7 +4644,6 @@ interface DashboardAdminRouteRouteChildren {
 }
 
 const DashboardAdminRouteRouteChildren: DashboardAdminRouteRouteChildren = {
-  DashboardAdminStaffRouteRoute: DashboardAdminStaffRouteRouteWithChildren,
   DashboardAdminIndexRoute: DashboardAdminIndexRoute,
   DashboardAdminBannerAddRoute: DashboardAdminBannerAddRoute,
   DashboardAdminBannerEditRoute: DashboardAdminBannerEditRoute,
@@ -4993,7 +4897,6 @@ const rootRouteChildren: RootRouteChildren = {
   ApiAddressesDeleteRoute: ApiAddressesDeleteRoute,
   ApiAddressesEditRoute: ApiAddressesEditRoute,
   ApiAddressesListRoute: ApiAddressesListRoute,
-  ApiAdminAuditLogsRoute: ApiAdminAuditLogsRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
   ApiAuthCheckEmailRoute: ApiAuthCheckEmailRoute,
   ApiAuthSendPasswordResetConfirmationRoute:

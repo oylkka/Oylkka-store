@@ -1,6 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { sendOrderShippedNotification } from '@/actions/send-order-email';
-import { createAuditLog } from '@/lib/audit-log';
 import { requireAdminOrManager, requireAuth } from '@/lib/auth-middleware';
 import { validateCsrf } from '@/lib/csrf';
 import { prisma } from '@/lib/db';
@@ -25,7 +24,6 @@ export const Route = createFileRoute('/api/orders/admin-fulfill')({
           if (authResult.response) return authResult.response;
           const roleResponse = requireAdminOrManager(authResult.session);
           if (roleResponse) return roleResponse;
-          const session = authResult.session;
 
           const csrfResponse = validateCsrf();
           if (csrfResponse) return csrfResponse;
@@ -136,20 +134,6 @@ export const Route = createFileRoute('/api/orders/admin-fulfill')({
                 console.error('Failed to send shipped notification:', err),
             );
           }
-
-          createAuditLog({
-            actorId: session.user.id,
-            actorRole: session.user.role ?? 'ADMIN',
-            action: 'ORDER_FULFILLED',
-            entity: 'OrderItem',
-            entityId: body.itemId,
-            details: {
-              orderId: body.orderId,
-              newStatus: body.fulfillmentStatus,
-              trackingNumber: body.trackingNumber,
-            },
-            // biome-ignore lint/suspicious/noConsole: this is fine
-          }).catch((err) => console.error('Failed to create audit log:', err));
 
           return Response.json(
             {

@@ -1,5 +1,4 @@
 import { createFileRoute } from '@tanstack/react-router';
-import { createAuditLog } from '@/lib/audit-log';
 import { requireAdmin, requireAuth } from '@/lib/auth-middleware';
 import { validateCsrf } from '@/lib/csrf';
 import { prisma } from '@/lib/db';
@@ -15,7 +14,6 @@ export const Route = createFileRoute('/api/shop/reject')({
           if (authResult.response) return authResult.response;
           const roleResponse = requireAdmin(authResult.session);
           if (roleResponse) return roleResponse;
-          const session = authResult.session;
 
           const csrfResponse = validateCsrf();
           if (csrfResponse) return csrfResponse;
@@ -61,19 +59,6 @@ export const Route = createFileRoute('/api/shop/reject')({
               rejectionReason: rejectionReason.trim(),
             },
           });
-
-          createAuditLog({
-            actorId: session.user.id,
-            actorRole: session.user.role ?? 'ADMIN',
-            action: 'SHOP_REJECTED',
-            entity: 'Shop',
-            entityId: id,
-            details: {
-              shopName: shop.name,
-              ownerId: shop.ownerId,
-              reason: rejectionReason,
-            },
-          }).catch(() => {});
 
           prisma.user
             .findUnique({

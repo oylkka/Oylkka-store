@@ -1,6 +1,4 @@
 import { createFileRoute } from '@tanstack/react-router';
-import { getRequestHeaders } from '@tanstack/react-start/server';
-import { createAuditLog } from '@/lib/audit-log';
 import { requireAdminOrManager, requireAuth } from '@/lib/auth-middleware';
 import { validateCsrf } from '@/lib/csrf';
 import { prisma } from '@/lib/db';
@@ -14,7 +12,6 @@ export const Route = createFileRoute('/api/admin/coupons/create')({
           if (authResult.response) return authResult.response;
           const roleResponse = requireAdminOrManager(authResult.session);
           if (roleResponse) return roleResponse;
-          const session = authResult.session;
 
           const csrfResponse = validateCsrf();
           if (csrfResponse) return csrfResponse;
@@ -110,16 +107,6 @@ export const Route = createFileRoute('/api/admin/coupons/create')({
                 : {}),
             },
             include: { _count: { select: { usages: true } } },
-          });
-
-          await createAuditLog({
-            actorId: session.user.id,
-            actorRole: session.user.role ?? 'USER',
-            action: 'COUPON_CREATED',
-            entity: 'Coupon',
-            entityId: coupon.id,
-            details: { code: coupon.code, type, value, scope },
-            ipAddress: getRequestHeaders().get('x-forwarded-for') || undefined,
           });
 
           return Response.json({ coupon }, { status: 201 });

@@ -1,9 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router';
-import { getRequestHeaders } from '@tanstack/react-start/server';
 import { z } from 'zod';
-import { createAuditLog } from '@/lib/audit-log';
 import { requireAdminOrManager, requireAuth } from '@/lib/auth-middleware';
-import { getClientIp } from '@/lib/client-ip';
 import { validateCsrf } from '@/lib/csrf';
 import { prisma } from '@/lib/db';
 import { USER_ROLES } from '@/lib/roles';
@@ -108,16 +105,12 @@ export const Route = createFileRoute('/api/admin/customers/$id')({
 
       PUT: async ({ request, params }) => {
         try {
-          const headers = getRequestHeaders();
           const authResult = await requireAuth();
           if (authResult.response) return authResult.response;
           const session = authResult.session;
 
           const roleResponse = requireAdminOrManager(session);
           if (roleResponse) return roleResponse;
-
-          // Narrowed to ADMIN | MANAGER by requireAdminOrManager above.
-          const actorRole = session.user.role as string;
 
           const csrfResponse = validateCsrf();
           if (csrfResponse) return csrfResponse;
@@ -189,36 +182,6 @@ export const Route = createFileRoute('/api/admin/customers/$id')({
 
             if (banned === true && !wasBanned) {
               await tx.session.deleteMany({ where: { userId: params.id } });
-            }
-
-            // AUTH-04: the audit row belongs in the same transaction as the
-            // mutation — the record can never disagree with what happened.
-            const ipAddress = getClientIp(headers) ?? undefined;
-
-            if (banned === true && !wasBanned) {
-              await createAuditLog({
-                actorId: session.user.id,
-                actorRole,
-                action: 'USER_BANNED',
-                entity: 'User',
-                entityId: params.id,
-                details: { reason: banReason, name: existing.name },
-                ipAddress,
-                tx,
-              });
-            }
-
-            if (roleChanged) {
-              await createAuditLog({
-                actorId: session.user.id,
-                actorRole,
-                action: 'USER_ROLE_CHANGED',
-                entity: 'User',
-                entityId: params.id,
-                details: { from: existing.role, to: role, name: existing.name },
-                ipAddress,
-                tx,
-              });
             }
 
             return updated;

@@ -44,7 +44,6 @@ oylkka/
 │   ├── return.prisma           # ReturnRequest
 │   ├── shipping.prisma         # ShippingZone, ShippingRate
 │   ├── email.prisma            # EmailLog
-│   ├── audit.prisma            # AuditLog
 │   ├── extra.prisma            # ExtraPage, Coupon, Wishlist, FollowedShop, etc.
 │   └── migrations/             # Prisma migrations
 │
@@ -132,7 +131,6 @@ oylkka/
 │   │   ├── invoice-queue.ts    # Invoice queue processing
 │   │   ├── nodemailer.ts       # Nodemailer transport config
 │   │   ├── send-email.ts       # Email sending utility
-│   │   ├── audit-log.ts        # Audit log creation
 │   │   └── cart-cleanup.ts     # Stale cart cleanup
 │   │
 │   ├── router.tsx              # Router factory (createRouter + routeTree)
@@ -212,7 +210,6 @@ oylkka/
 │   │   │       ├── returns/    # Returns queue
 │   │   │       ├── reviews/    # All reviews
 │   │   │       ├── settings/   # Admin settings
-│   │   │       ├── staff/      # Audit logs only (index redirects to audit-logs)
 │   │   │       └── vendors/    # Vendor list, approve/reject
 │   │   │
 │   │   └── api/                # Server-side API routes
@@ -245,7 +242,6 @@ oylkka/
 │   │
 │   ├── services/               # React Query hooks (one file per domain)
 │   │   ├── address.ts
-│   │   ├── admin-audit-logs.ts
 │   │   ├── admin-content.ts
 │   │   ├── admin-coupons.ts
 │   │   ├── admin-customers.ts
@@ -469,7 +465,6 @@ export function useUpdateShopMutation() {
 | **ReturnRequest**                                | `return.prisma`       | Return/refund requests                                             |
 | **ShippingZone / ShippingRate**                  | `shipping.prisma`     | Shipping configuration                                             |
 | **EmailLog**                                     | `email.prisma`        | Email delivery tracking                                            |
-| **AuditLog**                                     | `audit.prisma`        | Admin action audit trail                                           |
 | **Payout / PayoutItem**                          | `shop.prisma`         | Vendor payout records                                              |
 | **Wishlist / FollowedShop / Coupon / ExtraPage** | `extra.prisma`        | Miscellaneous domain models                                        |
 
@@ -518,7 +513,6 @@ Query keys are centralized in `src/lib/constants.ts` (~35 keys). Each domain has
 | `admin-reviews.ts`    | `useAdminReviews`, `useModerateReviewMutation`                                                 |
 | `admin-coupons.ts`    | `useAdminCoupons`, `useCreateCoupon`                                                           |
 | `admin-settings.ts`   | `useAdminSettings`, `useUpdateSettingsMutation`                                                |
-| `admin-audit-logs.ts` | `useAdminAuditLogs`                                                                            |
 | `sku-service.ts`      | SKU generation/validation utilities                                                            |
 | `payouts.ts`          | `usePayouts`, `useRequestPayout`                                                               |
 | `extra.ts`            | Followed shops, static pages                                                                   |

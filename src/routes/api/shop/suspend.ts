@@ -1,5 +1,4 @@
 import { createFileRoute } from '@tanstack/react-router';
-import { createAuditLog } from '@/lib/audit-log';
 import { requireAdmin, requireAuth } from '@/lib/auth-middleware';
 import { validateCsrf } from '@/lib/csrf';
 import { prisma } from '@/lib/db';
@@ -67,19 +66,6 @@ export const Route = createFileRoute('/api/shop/suspend')({
               suspendedBy: session.user.id,
             },
           });
-
-          createAuditLog({
-            actorId: session.user.id,
-            actorRole: session.user.role ?? 'ADMIN',
-            action: 'SHOP_SUSPENDED',
-            entity: 'Shop',
-            entityId: id,
-            details: {
-              shopName: shop.name,
-              ownerId: shop.ownerId,
-              reason: reason.trim(),
-            },
-          }).catch(() => {});
 
           prisma.user
             .findUnique({

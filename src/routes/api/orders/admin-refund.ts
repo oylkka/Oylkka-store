@@ -1,8 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router';
-import { createAuditLog } from '@/lib/audit-log';
 import { requireAdmin, requireAuth } from '@/lib/auth-middleware';
 import { refundBkashPayment } from '@/lib/bkash';
-import { getClientIp } from '@/lib/client-ip';
 import { validateCsrf } from '@/lib/csrf';
 import { prisma } from '@/lib/db';
 import { orderRefundHtml } from '@/lib/email-templates';
@@ -27,7 +25,6 @@ export const Route = createFileRoute('/api/orders/admin-refund')({
           if (authResult.response) return authResult.response;
           const roleResponse = requireAdmin(authResult.session);
           if (roleResponse) return roleResponse;
-          const session = authResult.session;
 
           const csrfResponse = validateCsrf();
           if (csrfResponse) return csrfResponse;
@@ -266,22 +263,6 @@ export const Route = createFileRoute('/api/orders/admin-refund')({
           }
 
           const metadata = updated.metadata as OrderMetadata | null;
-
-          createAuditLog({
-            actorId: session.user.id,
-            actorRole: session.user.role ?? 'ADMIN',
-            action: 'ORDER_REFUNDED',
-            entity: 'Order',
-            entityId: body.orderId,
-            ipAddress: getClientIp(request.headers) ?? undefined,
-            details: {
-              amount: body.amount,
-              reason: body.reason,
-              itemIds: body.itemIds,
-              orderNumber: order.orderNumber,
-            },
-            // biome-ignore lint/suspicious/noConsole: this is fine
-          }).catch((err) => console.error('Failed to create audit log:', err));
 
           sendEmail({
             to: order.shippingEmail,

@@ -104,14 +104,6 @@ describe('admin-customers service API calls', () => {
   });
 });
 
-describe('admin-audit-logs service API calls', () => {
-  it('fetches audit logs', async () => {
-    const get = spyOn(apiClient, 'get').mockResolvedValue({ data: [] });
-    await apiClient.get('/api/admin/audit-logs');
-    expect(get).toHaveBeenCalledWith('/api/admin/audit-logs');
-  });
-});
-
 describe('admin-settings service API calls', () => {
   it('lists settings', async () => {
     const get = spyOn(apiClient, 'get').mockResolvedValue({ data: [] });

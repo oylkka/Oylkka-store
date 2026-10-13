@@ -1,5 +1,4 @@
 import { createFileRoute } from '@tanstack/react-router';
-import { createAuditLog } from '@/lib/audit-log';
 import { requireAuth } from '@/lib/auth-middleware';
 import { validateCsrf } from '@/lib/csrf';
 import { prisma } from '@/lib/db';
@@ -96,20 +95,6 @@ export const Route = createFileRoute('/api/orders/cancel')({
               },
             });
           });
-
-          createAuditLog({
-            actorId: session.user.id,
-            actorRole: session.user.role ?? 'CUSTOMER',
-            action: 'ORDER_CANCELLED',
-            entity: 'Order',
-            entityId: order.id,
-            details: {
-              reason,
-              orderNumber: order.orderNumber,
-              by: 'customer',
-            },
-            // biome-ignore lint/suspicious/noConsole: this is fine
-          }).catch((err) => console.error('Failed to create audit log:', err));
 
           sendEmail({
             to: order.shippingEmail,

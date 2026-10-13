@@ -30,7 +30,6 @@ export const QUERY_KEYS = {
   PAYOUTS: 'payouts',
   ADDRESSES: 'addresses',
   FOLLOWED_SHOPS: 'followed-shops',
-  AUDIT_LOGS: 'audit-logs',
   ADMIN_SETTINGS: 'admin-settings',
   PUBLIC_SETTINGS: 'public-settings',
   VENDOR_QUESTIONS: 'vendor-questions',

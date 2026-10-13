@@ -1,12 +1,9 @@
 import { createFileRoute } from '@tanstack/react-router';
-import { getRequestHeaders } from '@tanstack/react-start/server';
-import { createAuditLog } from '@/lib/audit-log';
 import {
   requireAdmin,
   requireAdminOrManager,
   requireAuth,
 } from '@/lib/auth-middleware';
-import { getClientIp } from '@/lib/client-ip';
 import { validateCsrf } from '@/lib/csrf';
 import { prisma } from '@/lib/db';
 
@@ -48,7 +45,6 @@ export const Route = createFileRoute('/api/admin/coupons/$id')({
         try {
           // AUTH-09: authenticate through requireAuth so the per-actor admin
           // limiter applies to this mutating handler too.
-          const headers = getRequestHeaders();
           const authResult = await requireAuth();
           if (authResult.response) return authResult.response;
           const session = authResult.session;
@@ -180,16 +176,6 @@ export const Route = createFileRoute('/api/admin/coupons/$id')({
             }
           }
 
-          await createAuditLog({
-            actorId: session.user.id,
-            actorRole: session.user.role as string,
-            action: 'COUPON_MODIFIED',
-            entity: 'Coupon',
-            entityId: coupon.id,
-            details: { code: coupon.code },
-            ipAddress: getClientIp(headers) ?? undefined,
-          });
-
           return Response.json({ coupon });
         } catch (_error) {
           return Response.json(
@@ -202,7 +188,6 @@ export const Route = createFileRoute('/api/admin/coupons/$id')({
       DELETE: async ({ params }) => {
         try {
           // AUTH-09: route through requireAuth so the admin limiter applies.
-          const headers = getRequestHeaders();
           const authResult = await requireAuth();
           if (authResult.response) return authResult.response;
           const session = authResult.session;
@@ -239,14 +224,11 @@ export const Route = createFileRoute('/api/admin/coupons/$id')({
           });
           await prisma.coupon.delete({ where: { id: params.id } });
 
-          await createAuditLog({
-            actorId: session.user.id,
-            actorRole: session.user.role as string,
-            action: 'COUPON_MODIFIED',
-            entity: 'Coupon',
-            entityId: params.id,
-            details: { code: existing.code, action: 'deleted' },
-            ipAddress: getClientIp(headers) ?? undefined,
+          await prisma.coupon.update({
+            where: { id: params.id },
+            data: {
+              status: 'archived',
+            },
           });
 
           return Response.json({ success: true });

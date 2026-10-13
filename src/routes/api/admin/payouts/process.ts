@@ -1,11 +1,9 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { z } from 'zod';
-import { createAuditLog } from '@/lib/audit-log';
 import { requireAdmin, requireAuth } from '@/lib/auth-middleware';
 import { validateCsrf } from '@/lib/csrf';
 import { prisma } from '@/lib/db';
 import { payoutProcessedHtml } from '@/lib/email-templates';
-import { logError } from '@/lib/logger';
 import { sendEmail } from '@/lib/send-email';
 
 /**
@@ -169,21 +167,6 @@ export const Route = createFileRoute('/api/admin/payouts/process')({
               _count: { select: { items: true } },
             },
           });
-
-          createAuditLog({
-            actorId: session.user.id,
-            actorRole: session.user.role,
-            action: 'PAYOUT_PROCESSED',
-            entity: 'Payout',
-            entityId: payout.id,
-            details: {
-              shopId,
-              amount: totalAmount,
-              itemCount,
-              reference,
-              status: 'PENDING',
-            },
-          }).catch((err) => logError('payout-audit-log', err as Error));
 
           sendEmail({
             to: shop.owner.email,

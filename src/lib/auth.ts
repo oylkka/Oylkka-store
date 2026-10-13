@@ -38,10 +38,10 @@ export const auth = betterAuth({
 
   trustedOrigins: getTrustedOrigins(),
 
-  // AUTH-02: the admin plugin ships its own role/ban/impersonation endpoints
-  // that bypass `createAuditLog`. All privileged mutations are routed through
-  // the app's audited `/api/admin/*` handlers instead, so the plugin's
-  // mutating routes are disabled. Read-only routes are kept.
+  // AUTH-02: the admin plugin ships its own role/ban/impersonation endpoints.
+  // All privileged mutations are routed through the app's `/api/admin/*`
+  // handlers instead, so the plugin's mutating routes are disabled. Read-only
+  // routes are kept.
   // The `banned` / `role` fields and their core enforcement remain active.
   disabledPaths: [
     '/admin/set-role',

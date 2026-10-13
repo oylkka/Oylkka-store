@@ -1,9 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router';
-import { getRequestHeaders } from '@tanstack/react-start/server';
 import { z } from 'zod';
-import { createAuditLog } from '@/lib/audit-log';
 import { requireAdminOrManager, requireAuth } from '@/lib/auth-middleware';
-import { getClientIp } from '@/lib/client-ip';
 import { validateCsrf } from '@/lib/csrf';
 import { prisma } from '@/lib/db';
 
@@ -68,7 +65,6 @@ export const Route = createFileRoute('/api/admin/reviews/$id')({
         try {
           // AUTH-09: authenticate through requireAuth so the per-actor admin
           // limiter applies to this mutating handler too.
-          const headers = getRequestHeaders();
           const authResult = await requireAuth();
           if (authResult.response) return authResult.response;
           const session = authResult.session;
@@ -120,16 +116,6 @@ export const Route = createFileRoute('/api/admin/reviews/$id')({
             },
           });
 
-          await createAuditLog({
-            actorId: session.user.id,
-            actorRole: session.user.role as string,
-            action: 'REVIEW_MODERATED',
-            entity: 'Review',
-            entityId: params.id,
-            details: { changes: parsed.data },
-            ipAddress: getClientIp(headers) ?? undefined,
-          });
-
           return Response.json({ review });
         } catch (error) {
           return Response.json(
@@ -143,7 +129,6 @@ export const Route = createFileRoute('/api/admin/reviews/$id')({
         try {
           // AUTH-09: authenticate through requireAuth so the admin limiter
           // applies to this mutating handler too.
-          const headers = getRequestHeaders();
           const authResult = await requireAuth();
           if (authResult.response) return authResult.response;
           const session = authResult.session;
@@ -183,16 +168,6 @@ export const Route = createFileRoute('/api/admin/reviews/$id')({
                 }),
               },
             });
-          });
-
-          await createAuditLog({
-            actorId: session.user.id,
-            actorRole: session.user.role as string,
-            action: 'REVIEW_MODERATED',
-            entity: 'Review',
-            entityId: params.id,
-            details: { action: 'deleted' },
-            ipAddress: getClientIp(headers) ?? undefined,
           });
 
           return Response.json({ success: true });

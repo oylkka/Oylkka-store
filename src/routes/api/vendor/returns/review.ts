@@ -1,8 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { getRequestHeaders } from '@tanstack/react-start/server';
-import { createAuditLog } from '@/lib/audit-log';
 import { auth } from '@/lib/auth';
-import { getClientIp } from '@/lib/client-ip';
 import { validateCsrf } from '@/lib/csrf';
 import { prisma } from '@/lib/db';
 import { generalLimiter } from '@/lib/rate-limit';
@@ -86,23 +84,8 @@ export const Route = createFileRoute('/api/vendor/returns/review')({
             },
           });
 
-          // AUTH-11: a vendor return decision is a commercial action — record
-          // it in the audit trail and tell the customer the outcome.
-          await createAuditLog({
-            actorId: session.user.id,
-            actorRole: session.user.role ?? 'VENDOR',
-            action: 'RETURN_REVIEWED',
-            entity: 'ReturnRequest',
-            entityId: returnId,
-            details: {
-              status: newStatus,
-              shopId: shop.id,
-              orderId: returnRequest.order.id,
-              adminNote: adminNote ?? null,
-            },
-            ipAddress: getClientIp(headers) ?? undefined,
-          });
-
+          // AUTH-11: a vendor return decision is a commercial action — tell the
+          // customer the outcome.
           const customerEmail = returnRequest.order.shippingEmail;
           if (customerEmail) {
             await sendEmail({

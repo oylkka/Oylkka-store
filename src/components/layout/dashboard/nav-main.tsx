@@ -8,7 +8,6 @@ import {
   LayoutDashboard,
   Package,
   Settings,
-  Shield,
   ShoppingBag,
   ShoppingCart,
   Store,
@@ -291,15 +290,6 @@ export function NavMain({ user }: { user: User }) {
       icon: ClipboardCheck,
       roles: ['ADMIN', 'MANAGER'],
       items: [{ title: 'Conversations', to: '/dashboard/admin/messages' }],
-    },
-    {
-      title: 'Staff',
-      icon: Shield,
-      roles: ['ADMIN'],
-      items: [
-        { title: 'All Staff', to: '/dashboard/admin/staff' },
-        { title: 'Audit Logs', to: '/dashboard/admin/staff/audit-logs' },
-      ],
     },
     {
       title: 'Platform Settings',
