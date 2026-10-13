@@ -330,9 +330,6 @@ export const Route = createFileRoute('/api/product/create')({
                       imagePublicId?: string | null;
                       metadata?: Record<string, unknown> | null;
                       priceModifier?: number | null;
-                      // FE-45: optional canonical mapping links
-                      globalAttributeId?: string | null;
-                      globalValueId?: string | null;
                     }>;
                     isVariantDefining?: boolean;
                     displayOrder?: number;
@@ -349,8 +346,6 @@ export const Route = createFileRoute('/api/product/create')({
                       imageUrl: v.imageUrl ?? null,
                       imagePublicId: v.imagePublicId ?? null,
                       priceModifier: v.priceModifier ?? null,
-                      globalAttributeId: v.globalAttributeId ?? null,
-                      globalValueId: v.globalValueId ?? null,
                       ...(v.metadata != null
                         ? // biome-ignore lint/suspicious/noExplicitAny: Prisma JSON types are strict
                           { metadata: v.metadata as any }
@@ -501,7 +496,7 @@ export const Route = createFileRoute('/api/product/create')({
 
                 if (attr.attributeValues && attr.attributeValues.length > 0) {
                   for (const av of attr.attributeValues) {
-                    const localValue = await tx.productAttributeValue.create({
+                    await tx.productAttributeValue.create({
                       data: {
                         optionId: option.id,
                         value: av.value,
@@ -516,19 +511,6 @@ export const Route = createFileRoute('/api/product/create')({
                           : {}),
                       },
                     });
-
-                    // FE-45: persist the canonical mapping when the vendor's
-                    // local value was linked to a GlobalAttributeValue.
-                    if (av.globalAttributeId && av.globalValueId) {
-                      await tx.productGlobalAttributeValue.create({
-                        data: {
-                          productId: product.id,
-                          globalAttributeId: av.globalAttributeId,
-                          localValueId: localValue.id,
-                          globalValueId: av.globalValueId,
-                        },
-                      });
-                    }
                   }
                 }
               }

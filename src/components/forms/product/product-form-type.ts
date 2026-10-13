@@ -73,11 +73,6 @@ const ProductAttributeValueSchema = z.object({
   imagePublicId: z.string().optional().nullable(),
   metadata: z.record(z.string(), z.unknown()).optional().nullable(),
   priceModifier: z.number().optional().nullable(),
-  // FE-45: optional links to the canonical GlobalAttributeValue this local
-  // value maps to (persisted as ProductGlobalAttributeValue). Kept by zod so
-  // the round-trip through validation and `reset()` does not drop them.
-  globalAttributeId: z.string().optional().nullable(),
-  globalValueId: z.string().optional().nullable(),
 });
 
 const ExtendedAttributeOptionSchema = z.object({

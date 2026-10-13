@@ -215,15 +215,6 @@ export function NavMain({ user }: { user: User }) {
       items: [
         { title: 'Categories', to: '/dashboard/admin/category/all' },
         { title: 'Reviews', to: '/dashboard/admin/reviews' },
-        {
-          title: 'Global Attributes',
-          to: '/dashboard/admin/global-attributes',
-        },
-        {
-          title: 'Content',
-          to: '/dashboard/admin/content',
-          roles: ['ADMIN'],
-        },
       ],
     },
     {

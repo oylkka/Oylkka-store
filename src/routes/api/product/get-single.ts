@@ -27,18 +27,12 @@ export const Route = createFileRoute('/api/product/get-single')({
               images: { orderBy: { order: 'asc' } },
               _count: { select: { reviews: true, orderItems: true } },
               // FE-45: hydrate the vendor edit form with the product's existing
-              // attribute options/values and their canonical global mappings,
-              // so `reset()` does not silently drop them.
+              // attribute options/values, so `reset()` does not silently drop
+              // them.
               attributeOptions: {
                 orderBy: { displayOrder: 'asc' },
                 include: {
                   attributeValues: { orderBy: { displayOrder: 'asc' } },
-                },
-              },
-              globalAttributeValues: {
-                include: {
-                  globalAttribute: { select: { id: true, name: true } },
-                  globalValue: { select: { id: true, value: true } },
                 },
               },
             },

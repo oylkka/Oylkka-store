@@ -104,14 +104,6 @@ export type VendorProduct = {
       priceModifier?: number | null;
     }>;
   }>;
-  globalAttributeValues?: Array<{
-    id: string;
-    globalAttributeId: string;
-    globalValueId: string;
-    localValueId: string;
-    globalAttribute: { id: string; name: string };
-    globalValue: { id: string; value: string };
-  }>;
 };
 
 type VendorCategory = {

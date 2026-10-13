@@ -57,9 +57,8 @@ model Product {
 
   images ProductImage[]
 
-  variants              ProductVariant[]
-  attributeOptions      ProductAttributeOption[]
-  globalAttributeValues ProductGlobalAttributeValue[]
+  variants         ProductVariant[]
+  attributeOptions ProductAttributeOption[]
 
   metaTitle       String?
   metaDescription String?
@@ -219,62 +218,6 @@ model ProductVariantAttribute {
   @@index([attributeValueId])
   @@index([variantId])
   @@map("product_variant_attribute")
-}
-
-// ──────────────────────────────────────────────
-// Phase 5 — Global Attribute Taxonomy
-// ──────────────────────────────────────────────
-
-model GlobalAttribute {
-  id           String @id @default(cuid())
-  name         String
-  slug         String @unique
-  displayOrder Int    @default(0)
-
-  values       GlobalAttributeValue[]
-  productLinks ProductGlobalAttributeValue[]
-
-  @@map("global_attribute")
-}
-
-model GlobalAttributeValue {
-  id          String          @id @default(cuid())
-  attributeId String
-  attribute   GlobalAttribute @relation(fields: [attributeId], references: [id], onDelete: Cascade)
-
-  value String
-  slug  String
-
-  // Structured metadata (e.g. {"hex": "#FF0000"} for color)
-  metadata Json?
-
-  productLinks ProductGlobalAttributeValue[]
-
-  @@unique([attributeId, slug])
-  @@index([attributeId])
-  @@map("global_attribute_value")
-}
-
-model ProductGlobalAttributeValue {
-  id        String  @id @default(cuid())
-  productId String
-  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
-
-  globalAttributeId String
-  globalAttribute   GlobalAttribute @relation(fields: [globalAttributeId], references: [id])
-
-  // References the local ProductAttributeValue
-  localValueId String
-
-  // References the GlobalAttributeValue this local value maps to
-  globalValueId String
-  globalValue   GlobalAttributeValue @relation(fields: [globalValueId], references: [id])
-
-  @@unique([productId, globalAttributeId, localValueId])
-  @@index([globalAttributeId])
-  @@index([globalValueId])
-  @@index([productId])
-  @@map("product_global_attribute_value")
 }
 
 model ProductVariantImage {

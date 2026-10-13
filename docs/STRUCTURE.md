@@ -39,7 +39,7 @@ oylkka/
 │   ├── cart.prisma             # Cart, CartItem
 │   ├── review.prisma           # Review, ReviewVote
 │   ├── banner.prisma           # Banner
-│   ├── content.prisma          # ContentBlock
+│   ├── content.prisma          # Subscriber, ContactMessage, Verification
 │   ├── conversation.prisma     # Conversation, Message
 │   ├── return.prisma           # ReturnRequest
 │   ├── shipping.prisma         # ShippingZone, ShippingRate
@@ -205,10 +205,8 @@ oylkka/
 │   │   │       ├── index.tsx   # Dashboard overview
 │   │   │       ├── banner/     # List, add, edit
 │   │   │       ├── category/   # List, add, edit
-│   │   │       ├── content/    # Content blocks
 │   │   │       ├── coupons/    # Coupon management
 │   │   │       ├── customers/  # Customer list
-│   │   │       ├── global-attributes/  # Global attribute taxonomy + product mappings
 │   │   │       ├── messages/   # Admin conversations
 │   │   │       ├── orders/     # All orders
 │   │   │       ├── returns/    # Returns queue
@@ -226,7 +224,6 @@ oylkka/
 │   │       ├── cart/           # Add, remove, update
 │   │       ├── categories/     # CRUD
 │   │       ├── checkout/       # Place order, validate
-│   │       ├── content/        # Content blocks
 │   │       ├── conversations/  # Messaging
 │   │       ├── messages/       # Messages within conversations
 │   │       ├── orders/         # Order CRUD
@@ -253,7 +250,6 @@ oylkka/
 │   │   ├── admin-coupons.ts
 │   │   ├── admin-customers.ts
 │   │   ├── admin-dashboard.ts
-│   │   ├── admin-global-attributes.ts
 │   │   ├── admin-orders.ts
 │   │   ├── admin-reviews.ts
 │   │   ├── admin-settings.ts
@@ -469,7 +465,6 @@ export function useUpdateShopMutation() {
 | **Cart / CartItem**                              | `cart.prisma`         | Guest/user cart                                                    |
 | **Review / ReviewVote**                          | `review.prisma`       | Product reviews (rating, comment)                                  |
 | **Banner**                                       | `banner.prisma`       | Homepage banners (title, imageUrl, linkUrl, active)                |
-| **ContentBlock**                                 | `content.prisma`      | CMS content blocks (key, title, body)                              |
 | **Conversation / Message**                       | `conversation.prisma` | Messaging between users                                            |
 | **ReturnRequest**                                | `return.prisma`       | Return/refund requests                                             |
 | **ShippingZone / ShippingRate**                  | `shipping.prisma`     | Shipping configuration                                             |
@@ -522,9 +517,7 @@ Query keys are centralized in `src/lib/constants.ts` (~35 keys). Each domain has
 | `admin-customers.ts`  | `useAdminCustomers`                                                                            |
 | `admin-reviews.ts`    | `useAdminReviews`, `useModerateReviewMutation`                                                 |
 | `admin-coupons.ts`    | `useAdminCoupons`, `useCreateCoupon`                                                           |
-| `admin-content.ts`    | `useAdminContentBlocks`, `useSaveContentBlockMutation`, `useContentBlock`                      |
 | `admin-settings.ts`   | `useAdminSettings`, `useUpdateSettingsMutation`                                                |
-| `admin-global-attributes.ts` | `useAdminGlobalAttributes`, `useProductGlobalAttributeMappings`, `useGlobalAttributeProducts`, `useMapProductAttributeMutation`, `useUnmapProductAttributeMutation` |
 | `admin-audit-logs.ts` | `useAdminAuditLogs`                                                                            |
 | `sku-service.ts`      | SKU generation/validation utilities                                                            |
 | `payouts.ts`          | `usePayouts`, `useRequestPayout`                                                               |

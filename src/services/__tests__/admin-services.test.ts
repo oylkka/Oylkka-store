@@ -50,34 +50,6 @@ describe('admin-coupons service API calls', () => {
   });
 });
 
-describe('admin-content service API calls', () => {
-  it('lists content pages', async () => {
-    const get = spyOn(apiClient, 'get').mockResolvedValue({ data: [] });
-    await apiClient.get('/api/admin/content/list');
-    expect(get).toHaveBeenCalledWith('/api/admin/content/list');
-  });
-
-  it('saves content page', async () => {
-    const post = spyOn(apiClient, 'post').mockResolvedValue({
-      data: { message: 'Saved' },
-    });
-    await apiClient.post('/api/admin/content/save', {
-      key: 'about',
-      content: '...',
-    });
-    expect(post).toHaveBeenCalledWith('/api/admin/content/save', {
-      key: 'about',
-      content: '...',
-    });
-  });
-
-  it('fetches public content', async () => {
-    const get = spyOn(apiClient, 'get').mockResolvedValue({ data: {} });
-    await apiClient.get('/api/content/get');
-    expect(get).toHaveBeenCalledWith('/api/content/get');
-  });
-});
-
 describe('admin-reviews service API calls', () => {
   it('lists reviews', async () => {
     const get = spyOn(apiClient, 'get').mockResolvedValue({ data: [] });

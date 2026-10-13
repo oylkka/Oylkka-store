@@ -488,9 +488,6 @@ export const Route = createFileRoute('/api/product/edit')({
                         imagePublicId?: string | null;
                         metadata?: Record<string, unknown> | null;
                         priceModifier?: number | null;
-                        // FE-45: optional canonical mapping links
-                        globalAttributeId?: string | null;
-                        globalValueId?: string | null;
                       }>;
                       isVariantDefining?: boolean;
                       displayOrder?: number;
@@ -507,8 +504,6 @@ export const Route = createFileRoute('/api/product/edit')({
                         imageUrl: av.imageUrl ?? null,
                         imagePublicId: av.imagePublicId ?? null,
                         priceModifier: av.priceModifier ?? null,
-                        globalAttributeId: av.globalAttributeId ?? null,
-                        globalValueId: av.globalValueId ?? null,
                         ...(av.metadata != null
                           ? // biome-ignore lint/suspicious/noExplicitAny: Prisma JSON types are strict
                             { metadata: av.metadata as any }
@@ -525,15 +520,6 @@ export const Route = createFileRoute('/api/product/edit')({
                   };
                 },
               );
-
-              // FE-45: ProductGlobalAttributeValue rows are rebuilt from the
-              // form payload on every save (the form is the source of truth for
-              // a product's mappings). Delete-then-create keeps them consistent
-              // when a link is removed or re-pointed, inside the same
-              // transaction as the values they reference.
-              await tx.productGlobalAttributeValue.deleteMany({
-                where: { productId },
-              });
 
               for (const attr of normalizedAttributes) {
                 const option = await tx.productAttributeOption.upsert({
@@ -555,7 +541,7 @@ export const Route = createFileRoute('/api/product/edit')({
                 if (!attr.attributeValues) continue;
 
                 for (const av of attr.attributeValues) {
-                  const localValue = await tx.productAttributeValue.upsert({
+                  await tx.productAttributeValue.upsert({
                     where: {
                       optionId_slug: { optionId: option.id, slug: av.slug },
                     },
@@ -584,19 +570,6 @@ export const Route = createFileRoute('/api/product/edit')({
                         : {}),
                     },
                   });
-
-                  // FE-45: links were cleared above; recreate the mapping for
-                  // values the vendor linked to a GlobalAttributeValue.
-                  if (av.globalAttributeId && av.globalValueId) {
-                    await tx.productGlobalAttributeValue.create({
-                      data: {
-                        productId,
-                        globalAttributeId: av.globalAttributeId,
-                        localValueId: localValue.id,
-                        globalValueId: av.globalValueId,
-                      },
-                    });
-                  }
                 }
               }
             }

@@ -33,9 +33,6 @@ export const QUERY_KEYS = {
   AUDIT_LOGS: 'audit-logs',
   ADMIN_SETTINGS: 'admin-settings',
   PUBLIC_SETTINGS: 'public-settings',
-  GLOBAL_ATTRIBUTES: 'global-attributes',
-  CONTENT_BLOCKS: 'content-blocks',
-  ADMIN_GLOBAL_ATTRIBUTES: 'admin-global-attributes',
   VENDOR_QUESTIONS: 'vendor-questions',
 };
 
