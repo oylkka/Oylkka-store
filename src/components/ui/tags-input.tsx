@@ -4,6 +4,7 @@ import { X as RemoveIcon } from 'lucide-react';
 import React from 'react';
 
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
 
@@ -20,6 +21,9 @@ interface TagsInputProps extends React.HTMLAttributes<HTMLDivElement> {
   inputId?: string;
   /** Accessible name for the inner text input. */
   inputAriaLabel?: string;
+  /** When set, renders an "Add" button inside the container that commits the
+   *  currently typed value (same behaviour as pressing Enter). */
+  addButtonLabel?: string;
 }
 
 interface TagsInputContextProps {
@@ -43,6 +47,7 @@ export const TagsInput = React.forwardRef<HTMLDivElement, TagsInputProps>(
       minItems,
       inputId,
       inputAriaLabel,
+      addButtonLabel,
       className,
       dir,
       ...props
@@ -284,6 +289,25 @@ export const TagsInput = React.forwardRef<HTMLDivElement, TagsInputProps>(
               activeIndex !== -1 && 'caret-transparent',
             )}
           />
+          {addButtonLabel && (
+            <Button
+              type='button'
+              size='sm'
+              variant='outline'
+              className='h-7 px-2 text-xs'
+              aria-label={addButtonLabel}
+              disabled={inputValue.trim() === '' || disableInput}
+              onClick={() => {
+                if (inputValue.trim() !== '' && value.length < parseMaxItems) {
+                  onValueChangeHandler(inputValue);
+                  setInputValue('');
+                  setActiveIndex(-1);
+                }
+              }}
+            >
+              {addButtonLabel}
+            </Button>
+          )}
         </div>
       </TagInputContext.Provider>
     );

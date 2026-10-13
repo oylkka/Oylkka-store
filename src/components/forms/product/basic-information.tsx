@@ -278,9 +278,10 @@ export function BasicInformationCard({ productId }: BasicInformationCardProps) {
               setValue('tags', val, { shouldValidate: true })
             }
             placeholder='Type a tag and press Enter...'
+            addButtonLabel='Add tag'
           />
           <FieldDescription>
-            Type a tag and press Enter to add it
+            Type a tag and press Enter, or click Add tag
           </FieldDescription>
           {errors.tags && <FieldError>{errors.tags.message}</FieldError>}
         </Field>
