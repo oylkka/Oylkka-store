@@ -3,6 +3,7 @@ import {
   LayoutDashboard,
   MessageSquare,
   Settings,
+  ShieldCheck,
   Ticket,
   UserIcon,
 } from 'lucide-react';
@@ -17,6 +18,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { getRoleLabel, USER_ROLES } from '@/lib/roles';
 import { getInitials } from '@/lib/utils';
 import { useUnreadMessageCount } from '@/services/conversations';
 import { SignOut } from './signout';
@@ -28,6 +30,7 @@ interface UserDropDownProps {
     name?: string | null;
     email?: string | null;
     image?: string | null;
+    role?: string | null;
   } | null;
 }
 
@@ -45,6 +48,10 @@ export default function UserDropDown({ user }: UserDropDownProps) {
       </Link>
     );
   }
+
+  const roleLabel = getRoleLabel(user.role);
+  const isAdmin =
+    user.role === USER_ROLES.ADMIN || user.role === USER_ROLES.MANAGER;
 
   return (
     <div className='pl-2'>
@@ -76,7 +83,14 @@ export default function UserDropDown({ user }: UserDropDownProps) {
         >
           <DropdownMenuLabel className='font-normal'>
             <div className='flex flex-col space-y-1'>
-              <p className='text-sm leading-none font-medium'>{user.name}</p>
+              <div className='flex items-center gap-2'>
+                <p className='text-sm leading-none font-medium'>{user.name}</p>
+                {roleLabel && (
+                  <Badge variant='secondary' className='text-[10px] uppercase'>
+                    {roleLabel}
+                  </Badge>
+                )}
+              </div>
               <p className='text-muted-foreground text-xs leading-none'>
                 {user.email}
               </p>
@@ -85,14 +99,19 @@ export default function UserDropDown({ user }: UserDropDownProps) {
 
           <DropdownMenuSeparator />
 
-          {/* Navigation Items using 'to' instead of 'href' */}
+          {/* Admin staff jump straight into the console; everyone else gets
+              their customer dashboard. */}
           <DropdownMenuItem asChild>
             <Link
-              to='/dashboard'
+              to={isAdmin ? '/dashboard/admin' : '/dashboard'}
               className='flex w-full cursor-pointer items-center'
             >
-              <LayoutDashboard className='text-primary/70 mr-2 h-4 w-4' />
-              Dashboard
+              {isAdmin ? (
+                <ShieldCheck className='text-primary/70 mr-2 h-4 w-4' />
+              ) : (
+                <LayoutDashboard className='text-primary/70 mr-2 h-4 w-4' />
+              )}
+              {isAdmin ? 'Admin Console' : 'Dashboard'}
             </Link>
           </DropdownMenuItem>
 

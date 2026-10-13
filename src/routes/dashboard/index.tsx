@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from '@tanstack/react-router';
+import { createFileRoute, Link, redirect } from '@tanstack/react-router';
 import {
   Heart,
   Package,
@@ -13,6 +13,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { formatBDT } from '@/lib/currency';
+import { USER_ROLES } from '@/lib/roles';
 import { useMyOrders } from '@/services/order';
 import { useMyReturns } from '@/services/returns';
 import { useWishlist } from '@/services/wishlist';
@@ -50,6 +51,14 @@ const statusBadge = (status: string) => {
 };
 
 export const Route = createFileRoute('/dashboard/')({
+  // Admins and managers work from the admin console, so send them there
+  // instead of showing the customer dashboard (which has no admin context).
+  beforeLoad: ({ context }) => {
+    const role = context.user?.role;
+    if (role === USER_ROLES.ADMIN || role === USER_ROLES.MANAGER) {
+      throw redirect({ to: '/dashboard/admin' });
+    }
+  },
   component: DashboardHome,
 });
 

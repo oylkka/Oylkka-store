@@ -66,13 +66,13 @@ export const Route = createFileRoute('/dashboard/admin/customers/')({
 
 function RouteComponent() {
   const [search, setSearch] = useState('');
-  const [roleFilter, setRoleFilter] = useState('');
-  const [bannedFilter, setBannedFilter] = useState('');
+  const [roleFilter, setRoleFilter] = useState('all');
+  const [bannedFilter, setBannedFilter] = useState('all');
   const [page, setPage] = useState(1);
 
   const filters = {
     ...(search && { search }),
-    ...(roleFilter && { role: roleFilter }),
+    ...(roleFilter !== 'all' && { role: roleFilter }),
     ...(bannedFilter === 'true' && { banned: true }),
     ...(bannedFilter === 'false' && { banned: false }),
     page,
@@ -127,7 +127,7 @@ function RouteComponent() {
                   <SelectValue placeholder='All Roles' />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value=''>All Roles</SelectItem>
+                  <SelectItem value='all'>All Roles</SelectItem>
                   <SelectItem value='ADMIN'>Admin</SelectItem>
                   <SelectItem value='MANAGER'>Manager</SelectItem>
                   <SelectItem value='VENDOR'>Vendor</SelectItem>
@@ -146,7 +146,7 @@ function RouteComponent() {
                   <SelectValue placeholder='All Status' />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value=''>All Status</SelectItem>
+                  <SelectItem value='all'>All Status</SelectItem>
                   <SelectItem value='false'>Active</SelectItem>
                   <SelectItem value='true'>Banned</SelectItem>
                 </SelectContent>
@@ -170,7 +170,7 @@ function RouteComponent() {
                 <Users className='w-10 h-10 text-muted-foreground mb-3' />
                 <p className='text-sm font-semibold'>No customers found</p>
                 <p className='text-sm text-muted-foreground mt-1'>
-                  {search || roleFilter || bannedFilter
+                  {search || roleFilter !== 'all' || bannedFilter !== 'all'
                     ? 'Try adjusting your filters'
                     : 'No users have registered yet'}
                 </p>

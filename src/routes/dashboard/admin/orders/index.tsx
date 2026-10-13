@@ -34,7 +34,7 @@ const STATUS_TABS = [
 ] as const;
 
 const PAYMENT_STATUS_OPTIONS = [
-  { label: 'All', value: '' },
+  { label: 'All', value: 'all' },
   { label: 'Paid', value: 'PAID' },
   { label: 'Unpaid', value: 'PENDING' },
   { label: 'Failed', value: 'FAILED' },
@@ -67,7 +67,7 @@ function RouteComponent() {
     statusParam && STATUS_TABS.some((t) => t.value === statusParam)
       ? statusParam
       : '';
-  const [paymentStatus, setPaymentStatus] = useState('');
+  const [paymentStatus, setPaymentStatus] = useState('all');
   const [search, setSearch] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
   const [customerSearch, setCustomerSearch] = useState('');
@@ -76,7 +76,7 @@ function RouteComponent() {
 
   const { data, isLoading, isError, refetch } = useAdminOrders({
     status: status || undefined,
-    paymentStatus: paymentStatus || undefined,
+    paymentStatus: paymentStatus === 'all' ? undefined : paymentStatus,
     search: debouncedSearch || undefined,
     customer: customerSearch || undefined,
     vendor: vendorSearch || undefined,

@@ -82,9 +82,9 @@ function StarRating({ rating }: { rating: number }) {
 
 function RouteComponent() {
   const [search, setSearch] = useState('');
-  const [reportedFilter, setReportedFilter] = useState('');
-  const [verifiedFilter, setVerifiedFilter] = useState('');
-  const [minRating, setMinRating] = useState('');
+  const [reportedFilter, setReportedFilter] = useState('all');
+  const [verifiedFilter, setVerifiedFilter] = useState('all');
+  const [minRating, setMinRating] = useState('all');
   const [page, setPage] = useState(1);
   const [deleteId, setDeleteId] = useState<string | null>(null);
 
@@ -94,7 +94,7 @@ function RouteComponent() {
     ...(reportedFilter === 'false' && { reported: false }),
     ...(verifiedFilter === 'true' && { verified: true }),
     ...(verifiedFilter === 'false' && { verified: false }),
-    ...(minRating && { minRating: Number(minRating) }),
+    ...(minRating !== 'all' && { minRating: Number(minRating) }),
     page,
     limit: 20,
   };
@@ -171,7 +171,7 @@ function RouteComponent() {
                   <SelectValue placeholder='All Reports' />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value=''>All Reports</SelectItem>
+                  <SelectItem value='all'>All Reports</SelectItem>
                   <SelectItem value='true'>Reported</SelectItem>
                   <SelectItem value='false'>Not Reported</SelectItem>
                 </SelectContent>
@@ -187,7 +187,7 @@ function RouteComponent() {
                   <SelectValue placeholder='All Verified' />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value=''>All</SelectItem>
+                  <SelectItem value='all'>All</SelectItem>
                   <SelectItem value='true'>Verified</SelectItem>
                   <SelectItem value='false'>Unverified</SelectItem>
                 </SelectContent>
@@ -203,7 +203,7 @@ function RouteComponent() {
                   <SelectValue placeholder='Min Rating' />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value=''>All Ratings</SelectItem>
+                  <SelectItem value='all'>All Ratings</SelectItem>
                   <SelectItem value='5'>5 Stars</SelectItem>
                   <SelectItem value='4'>4+ Stars</SelectItem>
                   <SelectItem value='3'>3+ Stars</SelectItem>
@@ -225,7 +225,10 @@ function RouteComponent() {
                 <MessageSquare className='w-10 h-10 text-muted-foreground mb-3' />
                 <p className='text-sm font-semibold'>No reviews found</p>
                 <p className='text-sm text-muted-foreground mt-1'>
-                  {search || reportedFilter || verifiedFilter || minRating
+                  {search ||
+                  reportedFilter !== 'all' ||
+                  verifiedFilter !== 'all' ||
+                  minRating !== 'all'
                     ? 'Try adjusting your filters'
                     : 'No reviews have been submitted yet'}
                 </p>

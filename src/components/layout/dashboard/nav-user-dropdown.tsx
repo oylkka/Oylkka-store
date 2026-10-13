@@ -3,6 +3,7 @@ import { ChevronsUpDown, Heart, Package, Settings } from 'lucide-react';
 import { getInitials } from '#/lib/utils';
 import { SignOut } from '@/components/layout/header/signout';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Badge } from '@/components/ui/badge';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -18,6 +19,7 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from '@/components/ui/sidebar';
+import { getRoleLabel } from '@/lib/roles';
 import type { User } from './types';
 
 interface NavUserDropdownProps {
@@ -30,6 +32,8 @@ export function NavUserDropdown({ user }: NavUserDropdownProps) {
   if (!user) {
     return null;
   }
+
+  const roleLabel = getRoleLabel(user.role);
 
   return (
     <SidebarMenu>
@@ -47,7 +51,17 @@ export function NavUserDropdown({ user }: NavUserDropdownProps) {
                 </AvatarFallback>
               </Avatar>
               <div className='grid flex-1 text-left text-sm leading-tight'>
-                <span className='truncate font-semibold'>{user.name}</span>
+                <span className='flex items-center gap-1.5'>
+                  <span className='truncate font-semibold'>{user.name}</span>
+                  {roleLabel && (
+                    <Badge
+                      variant='secondary'
+                      className='shrink-0 text-[10px] uppercase'
+                    >
+                      {roleLabel}
+                    </Badge>
+                  )}
+                </span>
                 <span className='truncate text-xs'>{user.email}</span>
               </div>
               <ChevronsUpDown className='ml-auto size-4' />
@@ -63,10 +77,22 @@ export function NavUserDropdown({ user }: NavUserDropdownProps) {
               <div className='flex items-center gap-2 px-1 py-1.5 text-left text-sm'>
                 <Avatar className='h-8 w-8 rounded-lg'>
                   <AvatarImage src={user.image ?? undefined} alt={user.name} />
-                  <AvatarFallback className='rounded-lg'>CN</AvatarFallback>
+                  <AvatarFallback className='rounded-lg'>
+                    {getInitials(user.name)}
+                  </AvatarFallback>
                 </Avatar>
                 <div className='grid flex-1 text-left text-sm leading-tight'>
-                  <span className='truncate font-semibold'>{user.name}</span>
+                  <span className='flex items-center gap-1.5'>
+                    <span className='truncate font-semibold'>{user.name}</span>
+                    {roleLabel && (
+                      <Badge
+                        variant='secondary'
+                        className='shrink-0 text-[10px] uppercase'
+                      >
+                        {roleLabel}
+                      </Badge>
+                    )}
+                  </span>
                   <span className='truncate text-xs'>{user.email}</span>
                 </div>
               </div>

@@ -5,7 +5,7 @@ import { prisma } from '@/lib/db';
 export const Route = createFileRoute('/api/admin/reviews/list')({
   server: {
     handlers: {
-      POST: async ({ request }) => {
+      GET: async ({ request }) => {
         try {
           const authResult = await requireAuth();
           if (authResult.response) return authResult.response;

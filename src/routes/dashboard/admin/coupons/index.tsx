@@ -81,14 +81,14 @@ export const Route = createFileRoute('/dashboard/admin/coupons/')({
 
 function RouteComponent() {
   const [search, setSearch] = useState('');
-  const [scopeFilter, setScopeFilter] = useState('');
-  const [activeFilter, setActiveFilter] = useState('');
+  const [scopeFilter, setScopeFilter] = useState('all');
+  const [activeFilter, setActiveFilter] = useState('all');
   const [page, setPage] = useState(1);
   const [deleteId, setDeleteId] = useState<string | null>(null);
 
   const filters = {
     ...(search && { search }),
-    ...(scopeFilter && { scope: scopeFilter }),
+    ...(scopeFilter !== 'all' && { scope: scopeFilter }),
     ...(activeFilter === 'true' && { isActive: true }),
     ...(activeFilter === 'false' && { isActive: false }),
     page,
@@ -164,7 +164,7 @@ function RouteComponent() {
                   <SelectValue placeholder='All Scopes' />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value=''>All Scopes</SelectItem>
+                  <SelectItem value='all'>All Scopes</SelectItem>
                   {Object.entries(SCOPE_LABELS).map(([k, v]) => (
                     <SelectItem key={k} value={k}>
                       {v}
@@ -183,7 +183,7 @@ function RouteComponent() {
                   <SelectValue placeholder='All Status' />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value=''>All Status</SelectItem>
+                  <SelectItem value='all'>All Status</SelectItem>
                   <SelectItem value='true'>Active</SelectItem>
                   <SelectItem value='false'>Inactive</SelectItem>
                 </SelectContent>
@@ -202,11 +202,11 @@ function RouteComponent() {
                 <Tag className='w-10 h-10 text-muted-foreground mb-3' />
                 <p className='text-sm font-semibold'>No coupons found</p>
                 <p className='text-sm text-muted-foreground mt-1'>
-                  {search || scopeFilter || activeFilter
+                  {search || scopeFilter !== 'all' || activeFilter !== 'all'
                     ? 'Try adjusting your filters'
                     : 'Create your first coupon to get started'}
                 </p>
-                {!search && !scopeFilter && !activeFilter && (
+                {!search && scopeFilter === 'all' && activeFilter === 'all' && (
                   <Button className='mt-4' size='sm' asChild>
                     <Link to='/dashboard/admin/coupons/create'>
                       <Plus className='w-4 h-4 mr-2' />
