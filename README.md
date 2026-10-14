@@ -31,7 +31,8 @@ Copy `.env` from your team or set the following:
 
 | Variable | Description |
 |----------|-------------|
-| `DATABASE_URL` | PostgreSQL connection string |
+| `DATABASE_URL` | PostgreSQL connection string (pooled, used by the app) |
+| `DIRECT_URL` | PostgreSQL direct connection string (used for migrations) |
 | `BETTER_AUTH_URL` | App base URL (e.g. `http://localhost:3000`) |
 | `SMTP_SERVER` | SMTP host (e.g. `smtp-relay.brevo.com`) |
 | `SMTP_PORT` | SMTP port |
@@ -89,6 +90,10 @@ src/
 | `bun run upstash:keepalive` | Write the Upstash keepalive key (CI uses this) |
 | `bun run check` | Lint and format with Biome |
 | `bun run typecheck` | Regenerate the Prisma client and typecheck with `tsc` |
+| `bun run db:migrate` | Create/apply migrations in development |
+| `bun run db:deploy` | Apply pending migrations to the configured database |
+| `bun run db:status` | Show pending/applied migrations |
+| `bun run auth:check` | Verify the Prisma client satisfies better-auth's schema |
 
 `src/generated` (the Prisma client) is gitignored and `tsconfig.json` excludes it from
 the root file set, so run `bun run typecheck` (or `prisma generate`) before a bare
@@ -145,6 +150,31 @@ The app is deployed via Nitro. Build output goes to `.output/`.
 bun run build
 bun run preview
 ```
+
+### Database migrations
+
+Migrations are **not** run by `bun run build` — doing so would point a local
+build at the production database. They are applied by
+`.github/workflows/migrate.yml` instead:
+
+- On every pull request that touches `prisma/**` or `src/lib/auth.ts`, the
+  workflow runs `bun run auth:check` to confirm the Prisma client still
+  satisfies better-auth's expected schema.
+- On push to `main`, it additionally runs `bun run db:deploy`
+  (`prisma migrate deploy`) to apply any pending migrations.
+
+Required repository secret: `DIRECT_URL` (the direct, non-pooled Neon connection
+string — the same one `prisma.config.ts` reads).
+
+> Why `auth:check` exists: a dependency bump can change the fields better-auth
+> expects without any Prisma schema change, and the app only fails at runtime in
+> production. `auth:check` turns that into a CI failure. Keep it in lockstep with
+> `better-auth` by bumping the `auth` devDependency alongside it.
+
+If you deploy on a platform that builds on push rather than via this workflow,
+make its deploy command `bun run db:deploy && bun run build` instead, so
+migrations land before the new code starts.
+
 
 ## License
 

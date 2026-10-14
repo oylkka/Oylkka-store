@@ -1,0 +1,77 @@
+name: Database
+
+# Guards against the failure mode where a dependency bump changes what
+# better-auth expects (e.g. the two-factor lockout columns added in 1.7.x)
+# without a matching Prisma migration reaching production.
+#
+# - On pull requests: verify the Prisma client still satisfies better-auth.
+# - On push to main: do the same, then apply any pending migrations.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'prisma/**'
+      - 'src/lib/auth.ts'
+      - 'package.json'
+      - 'bun.lock'
+      - '.github/workflows/migrate.yml'
+  pull_request:
+    paths:
+      - 'prisma/**'
+      - 'src/lib/auth.ts'
+      - 'package.json'
+      - 'bun.lock'
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+# Never run two migrations against the database at once.
+concurrency:
+  group: database-migrations
+  cancel-in-progress: false
+
+jobs:
+  check:
+    name: Check schema
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Generate Prisma client
+        run: bunx prisma generate
+
+      - name: Verify Prisma schema satisfies better-auth
+        run: bun run auth:check
+
+  migrate:
+    name: Apply migrations
+    # Only touch the database from main (or a manual run), never from a PR.
+    if: github.event_name != 'pull_request'
+    needs: check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Generate Prisma client
+        run: bunx prisma generate
+
+      - name: Apply pending migrations
+        run: bun run db:deploy
+        env:
+          DIRECT_URL: ${{ secrets.DIRECT_URL }}
