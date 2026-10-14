@@ -8,12 +8,14 @@ export const Route = createFileRoute('/api/vouchers/product-vouchers')({
     handlers: {
       POST: async ({ request }) => {
         try {
+          // Public endpoint: guests may browse a product and see its available
+          // vouchers. Only the per-user `isCollected` flag needs a session, so
+          // an anonymous request is served with `isCollected: false` instead of
+          // a 401 (which the global interceptor would turn into a forced
+          // sign-in redirect just for opening a product page).
           const headers = getRequestHeaders();
           const session = await auth.api.getSession({ headers });
-
-          if (!session?.user) {
-            return Response.json({ error: 'Unauthorized' }, { status: 401 });
-          }
+          const userId = session?.user?.id ?? null;
 
           const body: { productId: string } = await request.json();
 
@@ -86,16 +88,16 @@ export const Route = createFileRoute('/api/vouchers/product-vouchers')({
             },
           });
 
-          const userId = session.user.id;
-
-          const collectedIds = await prisma.userVoucher.findMany({
-            where: {
-              userId,
-              couponId: { in: applicableCoupons.map((c) => c.id) },
-              usedAt: null,
-            },
-            select: { couponId: true },
-          });
+          const collectedIds = userId
+            ? await prisma.userVoucher.findMany({
+                where: {
+                  userId,
+                  couponId: { in: applicableCoupons.map((c) => c.id) },
+                  usedAt: null,
+                },
+                select: { couponId: true },
+              })
+            : [];
 
           const collectedSet = new Set(collectedIds.map((c) => c.couponId));
 
