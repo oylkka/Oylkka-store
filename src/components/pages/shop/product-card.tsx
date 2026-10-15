@@ -1,5 +1,5 @@
 import { Link, useNavigate } from '@tanstack/react-router';
-import { Heart, Package, ShoppingCart, Star } from 'lucide-react';
+import { Heart, Package, ShoppingCart } from 'lucide-react';
 import { motion } from 'motion/react';
 import { toast } from 'sonner';
 
@@ -118,7 +118,7 @@ export function ProductCard({ product }: ProductCardProps) {
             {product.productName}
           </h3>
 
-          <div className='flex items-center gap-1.5'>
+          {/*<div className='flex items-center gap-1.5'>
             <div className='flex items-center gap-0.5'>
               {Array.from({ length: 5 }).map((_, i) => (
                 // biome-ignore lint/suspicious/noArrayIndexKey: star
@@ -128,7 +128,7 @@ export function ProductCard({ product }: ProductCardProps) {
             <span className='text-xs text-muted-foreground'>
               ({product._count.reviews})
             </span>
-          </div>
+          </div>*/}
 
           <div className='flex items-baseline gap-2'>
             <span className='text-base font-bold tabular-nums'>
