@@ -46,7 +46,16 @@ export function ProductEditView({ productId }: { productId?: string }) {
       freeShipping: product.freeShipping,
       metaTitle: product.metaTitle ?? '',
       metaDescription: product.metaDescription ?? '',
-      status: product.status as 'DRAFT' | 'PUBLISHED' | 'ARCHIVED',
+      // A rejected listing opens in a non-live state. The status vocabulary a
+      // vendor may submit (`ProductStatusEnum`) has no REJECTED value — that
+      // outcome belongs to the staff moderation endpoint — so hydrating it
+      // verbatim would make the form unsavable. Relisting is then an explicit
+      // "Published" (or a deliberate Draft), never an accidental side effect of
+      // saving an unrelated field.
+      status:
+        product.status === 'REJECTED'
+          ? 'DRAFT'
+          : (product.status as 'DRAFT' | 'PUBLISHED' | 'ARCHIVED'),
       featured: product.featured,
       slug: product.slug,
       // FE-45: without this, `reset()` would wipe the product's attributes in
@@ -130,10 +139,28 @@ export function ProductEditView({ productId }: { productId?: string }) {
   }
 
   return (
-    <NewProductPage
-      productId={product.id}
-      defaultValues={defaultValues}
-      initialImages={initialImages}
-    />
+    <>
+      {product.status === 'REJECTED' && (
+        <div className='mb-6 rounded-2xl border border-destructive/30 bg-destructive/5 p-4'>
+          <p className='text-sm font-semibold text-destructive'>
+            This listing was rejected by an admin
+          </p>
+          {product.rejectionReason && (
+            <p className='text-sm text-muted-foreground mt-1'>
+              {product.rejectionReason}
+            </p>
+          )}
+          <p className='text-sm text-muted-foreground mt-1'>
+            Fix the listing, then choose Published to put it back on the
+            storefront (or Draft to keep it hidden) and save.
+          </p>
+        </div>
+      )}
+      <NewProductPage
+        productId={product.id}
+        defaultValues={defaultValues}
+        initialImages={initialImages}
+      />
+    </>
   );
 }

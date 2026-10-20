@@ -2,6 +2,7 @@ import { describe, expect, it } from 'bun:test';
 import {
   ProductApiCreateSchema,
   ProductApiEditSchema,
+  ProductModerationSchema,
 } from '@/schemas/product-api-schema';
 
 const validProduct = {
@@ -286,5 +287,64 @@ describe('variant reservedStock stays server-owned (MONEY-34)', () => {
       ],
     });
     expect(result.success).toBe(true);
+  });
+});
+
+describe('rejection is a staff outcome, not a vendor status', () => {
+  it('keeps REJECTED out of what a vendor may submit', () => {
+    const result = ProductApiEditSchema.safeParse({
+      ...validProduct,
+      status: 'REJECTED',
+    });
+
+    expect(result.success).toBe(false);
+  });
+});
+
+describe('ProductModerationSchema', () => {
+  it('accepts a rejection that carries a reason', () => {
+    const result = ProductModerationSchema.safeParse({
+      id: 'p-1',
+      status: 'REJECTED',
+      reason: 'Photos do not match the described item',
+    });
+
+    expect(result.success).toBe(true);
+  });
+
+  it('rejects a rejection with no reason', () => {
+    const result = ProductModerationSchema.safeParse({
+      id: 'p-1',
+      status: 'REJECTED',
+    });
+
+    expect(result.success).toBe(false);
+  });
+
+  it('rejects a rejection with a throwaway reason', () => {
+    const result = ProductModerationSchema.safeParse({
+      id: 'p-1',
+      status: 'REJECTED',
+      reason: 'no',
+    });
+
+    expect(result.success).toBe(false);
+  });
+
+  it('accepts publishing without a reason', () => {
+    const result = ProductModerationSchema.safeParse({
+      id: 'p-1',
+      status: 'PUBLISHED',
+    });
+
+    expect(result.success).toBe(true);
+  });
+
+  it('refuses any other outcome, including vendor statuses', () => {
+    for (const status of ['DRAFT', 'ARCHIVED', 'OUT_OF_STOCK', 'ALLOWED']) {
+      expect(
+        ProductModerationSchema.safeParse({ id: 'p-1', status }).success,
+      ).toBe(false);
+    }
   });
 });

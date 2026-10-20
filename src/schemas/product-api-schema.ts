@@ -11,6 +11,12 @@ export const ProductConditionEnum = z.enum([
   'FOR_PARTS',
 ]);
 
+/**
+ * Statuses a vendor may set on their own listing. `REJECTED` is deliberately
+ * absent: rejecting is an admin moderation outcome, applied through
+ * `ProductModerationSchema` and `/api/product/moderate`, so a vendor cannot
+ * mark their way out of (or into) a rejection.
+ */
 export const ProductStatusEnum = z.enum([
   'DRAFT',
   'PUBLISHED',
@@ -204,3 +210,24 @@ export const ProductApiEditSchema = priceRefinement(
 
 export type ProductApiCreateInput = z.input<typeof ProductApiCreateSchema>;
 export type ProductApiEditInput = z.input<typeof ProductApiEditSchema>;
+
+/**
+ * Admin moderation of a single listing: pull it (`REJECTED`) or put it back
+ * (`PUBLISHED`). A rejection must carry a reason, because the vendor is shown
+ * it on the product list and in the edit form — a silent takedown is not
+ * something they could act on.
+ */
+export const ProductModerationSchema = z
+  .object({
+    id: z.string().min(1, 'Product ID is required'),
+    status: z.enum(['REJECTED', 'PUBLISHED']),
+    reason: z.string().trim().max(500).optional(),
+  })
+  .refine(
+    (data) => data.status !== 'REJECTED' || (data.reason?.length ?? 0) >= 5,
+    {
+      message:
+        'Tell the vendor why the listing was rejected (at least 5 characters)',
+      path: ['reason'],
+    },
+  );

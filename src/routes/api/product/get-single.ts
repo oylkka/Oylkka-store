@@ -1,5 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router';
-import { requireAuth } from '@/lib/auth-middleware';
+import { isAdminOrManager, requireAuth } from '@/lib/auth-middleware';
 import { prisma } from '@/lib/db';
 
 export const Route = createFileRoute('/api/product/get-single')({
@@ -50,10 +50,7 @@ export const Route = createFileRoute('/api/product/get-single')({
           });
 
           if (!shop || product.shopId !== shop.id) {
-            if (
-              session.user.role !== 'ADMIN' &&
-              session.user.role !== 'MANAGER'
-            ) {
+            if (!isAdminOrManager(session)) {
               return Response.json({ error: 'Forbidden' }, { status: 403 });
             }
           }

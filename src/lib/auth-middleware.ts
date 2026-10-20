@@ -41,12 +41,15 @@ export async function requireAuth(): Promise<
   return { session: session as NonNullable<Session>, response: null };
 }
 
+const forbiddenResponse = () =>
+  Response.json({ error: 'Forbidden' }, { status: 403 });
+
 export function requireRole(
   session: NonNullable<Session>,
   ...roles: UserRole[]
 ): Response | null {
   if (!roles.includes(session.user.role as UserRole)) {
-    return Response.json({ error: 'Forbidden' }, { status: 403 });
+    return forbiddenResponse();
   }
   return null;
 }
@@ -64,8 +67,24 @@ export function requireStaff(session: NonNullable<Session>): Response | null {
   );
 }
 
+/**
+ * The admin console audience: ADMIN and MANAGER.
+ *
+ * `CUSTOMER_SERVICE` is staff for rate-limiting (`requireAuth`) and for the
+ * support inbox (`requireStaff`), but it has no console destinations and must
+ * not pick up console powers — catalog control included — by accident. This is
+ * the single list every "may act on any product" check reads, so the vendor
+ * endpoints (`delete`, `edit`, `get-single`) and the admin ones cannot drift.
+ */
+export function isAdminOrManager(session: NonNullable<Session>): boolean {
+  return (
+    session.user.role === USER_ROLES.ADMIN ||
+    session.user.role === USER_ROLES.MANAGER
+  );
+}
+
 export function requireAdminOrManager(
   session: NonNullable<Session>,
 ): Response | null {
-  return requireRole(session, USER_ROLES.ADMIN, USER_ROLES.MANAGER);
+  return isAdminOrManager(session) ? null : forbiddenResponse();
 }

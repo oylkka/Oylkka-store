@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'bun:test';
 import {
+  isAdminOrManager,
   requireAdmin,
   requireAdminOrManager,
   requireRole,
@@ -98,5 +99,27 @@ describe('requireAdminOrManager', () => {
 
   it('returns 403 for vendor', () => {
     expect(requireAdminOrManager(makeSession('VENDOR'))?.status).toBe(403);
+  });
+
+  it('returns 403 for customer service — staff, but not a console role', () => {
+    expect(requireAdminOrManager(makeSession('CUSTOMER_SERVICE'))?.status).toBe(
+      403,
+    );
+  });
+});
+
+describe('isAdminOrManager', () => {
+  it('is true for admin and manager', () => {
+    expect(isAdminOrManager(makeSession('ADMIN'))).toBe(true);
+    expect(isAdminOrManager(makeSession('MANAGER'))).toBe(true);
+  });
+
+  it('is false for customer service, which has no console destinations', () => {
+    expect(isAdminOrManager(makeSession('CUSTOMER_SERVICE'))).toBe(false);
+  });
+
+  it('is false for vendor and customer', () => {
+    expect(isAdminOrManager(makeSession('VENDOR'))).toBe(false);
+    expect(isAdminOrManager(makeSession('USER'))).toBe(false);
   });
 });

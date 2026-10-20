@@ -28,6 +28,7 @@ function RouteComponent() {
       isLoading={isLoading}
       isError={isError}
       onRetry={() => refetch()}
+      showModeration
       onEdit={(productId) =>
         navigate({
           to: '/dashboard/admin/products/edit',

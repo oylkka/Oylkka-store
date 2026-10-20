@@ -38,6 +38,8 @@ export type VendorProduct = {
   dimensionUnit: string;
   images: ProductImage[];
   status: string;
+  /** Set while `status` is `REJECTED`; shown to the vendor and cleared on relist. */
+  rejectionReason: string | null;
   featured: boolean;
   metaTitle: string | null;
   metaDescription: string | null;
@@ -542,6 +544,48 @@ export function useDeleteProductMutation() {
         ? (error.response?.data?.error ?? error.message)
         : 'Failed to delete product';
       toast.error(`Error: ${message}`, { id: 'product-delete' });
+    },
+  });
+}
+
+/**
+ * Staff moderation of any listing: pull it with a reason, or put it back.
+ * Deliberately separate from `useUpdateProduct` — a vendor must not be able to
+ * send a moderation outcome from their own form.
+ */
+export function useModerateProductMutation() {
+  const queryClient = useQueryClient();
+
+  return useMutation<
+    { message: string },
+    Error,
+    { id: string; status: 'REJECTED' | 'PUBLISHED'; reason?: string }
+  >({
+    mutationFn: async (input) => {
+      const response = await apiClient.post('/api/product/moderate', input);
+      return response.data;
+    },
+    onMutate: ({ status }) => {
+      toast.loading(
+        status === 'REJECTED'
+          ? 'Rejecting product...'
+          : 'Publishing product...',
+        { id: 'product-moderate' },
+      );
+    },
+    onSuccess: (_data, { status }) => {
+      toast.success(
+        status === 'REJECTED' ? 'Product rejected' : 'Product published',
+        { id: 'product-moderate' },
+      );
+      queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.PRODUCTS] });
+      queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.PUBLIC_PRODUCTS] });
+    },
+    onError: (error) => {
+      const message = axios.isAxiosError(error)
+        ? (error.response?.data?.error ?? error.message)
+        : 'Failed to update product status';
+      toast.error(`Error: ${message}`, { id: 'product-moderate' });
     },
   });
 }

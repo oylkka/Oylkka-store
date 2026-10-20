@@ -1,4 +1,12 @@
-import { Loader2, Package, Pencil, Search, Trash2 } from 'lucide-react';
+import {
+  Ban,
+  Loader2,
+  Package,
+  Pencil,
+  RotateCcw,
+  Search,
+  Trash2,
+} from 'lucide-react';
 import { type ReactNode, useState } from 'react';
 
 import { QueryErrorState } from '@/components/query-state';
@@ -17,37 +25,23 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Textarea } from '@/components/ui/textarea';
 import { formatBDT } from '@/lib/currency';
+import { productStatusBadge } from '@/lib/product-status';
 import {
   useDeleteProductMutation,
+  useModerateProductMutation,
   type VendorProduct,
 } from '@/services/product';
 
 /**
  * Product management list shared by the vendor dashboard and the admin
  * console. Both screens list, filter, edit and delete exactly the same rows —
- * the only differences are the copy, the route an edit opens, and whether the
+ * the only differences are the copy, the route an edit opens, whether the
  * header offers "Add Product" (admins cannot create products: a listing
- * belongs to a shop, and an admin has none).
+ * belongs to a shop, and an admin has none), and whether the row carries the
+ * staff-only moderation controls.
  */
-
-const statusBadge = (status: string) => {
-  switch (status) {
-    case 'PUBLISHED':
-    case 'ACTIVE':
-      return { variant: 'default' as const, label: 'Published' };
-    case 'DRAFT':
-      return { variant: 'secondary' as const, label: 'Draft' };
-    case 'ARCHIVED':
-      return { variant: 'outline' as const, label: 'Archived' };
-    case 'OUT_OF_STOCK':
-      return { variant: 'destructive' as const, label: 'Out of Stock' };
-    case 'REJECTED':
-      return { variant: 'destructive' as const, label: 'Rejected' };
-    default:
-      return { variant: 'outline' as const, label: status };
-  }
-};
 
 // Values come from the `ProductStatus` Prisma enum. `ACTIVE` is a legacy
 // spelling still worth showing in a badge, but filtering on it matched
@@ -56,6 +50,7 @@ const STATUS_FILTERS = [
   'all',
   'PUBLISHED',
   'DRAFT',
+  'REJECTED',
   'OUT_OF_STOCK',
   'ARCHIVED',
 ];
@@ -75,6 +70,11 @@ type ProductListProps = {
   isError: boolean;
   onRetry: () => void;
   onEdit: (productId: string) => void;
+  /**
+   * Staff-only row controls (reject with a reason, restore). The vendor list
+   * leaves this off: moderation is not a vendor action.
+   */
+  showModeration?: boolean;
   /** Shown when the catalog itself is empty (not when a filter matches nothing). */
   emptyHint?: string;
 };
@@ -88,6 +88,7 @@ export function ProductList({
   isError,
   onRetry,
   onEdit,
+  showModeration = false,
   emptyHint = 'Add your first product to start selling.',
 }: ProductListProps) {
   const [search, setSearch] = useState('');
@@ -181,6 +182,7 @@ export function ProductList({
               key={product.id}
               product={product}
               onEdit={() => onEdit(product.id)}
+              showModeration={showModeration}
             />
           ))}
         </div>
@@ -192,14 +194,24 @@ export function ProductList({
 function ProductRow({
   product,
   onEdit,
+  showModeration,
 }: {
   product: VendorProduct;
   onEdit: () => void;
+  showModeration: boolean;
 }) {
   const { mutate: deleteProduct, isPending: isDeleting } =
     useDeleteProductMutation();
+  const { mutate: moderateProduct, isPending: isModerating } =
+    useModerateProductMutation();
   const [deleteOpen, setDeleteOpen] = useState(false);
-  const { variant, label } = statusBadge(product.status);
+  const [rejectOpen, setRejectOpen] = useState(false);
+  const [reason, setReason] = useState('');
+  const { variant, label } = productStatusBadge(product.status);
+  const isRejected = product.status === 'REJECTED';
+  // Mirrors the API rule (`ProductModerationSchema`): a rejection without a
+  // reason tells the vendor nothing, so it cannot be submitted.
+  const reasonTooShort = reason.trim().length < 5;
 
   return (
     <div className='rounded-2xl border border-border bg-card p-4 flex items-center gap-4 hover:border-primary/30 transition-colors duration-200'>
@@ -226,6 +238,11 @@ function ProductRow({
             {product.productName}
           </p>
           <p className='text-xs text-muted-foreground'>SKU: {product.sku}</p>
+          {isRejected && product.rejectionReason && (
+            <p className='text-xs text-destructive line-clamp-2'>
+              Rejected: {product.rejectionReason}
+            </p>
+          )}
           {product.shop?.name && (
             <p className='text-xs text-muted-foreground truncate'>
               Sold by {product.shop.name}
@@ -258,6 +275,77 @@ function ProductRow({
         </div>
       </div>
       <div className='flex items-center gap-1 shrink-0'>
+        {showModeration &&
+          (isRejected ? (
+            <Button
+              variant='ghost'
+              size='icon'
+              className='w-8 h-8 rounded-lg text-emerald-600 hover:text-emerald-600 hover:bg-emerald-500/10'
+              title='Publish this listing'
+              aria-label='Publish this listing'
+              disabled={isModerating}
+              onClick={() =>
+                moderateProduct({ id: product.id, status: 'PUBLISHED' })
+              }
+            >
+              <RotateCcw className='w-3.5 h-3.5' />
+            </Button>
+          ) : (
+            <AlertDialog open={rejectOpen} onOpenChange={setRejectOpen}>
+              <AlertDialogTrigger asChild>
+                <Button
+                  variant='ghost'
+                  size='icon'
+                  className='w-8 h-8 rounded-lg text-amber-600 hover:text-amber-600 hover:bg-amber-500/10'
+                  title='Reject this listing'
+                  aria-label='Reject this listing'
+                >
+                  <Ban className='w-3.5 h-3.5' />
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent size='sm'>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>
+                    Reject &ldquo;{product.productName}&rdquo;?
+                  </AlertDialogTitle>
+                  <AlertDialogDescription>
+                    The listing disappears from the storefront immediately. The
+                    vendor sees your reason and has to fix the listing and save
+                    it again to relist it.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <Textarea
+                  value={reason}
+                  onChange={(e) => setReason(e.target.value)}
+                  placeholder='What does the vendor need to fix?'
+                  rows={3}
+                  maxLength={500}
+                />
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                  <AlertDialogAction
+                    variant='destructive'
+                    disabled={isModerating || reasonTooShort}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      moderateProduct({
+                        id: product.id,
+                        status: 'REJECTED',
+                        reason: reason.trim(),
+                      });
+                      setRejectOpen(false);
+                      setReason('');
+                    }}
+                  >
+                    {isModerating && (
+                      <Loader2 className='w-3.5 h-3.5 animate-spin' />
+                    )}
+                    Reject
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          ))}
         <Button
           variant='ghost'
           size='icon'

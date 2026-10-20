@@ -63,8 +63,11 @@ model Product {
   metaTitle       String?
   metaDescription String?
 
-  status   ProductStatus @default(PUBLISHED)
-  featured Boolean       @default(false)
+  status          ProductStatus @default(PUBLISHED)
+  // Set when an admin rejects a listing, cleared as soon as it leaves REJECTED.
+  rejectionReason String?
+
+  featured Boolean @default(false)
 
   shopId String?
   shop   Shop?   @relation("ShopProducts", fields: [shopId], references: [id], onUpdate: NoAction)

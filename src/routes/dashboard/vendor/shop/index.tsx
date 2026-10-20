@@ -26,6 +26,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { formatBDT } from '@/lib/currency';
+import { productStatusBadge } from '@/lib/product-status';
 import { useVendorProducts, type VendorProduct } from '@/services/product';
 import { useMyShop } from '@/services/shop';
 
@@ -582,22 +583,7 @@ function ShopProductsGrid() {
 }
 
 function ProductCard({ product }: { product: VendorProduct }) {
-  const statusBadge = (status: string) => {
-    switch (status) {
-      case 'ACTIVE':
-        return { variant: 'default' as const, label: 'Active' };
-      case 'DRAFT':
-        return { variant: 'secondary' as const, label: 'Draft' };
-      case 'ARCHIVED':
-        return { variant: 'outline' as const, label: 'Archived' };
-      case 'OUT_OF_STOCK':
-        return { variant: 'destructive' as const, label: 'Out of Stock' };
-      default:
-        return { variant: 'outline' as const, label: status };
-    }
-  };
-
-  const { variant, label } = statusBadge(product.status);
+  const { variant, label } = productStatusBadge(product.status);
 
   return (
     <motion.div

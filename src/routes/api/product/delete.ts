@@ -1,6 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { DeleteImage } from '@/cloudinary';
-import { requireAuth } from '@/lib/auth-middleware';
+import { isAdminOrManager, requireAuth } from '@/lib/auth-middleware';
 import { validateCsrf } from '@/lib/csrf';
 import { prisma } from '@/lib/db';
 
@@ -41,11 +41,10 @@ export const Route = createFileRoute('/api/product/delete')({
             );
           }
 
-          const isAdmin =
-            session.user.role === 'ADMIN' || session.user.role === 'MANAGER';
+          const isStaff = isAdminOrManager(session);
           const isOwner = shop && product.shopId === shop.id;
 
-          if (!isAdmin && !isOwner) {
+          if (!isStaff && !isOwner) {
             return Response.json({ error: 'Forbidden' }, { status: 403 });
           }
 

@@ -1,6 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { DeleteImage, UploadImage } from '@/cloudinary';
-import { requireAuth } from '@/lib/auth-middleware';
+import { isAdminOrManager, requireAuth } from '@/lib/auth-middleware';
 import {
   PRODUCT_IMAGE_ACCEPTED_TYPES,
   PRODUCT_IMAGE_MAX_BYTES,
@@ -47,8 +47,7 @@ export const Route = createFileRoute('/api/product/edit')({
           // ADMIN/MANAGER act on any product in the catalog; the edit path
           // used to reject them here, before the ownership check ever ran,
           // because an admin normally owns no shop at all.
-          const isStaff =
-            session.user.role === 'ADMIN' || session.user.role === 'MANAGER';
+          const isStaff = isAdminOrManager(session);
 
           if (!isStaff && shop?.status !== 'ACTIVE') {
             return Response.json(
@@ -784,6 +783,14 @@ export const Route = createFileRoute('/api/product/edit')({
             }
 
             // ---- The product row ----
+            const nextStatus =
+              (v.status as
+                | 'DRAFT'
+                | 'PUBLISHED'
+                | 'REJECTED'
+                | 'ARCHIVED'
+                | 'OUT_OF_STOCK') ?? existing.status;
+
             const updated = await tx.product.update({
               where: { id: productId },
               data: {
@@ -821,13 +828,13 @@ export const Route = createFileRoute('/api/product/edit')({
                 dimensionUnit,
                 metaTitle: v.metaTitle ?? existing.metaTitle,
                 metaDescription: v.metaDescription ?? existing.metaDescription,
-                status:
-                  (v.status as
-                    | 'DRAFT'
-                    | 'PUBLISHED'
-                    | 'REJECTED'
-                    | 'ARCHIVED'
-                    | 'OUT_OF_STOCK') ?? existing.status,
+                status: nextStatus,
+                // A vendor relisting their product clears the moderation note:
+                // it describes the rejected state and nothing else. Vendors
+                // cannot send REJECTED (it is absent from `ProductStatusEnum`),
+                // so this path can only ever clear a reason, never set one.
+                rejectionReason:
+                  nextStatus === 'REJECTED' ? existing.rejectionReason : null,
                 featured: v.featured ?? existing.featured,
               },
               include: {

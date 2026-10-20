@@ -103,6 +103,7 @@ import { Route as ApiProductDeleteRouteImport } from './routes/api/product/delet
 import { Route as ApiProductEditRouteImport } from './routes/api/product/edit'
 import { Route as ApiProductGetSingleRouteImport } from './routes/api/product/get-single'
 import { Route as ApiProductHelpfulVoteRouteImport } from './routes/api/product/helpful-vote'
+import { Route as ApiProductModerateRouteImport } from './routes/api/product/moderate'
 import { Route as ApiProductPublicBestsellersRouteImport } from './routes/api/product/public-bestsellers'
 import { Route as ApiProductPublicByCategoryRouteImport } from './routes/api/product/public-by-category'
 import { Route as ApiProductPublicListRouteImport } from './routes/api/product/public-list'
@@ -718,6 +719,11 @@ const ApiProductGetSingleRoute = ApiProductGetSingleRouteImport.update({
 const ApiProductHelpfulVoteRoute = ApiProductHelpfulVoteRouteImport.update({
   id: '/api/product/helpful-vote',
   path: '/api/product/helpful-vote',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiProductModerateRoute = ApiProductModerateRouteImport.update({
+  id: '/api/product/moderate',
+  path: '/api/product/moderate',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiProductPublicBestsellersRoute =
@@ -1576,6 +1582,7 @@ export interface FileRoutesByFullPath {
   '/api/product/edit': typeof ApiProductEditRoute
   '/api/product/get-single': typeof ApiProductGetSingleRoute
   '/api/product/helpful-vote': typeof ApiProductHelpfulVoteRoute
+  '/api/product/moderate': typeof ApiProductModerateRoute
   '/api/product/public-bestsellers': typeof ApiProductPublicBestsellersRoute
   '/api/product/public-by-category': typeof ApiProductPublicByCategoryRoute
   '/api/product/public-list': typeof ApiProductPublicListRoute
@@ -1803,6 +1810,7 @@ export interface FileRoutesByTo {
   '/api/product/edit': typeof ApiProductEditRoute
   '/api/product/get-single': typeof ApiProductGetSingleRoute
   '/api/product/helpful-vote': typeof ApiProductHelpfulVoteRoute
+  '/api/product/moderate': typeof ApiProductModerateRoute
   '/api/product/public-bestsellers': typeof ApiProductPublicBestsellersRoute
   '/api/product/public-by-category': typeof ApiProductPublicByCategoryRoute
   '/api/product/public-list': typeof ApiProductPublicListRoute
@@ -2039,6 +2047,7 @@ export interface FileRoutesById {
   '/api/product/edit': typeof ApiProductEditRoute
   '/api/product/get-single': typeof ApiProductGetSingleRoute
   '/api/product/helpful-vote': typeof ApiProductHelpfulVoteRoute
+  '/api/product/moderate': typeof ApiProductModerateRoute
   '/api/product/public-bestsellers': typeof ApiProductPublicBestsellersRoute
   '/api/product/public-by-category': typeof ApiProductPublicByCategoryRoute
   '/api/product/public-list': typeof ApiProductPublicListRoute
@@ -2276,6 +2285,7 @@ export interface FileRouteTypes {
     | '/api/product/edit'
     | '/api/product/get-single'
     | '/api/product/helpful-vote'
+    | '/api/product/moderate'
     | '/api/product/public-bestsellers'
     | '/api/product/public-by-category'
     | '/api/product/public-list'
@@ -2503,6 +2513,7 @@ export interface FileRouteTypes {
     | '/api/product/edit'
     | '/api/product/get-single'
     | '/api/product/helpful-vote'
+    | '/api/product/moderate'
     | '/api/product/public-bestsellers'
     | '/api/product/public-by-category'
     | '/api/product/public-list'
@@ -2738,6 +2749,7 @@ export interface FileRouteTypes {
     | '/api/product/edit'
     | '/api/product/get-single'
     | '/api/product/helpful-vote'
+    | '/api/product/moderate'
     | '/api/product/public-bestsellers'
     | '/api/product/public-by-category'
     | '/api/product/public-list'
@@ -2960,6 +2972,7 @@ export interface RootRouteChildren {
   ApiProductEditRoute: typeof ApiProductEditRoute
   ApiProductGetSingleRoute: typeof ApiProductGetSingleRoute
   ApiProductHelpfulVoteRoute: typeof ApiProductHelpfulVoteRoute
+  ApiProductModerateRoute: typeof ApiProductModerateRoute
   ApiProductPublicBestsellersRoute: typeof ApiProductPublicBestsellersRoute
   ApiProductPublicByCategoryRoute: typeof ApiProductPublicByCategoryRoute
   ApiProductPublicListRoute: typeof ApiProductPublicListRoute
@@ -3700,6 +3713,13 @@ declare module '@tanstack/react-router' {
       path: '/api/product/helpful-vote'
       fullPath: '/api/product/helpful-vote'
       preLoaderRoute: typeof ApiProductHelpfulVoteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/product/moderate': {
+      id: '/api/product/moderate'
+      path: '/api/product/moderate'
+      fullPath: '/api/product/moderate'
+      preLoaderRoute: typeof ApiProductModerateRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/product/public-bestsellers': {
@@ -5011,6 +5031,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiProductEditRoute: ApiProductEditRoute,
   ApiProductGetSingleRoute: ApiProductGetSingleRoute,
   ApiProductHelpfulVoteRoute: ApiProductHelpfulVoteRoute,
+  ApiProductModerateRoute: ApiProductModerateRoute,
   ApiProductPublicBestsellersRoute: ApiProductPublicBestsellersRoute,
   ApiProductPublicByCategoryRoute: ApiProductPublicByCategoryRoute,
   ApiProductPublicListRoute: ApiProductPublicListRoute,

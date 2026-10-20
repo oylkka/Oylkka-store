@@ -43,6 +43,13 @@ const productUpdate = mock(async (args: Row) => ({
   id: 'p-1',
   ...(args.data as Row),
 }));
+// The moderation endpoint writes through the top-level client, not a
+// transaction, so it needs its own spy to assert on.
+const productModerate = mock(async (args: Row) => ({
+  id: 'p-1',
+  productName: 'Existing Name',
+  ...(args.data as Row),
+}));
 
 const tx = {
   product: { update: productUpdate },
@@ -77,6 +84,7 @@ mock.module('@/lib/db', () => ({
     product: {
       findUnique: async () => existingProduct,
       findMany: async () => productFindMany(),
+      update: async (args: Row) => productModerate(args),
     },
     $transaction: async (fn: (t: unknown) => Promise<unknown>) => fn(tx),
   },
@@ -103,8 +111,14 @@ const editPost = handlerOf(
   'POST',
 );
 
+const moderatePost = handlerOf(
+  (await import('@/routes/api/product/moderate'))
+    .Route as unknown as RouteShape,
+  'POST',
+);
+
 /** A payload that passes ProductApiEditSchema unchanged for `existingProduct`. */
-function editRequest() {
+function editRequest(extra: Record<string, string> = {}) {
   const form = new FormData();
   form.append('id', 'p-1');
   form.append('productName', 'Existing Name');
@@ -114,6 +128,9 @@ function editRequest() {
   form.append('category', 'cat-1');
   form.append('price', '10');
   form.append('stock', '5');
+  for (const [key, value] of Object.entries(extra)) {
+    form.append(key, value);
+  }
 
   return new Request('http://localhost/api/product/edit', {
     method: 'POST',
@@ -262,5 +279,158 @@ describe('POST /api/product/edit authorization', () => {
 
     expect(res?.status).toBe(200);
     expect(productUpdate).toHaveBeenCalledTimes(1);
+  });
+
+  it('rejects customer service editing a product', async () => {
+    currentUser = { id: 'cs-1', role: 'CUSTOMER_SERVICE' };
+
+    const res = await editing();
+
+    expect(res?.status).toBe(403);
+    expect(productUpdate).not.toHaveBeenCalled();
+  });
+
+  it('clears the moderation note when the vendor relists', async () => {
+    currentUser = { id: 'v-1', role: 'VENDOR' };
+    shop = { id: 's-1', status: 'ACTIVE' };
+    existingProduct = {
+      ...(existingProduct as Row),
+      status: 'REJECTED',
+      rejectionReason: 'Photos do not match the item',
+    };
+
+    const res = await editPost?.({
+      request: editRequest({ status: 'PUBLISHED' }),
+    });
+
+    expect(res?.status).toBe(200);
+    expect(productUpdate).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({
+          status: 'PUBLISHED',
+          rejectionReason: null,
+        }),
+      }),
+    );
+  });
+});
+
+const moderating = (body: unknown) =>
+  moderatePost?.({
+    request: new Request('http://localhost/api/product/moderate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    }),
+  });
+
+describe('POST /api/product/moderate', () => {
+  beforeEach(() => {
+    currentUser = null;
+    existingProduct = { id: 'p-1', productName: 'Existing Name' };
+    productModerate.mockClear();
+  });
+
+  it('rejects unauthenticated callers', async () => {
+    const res = await moderating({
+      id: 'p-1',
+      status: 'REJECTED',
+      reason: 'Photos do not match the item',
+    });
+
+    expect(res?.status).toBe(401);
+    expect(productModerate).not.toHaveBeenCalled();
+  });
+
+  it('rejects vendors', async () => {
+    currentUser = { id: 'v-1', role: 'VENDOR' };
+
+    const res = await moderating({
+      id: 'p-1',
+      status: 'REJECTED',
+      reason: 'Photos do not match the item',
+    });
+
+    expect(res?.status).toBe(403);
+    expect(productModerate).not.toHaveBeenCalled();
+  });
+
+  it('rejects customer service — no catalog control', async () => {
+    currentUser = { id: 'cs-1', role: 'CUSTOMER_SERVICE' };
+
+    const res = await moderating({
+      id: 'p-1',
+      status: 'REJECTED',
+      reason: 'Photos do not match the item',
+    });
+
+    expect(res?.status).toBe(403);
+    expect(productModerate).not.toHaveBeenCalled();
+  });
+
+  it('refuses a rejection without a reason the vendor could act on', async () => {
+    currentUser = { id: 'admin-1', role: 'ADMIN' };
+
+    const res = await moderating({ id: 'p-1', status: 'REJECTED' });
+
+    expect(res?.status).toBe(400);
+    expect(productModerate).not.toHaveBeenCalled();
+  });
+
+  it('refuses an outcome that is not a moderation decision', async () => {
+    currentUser = { id: 'admin-1', role: 'ADMIN' };
+
+    const res = await moderating({ id: 'p-1', status: 'DRAFT' });
+
+    expect(res?.status).toBe(400);
+    expect(productModerate).not.toHaveBeenCalled();
+  });
+
+  it('404s for a product that does not exist', async () => {
+    currentUser = { id: 'admin-1', role: 'ADMIN' };
+    existingProduct = null;
+
+    const res = await moderating({
+      id: 'missing',
+      status: 'REJECTED',
+      reason: 'Photos do not match the item',
+    });
+
+    expect(res?.status).toBe(404);
+    expect(productModerate).not.toHaveBeenCalled();
+  });
+
+  it('rejects a listing for an admin, storing the reason', async () => {
+    currentUser = { id: 'admin-1', role: 'ADMIN' };
+
+    const res = await moderating({
+      id: 'p-1',
+      status: 'REJECTED',
+      reason: 'Photos do not match the item',
+    });
+
+    expect(res?.status).toBe(200);
+    expect(productModerate).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: { id: 'p-1' },
+        data: {
+          status: 'REJECTED',
+          rejectionReason: 'Photos do not match the item',
+        },
+      }),
+    );
+  });
+
+  it('clears the reason when publishing a listing back', async () => {
+    currentUser = { id: 'mgr-1', role: 'MANAGER' };
+
+    const res = await moderating({ id: 'p-1', status: 'PUBLISHED' });
+
+    expect(res?.status).toBe(200);
+    expect(productModerate).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: { status: 'PUBLISHED', rejectionReason: null },
+      }),
+    );
   });
 });
