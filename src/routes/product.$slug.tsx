@@ -4,6 +4,7 @@ import {
   Clock,
   Heart,
   HelpCircle,
+  Info,
   Loader2,
   MapPin,
   MessageSquare,
@@ -24,6 +25,10 @@ import { getPublicProductMeta } from '@/actions/public-product-meta';
 import Footer from '@/components/layout/footer';
 import Header from '@/components/layout/header';
 import { ProductDescription } from '@/components/pages/product/product-description';
+import {
+  ProductDetails,
+  productHasDetails,
+} from '@/components/pages/product/product-details';
 import { ProductGallery } from '@/components/pages/product/product-gallery';
 import { ProductInfo } from '@/components/pages/product/product-info';
 import { ProductQuestions } from '@/components/pages/product/product-questions';
@@ -568,6 +573,21 @@ function RouteComponent() {
                 <ProductDescription product={product} />
               </div>
             </motion.div>
+
+            {productHasDetails(product) && (
+              <motion.div
+                initial='hidden'
+                whileInView='show'
+                viewport={{ once: true, margin: '-60px' }}
+                variants={fadeUp}
+                custom={0}
+              >
+                <SectionHeader label='Details' icon={Info} />
+                <div className='bg-card border border-border rounded-2xl p-6 md:p-8'>
+                  <ProductDetails product={product} />
+                </div>
+              </motion.div>
+            )}
 
             <motion.div
               initial='hidden'
