@@ -44,6 +44,9 @@ export type VendorProduct = {
   createdAt: string;
   updatedAt: string;
   _count: { reviews: number; orderItems: number };
+  // Only present on the admin payload (/api/product/admin-list); the vendor
+  // list is already scoped to the caller's shop and omits it.
+  shop?: { id: string; name: string; status: string } | null;
   variants: Array<{
     id: string;
     name: string;
@@ -471,6 +474,19 @@ export function useVendorProducts() {
     queryFn: async () => {
       const response = await apiClient.get<VendorProduct[]>(
         '/api/product/vendor-list',
+      );
+      return response.data;
+    },
+  });
+}
+
+/** Every product on the platform, for the admin console. Staff-only. */
+export function useAdminProducts() {
+  return useQuery<VendorProduct[]>({
+    queryKey: [QUERY_KEYS.PRODUCTS, 'admin-list'],
+    queryFn: async () => {
+      const response = await apiClient.get<VendorProduct[]>(
+        '/api/product/admin-list',
       );
       return response.data;
     },

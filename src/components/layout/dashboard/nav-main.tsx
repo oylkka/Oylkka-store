@@ -212,6 +212,7 @@ export function NavMain({ user }: { user: User }) {
       icon: Package,
       roles: ['ADMIN', 'MANAGER'],
       items: [
+        { title: 'All Products', to: '/dashboard/admin/products' },
         { title: 'Categories', to: '/dashboard/admin/category/all' },
         { title: 'Reviews', to: '/dashboard/admin/reviews' },
       ],

@@ -43,7 +43,14 @@ export const Route = createFileRoute('/api/product/edit')({
             where: { ownerId: session.user.id },
           });
 
-          if (shop?.status !== 'ACTIVE') {
+          // Staff bypass. `delete.ts` and `get-single.ts` already let
+          // ADMIN/MANAGER act on any product in the catalog; the edit path
+          // used to reject them here, before the ownership check ever ran,
+          // because an admin normally owns no shop at all.
+          const isStaff =
+            session.user.role === 'ADMIN' || session.user.role === 'MANAGER';
+
+          if (!isStaff && shop?.status !== 'ACTIVE') {
             return Response.json(
               { error: 'You need an active shop to edit products' },
               { status: 403 },
@@ -137,7 +144,7 @@ export const Route = createFileRoute('/api/product/edit')({
             );
           }
 
-          if (existing.shopId !== shop.id) {
+          if (!isStaff && (!shop || existing.shopId !== shop.id)) {
             return Response.json({ error: 'Unauthorized' }, { status: 401 });
           }
 
