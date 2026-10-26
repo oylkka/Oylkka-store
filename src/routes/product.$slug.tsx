@@ -835,7 +835,7 @@ function ContactVendorDialog({
       setSubject('');
       setMessage('');
       navigate({
-        to: '/dashboard/messages/$id',
+        to: '/messages',
         params: { id: data.conversation.id },
       });
     } catch {

@@ -96,7 +96,7 @@ export function NavMain({ user }: { user: User }) {
       items: [
         { title: 'My Profile', to: '/dashboard/my-account' },
         { title: 'Addresses', to: '/dashboard/addresses' },
-        { title: 'Messages', to: '/dashboard/messages' },
+        { title: 'Messages', to: '/messages' },
         { title: 'Help & Support', to: '/help' },
       ],
     },
@@ -191,7 +191,7 @@ export function NavMain({ user }: { user: User }) {
         { title: 'Branding', to: '/dashboard/vendor/shop/branding' },
         { title: 'Policies', to: '/dashboard/vendor/shop/policies' },
         { title: 'Payout Details', to: '/dashboard/vendor/shop/payout' },
-        { title: 'Messages', to: '/dashboard/vendor/shop/messages' },
+        { title: 'Messages', to: '/messages' },
       ],
     },
   ];
@@ -290,7 +290,7 @@ export function NavMain({ user }: { user: User }) {
       title: 'Moderation',
       icon: ClipboardCheck,
       roles: ['ADMIN', 'MANAGER'],
-      items: [{ title: 'Conversations', to: '/dashboard/admin/messages' }],
+      items: [{ title: 'Conversations', to: '/messages' }],
     },
     {
       title: 'Platform Settings',
@@ -310,7 +310,7 @@ export function NavMain({ user }: { user: User }) {
       roles: ['ADMIN', 'MANAGER', 'VENDOR', 'CUSTOMER_SERVICE'],
       items: [
         { title: 'Profile', to: '/dashboard/my-account' },
-        { title: 'Messages', to: '/dashboard/messages' },
+        { title: 'Messages', to: '/messages' },
         { title: 'Help & Support', to: '/help' },
       ],
     },

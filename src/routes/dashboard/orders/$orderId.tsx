@@ -234,7 +234,7 @@ function RouteComponent() {
                   </div>
                   {i < ORDER_STEPS.length - 1 && (
                     <div
-                      className={`flex-1 h-px mx-2 mt-[-1.25rem] ${
+                      className={`flex-1 h-px mx-2 -mt-5 ${
                         i < activeStep ? 'bg-primary' : 'bg-border'
                       }`}
                     />
@@ -413,7 +413,7 @@ function RouteComponent() {
                                           </div>
                                           {i < ITEM_STEPS.length - 1 && (
                                             <div
-                                              className={`w-4 h-px mb-[-1rem] ${
+                                              className={`w-4 h-px -mb-4 ${
                                                 i < stepIndex
                                                   ? 'bg-primary'
                                                   : 'bg-border'
@@ -578,7 +578,6 @@ function MessageVendorButton({
   orderId: string;
 }) {
   const [isSending, setIsSending] = useState(false);
-  const navigate = useNavigate();
 
   async function handleClick() {
     setIsSending(true);
@@ -601,11 +600,6 @@ function MessageVendorButton({
         toast.error(data.error || 'Failed to start conversation');
         return;
       }
-
-      navigate({
-        to: '/dashboard/messages/$id',
-        params: { id: data.conversation.id },
-      });
     } catch {
       toast.error('Something went wrong');
     } finally {
