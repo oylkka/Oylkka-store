@@ -2,8 +2,8 @@ import { createFileRoute, Link, useNavigate } from '@tanstack/react-router';
 import { AlertCircle, MailCheck } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
-import Footer from '#/components/layout/footer';
-import Header from '#/components/layout/header';
+import Footer from '@/components/layout/footer';
+import Header from '@/components/layout/header';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import {

@@ -1,10 +1,10 @@
 import { createFileRoute, Outlet, redirect } from '@tanstack/react-router';
-import { AppSidebar } from '#/components/layout/dashboard/app-sidebar';
-import BreadCrumb from '#/components/layout/dashboard/breadcrumb';
-import Footer from '#/components/layout/footer';
-import Header from '#/components/layout/header';
-import { SidebarInset, SidebarProvider } from '#/components/ui/sidebar';
 import { RouteErrorBoundary } from '@/components/error-boundary';
+import { AppSidebar } from '@/components/layout/dashboard/app-sidebar';
+import BreadCrumb from '@/components/layout/dashboard/breadcrumb';
+import Footer from '@/components/layout/footer';
+import Header from '@/components/layout/header';
+import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar';
 
 export const Route = createFileRoute('/dashboard')({
   beforeLoad: ({ context }) => {

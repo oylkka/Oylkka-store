@@ -1,8 +1,8 @@
 import { createFileRoute, Link, redirect } from '@tanstack/react-router';
 import { CheckCircle2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import Footer from '#/components/layout/footer';
-import Header from '#/components/layout/header';
+import Footer from '@/components/layout/footer';
+import Header from '@/components/layout/header';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 

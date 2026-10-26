@@ -5,8 +5,8 @@ import {
   useNavigate,
 } from '@tanstack/react-router';
 import { ArrowLeft, Minus, Plus, ShoppingCart, Trash2 } from 'lucide-react';
-import Footer from '#/components/layout/footer';
-import Header from '#/components/layout/header';
+import Footer from '@/components/layout/footer';
+import Header from '@/components/layout/header';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';

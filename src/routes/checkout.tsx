@@ -9,9 +9,9 @@ import { z } from 'zod';
 import {
   type PaymentMethodOption,
   PaymentSelector,
-} from '#/components/checkout/payment-selector';
-import Footer from '#/components/layout/footer';
-import Header from '#/components/layout/header';
+} from '@/components/checkout/payment-selector';
+import Footer from '@/components/layout/footer';
+import Header from '@/components/layout/header';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Checkbox } from '@/components/ui/checkbox';

@@ -212,9 +212,9 @@ function RouteComponent() {
             </CardHeader>
             <CardContent>
               {isLoading ? (
-                <Skeleton className='h-[200px] w-full' />
+                <Skeleton className='h-50 w-full' />
               ) : !data?.dailyRevenue || data.dailyRevenue.length === 0 ? (
-                <div className='flex items-center justify-center h-[200px] text-sm text-muted-foreground'>
+                <div className='flex items-center justify-center h-50 text-sm text-muted-foreground'>
                   No revenue data for the last 30 days
                 </div>
               ) : (
@@ -281,7 +281,7 @@ function RouteComponent() {
                   ))}
                 </div>
               ) : !data?.recentOrders || data.recentOrders.length === 0 ? (
-                <div className='flex items-center justify-center h-[200px] text-sm text-muted-foreground'>
+                <div className='flex items-center justify-center h-50 text-sm text-muted-foreground'>
                   No orders yet
                 </div>
               ) : (

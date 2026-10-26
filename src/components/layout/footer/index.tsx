@@ -12,8 +12,8 @@ import {
 import { motion, useInView } from 'motion/react';
 import { useMemo, useRef, useState } from 'react';
 import { toast } from 'sonner';
-import { Button } from '#/components/ui/button';
-import { Input } from '#/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { RETURN_WINDOW_DAYS } from '@/lib/constants';
 import { useSubscribeMutation } from '@/services/newsletter';
 import { usePublicSettings } from '@/services/public-settings';

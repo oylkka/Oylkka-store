@@ -148,7 +148,7 @@ function RouteComponent() {
         <Card>
           <CardHeader>
             <div className='flex items-center gap-4 flex-wrap'>
-              <div className='relative flex-1 min-w-[200px]'>
+              <div className='relative flex-1 min-w-50'>
                 <Search className='absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground' />
                 <Input
                   placeholder='Search by product...'
@@ -167,7 +167,7 @@ function RouteComponent() {
                   setPage(1);
                 }}
               >
-                <SelectTrigger className='w-[150px]'>
+                <SelectTrigger className='w-37.5'>
                   <SelectValue placeholder='All Reports' />
                 </SelectTrigger>
                 <SelectContent>
@@ -183,7 +183,7 @@ function RouteComponent() {
                   setPage(1);
                 }}
               >
-                <SelectTrigger className='w-[150px]'>
+                <SelectTrigger className='w-37.5'>
                   <SelectValue placeholder='All Verified' />
                 </SelectTrigger>
                 <SelectContent>
@@ -199,7 +199,7 @@ function RouteComponent() {
                   setPage(1);
                 }}
               >
-                <SelectTrigger className='w-[140px]'>
+                <SelectTrigger className='w-35'>
                   <SelectValue placeholder='Min Rating' />
                 </SelectTrigger>
                 <SelectContent>
@@ -250,7 +250,7 @@ function RouteComponent() {
                   <TableBody>
                     {data.reviews.map((review) => (
                       <TableRow key={review.id}>
-                        <TableCell className='max-w-[200px]'>
+                        <TableCell className='max-w-50'>
                           <div className='flex items-center gap-2'>
                             {review.product.images[0] && (
                               <img
@@ -274,7 +274,7 @@ function RouteComponent() {
                         <TableCell>
                           <StarRating rating={review.rating} />
                         </TableCell>
-                        <TableCell className='max-w-[250px]'>
+                        <TableCell className='max-w-62.5'>
                           <p className='text-sm truncate'>{review.content}</p>
                         </TableCell>
                         <TableCell>

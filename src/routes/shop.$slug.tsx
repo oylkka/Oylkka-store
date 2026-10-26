@@ -497,7 +497,7 @@ function RouteComponent() {
                   className='rounded-2xl border border-border bg-card p-5 hover:border-primary/20 transition-colors duration-300'
                 >
                   <div className='flex items-start gap-3 mb-3'>
-                    <div className='w-9 h-9 rounded-full bg-muted overflow-hidden shrink-0 ring-2 ring-border flex items-center justify-center bg-primary/10'>
+                    <div className='w-9 h-9 rounded-full bg-muted overflow-hidden shrink-0 ring-2 ring-border flex items-center justify-center'>
                       <span className='text-xs font-bold text-primary'>
                         {review.user.name.charAt(0).toUpperCase()}
                       </span>

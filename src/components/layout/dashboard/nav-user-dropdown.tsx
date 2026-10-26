@@ -1,6 +1,5 @@
 import { Link } from '@tanstack/react-router';
 import { ChevronsUpDown, Heart, Package, Settings } from 'lucide-react';
-import { getInitials } from '#/lib/utils';
 import { SignOut } from '@/components/layout/header/signout';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
@@ -20,6 +19,7 @@ import {
   useSidebar,
 } from '@/components/ui/sidebar';
 import { getRoleLabel } from '@/lib/roles';
+import { getInitials } from '@/lib/utils';
 import type { User } from './types';
 
 interface NavUserDropdownProps {

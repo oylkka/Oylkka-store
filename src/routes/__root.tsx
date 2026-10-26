@@ -10,11 +10,11 @@ import {
 } from '@tanstack/react-router';
 import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools';
 import { useEffect, useRef } from 'react';
-import { Toaster } from '#/components/ui/sonner';
-import { TooltipProvider } from '#/components/ui/tooltip';
-import { ThemeProvider } from '#/context/theme-provider';
 import { RouteErrorBoundary } from '@/components/error-boundary';
 import { NotFound } from '@/components/not-found';
+import { Toaster } from '@/components/ui/sonner';
+import { TooltipProvider } from '@/components/ui/tooltip';
+import { ThemeProvider } from '@/context/theme-provider';
 import { getSession, signOut } from '@/lib/auth.functions';
 import { getSiteUrl, siteAsset } from '@/lib/site-url';
 import appCss from '../styles.css?url';

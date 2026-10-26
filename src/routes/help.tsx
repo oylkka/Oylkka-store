@@ -179,7 +179,7 @@ function HelpPage() {
               <motion.div key={topic.title} variants={fadeUp} custom={0}>
                 <Link
                   to={topic.to}
-                  className='group flex h-full items-start gap-4 rounded-2xl border border-border bg-card p-5 transition-colors hover:border-primary/30 hover:bg-primary/[0.02]'
+                  className='group flex h-full items-start gap-4 rounded-2xl border border-border bg-card p-5 transition-colors hover:border-primary/30 hover:bg-primary/2'
                 >
                   <div className='flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/10'>
                     <Icon className='h-5 w-5 text-primary' />
