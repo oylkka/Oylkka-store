@@ -20,7 +20,6 @@ import { Route as DashboardRouteRouteImport } from './routes/dashboard/route'
 import { Route as DealsRouteImport } from './routes/deals'
 import { Route as FaqRouteImport } from './routes/faq'
 import { Route as HelpRouteImport } from './routes/help'
-import { Route as NewArrivalsRouteImport } from './routes/new-arrivals'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as ProductsRouteImport } from './routes/products'
 import { Route as RecentlyViewedRouteImport } from './routes/recently-viewed'
@@ -297,11 +296,6 @@ const FaqRoute = FaqRouteImport.update({
 const HelpRoute = HelpRouteImport.update({
   id: '/help',
   path: '/help',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const NewArrivalsRoute = NewArrivalsRouteImport.update({
-  id: '/new-arrivals',
-  path: '/new-arrivals',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PrivacyRoute = PrivacyRouteImport.update({
@@ -1496,7 +1490,6 @@ export interface FileRoutesByFullPath {
   '/deals': typeof DealsRoute
   '/faq': typeof FaqRoute
   '/help': typeof HelpRoute
-  '/new-arrivals': typeof NewArrivalsRoute
   '/privacy': typeof PrivacyRoute
   '/products': typeof ProductsRouteWithChildren
   '/recently-viewed': typeof RecentlyViewedRoute
@@ -1731,7 +1724,6 @@ export interface FileRoutesByTo {
   '/deals': typeof DealsRoute
   '/faq': typeof FaqRoute
   '/help': typeof HelpRoute
-  '/new-arrivals': typeof NewArrivalsRoute
   '/privacy': typeof PrivacyRoute
   '/products': typeof ProductsRouteWithChildren
   '/recently-viewed': typeof RecentlyViewedRoute
@@ -1961,7 +1953,6 @@ export interface FileRoutesById {
   '/deals': typeof DealsRoute
   '/faq': typeof FaqRoute
   '/help': typeof HelpRoute
-  '/new-arrivals': typeof NewArrivalsRoute
   '/privacy': typeof PrivacyRoute
   '/products': typeof ProductsRouteWithChildren
   '/recently-viewed': typeof RecentlyViewedRoute
@@ -2199,7 +2190,6 @@ export interface FileRouteTypes {
     | '/deals'
     | '/faq'
     | '/help'
-    | '/new-arrivals'
     | '/privacy'
     | '/products'
     | '/recently-viewed'
@@ -2434,7 +2424,6 @@ export interface FileRouteTypes {
     | '/deals'
     | '/faq'
     | '/help'
-    | '/new-arrivals'
     | '/privacy'
     | '/products'
     | '/recently-viewed'
@@ -2663,7 +2652,6 @@ export interface FileRouteTypes {
     | '/deals'
     | '/faq'
     | '/help'
-    | '/new-arrivals'
     | '/privacy'
     | '/products'
     | '/recently-viewed'
@@ -2900,7 +2888,6 @@ export interface RootRouteChildren {
   DealsRoute: typeof DealsRoute
   FaqRoute: typeof FaqRoute
   HelpRoute: typeof HelpRoute
-  NewArrivalsRoute: typeof NewArrivalsRoute
   PrivacyRoute: typeof PrivacyRoute
   ProductsRoute: typeof ProductsRouteWithChildren
   RecentlyViewedRoute: typeof RecentlyViewedRoute
@@ -3132,13 +3119,6 @@ declare module '@tanstack/react-router' {
       path: '/help'
       fullPath: '/help'
       preLoaderRoute: typeof HelpRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/new-arrivals': {
-      id: '/new-arrivals'
-      path: '/new-arrivals'
-      fullPath: '/new-arrivals'
-      preLoaderRoute: typeof NewArrivalsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/privacy': {
@@ -4958,7 +4938,6 @@ const rootRouteChildren: RootRouteChildren = {
   DealsRoute: DealsRoute,
   FaqRoute: FaqRoute,
   HelpRoute: HelpRoute,
-  NewArrivalsRoute: NewArrivalsRoute,
   PrivacyRoute: PrivacyRoute,
   ProductsRoute: ProductsRouteWithChildren,
   RecentlyViewedRoute: RecentlyViewedRoute,

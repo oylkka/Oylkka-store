@@ -37,7 +37,7 @@ export default function NewArrivalsSection() {
   const { data, isLoading } = useAllProducts({
     sort: 'newest',
     page: 1,
-    limit: 8,
+    limit: 28,
   });
 
   const products = data?.products ?? [];
@@ -45,8 +45,8 @@ export default function NewArrivalsSection() {
   if (!isLoading && products.length === 0) return null;
 
   return (
-    <section className='border-b border-border py-16 md:py-24'>
-      <div className='container mx-auto px-2 md:px-4'>
+    <section className='border-b border-border'>
+      <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-24'>
         <motion.div
           initial='hidden'
           whileInView='show'
@@ -76,7 +76,7 @@ export default function NewArrivalsSection() {
             asChild
             className='hidden gap-2 text-primary sm:flex'
           >
-            <Link to='/new-arrivals'>
+            <Link to='/products'>
               View all <ArrowRight className='h-4 w-4' />
             </Link>
           </Button>
@@ -105,9 +105,9 @@ export default function NewArrivalsSection() {
           </motion.div>
         )}
 
-        <div className='mt-8 flex justify-center sm:hidden'>
-          <Button variant='outline' asChild className='gap-2'>
-            <Link to='/new-arrivals'>
+        <div className='mt-8 flex justify-center'>
+          <Button variant='outline' asChild className='gap-2 md:px-10'>
+            <Link to='/products'>
               View all <ArrowRight className='h-4 w-4' />
             </Link>
           </Button>

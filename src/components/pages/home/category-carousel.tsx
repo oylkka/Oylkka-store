@@ -74,8 +74,8 @@ export default function CategoryCarousel() {
   if (!categories || categories.length === 0) return null;
 
   return (
-    <section className='w-full py-16 md:py-20'>
-      <div className='container mx-auto px-2 md:px-4'>
+    <section className='w-full'>
+      <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-24'>
         <div className='mb-10 flex items-center gap-3'>
           <div className='h-px w-8 bg-primary' />
           <span className='text-xs font-semibold tracking-[0.18em] uppercase text-primary'>
@@ -129,12 +129,12 @@ export default function CategoryCarousel() {
                           className='h-full w-full object-cover transition-transform duration-500 group-hover:scale-110'
                         />
                       ) : (
-                        <div className='flex h-full w-full items-center justify-center bg-gradient-to-br from-primary/5 via-primary/10 to-primary/5'>
+                        <div className='flex h-full w-full items-center justify-center bg-linear-to-br from-primary/5 via-primary/10 to-primary/5'>
                           <ImageIcon className='h-12 w-12 text-primary/20' />
                         </div>
                       )}
 
-                      <div className='absolute inset-0 bg-gradient-to-t from-black/60 via-black/0 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100' />
+                      <div className='absolute inset-0 bg-linear-to-t from-black/60 via-black/0 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100' />
 
                       <div className='absolute bottom-0 left-0 right-0 p-4 translate-y-2 opacity-0 transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100'>
                         <h3 className='text-sm font-semibold text-white drop-shadow-sm'>
