@@ -42,7 +42,7 @@ export function ProductVendorCard({ shop }: ProductVendorCardProps) {
       variants={cardVariants}
       whileHover={{ y: -3 }}
       transition={{ type: 'spring', stiffness: 320, damping: 24 }}
-      className='group relative rounded-2xl border border-border bg-card p-5 hover:border-primary/30 hover:bg-primary/[0.02] transition-colors duration-300 flex items-center gap-4 cursor-pointer'
+      className='group relative rounded-2xl border border-border bg-card p-5 hover:border-primary/30 hover:bg-primary/2 transition-colors duration-300 flex items-center gap-4 cursor-pointer'
     >
       <div className='relative w-14 h-14 rounded-xl overflow-hidden bg-muted shrink-0 ring-2 ring-border group-hover:ring-primary/30 transition-all duration-300'>
         {shop.logoUrl ? (

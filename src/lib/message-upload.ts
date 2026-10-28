@@ -7,12 +7,12 @@ export const MESSAGE_IMAGE_TYPES = [
   'image/gif',
 ] as const;
 
-export const MESSAGE_IMAGE_MAX_BYTES = 5 * 1024 * 1024;
+export const MESSAGE_IMAGE_MAX_BYTES = 1 * 1024 * 1024;
 
 /**
  * Shared, validated message-image upload (MONEY-49). Both the public upload
- * endpoint and `api/messages/create.ts` go through this so an unbounded inline
- * upload path can never bypass the MIME/size checks.
+ * endpoint and `/api/chat/messages/create` go through this so an unbounded
+ * inline upload path can never bypass the MIME/size checks.
  */
 export async function uploadMessageImage(
   file: File,
@@ -22,7 +22,7 @@ export async function uploadMessageImage(
   }
 
   if (file.size > MESSAGE_IMAGE_MAX_BYTES) {
-    return { error: 'Image must be under 5MB' };
+    return { error: 'Image must be under 1MB' };
   }
 
   const result = await UploadImage(file, 'messages');

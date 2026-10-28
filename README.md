@@ -13,6 +13,7 @@ A full-featured e-commerce marketplace built for Bangladesh. Buyers can browse t
 | Payments | bKash (tokenized checkout) + Cash on Delivery + Wallet |
 | Email | Brevo SMTP via Nodemailer |
 | Rate Limiting | Upstash Redis |
+| Real-time | [Ably](https://ably.com) |
 | Media | Cloudinary |
 | Styling | Tailwind CSS 4 + shadcn/ui |
 
@@ -45,6 +46,7 @@ Copy `.env` from your team or set the following:
 | `GOOGLE_CLIENT_SECRET` | Google OAuth client secret |
 | `UPSTASH_REDIS_REST_URL` | Upstash Redis REST URL |
 | `UPSTASH_REDIS_REST_TOKEN` | Upstash Redis REST token |
+| `ABLY_API_KEY` | Ably API key used by the server for real-time messaging |
 | `CLOUDINARY_CLOUD_NAME` | Cloudinary cloud name |
 | `CLOUDINARY_API_KEY` | Cloudinary API key |
 | `CLOUDINARY_API_SECRET` | Cloudinary API secret |

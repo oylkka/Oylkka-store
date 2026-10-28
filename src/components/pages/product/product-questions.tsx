@@ -84,7 +84,7 @@ export function ProductQuestions({ productId }: ProductQuestionsProps) {
             value={question}
             onChange={(e) => setQuestion(e.target.value)}
             maxLength={500}
-            className='min-h-[80px] text-sm'
+            className='min-h-20 text-sm'
           />
           <div className='flex items-center justify-between'>
             <span className='text-xs text-muted-foreground'>

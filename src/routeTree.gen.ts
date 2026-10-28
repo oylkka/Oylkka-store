@@ -169,6 +169,13 @@ import { Route as ApiAdminReviewsListRouteImport } from './routes/api/admin/revi
 import { Route as ApiAdminSettingsListRouteImport } from './routes/api/admin/settings/list'
 import { Route as ApiAdminSettingsUpdateRouteImport } from './routes/api/admin/settings/update'
 import { Route as ApiAdminShopsShopIdRouteImport } from './routes/api/admin/shops/$shopId'
+import { Route as ApiChatAblyTokenRouteImport } from './routes/api/chat/ably/token'
+import { Route as ApiChatConversationsConversationIdRouteImport } from './routes/api/chat/conversations/$conversationId'
+import { Route as ApiChatConversationsCreateRouteImport } from './routes/api/chat/conversations/create'
+import { Route as ApiChatConversationsListRouteImport } from './routes/api/chat/conversations/list'
+import { Route as ApiChatConversationsUnreadRouteImport } from './routes/api/chat/conversations/unread'
+import { Route as ApiChatMessagesCreateRouteImport } from './routes/api/chat/messages/create'
+import { Route as ApiChatMessagesListRouteImport } from './routes/api/chat/messages/list'
 import { Route as ApiOrdersInvoiceInvoiceIdRouteImport } from './routes/api/orders/invoice/$invoiceId'
 import { Route as ApiReviewsMyIdRouteImport } from './routes/api/reviews/my/$id'
 import { Route as ApiReviewsMyListRouteImport } from './routes/api/reviews/my/list'
@@ -1052,6 +1059,45 @@ const ApiAdminShopsShopIdRoute = ApiAdminShopsShopIdRouteImport.update({
   path: '/api/admin/shops/$shopId',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiChatAblyTokenRoute = ApiChatAblyTokenRouteImport.update({
+  id: '/api/chat/ably/token',
+  path: '/api/chat/ably/token',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiChatConversationsConversationIdRoute =
+  ApiChatConversationsConversationIdRouteImport.update({
+    id: '/api/chat/conversations/$conversationId',
+    path: '/api/chat/conversations/$conversationId',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiChatConversationsCreateRoute =
+  ApiChatConversationsCreateRouteImport.update({
+    id: '/api/chat/conversations/create',
+    path: '/api/chat/conversations/create',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiChatConversationsListRoute =
+  ApiChatConversationsListRouteImport.update({
+    id: '/api/chat/conversations/list',
+    path: '/api/chat/conversations/list',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiChatConversationsUnreadRoute =
+  ApiChatConversationsUnreadRouteImport.update({
+    id: '/api/chat/conversations/unread',
+    path: '/api/chat/conversations/unread',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiChatMessagesCreateRoute = ApiChatMessagesCreateRouteImport.update({
+  id: '/api/chat/messages/create',
+  path: '/api/chat/messages/create',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiChatMessagesListRoute = ApiChatMessagesListRouteImport.update({
+  id: '/api/chat/messages/list',
+  path: '/api/chat/messages/list',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiOrdersInvoiceInvoiceIdRoute =
   ApiOrdersInvoiceInvoiceIdRouteImport.update({
     id: '/api/orders/invoice/$invoiceId',
@@ -1568,6 +1614,13 @@ export interface FileRoutesByFullPath {
   '/api/admin/settings/list': typeof ApiAdminSettingsListRoute
   '/api/admin/settings/update': typeof ApiAdminSettingsUpdateRoute
   '/api/admin/shops/$shopId': typeof ApiAdminShopsShopIdRoute
+  '/api/chat/ably/token': typeof ApiChatAblyTokenRoute
+  '/api/chat/conversations/$conversationId': typeof ApiChatConversationsConversationIdRoute
+  '/api/chat/conversations/create': typeof ApiChatConversationsCreateRoute
+  '/api/chat/conversations/list': typeof ApiChatConversationsListRoute
+  '/api/chat/conversations/unread': typeof ApiChatConversationsUnreadRoute
+  '/api/chat/messages/create': typeof ApiChatMessagesCreateRoute
+  '/api/chat/messages/list': typeof ApiChatMessagesListRoute
   '/api/orders/invoice/$invoiceId': typeof ApiOrdersInvoiceInvoiceIdRoute
   '/api/reviews/my/$id': typeof ApiReviewsMyIdRoute
   '/api/reviews/my/list': typeof ApiReviewsMyListRoute
@@ -1784,6 +1837,13 @@ export interface FileRoutesByTo {
   '/api/admin/settings/list': typeof ApiAdminSettingsListRoute
   '/api/admin/settings/update': typeof ApiAdminSettingsUpdateRoute
   '/api/admin/shops/$shopId': typeof ApiAdminShopsShopIdRoute
+  '/api/chat/ably/token': typeof ApiChatAblyTokenRoute
+  '/api/chat/conversations/$conversationId': typeof ApiChatConversationsConversationIdRoute
+  '/api/chat/conversations/create': typeof ApiChatConversationsCreateRoute
+  '/api/chat/conversations/list': typeof ApiChatConversationsListRoute
+  '/api/chat/conversations/unread': typeof ApiChatConversationsUnreadRoute
+  '/api/chat/messages/create': typeof ApiChatMessagesCreateRoute
+  '/api/chat/messages/list': typeof ApiChatMessagesListRoute
   '/api/orders/invoice/$invoiceId': typeof ApiOrdersInvoiceInvoiceIdRoute
   '/api/reviews/my/$id': typeof ApiReviewsMyIdRoute
   '/api/reviews/my/list': typeof ApiReviewsMyListRoute
@@ -2009,6 +2069,13 @@ export interface FileRoutesById {
   '/api/admin/settings/list': typeof ApiAdminSettingsListRoute
   '/api/admin/settings/update': typeof ApiAdminSettingsUpdateRoute
   '/api/admin/shops/$shopId': typeof ApiAdminShopsShopIdRoute
+  '/api/chat/ably/token': typeof ApiChatAblyTokenRoute
+  '/api/chat/conversations/$conversationId': typeof ApiChatConversationsConversationIdRoute
+  '/api/chat/conversations/create': typeof ApiChatConversationsCreateRoute
+  '/api/chat/conversations/list': typeof ApiChatConversationsListRoute
+  '/api/chat/conversations/unread': typeof ApiChatConversationsUnreadRoute
+  '/api/chat/messages/create': typeof ApiChatMessagesCreateRoute
+  '/api/chat/messages/list': typeof ApiChatMessagesListRoute
   '/api/orders/invoice/$invoiceId': typeof ApiOrdersInvoiceInvoiceIdRoute
   '/api/reviews/my/$id': typeof ApiReviewsMyIdRoute
   '/api/reviews/my/list': typeof ApiReviewsMyListRoute
@@ -2235,6 +2302,13 @@ export interface FileRouteTypes {
     | '/api/admin/settings/list'
     | '/api/admin/settings/update'
     | '/api/admin/shops/$shopId'
+    | '/api/chat/ably/token'
+    | '/api/chat/conversations/$conversationId'
+    | '/api/chat/conversations/create'
+    | '/api/chat/conversations/list'
+    | '/api/chat/conversations/unread'
+    | '/api/chat/messages/create'
+    | '/api/chat/messages/list'
     | '/api/orders/invoice/$invoiceId'
     | '/api/reviews/my/$id'
     | '/api/reviews/my/list'
@@ -2451,6 +2525,13 @@ export interface FileRouteTypes {
     | '/api/admin/settings/list'
     | '/api/admin/settings/update'
     | '/api/admin/shops/$shopId'
+    | '/api/chat/ably/token'
+    | '/api/chat/conversations/$conversationId'
+    | '/api/chat/conversations/create'
+    | '/api/chat/conversations/list'
+    | '/api/chat/conversations/unread'
+    | '/api/chat/messages/create'
+    | '/api/chat/messages/list'
     | '/api/orders/invoice/$invoiceId'
     | '/api/reviews/my/$id'
     | '/api/reviews/my/list'
@@ -2675,6 +2756,13 @@ export interface FileRouteTypes {
     | '/api/admin/settings/list'
     | '/api/admin/settings/update'
     | '/api/admin/shops/$shopId'
+    | '/api/chat/ably/token'
+    | '/api/chat/conversations/$conversationId'
+    | '/api/chat/conversations/create'
+    | '/api/chat/conversations/list'
+    | '/api/chat/conversations/unread'
+    | '/api/chat/messages/create'
+    | '/api/chat/messages/list'
     | '/api/orders/invoice/$invoiceId'
     | '/api/reviews/my/$id'
     | '/api/reviews/my/list'
@@ -2876,6 +2964,13 @@ export interface RootRouteChildren {
   ApiAdminSettingsListRoute: typeof ApiAdminSettingsListRoute
   ApiAdminSettingsUpdateRoute: typeof ApiAdminSettingsUpdateRoute
   ApiAdminShopsShopIdRoute: typeof ApiAdminShopsShopIdRoute
+  ApiChatAblyTokenRoute: typeof ApiChatAblyTokenRoute
+  ApiChatConversationsConversationIdRoute: typeof ApiChatConversationsConversationIdRoute
+  ApiChatConversationsCreateRoute: typeof ApiChatConversationsCreateRoute
+  ApiChatConversationsListRoute: typeof ApiChatConversationsListRoute
+  ApiChatConversationsUnreadRoute: typeof ApiChatConversationsUnreadRoute
+  ApiChatMessagesCreateRoute: typeof ApiChatMessagesCreateRoute
+  ApiChatMessagesListRoute: typeof ApiChatMessagesListRoute
   ApiOrdersInvoiceInvoiceIdRoute: typeof ApiOrdersInvoiceInvoiceIdRoute
   ApiReviewsMyIdRoute: typeof ApiReviewsMyIdRoute
   ApiReviewsMyListRoute: typeof ApiReviewsMyListRoute
@@ -4022,6 +4117,55 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiAdminShopsShopIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/chat/ably/token': {
+      id: '/api/chat/ably/token'
+      path: '/api/chat/ably/token'
+      fullPath: '/api/chat/ably/token'
+      preLoaderRoute: typeof ApiChatAblyTokenRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/chat/conversations/$conversationId': {
+      id: '/api/chat/conversations/$conversationId'
+      path: '/api/chat/conversations/$conversationId'
+      fullPath: '/api/chat/conversations/$conversationId'
+      preLoaderRoute: typeof ApiChatConversationsConversationIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/chat/conversations/create': {
+      id: '/api/chat/conversations/create'
+      path: '/api/chat/conversations/create'
+      fullPath: '/api/chat/conversations/create'
+      preLoaderRoute: typeof ApiChatConversationsCreateRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/chat/conversations/list': {
+      id: '/api/chat/conversations/list'
+      path: '/api/chat/conversations/list'
+      fullPath: '/api/chat/conversations/list'
+      preLoaderRoute: typeof ApiChatConversationsListRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/chat/conversations/unread': {
+      id: '/api/chat/conversations/unread'
+      path: '/api/chat/conversations/unread'
+      fullPath: '/api/chat/conversations/unread'
+      preLoaderRoute: typeof ApiChatConversationsUnreadRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/chat/messages/create': {
+      id: '/api/chat/messages/create'
+      path: '/api/chat/messages/create'
+      fullPath: '/api/chat/messages/create'
+      preLoaderRoute: typeof ApiChatMessagesCreateRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/chat/messages/list': {
+      id: '/api/chat/messages/list'
+      path: '/api/chat/messages/list'
+      fullPath: '/api/chat/messages/list'
+      preLoaderRoute: typeof ApiChatMessagesListRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/orders/invoice/$invoiceId': {
       id: '/api/orders/invoice/$invoiceId'
       path: '/api/orders/invoice/$invoiceId'
@@ -4834,6 +4978,14 @@ const rootRouteChildren: RootRouteChildren = {
   ApiAdminSettingsListRoute: ApiAdminSettingsListRoute,
   ApiAdminSettingsUpdateRoute: ApiAdminSettingsUpdateRoute,
   ApiAdminShopsShopIdRoute: ApiAdminShopsShopIdRoute,
+  ApiChatAblyTokenRoute: ApiChatAblyTokenRoute,
+  ApiChatConversationsConversationIdRoute:
+    ApiChatConversationsConversationIdRoute,
+  ApiChatConversationsCreateRoute: ApiChatConversationsCreateRoute,
+  ApiChatConversationsListRoute: ApiChatConversationsListRoute,
+  ApiChatConversationsUnreadRoute: ApiChatConversationsUnreadRoute,
+  ApiChatMessagesCreateRoute: ApiChatMessagesCreateRoute,
+  ApiChatMessagesListRoute: ApiChatMessagesListRoute,
   ApiOrdersInvoiceInvoiceIdRoute: ApiOrdersInvoiceInvoiceIdRoute,
   ApiReviewsMyIdRoute: ApiReviewsMyIdRoute,
   ApiReviewsMyListRoute: ApiReviewsMyListRoute,

@@ -361,7 +361,7 @@ function RouteComponent() {
               </form>
 
               <div className='bg-muted relative hidden md:block overflow-hidden'>
-                <div className='absolute inset-0 h-full w-full bg-gradient-to-br from-primary/20 via-primary/5 to-background dark:from-primary/10 dark:via-primary/5 dark:to-background' />
+                <div className='absolute inset-0 h-full w-full bg-linear-to-br from-primary/20 via-primary/5 to-background dark:from-primary/10 dark:via-primary/5 dark:to-background' />
               </div>
             </CardContent>
           </Card>

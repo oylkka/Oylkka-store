@@ -15,8 +15,8 @@ model Conversation {
   updatedAt     DateTime           @updatedAt
   messages      Message[]
 
-  @@index([customerId])
-  @@index([shopId])
+  @@index([customerId, lastMessageAt])
+  @@index([shopId, lastMessageAt])
   @@index([status])
   @@map("conversations")
 }
@@ -33,7 +33,7 @@ model Message {
   isRead         Boolean      @default(false)
   createdAt      DateTime     @default(now())
 
-  @@index([conversationId])
+  @@index([conversationId, createdAt])
   @@index([senderId])
   @@map("messages")
 }
