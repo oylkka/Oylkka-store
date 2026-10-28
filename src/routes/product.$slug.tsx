@@ -65,7 +65,6 @@ import {
   FieldGroup,
   FieldLabel,
 } from '@/components/ui/field';
-import { Input } from '@/components/ui/input';
 import { Separator } from '@/components/ui/separator';
 import { Skeleton } from '@/components/ui/skeleton';
 import { RETURN_WINDOW_DAYS } from '@/lib/constants';
@@ -73,6 +72,7 @@ import { trackProductView } from '@/lib/recently-viewed';
 import { getSiteUrl, siteAsset } from '@/lib/site-url';
 import { cn } from '@/lib/utils';
 import { useAddToCartMutation } from '@/services/cart';
+import { useCreateConversationMutation } from '@/services/conversations';
 import { usePublicProduct } from '@/services/product';
 import { usePublicSettings } from '@/services/public-settings';
 import {
@@ -717,6 +717,7 @@ function RouteComponent() {
                     shopId={product.shop.id}
                     shopName={product.shop.name}
                     productId={product.id}
+                    productName={product.productName}
                   />
                 </div>
               </motion.div>
@@ -783,25 +784,41 @@ function RouteComponent() {
   );
 }
 
+// Phase 6: replacement for `ContactVendorDialog` at the bottom of src/routes/product.$slug.tsx
+//
+// 1. Add this import near your other service imports:
+//      import { useCreateConversationMutation } from '@/services/conversations';
+// 2. Replace the whole existing ContactVendorDialog function with the one below.
+// 3. Pass the product name where the dialog is used:
+//      <ContactVendorDialog
+//        shopId={product.shop.id}
+//        shopName={product.shop.name}
+//        productId={product.id}
+//        productName={product.productName}
+//      />
+// 4. `FieldError`, `Input` and `Field`/`FieldLabel` are still used elsewhere in your
+//    imports? If `Input` is no longer used in this file, remove its import.
+
 function ContactVendorDialog({
   shopId,
   shopName,
   productId,
+  productName,
 }: {
   shopId: string;
   shopName: string;
   productId?: string;
+  productName: string;
 }) {
   const { user } = Route.useRouteContext();
   const navigate = useNavigate();
-  const [subject, setSubject] = useState('');
+  const createConversation = useCreateConversationMutation();
   const [message, setMessage] = useState('');
-  const [isSending, setIsSending] = useState(false);
   const [open, setOpen] = useState(false);
 
-  async function handleSend() {
-    if (!subject.trim() || !message.trim()) {
-      toast.error('Please fill in both subject and message');
+  function handleSend() {
+    if (!message.trim()) {
+      toast.error('Please write a message');
       return;
     }
 
@@ -810,39 +827,28 @@ function ContactVendorDialog({
       return;
     }
 
-    setIsSending(true);
-    try {
-      const response = await fetch('/api/conversations/create', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          shopId,
-          subject: subject.trim(),
-          message: message.trim(),
-          productId: productId || undefined,
-        }),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        toast.error(data.error || 'Failed to send message');
-        return;
-      }
-
-      toast.success('Message sent!');
-      setOpen(false);
-      setSubject('');
-      setMessage('');
-      navigate({
-        to: '/messages',
-        params: { id: data.conversation.id },
-      });
-    } catch {
-      toast.error('Something went wrong. Please try again.');
-    } finally {
-      setIsSending(false);
-    }
+    // Failures (inactive shop, messaging your own shop, rate limit...) are
+    // toasted by the mutation hook, so there is no catch block here.
+    createConversation.mutate(
+      {
+        shopId,
+        productId: productId ?? null,
+        // The API requires a subject, so we generate one instead of asking
+        subject: `Question about ${productName}`.slice(0, 200),
+        message: message.trim(),
+      },
+      {
+        onSuccess: ({ conversation }) => {
+          toast.success('Message sent!');
+          setOpen(false);
+          setMessage('');
+          navigate({
+            to: '/messages',
+            search: { conversation: conversation.id },
+          });
+        },
+      },
+    );
   }
 
   return (
@@ -862,19 +868,6 @@ function ContactVendorDialog({
         </DialogHeader>
         <FieldGroup>
           <Field>
-            <FieldLabel htmlFor='subject'>Subject</FieldLabel>
-            <Input
-              id='subject'
-              value={subject}
-              onChange={(e) => setSubject(e.target.value)}
-              placeholder='e.g. Question about product'
-              maxLength={200}
-            />
-            {subject.length > 180 && (
-              <FieldError>Maximum 200 characters</FieldError>
-            )}
-          </Field>
-          <Field>
             <FieldLabel htmlFor='message'>Message</FieldLabel>
             <textarea
               id='message'
@@ -893,10 +886,10 @@ function ContactVendorDialog({
         <DialogFooter>
           <Button
             onClick={handleSend}
-            disabled={isSending || !subject.trim() || !message.trim()}
+            disabled={createConversation.isPending || !message.trim()}
             className='gap-2'
           >
-            {isSending ? (
+            {createConversation.isPending ? (
               <Loader2 className='h-4 w-4 animate-spin' />
             ) : (
               <Send className='h-4 w-4' />
