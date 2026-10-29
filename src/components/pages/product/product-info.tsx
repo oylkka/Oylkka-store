@@ -111,13 +111,6 @@ export function ProductInfo({
       {/* ── Stock status ── */}
       <StockStatus stock={product.stock} lowStockThreshold={5} />
 
-      {/* ── Condition description ── */}
-      {product.conditionDescription && (
-        <p className='text-sm text-muted-foreground leading-relaxed border-t border-border pt-4'>
-          {product.conditionDescription}
-        </p>
-      )}
-
       {/* ── Sold by ── */}
       {product.shop && (
         <div className='flex items-center gap-2 border-t border-border pt-4'>
